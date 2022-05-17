@@ -1,0 +1,63 @@
+﻿@using MediatR;
+@using NursesSheduler.Application.Nurses.Queries.GetAllNurses
+@inject IMediator mediatr;
+
+@if (Nurses == null)
+{
+    <div class="is-loading"></div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Surname</th>
+                <th>Name</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var nurse in Nurses)
+            {
+                <tr>
+                    <td>@nurse.Surname</td>
+                    <td>@nurse.Name</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<NurseViewModel> Nurses { get; set; }
+
+    private class NurseViewModel
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
+    }
+
+    protected async override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var request = new GetAllNursesRequest();
+
+        var response = await mediatr.Send(request);
+
+        Nurses = new List<NurseViewModel>();
+        foreach(var nurse in response)
+        {
+            Nurses.Add(new NurseViewModel
+            {
+                Name = nurse.Name,
+                Surname = nurse.Surname
+            });
+        }
+    }
+}
