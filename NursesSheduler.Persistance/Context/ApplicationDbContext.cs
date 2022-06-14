@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NursesSheduler.Domain.Entities;
-using NursesSheduler.Persistance.Configuration;
-using NursesSheduler.Persistance.Interfaces;
+using NursesScheduler.Domain.Entities;
+using NursesScheduler.Persistance.Configuration;
+using NursesScheduler.Persistance.Interfaces;
 
-namespace NursesSheduler.Persistance.Context
+namespace NursesScheduler.Persistance.Context
 {
-    internal class ApplicationDbContext : DbContext, IApplicationDbContext
+    public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         public DbSet<Nurse> Nurses { get; set; }
         public DbSet<Departament> Departaments { get; set; }
-
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 

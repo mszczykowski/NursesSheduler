@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using NursesSheduler.BlazorShared.Data;
-using NursesSheduler.Persistance;
+using NursesScheduler.BlazorShared.Data;
+using NursesScheduler.BusinessLogic;
+using NursesScheduler.Persistance;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddPersistenceLayer();
+builder.Services.AddBusinessLogicLayer();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

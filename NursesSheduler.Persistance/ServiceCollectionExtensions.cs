@@ -1,15 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NursesSheduler.Persistance.Context;
+using NursesScheduler.Persistance.Context;
 using Microsoft.EntityFrameworkCore;
-using NursesSheduler.Persistance.Interfaces;
+using NursesScheduler.Persistance.Interfaces;
+using System.Security;
 
-namespace NursesSheduler.Persistance
+namespace NursesScheduler.Persistance
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddPersistenceLayer(this IServiceCollection services)
+        public static void AddPersistenceLayer(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=Scheduler.db"));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
            
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
         }

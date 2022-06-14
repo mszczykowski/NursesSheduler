@@ -1,4 +1,4 @@
-namespace NursesSheduler.BlazorShared.Data
+namespace NursesScheduler.BlazorShared.Data
 {
     public class WeatherForecastService
     {

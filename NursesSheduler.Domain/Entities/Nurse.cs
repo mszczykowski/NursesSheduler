@@ -1,6 +1,6 @@
-﻿using NursesSheduler.Domain.Common;
+﻿using NursesScheduler.Domain.Interfaces;
 
-namespace NursesSheduler.Domain.Entities
+namespace NursesScheduler.Domain.Entities
 {
     public class Nurse : ISoftDelete
     {

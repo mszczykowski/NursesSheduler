@@ -1,15 +1,16 @@
-﻿<Window x:Class="NursesSheduler.WPF.MainWindow"
+﻿<Window x:Class="NursesScheduler.WPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:NursesSheduler.WPF"
+        xmlns:local="clr-namespace:NursesScheduler.WPF"
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-        xmlns:shared="clr-namespace:NursesSheduler.BlazorShared;assembly=NursesSheduler.BlazorShared"
+        xmlns:shared="clr-namespace:NursesScheduler.BlazorShared;assembly=NursesScheduler.BlazorShared"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
-        <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{StaticResource services}">
+        <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{Binding Services}">
             <blazor:BlazorWebView.RootComponents>
                 <blazor:RootComponent Selector="#app" ComponentType="{x:Type shared:App}" />
             </blazor:BlazorWebView.RootComponents>

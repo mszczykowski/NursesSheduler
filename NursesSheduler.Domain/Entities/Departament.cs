@@ -1,4 +1,4 @@
-﻿namespace NursesSheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.Entities
 {
     public class Departament
     {

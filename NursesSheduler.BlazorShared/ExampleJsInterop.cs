@@ -1,6 +1,6 @@
 using Microsoft.JSInterop;
 
-namespace NursesSheduler.BlazorShared
+namespace NursesScheduler.BlazorShared
 {
     // This class provides an example of how JavaScript functionality can be wrapped
     // in a .NET class for easy consumption. The associated JavaScript module is
@@ -16,7 +16,7 @@ namespace NursesSheduler.BlazorShared
         public ExampleJsInterop(IJSRuntime jsRuntime)
         {
             moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-               "import", "./_content/NursesSheduler.BlazorShared/exampleJsInterop.js").AsTask());
+               "import", "./_content/NursesScheduler.BlazorShared/exampleJsInterop.js").AsTask());
         }
 
         public async ValueTask<string> Prompt(string message)
