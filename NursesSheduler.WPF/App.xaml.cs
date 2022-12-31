@@ -6,7 +6,7 @@ using NursesScheduler.WPF.ViewModels;
 using System;
 using System.Threading;
 using NursesScheduler.WPF.Services.Interfaces;
-using NursesScheduler.WPF.Services.Implementations;
+using NursesScheduler.WPF.Services.Implementation;
 
 namespace NursesScheduler.WPF
 {

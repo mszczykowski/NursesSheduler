@@ -1,21 +1,19 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using NursesScheduler.Persistance.Context;
+using NursesScheduler.Infrastructure.Context;
 using NursesScheduler.WPF.Services.Interfaces;
-using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace NursesScheduler.WPF.Services.Implementations
+namespace NursesScheduler.WPF.Services.Implementation
 {
     internal class DatabaseService : IDatabaseService
     {
         private readonly string dbLocation;
         public DatabaseService()
         {
-            var configuration = ConfigurationManager.AppSettings;
-            dbLocation = configuration["dbFileLocation"];
+            dbLocation = ConfigurationManager.AppSettings["dbFileLocation"];
         }
 
         public Task ChangeDbPassword(string oldPassword, string newPassword)

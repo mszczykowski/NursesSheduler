@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
-    <ProjectReference Include="..\NursesSheduler.Persistance\NursesScheduler.Persistance.csproj" />
+    <ProjectReference Include="..\NursesSheduler.Persistance\NursesScheduler.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

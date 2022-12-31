@@ -2,7 +2,7 @@
 using NursesScheduler.WPF.Services.Interfaces;
 using System.Threading.Tasks;
 
-namespace NursesScheduler.WPF.Services.Implementations
+namespace NursesScheduler.WPF.Services.Implementation
 {
     internal class PasswordService : IPasswordService
     {

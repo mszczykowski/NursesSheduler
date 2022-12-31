@@ -3,7 +3,7 @@ using NursesScheduler.WPF.Stores;
 using NursesScheduler.WPF.ViewModels;
 using System;
 
-namespace NursesScheduler.WPF.Services.Implementations
+namespace NursesScheduler.WPF.Services.Implementation
 {
     internal class NavigationService<TViewModel> : INavigationService where TViewModel : ViewModelBase
     {

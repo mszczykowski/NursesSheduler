@@ -32,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controls\Departaments\" />
+    <Folder Include="Controls\Settings\" />
+    <Folder Include="Controls\Schdules\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 

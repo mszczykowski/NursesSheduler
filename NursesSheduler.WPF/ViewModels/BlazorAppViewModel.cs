@@ -1,15 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NursesScheduler.BlazorShared.Data;
 using NursesScheduler.BusinessLogic;
-using NursesScheduler.Persistance;
+using NursesScheduler.Infrastructure;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NursesScheduler.WPF.ViewModels
 {
@@ -27,7 +21,7 @@ namespace NursesScheduler.WPF.ViewModels
                 services.AddBlazorWebView();
                 services.AddSingleton<WeatherForecastService>();
                 services.AddBusinessLogicLayer();
-                services.AddPersistenceLayer(connectionString);
+                services.AddInfrastructureLayer(connectionString);
             }).Build();
 
             _host.Start();

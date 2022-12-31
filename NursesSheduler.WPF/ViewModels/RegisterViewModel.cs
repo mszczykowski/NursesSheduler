@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.WPF.Commands;
 using NursesScheduler.WPF.Commands.Common;
-using NursesScheduler.WPF.Services.Implementations;
+using NursesScheduler.WPF.Services.Implementation;
 using NursesScheduler.WPF.Services.Interfaces;
 using System;
 using System.Collections;

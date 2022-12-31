@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.Domain.Entities
 {
-    public class Nurse : ISoftDelete
+    public sealed class Nurse : ISoftDelete
     {
         public int Id { get; set; }
         public string Name { get; set; }

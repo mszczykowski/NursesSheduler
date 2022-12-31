@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NursesScheduler.Persistance.Configuration
+namespace NursesScheduler.Infrastructure.Configuration
 {
     internal class DepartamentConfiguration : IEntityTypeConfiguration<Departament>
     {

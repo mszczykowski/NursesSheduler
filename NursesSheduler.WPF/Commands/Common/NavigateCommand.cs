@@ -1,4 +1,4 @@
-﻿using NursesScheduler.WPF.Services.Implementations;
+﻿using NursesScheduler.WPF.Services.Implementation;
 using NursesScheduler.WPF.ViewModels;
 
 namespace NursesScheduler.WPF.Commands.Common

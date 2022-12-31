@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.Persistance.Interfaces
+namespace NursesScheduler.Infrastructure.Interfaces
 {
     public interface IApplicationDbContext
     {

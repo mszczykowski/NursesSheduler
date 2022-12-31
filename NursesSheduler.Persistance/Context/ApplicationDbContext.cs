@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Persistance.Configuration;
-using NursesScheduler.Persistance.Interfaces;
+using NursesScheduler.Infrastructure.Configuration;
+using NursesScheduler.Infrastructure.Interfaces;
 
-namespace NursesScheduler.Persistance.Context
+namespace NursesScheduler.Infrastructure.Context
 {
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
