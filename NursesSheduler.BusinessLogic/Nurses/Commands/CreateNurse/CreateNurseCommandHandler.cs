@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using MediatR;
+using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

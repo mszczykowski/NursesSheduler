@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj" />
     <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
   </ItemGroup>
 

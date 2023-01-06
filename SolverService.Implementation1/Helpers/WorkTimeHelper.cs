@@ -1,12 +1,12 @@
-﻿using SheduleSolver.Domain.Enums;
-using SheduleSolver.Domain.Models;
-using SheduleSolver.Domain.Models.Calendar;
-using SolverService.Interfaces.Services;
-using SolverService.Interfaces.StateManagers;
+﻿using ScheduleSolver.Domain.Enums;
+using ScheduleSolver.Domain.Models;
+using ScheduleSolver.Domain.Models.Calendar;
+using ScheduleSolver.Interfaces.Helpers;
+using ScheduleSolver.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.Services
+namespace ScheduleSolver.Implementation.Helpers
 {
-    internal sealed class WorkTimeService : IWorkTimeService
+    internal sealed class WorkTimeHelper : IWorkTimeHelper
     {
         private readonly Quarter _currentQuarter;
         private readonly Month _currentMonth;
@@ -17,7 +17,7 @@ namespace SolverService.Implementation.Services
         private int[,] shortShiftsCapacities;
 
 
-        public WorkTimeService(Quarter quarter, int currentMonthIndex, WorkTimeConfiguration workTimeConfiguration)
+        public WorkTimeHelper(Quarter quarter, int currentMonthIndex, WorkTimeConfiguration workTimeConfiguration)
         {
             _currentQuarter = quarter;
             _currentMonth = _currentQuarter.Months[currentMonthIndex];

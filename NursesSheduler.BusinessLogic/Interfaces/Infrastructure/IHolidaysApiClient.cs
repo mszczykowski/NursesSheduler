@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.Domain.Entities.Calendar;
 
-namespace NursesScheduler.Infrastructure.Interfaces
+namespace NursesScheduler.BusinessLogic.Interfaces.Infrastructure
 {
     public interface IHolidaysApiClient
     {

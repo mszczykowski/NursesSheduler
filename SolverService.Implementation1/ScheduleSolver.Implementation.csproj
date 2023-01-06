@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\SheduleSolver\Algorithm.Interfaces\ScheduleSolver.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>

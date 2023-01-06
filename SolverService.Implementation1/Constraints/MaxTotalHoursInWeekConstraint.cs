@@ -1,9 +1,9 @@
-﻿using SheduleSolver.Domain.Models;
+﻿using ScheduleSolver.Interfaces.Constraints;
+using ScheduleSolver.Interfaces.StateManagers;
+using SheduleSolver.Domain.Models;
 using SheduleSolver.Domain.Models.Calendar;
-using SolverService.Interfaces.Constraints;
-using SolverService.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.Constraints
+namespace ScheduleSolver.Implementation.Constraints
 {
     internal sealed class MaxTotalHoursInWeekConstraint : IConstraint
     {

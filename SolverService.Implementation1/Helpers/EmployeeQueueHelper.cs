@@ -1,13 +1,12 @@
-﻿using SheduleSolver.Domain.Enums;
-using SheduleSolver.Implementation.Builders;
-using SheduleSolver.Implementation.StateManagers;
-using SolverService.Interfaces.Builders;
-using SolverService.Interfaces.Services;
-using SolverService.Interfaces.StateManagers;
+﻿using ScheduleSolver.Domain.Enums;
+using ScheduleSolver.Implementation.Builders;
+using ScheduleSolver.Interfaces.Builders;
+using ScheduleSolver.Interfaces.Helpers;
+using ScheduleSolver.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.Services
+namespace ScheduleSolver.Implementation.Helpers
 {
-    internal sealed class EmployeeManagerService : IEmployeeManagerService
+    internal sealed class EmployeeQueueHelper : IEmployeeQueueHelper
     {
         private IEmployeeQueueBuilder queueBuilder;
         public Queue<int> GetSortedEmployeeQueue(ShiftType shitType, bool isHolidayShift,

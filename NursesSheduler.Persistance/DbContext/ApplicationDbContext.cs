@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Infrastructure.Configuration;
-using NursesScheduler.Infrastructure.Interfaces;
 
 namespace NursesScheduler.Infrastructure.Context
 {

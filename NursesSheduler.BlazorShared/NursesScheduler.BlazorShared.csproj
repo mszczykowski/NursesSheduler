@@ -7,6 +7,10 @@
 	  <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\css\bootstrap.css" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
@@ -34,8 +38,19 @@
   <ItemGroup>
     <Folder Include="Controls\Departaments\" />
     <Folder Include="Controls\Settings\" />
-    <Folder Include="Controls\Schdules\" />
     <Folder Include="ViewModels\" />
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
+    <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="wwwroot\css\bootstrap.css" />
   </ItemGroup>
 
 </Project>

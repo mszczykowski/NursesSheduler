@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NursesScheduler.Infrastructure.Interfaces;
+using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;

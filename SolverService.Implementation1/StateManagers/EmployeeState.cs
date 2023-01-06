@@ -1,8 +1,8 @@
-﻿using SheduleSolver.Domain.Enums;
+﻿using ScheduleSolver.Interfaces.StateManagers;
+using SheduleSolver.Domain.Enums;
 using SheduleSolver.Domain.Models;
-using SolverService.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.StateManagers
+namespace ScheduleSolver.Implementation.StateManagers
 {
     public sealed class EmployeeState : IEmployeeState
     {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NursesScheduler.BlazorShared.Data;
 using NursesScheduler.BusinessLogic;
 using NursesScheduler.Infrastructure;
 using System;
@@ -19,7 +18,6 @@ namespace NursesScheduler.WPF.ViewModels
             _host = Host.CreateDefaultBuilder().ConfigureServices(services =>
             {
                 services.AddBlazorWebView();
-                services.AddSingleton<WeatherForecastService>();
                 services.AddBusinessLogicLayer();
                 services.AddInfrastructureLayer(connectionString);
             }).Build();

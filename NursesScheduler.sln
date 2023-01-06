@@ -21,15 +21,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClientApp", "ClientApp", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolverService", "SolverService", "{729E40D5-8D1D-4BE9-8E35-F774EFB986E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverService.TestApplication", "..\SheduleSolver\Algorithm\SolverService.TestApplication.csproj", "{FAC1115C-B560-425D-ACE1-C50A5A674E39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.TestApplication", "..\SheduleSolver\Algorithm\ScheduleSolver.TestApplication.csproj", "{FAC1115C-B560-425D-ACE1-C50A5A674E39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverService.Interfaces", "..\SheduleSolver\Algorithm.Interfaces\SolverService.Interfaces.csproj", "{9B443A78-3669-4BEB-8517-ED8C625C40C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Interfaces", "..\SheduleSolver\Algorithm.Interfaces\ScheduleSolver.Interfaces.csproj", "{9B443A78-3669-4BEB-8517-ED8C625C40C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverService.ServiceDefinition", "..\SheduleSolver\Algorithm.ServiceDefinition\SolverService.ServiceDefinition.csproj", "{4505F68A-43C7-4006-8DFA-DEA27E073E5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Service", "..\SheduleSolver\Algorithm.ServiceDefinition\ScheduleSolver.Service.csproj", "{4505F68A-43C7-4006-8DFA-DEA27E073E5B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverService.Domain", "..\SheduleSolver\Domain\SolverService.Domain.csproj", "{0A398641-B98B-489E-9787-EAE6B5027BF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Domain", "..\SheduleSolver\Domain\ScheduleSolver.Domain.csproj", "{0A398641-B98B-489E-9787-EAE6B5027BF7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolverService.Implementation", "SolverService.Implementation1\SolverService.Implementation.csproj", "{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Implementation", "SolverService.Implementation1\ScheduleSolver.Implementation.csproj", "{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9B443A78-3669-4BEB-8517-ED8C625C40C0} = {9B443A78-3669-4BEB-8517-ED8C625C40C0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

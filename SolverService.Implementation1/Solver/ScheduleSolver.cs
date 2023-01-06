@@ -1,22 +1,22 @@
-﻿using SheduleSolver.Domain.Enums;
-using SheduleSolver.Domain.Models;
-using SheduleSolver.Domain.Models.Calendar;
-using SheduleSolver.Implementation.Constraints;
-using SheduleSolver.Implementation.Services;
-using SheduleSolver.Implementation.StateManagers;
-using SolverService.Interfaces.Constraints;
-using SolverService.Interfaces.StateManagers;
-using SolverService.Interfaces.Services;
+﻿using ScheduleSolver.Domain.Enums;
+using ScheduleSolver.Domain.Models;
+using ScheduleSolver.Domain.Models.Calendar;
+using ScheduleSolver.Implementation.Constraints;
+using ScheduleSolver.Implementation.Helpers;
+using ScheduleSolver.Implementation.StateManagers;
+using ScheduleSolver.Interfaces.Constraints;
+using ScheduleSolver.Interfaces.Helpers;
+using ScheduleSolver.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.Solver
+namespace ScheduleSolver.Implementation.Solver
 {
     internal sealed class ScheduleSolver
     {
         private List<IEmployeeState> _employees;
         private Quarter _quarter;
         private Month _month;
-        private IWorkTimeService _workTimeService;
-        private IEmployeeManagerService _employeeManagerService;
+        private IWorkTimeHelper _workTimeHelper;
+        private IEmployeeQueueHelper _employeeQueueHelper;
         private List<IConstraint> _constraints;
         private int currentEmployeeId;
         private IEmployeeState currentEmployee;
@@ -30,12 +30,12 @@ namespace SolverService.Implementation.Solver
             _quarter = quarter;
             _month = _quarter.Months[0];
 
-            _employeeManagerService = new EmployeeManagerService();
+            _employeeQueueHelper = new EmployeeQueueHelper();
             _workTimeConfiguration = new WorkTimeConfiguration();
 
             random = new Random();
 
-            _workTimeService = new WorkTimeService(_quarter, 0, _workTimeConfiguration);
+            _workTimeHelper = new WorkTimeHelper(_quarter, 0, _workTimeConfiguration);
 
             _constraints = new List<IConstraint>
             {
@@ -44,14 +44,14 @@ namespace SolverService.Implementation.Solver
                 new MaxTotalHoursInWeekConstraint(),
             };
 
-            _workTimeService.InitialiseShortShifts();
+            _workTimeHelper.InitialiseShortShifts();
         }
 
         public ISolverState Run()
         {
-            _workTimeService.InitialiseEmployeeTimeToAssign(_employees);
+            _workTimeHelper.InitialiseEmployeeTimeToAssign(_employees);
 
-            _workTimeService.InitialiseShiftCapacities(_employees, random);
+            _workTimeHelper.InitialiseShiftCapacities(_employees, random);
 
             var initialState = new SolverState(_employees, _quarter.Months[0].Days.Length,
                 _workTimeConfiguration.ShiftDetails.Count);
@@ -69,13 +69,13 @@ namespace SolverService.Implementation.Solver
 
             if (previousState.EmployeesToAssignForCurrentShift == 0 && previousState.ShortShiftsToAssign == 0)
             {
-                previousState.EmployeesToAssignForCurrentShift = _workTimeService
+                previousState.EmployeesToAssignForCurrentShift = _workTimeHelper
                     .GetNumberOfNursesForShift((ShiftType)previousState.CurrentShift, previousState.CurrentDay);
-                previousState.ShortShiftsToAssign = _workTimeService
+                previousState.ShortShiftsToAssign = _workTimeHelper
                     .GetNumberOfShortShifts((ShiftType)previousState.CurrentShift, previousState.CurrentDay);
-                currentQueue = _employeeManagerService
+                currentQueue = _employeeQueueHelper
                     .GetSortedEmployeeQueue((ShiftType)previousState.CurrentShift,
-                    _workTimeService.IsHoliday(_month.Days[previousState.CurrentDay - 1]),
+                    _workTimeHelper.IsHoliday(_month.Days[previousState.CurrentDay - 1]),
                     previousState.GetPreviousDayShift(),
                     previousState.Employees.ToList(),
                     previousState.CurrentDay,
@@ -101,7 +101,7 @@ namespace SolverService.Implementation.Solver
                         continue;
 
                     currentState.AssignEmployee(currentEmployee,
-                        _workTimeService.IsHoliday(_month.Days[currentState.CurrentDay - 1]),
+                        _workTimeHelper.IsHoliday(_month.Days[currentState.CurrentDay - 1]),
                         _workTimeConfiguration, _month.Days[currentState.CurrentDay - 1].WeekInQuarter);
                 }
                 else
@@ -147,6 +147,7 @@ namespace SolverService.Implementation.Solver
 
         private void AssignShiftsForPTO(ISolverState initialState, IEmployeeState employee)
         {
+            throw new NotImplementedException();
             int ptoStart;
             int ptoEnd;
             for (int i = 0; i < _month.Days.Length; i++)
