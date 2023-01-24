@@ -18,8 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Departaments\Commands\" />
-    <Folder Include="Departaments\Queries\" />
+    <Folder Include="Departaments\Commands\EditDepartament\" />
+    <Folder Include="Departaments\Commands\DeleteDepartament\" />
+    <Folder Include="Departaments\Commands\SetDepartamentAsDefault\" />
+    <Folder Include="Nurses\Commands\CreateNurse\" />
   </ItemGroup>
 
   <ItemGroup>

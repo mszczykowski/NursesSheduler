@@ -2,11 +2,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NursesScheduler.BusinessLogic.Nurses.Queries.GetAllNurses
 {

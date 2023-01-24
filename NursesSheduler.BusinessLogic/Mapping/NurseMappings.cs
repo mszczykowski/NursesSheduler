@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
-using NursesScheduler.BusinessLogic.Nurses.Commands.CreateNurse;
+using NursesScheduler.BusinessLogic.Departaments.Commands.CreateDepartament;
 using NursesScheduler.BusinessLogic.Nurses.Queries.GetAllNurses;
 using NursesScheduler.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {
@@ -14,11 +9,10 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public NurseMappings()
         {
-            CreateMap<Nurse, CreateNurseRequest>()
+            CreateMap<Nurse, CreateDepartamentRequest>()
                 .ReverseMap();
-            CreateMap<Nurse, CreateNurseResponse>()
+            CreateMap<Nurse, CreateDepartamentResponse>()
                 .ReverseMap();
-
             CreateMap<Nurse, GetAllNursesResponse>()
                 .ReverseMap();
         }

@@ -7,7 +7,7 @@ using NursesScheduler.Infrastructure.Context;
 
 #nullable disable
 
-namespace NursesScheduler.Persistance.Migrations
+namespace NursesScheduler.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -21,6 +21,9 @@ namespace NursesScheduler.Persistance.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")

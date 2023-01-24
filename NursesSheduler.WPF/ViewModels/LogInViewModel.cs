@@ -58,6 +58,10 @@ namespace NursesScheduler.WPF.ViewModels
             _errorsViewModel = new ErrorsViewModel();
 
             _errorsViewModel.ErrorsChanged += ErrorsViewModel_ErrorsChanged;
+
+
+            //test
+            Password = "test";
         }
 
         private readonly ErrorsViewModel _errorsViewModel;

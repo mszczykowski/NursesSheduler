@@ -8,10 +8,10 @@ using NursesScheduler.Infrastructure.Context;
 
 #nullable disable
 
-namespace NursesScheduler.Persistance.Migrations
+namespace NursesScheduler.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220517080756_initial-schema")]
+    [Migration("20230108173112_initial-schema")]
     partial class initialschema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,9 @@ namespace NursesScheduler.Persistance.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")

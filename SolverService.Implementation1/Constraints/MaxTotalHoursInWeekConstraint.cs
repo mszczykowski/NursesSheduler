@@ -1,7 +1,7 @@
-﻿using ScheduleSolver.Interfaces.Constraints;
+﻿using ScheduleSolver.Domain.Models;
+using ScheduleSolver.Domain.Models.Calendar;
+using ScheduleSolver.Interfaces.Constraints;
 using ScheduleSolver.Interfaces.StateManagers;
-using SheduleSolver.Domain.Models;
-using SheduleSolver.Domain.Models.Calendar;
 
 namespace ScheduleSolver.Implementation.Constraints
 {

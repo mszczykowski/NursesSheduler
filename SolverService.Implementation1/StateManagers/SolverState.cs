@@ -1,7 +1,7 @@
-﻿using ScheduleSolver.Interfaces.StateManagers;
-using SheduleSolver.Domain.Enums;
-using SheduleSolver.Domain.Models;
-using SheduleSolver.Domain.Models.Calendar;
+﻿using ScheduleSolver.Domain.Enums;
+using ScheduleSolver.Domain.Models;
+using ScheduleSolver.Domain.Models.Calendar;
+using ScheduleSolver.Interfaces.StateManagers;
 
 namespace ScheduleSolver.Implementation.StateManagers
 {

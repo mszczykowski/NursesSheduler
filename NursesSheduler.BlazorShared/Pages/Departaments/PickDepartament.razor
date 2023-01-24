@@ -1,0 +1,51 @@
+﻿@page "/departaments"
+
+@using NursesScheduler.BlazorShared.ViewModels
+@using MediatR;
+@using AutoMapper;
+@using NursesScheduler.BusinessLogic.Departaments.Queries.GetAllDepartaments
+@using NursesScheduler.BusinessLogic.Interfaces.Infrastructure
+@inject IMediator mediatr;
+@inject IMapper mapper;
+
+@if (Departaments == null)
+{
+    <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <h3>Wybierz oddział</h3>
+        </div>
+        <div class="col float-right">
+            <a type="button" class="btn btn-primary" href="/departaments/add">Dodaj nowy oddział</a>
+        </div>
+    </div>
+
+    <div class="card-group">
+        @foreach(var depatament in Departaments)
+        {
+            <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=@depatament/>
+        }
+    </div>
+}
+
+
+@code {
+    private List<DepartamentViewModel> Departaments = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) await LoadDepartaments();
+    }
+
+    private async Task LoadDepartaments()
+    {
+        var request = new GetAllDepartamentsRequest();
+        var response = await mediatr.Send(request);
+
+        Departaments = mapper.Map<List<DepartamentViewModel>>(response);
+        StateHasChanged();
+    }
+}

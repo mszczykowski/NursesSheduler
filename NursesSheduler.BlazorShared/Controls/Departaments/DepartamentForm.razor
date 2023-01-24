@@ -1,0 +1,17 @@
+﻿@using NursesScheduler.BlazorShared.ViewModels
+
+<form>
+  <div class="form-group">
+    <label for="nameInput">Nazwa</label>
+    <input type="text" class="form-control" id="nameInput" @bind="Departament.Name">
+  </div>
+  <button class="btn btn-primary" @onclick="SaveOnClick">Zapisz</button>
+</form>
+
+@code {
+    [Parameter]
+    public DepartamentViewModel Departament { get; set; }
+    [Parameter]
+    public EventCallback SaveOnClick { get; set; }
+}
+ 

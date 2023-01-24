@@ -36,9 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controls\Departaments\" />
     <Folder Include="Controls\Settings\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 

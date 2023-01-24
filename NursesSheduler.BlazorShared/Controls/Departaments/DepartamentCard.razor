@@ -1,0 +1,17 @@
+﻿@using NursesScheduler.BlazorShared.ViewModels 
+
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">@Departament.Name</h5>
+    <p class="card-text">
+        <input type="checkbox">Domyślny?
+    </p>
+    <a href="#">Edytuj</a>
+    <button type="button" class="btn btn-primary">Wybierz</button>
+  </div>
+</div>
+
+@code {
+    [Parameter]
+    public DepartamentViewModel Departament { get; set; }
+}
