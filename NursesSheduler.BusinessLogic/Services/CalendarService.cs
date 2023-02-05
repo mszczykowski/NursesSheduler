@@ -1,44 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
+using NursesScheduler.BusinessLogic.Interfaces.Services;
+using NursesScheduler.Domain.Entities.Calendar;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    internal class CalendarService
+    public sealed class CalendarService : ICalendarService
     {
-        /*public async Task<Quarter> GetQuarter(int whichQuarter, int quarterStartYear)
+        private readonly IScheduleConfigurationService _scheduleConfiguration;
+        private readonly IHolidaysApiClient _holidaysApiClient;
+
+        private ICollection<Holiday> _holidays;
+
+        private int quarterIterator;
+
+        public CalendarService(IHolidaysApiClient holidaysApiClient, IScheduleConfigurationService scheduleConfiguration)
         {
-            var currentDate = DateTime.Now;
+            _holidaysApiClient = holidaysApiClient;
+            _scheduleConfiguration = scheduleConfiguration;
+        }
 
+        public async Task<Quarter> GetQuarter(int whichQuarter, int year)
+        {
             Quarter quarter = new Quarter();
-            quarter.Months = new Month[3];
 
+            if (_holidays != null && _holidays.Any() && _holidays.First().Date.Year != year)
+            {
+                _holidays = null;
+            }
+
+            int quarterStart = _scheduleConfiguration.GetQuarterStart();
             quarterIterator = 0;
+
             int month;
 
             for (int i = 0; i < 3; i++)
             {
-                month = quaterStart + i + whichQuarter * 3;
+                month = quarterStart + i + whichQuarter * 3;
                 if (month > 12)
                 {
                     month = 1;
-                    quarterStartYear++;
-                    holidays = null;
+                    year++;
+                    _holidays = null;
                 }
-                quarter.Months[i] = await GetMonth(month, quarterStartYear);
+                quarter.Months[i] = await GetMonth(month, year);
                 quarter.Months[i].MonthInQuarter = i + 1;
             }
 
             return quarter;
         }
 
-        public async Task<Month> GetMonth(int monthNumber, int yearNumber)
+        private async Task<Month> GetMonth(int monthNumber, int yearNumber)
         {
-            if (holidays == null) holidays = await GetHolidays(yearNumber);
+            if (_holidays == null) _holidays = await _holidaysApiClient.GetHolidays(yearNumber);
 
-            List<Holiday> holidaysInRequestedMonth = holidays.Where(h => h.Date.Month == monthNumber).ToList();
+            List<Holiday> holidaysInRequestedMonth = _holidays.Where(h => h.Date.Month == monthNumber).ToList();
 
             int daysInMonth = DateTime.DaysInMonth(yearNumber, monthNumber);
 
@@ -63,6 +78,6 @@ namespace NursesScheduler.BusinessLogic.Services
             }
 
             return month;
-        }*/
+        }
     }
 }

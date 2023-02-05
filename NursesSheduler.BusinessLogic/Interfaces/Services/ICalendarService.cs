@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NursesScheduler.Domain.Entities.Calendar;
 
 namespace NursesScheduler.BusinessLogic.Interfaces.Services
 {
-    internal class ICalendarService
+    public interface ICalendarService
     {
+        Task<Quarter> GetQuarter(int whichQuarter, int year);
     }
 }

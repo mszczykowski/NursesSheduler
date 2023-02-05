@@ -1,5 +1,55 @@
-﻿<h3>EditDepartament</h3>
+﻿@page "/departaments/edit/{Id:int}"
+
+@using AutoMapper
+@using MediatR
+@using NursesScheduler.BlazorShared.ViewModels
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament
+@inject IMediator mediatr;
+@inject IMapper mapper;
+
+<h3>Edytuj oddział</h3>
+
+@if(departament == null)
+{
+    <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+}
+else
+{
+    <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Departament=@departament SaveOnClick="SaveDepartament"/>
+}
+
+
 
 @code {
+    private bool notFound;
+    protected DepartamentViewModel departament;
 
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) await LoadDepartament();
+    }
+
+    private async Task LoadDepartament()
+    {
+        var request = new GetDepartamentRequest
+        {
+            Id = this.Id
+        };
+        var response = await mediatr.Send(request);
+
+        departament = mapper.Map<DepartamentViewModel>(response);
+        StateHasChanged();
+    }
+
+    protected async void SaveDepartament()
+    {
+        var request = mapper.Map<EditDepartamentRequest>(departament);
+        var response = await mediatr.Send(request);
+        Console.WriteLine(response.Id);
+    }
 }

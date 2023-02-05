@@ -1,10 +1,12 @@
 ﻿@page "/departaments/add"
+
 @using AutoMapper
 @using MediatR
 @using NursesScheduler.BlazorShared.ViewModels
-@using NursesScheduler.BusinessLogic.Departaments.Commands.CreateDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
 @inject IMediator mediatr;
 @inject IMapper mapper;
+@inject NavigationManager NavManager
 
 <h3>Dodaj oddział</h3>
 <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Departament=@departament SaveOnClick="SaveDepartament"/>
@@ -17,5 +19,7 @@
         var request = mapper.Map<CreateDepartamentRequest>(departament);
         var response = await mediatr.Send(request);
         Console.WriteLine(response.Id);
+
+        NavManager.NavigateTo("/departaments/");
     }
 }

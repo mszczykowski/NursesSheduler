@@ -2,10 +2,10 @@
 using System.Reflection;
 using MediatR;
 using FluentValidation;
-using NursesScheduler.BusinessLogic.Validation.Nurse;
-using NursesScheduler.BusinessLogic.Nurses.Commands.CreateNurse;
-using NursesScheduler.BusinessLogic.Departaments.Commands.CreateDepartament;
-using NursesScheduler.BusinessLogic.Validation.Departament;
+using NursesScheduler.BusinessLogic.Validation;
+using NursesScheduler.Domain.Entities;
+using NursesScheduler.BusinessLogic.Interfaces.Services;
+using NursesScheduler.BusinessLogic.Services;
 
 namespace NursesScheduler.BusinessLogic
 {
@@ -13,8 +13,10 @@ namespace NursesScheduler.BusinessLogic
     {
         public static void AddBusinessLogicLayer(this IServiceCollection services)
         {
-            services.AddScoped<IValidator<CreateNurseRequest>, CreateNurseRequestValidator>();
-            services.AddScoped<IValidator<CreateDepartamentRequest>, CreateDepartamentRequestValidator>();
+            services.AddTransient<IValidator<Nurse>, NurseValidator>();
+            services.AddTransient<IValidator<Departament>, DepartamentValidator>();
+            services.AddTransient<ICalendarService, CalendarService>();
+            services.AddSingleton<IScheduleConfigurationService, ScheduleConfigurationService>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
         }

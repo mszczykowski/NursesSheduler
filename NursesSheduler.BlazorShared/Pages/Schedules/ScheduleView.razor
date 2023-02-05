@@ -1,0 +1,95 @@
+﻿@page "/scheduleView"
+@using NursesScheduler.Domain.Entities.Calendar
+
+<div class="container is-fluid">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <label class="label">Miesiąc</label>
+            </div>
+            <div class="level-item">
+                <div class="control">
+                    <div class="select">
+                        <select>
+                            <option>Stytczeń</option>
+                            <option>Luty</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="level-item">
+                <label class="label">Rok</label>
+            </div>
+            <div class="level-item">
+                <div class="control">
+                    <div class="select">
+                        <select>
+                            <option>2023</option>
+                            <option>2024</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="level-item">
+                <button class="button is-info">Bieżący miesiąc</button>
+            </div>
+            <div class="level-item">
+                <a>Konfiguracja generatora</a>
+            </div>
+        </div>
+
+
+        <div class="level-right">
+            <div class="level-item">
+                <button class="button is-info">Drukuj</button>
+            </div>
+            <div class="level-item">
+                <button class="button is-info">Sprawdź</button>
+            </div>
+            <div class="level-item">
+                <button class="button is-danger">Wyczyść</button>
+            </div>
+            <div class="level-item">
+                <button class="button is-warning">Generuj</button>
+            </div>
+            <div class="level-item">
+                <button class="button is-success">Zapisz</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <p>
+                    <b>Norma:</b> 178:00
+                </p>
+            </div>
+            <div class="level-item">
+                <p>
+                    <b>Gdodzin urlopu:</b> 178:00
+                </p>
+            </div>
+            <div class="level-item">
+                <p>
+                    <b>Przydzielony urlop:</b> 178:00
+                </p>
+            </div>
+        </div>
+        <div class="level-right">
+            <p><b>Zapisano!</b></p>
+        </div>
+    </div>
+
+    <NursesScheduler.BlazorShared.Controls.Schedule.ScheduleTable/>
+</div>
+
+
+@code {
+    private Quarter _quarter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+}

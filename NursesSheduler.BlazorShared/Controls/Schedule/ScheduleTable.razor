@@ -1,13 +1,20 @@
-﻿<h3>ScheduleTable</h3>
+﻿<!--@using NursesScheduler.Domain.Entities.Calendar
 
-<table class="table">
+<h3>ScheduleTable</h3>
+
+<table class="table-schedule">
     <thead>
         <tr>
             <th>Pracownik</th>
-            @for(int i = 0; i < 31; i++)
+            <th class="previous">Poprz.</th>
+            @for(int i = 0; i < Month.Days.Length; i++)
             {
-                <th>@(i + 1)</th>
+                <th>
+                    @(i + 1) + "." + Month.MonthNumber.ToString().PadLeft(2);
+                </th>
             }
+            <th>Czas pracy</th>
+            <th>Czas pracy</th>
             <th>Czas pracy</th>
         </tr>
     </thead>
@@ -17,9 +24,10 @@
             <ScheduleRow/>
         }
     </tbody>
-</table>
+</table>-->
 
 
 @code {
-
+    //[Parameter]
+    //public Month Month { get; set; }
 }

@@ -18,14 +18,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Departaments\Commands\EditDepartament\" />
-    <Folder Include="Departaments\Commands\DeleteDepartament\" />
-    <Folder Include="Departaments\Commands\SetDepartamentAsDefault\" />
-    <Folder Include="Nurses\Commands\CreateNurse\" />
+    <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\GenerateSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\AddSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\EditSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Queries\GetSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Queries\GetAllSchedules\" />
+    <Folder Include="CommandsAndQueries\Settings\Commands\" />
+    <Folder Include="CommandsAndQueries\Settings\Queries\GetSetting\" />
+    <Folder Include="CommandsAndQueries\Settings\Queries\GetAllSettings\" />
   </ItemGroup>
 
 </Project>

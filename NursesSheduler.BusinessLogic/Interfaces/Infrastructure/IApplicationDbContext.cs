@@ -7,7 +7,6 @@ namespace NursesScheduler.BusinessLogic.Interfaces.Infrastructure
     {
         DbSet<Nurse> Nurses { get; set; }
         DbSet<Departament> Departaments { get; set; }
-
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

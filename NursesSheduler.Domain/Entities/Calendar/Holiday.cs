@@ -1,4 +1,10 @@
 ﻿namespace NursesScheduler.Domain.Entities.Calendar
 {
-    public sealed record Holiday(DateTime Date, string LocalName, string Name, string CountryCode);
+    public sealed class Holiday
+    {
+        public DateTime Date { get; set; }
+        public string Name { get; set; }
+        public string LocalName { get; set; }
+        public string CountryCode { get; set; }
+    }
 }
