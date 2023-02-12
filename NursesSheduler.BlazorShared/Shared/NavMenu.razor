@@ -1,14 +1,20 @@
-﻿<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-  <div id="navbarBasicExample" class="navbar-menu">
+﻿@using NursesScheduler.BlazorShared.Stores
+
+@inject CurrentDepartamentStore currentDepartamentStore;
+
+@if(isNavVisible)
+{
+<nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+  <div class="container is-fluid">
     <div class="navbar-start">
-      <NavLink class="navbar-item" href="/scheduleView">Grafiki</NavLink>
-      <NavLink class="navbar-item" href="/Nurses">Pielęgniarki</NavLink>
-      <NavLink class="navbar-item" href="/Settings">Ustawienia</NavLink>
+      <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/scheduleView">Grafiki</NavLink>
+      <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Nurses">Pielęgniarki</NavLink>
+      <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Settings">Ustawienia</NavLink>
     </div>
 
     <div class="navbar-end">
       <b class="navbar-item">
-          Oddział:
+          Oddział: @departamentName
       </b>
       <div class="navbar-item">
         <div class="buttons">
@@ -18,7 +24,30 @@
     </div>
   </div>
 </nav>
+}
+
 
 @code {
+    private bool isNavVisible;
+    private string departamentName;
+    protected override void OnInitialized()
+    {
+        isNavVisible = false;
+        currentDepartamentStore.OnChange += OnDepartamentChange;
+    }
 
+    public void Dispose()
+    {
+        currentDepartamentStore.OnChange -= OnDepartamentChange;
+    }
+
+    private async void OnDepartamentChange()
+    {
+        // InvokeAsync is inherited, it syncs the call back to the render thread
+        await InvokeAsync(() => {
+            departamentName = currentDepartamentStore.CurrentDepartament.Name;
+            isNavVisible = true;
+            StateHasChanged();
+        });
+    }
 }

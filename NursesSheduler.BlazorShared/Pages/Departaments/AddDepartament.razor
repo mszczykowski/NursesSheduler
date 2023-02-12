@@ -8,18 +8,24 @@
 @inject IMapper mapper;
 @inject NavigationManager NavManager
 
-<h3>Dodaj oddział</h3>
-<NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Departament=@departament SaveOnClick="SaveDepartament"/>
+<NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Dodaj nowy oddział" Departament=@departament SaveOnClick="SaveDepartament"/>
 
 
 @code {
     protected DepartamentViewModel departament = new DepartamentViewModel();
     protected async void SaveDepartament()
     {
-        var request = mapper.Map<CreateDepartamentRequest>(departament);
-        var response = await mediatr.Send(request);
-        Console.WriteLine(response.Id);
+        try
+        {
+            var request = mapper.Map<CreateDepartamentRequest>(departament);
+            var response = await mediatr.Send(request);
+            Console.WriteLine(response.Id);
 
-        NavManager.NavigateTo("/departaments/");
+            NavManager.NavigateTo("/departaments");
+        }
+        catch (Exception e)
+        {
+            NavManager.NavigateTo("/error");
+        }
     }
 }

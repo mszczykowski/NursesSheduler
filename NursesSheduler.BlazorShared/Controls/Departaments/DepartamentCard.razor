@@ -1,14 +1,34 @@
-﻿@using NursesScheduler.BlazorShared.ViewModels 
+﻿@using NursesScheduler.BlazorShared.Stores
+@using NursesScheduler.BlazorShared.ViewModels
 
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">@Departament.Name</h5>
+@inject CurrentDepartamentStore currentDepartamentStore;
+
+<div class="card">
+  <div class="card-content">
+    <p class="title is-4">@Departament.Name</p>
     <a href="#">Edytuj</a>
-    <button type="button" class="btn btn-primary">Wybierz</button>
+    <button type="button" class="btn btn-primary" @onclick="OnDepartamentPick">Wybierz</button>
+    <footer class="card-footer">
+    <p class="card-footer-item">
+      <span>
+        View on <a href="https://twitter.com/codinghorror/status/506010907021828096">Twitter</a>
+      </span>
+    </p>
+    <p class="card-footer-item">
+      <span>
+        Share on <a href="#">Facebook</a>
+      </span>
+    </p>
+  </footer>
   </div>
 </div>
 
 @code {
     [Parameter]
     public DepartamentViewModel Departament { get; set; }
+
+    private void OnDepartamentPick()
+    {
+        currentDepartamentStore.CurrentDepartament = Departament;
+    }
 }

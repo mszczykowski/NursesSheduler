@@ -1,4 +1,4 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using NursesScheduler.BlazorShared;
 using NursesScheduler.BusinessLogic;
 using NursesScheduler.Infrastructure;
@@ -16,7 +16,7 @@ builder.Services.AddPresentationLayer();
 builder.Services.AddBusinessLogicLayer();
 builder.Services.AddInfrastructureLayer(new SqliteConnectionStringBuilder
                                                 {
-                                                    DataSource = "./scheduler1.db",
+                                                    DataSource = @"D:\Projekty\inżynierka\NursesSheduler\NursesSheduler.WPF\bin\Debug\net6.0-windows\scheduler1.db",
                                                     Mode = SqliteOpenMode.ReadWrite,
                                                     Password = "test",
                                                 }.ToString());

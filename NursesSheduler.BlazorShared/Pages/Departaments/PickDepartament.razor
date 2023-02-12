@@ -8,28 +8,40 @@
 @inject IMediator mediatr;
 @inject IMapper mapper;
 
-@if (Departaments == null)
-{
-    <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
-}
-else
-{
-    <div class="row">
-        <div class="col">
-            <h3>Wybierz oddział</h3>
-        </div>
-        <div class="col float-right">
-            <a type="button" class="btn btn-primary" href="/departaments/add">Dodaj nowy oddział</a>
+<div class="level container is-fluid">
+    <div class="level-left">
+        <div class="level-item has-text-centered">
+            <p class="title">Wybierz oddział</p>
         </div>
     </div>
+    <div class="level-right">
+        <div class="level-item">
+            <a class="button is-primary" href="/departaments/add">Dodaj nowy oddział</a>
+        </div>
+    </div>
+</div>
 
-    <div class="card-group">
-        @foreach(var depatament in Departaments)
-        {
-            <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=@depatament/>
-        }
-    </div>
-}
+<div class="container">
+    @if (Departaments == null)
+    {
+        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+    }
+    else if(Departaments.Count == 0)
+    {
+        <div class="has-text-centered">
+            <h4 class="subtitle is-4">Nie dodano jeszcze oddziału</h4>
+        </div>
+    }
+    else
+    {
+        <div class="card-group">
+            @foreach(var depatament in Departaments)
+            {
+                <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=@depatament/>
+            }
+        </div>
+    }
+</div>
 
 
 @code {

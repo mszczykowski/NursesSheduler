@@ -1,7 +1,21 @@
-﻿namespace NursesScheduler.BlazorShared.Stores
+﻿using NursesScheduler.BlazorShared.ViewModels;
+
+namespace NursesScheduler.BlazorShared.Stores
 {
-    internal class CurrentDepartamentStore
+    internal sealed class CurrentDepartamentStore
     {
-        public int? CurrentDepartamentId { get; set; }
+        private DepartamentViewModel _currentDepartament;
+        public event Action OnChange;
+        public DepartamentViewModel CurrentDepartament
+        {
+            get => _currentDepartament;
+            set
+            {
+                _currentDepartament = value;
+                NotifyStateChanged();
+            }
+        }
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

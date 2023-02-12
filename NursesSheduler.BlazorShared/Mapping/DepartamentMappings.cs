@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.ViewModels;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments;
 
 namespace NursesScheduler.BlazorShared.Mapping
@@ -13,6 +14,8 @@ namespace NursesScheduler.BlazorShared.Mapping
             CreateMap<DepartamentViewModel, GetAllDepartamentsRequest>()
                 .ReverseMap();
             CreateMap<DepartamentViewModel, GetAllDepartamentsResponse>()
+                .ReverseMap();
+            CreateMap<DepartamentViewModel, CreateDepartamentRequest>()
                 .ReverseMap();
         }
     }
