@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
+    <EmbeddedResource Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
+    <None Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="FluentValidation" Version="11.0.1" />
@@ -26,8 +32,6 @@
     <Folder Include="CommandsAndQueries\Schedules\Commands\AddSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\EditSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Queries\GetSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Queries\GetAllSchedules\" />
     <Folder Include="CommandsAndQueries\Settings\Commands\" />
     <Folder Include="CommandsAndQueries\Settings\Queries\GetSetting\" />
     <Folder Include="CommandsAndQueries\Settings\Queries\GetAllSettings\" />

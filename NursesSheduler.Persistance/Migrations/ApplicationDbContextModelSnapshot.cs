@@ -17,13 +17,25 @@ namespace NursesScheduler.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.5");
 
+            modelBuilder.Entity("NurseShift", b =>
+                {
+                    b.Property<int>("AssignedNursesId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ShiftsShiftId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AssignedNursesId", "ShiftsShiftId");
+
+                    b.HasIndex("ShiftsShiftId");
+
+                    b.ToTable("NurseShift");
+                });
+
             modelBuilder.Entity("NursesScheduler.Domain.Entities.Departament", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -65,6 +77,108 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.ToTable("Nurses");
                 });
 
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.Schedule", b =>
+                {
+                    b.Property<int>("ScheduleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DepartamentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Holidays")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MonthInQuarter")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MonthNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ScheduleId");
+
+                    b.HasIndex("DepartamentId");
+
+                    b.ToTable("Schedules");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.Shift", b =>
+                {
+                    b.Property<int>("ShiftId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsShortShift")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly>("ShiftEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly>("ShiftStart")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ShiftId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("Shift");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.TimeOff", b =>
+                {
+                    b.Property<int>("TimeOffId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NurseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ScheduleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TimeOffId");
+
+                    b.HasIndex("NurseId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("TimeOff");
+                });
+
+            modelBuilder.Entity("NurseShift", b =>
+                {
+                    b.HasOne("NursesScheduler.Domain.Entities.Nurse", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedNursesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursesScheduler.Domain.Entities.Schedules.Shift", null)
+                        .WithMany()
+                        .HasForeignKey("ShiftsShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NursesScheduler.Domain.Entities.Nurse", b =>
                 {
                     b.HasOne("NursesScheduler.Domain.Entities.Departament", "Departament")
@@ -72,6 +186,55 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .HasForeignKey("DepartamentId");
 
                     b.Navigation("Departament");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.Schedule", b =>
+                {
+                    b.HasOne("NursesScheduler.Domain.Entities.Departament", "Departament")
+                        .WithMany()
+                        .HasForeignKey("DepartamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Departament");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.Shift", b =>
+                {
+                    b.HasOne("NursesScheduler.Domain.Entities.Schedules.Schedule", "Schedule")
+                        .WithMany("Shifts")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Schedule");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.TimeOff", b =>
+                {
+                    b.HasOne("NursesScheduler.Domain.Entities.Nurse", "Nurse")
+                        .WithMany("TimeOffs")
+                        .HasForeignKey("NurseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursesScheduler.Domain.Entities.Schedules.Schedule", null)
+                        .WithMany("TimeOffs")
+                        .HasForeignKey("ScheduleId");
+
+                    b.Navigation("Nurse");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Nurse", b =>
+                {
+                    b.Navigation("TimeOffs");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.Entities.Schedules.Schedule", b =>
+                {
+                    b.Navigation("Shifts");
+
+                    b.Navigation("TimeOffs");
                 });
 #pragma warning restore 612, 618
         }

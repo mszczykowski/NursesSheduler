@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.DatabaseModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

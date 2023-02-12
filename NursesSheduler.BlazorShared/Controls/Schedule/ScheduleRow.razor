@@ -1,14 +1,20 @@
-﻿<tr>
-    <td>Imie nazwisko</td>
-    @for(int i = 0; i < 31; i++ )
+﻿@using NursesScheduler.BlazorShared.ViewModels
+
+<tr>
+    <td>@RowData.Nurse.ToString();</td>
+    @foreach(var shift in RowData.Shifts)
     {
         <ScheduleShift/>
     }
-    <td>178:00</td>
-    <td>178:00</td>
-    <td>178:00</td>
+    <td>@RowData.PreviousMonthTime</td>
+    <td>@RowData.AssignedTime</td>
+    <td>@RowData.AssignedTimeInQuarter</td>
+    <td>@RowData.AssignedPTO</td>
 </tr>
 
 @code {
-
+    [Parameter]
+    public MonthViewModel Month { get; set; }
+    [Parameter]
+    public ScheduleRowViewModel RowData { get; set; }
 }

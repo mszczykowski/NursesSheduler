@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using NursesScheduler.BlazorShared;
 using NursesScheduler.BusinessLogic;
 using NursesScheduler.Infrastructure;
 
@@ -9,6 +10,9 @@ builder.Services.AddBusinessLogicLayer();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+//add layers here
+builder.Services.AddPresentationLayer();
 builder.Services.AddBusinessLogicLayer();
 builder.Services.AddInfrastructureLayer(new SqliteConnectionStringBuilder
                                                 {

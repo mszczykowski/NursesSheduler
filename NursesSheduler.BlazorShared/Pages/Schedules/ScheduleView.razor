@@ -1,94 +1,172 @@
 ﻿@page "/scheduleView"
-@using NursesScheduler.Domain.Entities.Calendar
+@using AutoMapper
+@using MediatR
+@using NursesScheduler.BlazorShared.ViewModels
+@using NursesScheduler.BlazorShared.ViewModels.Enums
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetAllNurses
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+@inject IMediator mediatr;
+@inject IMapper mapper;
 
 <div class="container is-fluid">
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <label class="label">Miesiąc</label>
-            </div>
-            <div class="level-item">
-                <div class="control">
-                    <div class="select">
-                        <select>
-                            <option>Stytczeń</option>
-                            <option>Luty</option>
-                        </select>
+    @if(!isLoaded)
+    {
+        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+    }
+    else
+    {
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <label class="label">Miesiąc</label>
+                </div>
+                <div class="level-item">
+                    <div class="control">
+                        <div class="select">
+                            <select value=@monthNumber @onchange="SelectedMonthChanged">
+                                @for(int i = 1; i < 13; i++)
+                                {
+                                    <option value="@i">@((Months)i)</option>
+                                }
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="level-item">
-                <label class="label">Rok</label>
-            </div>
-            <div class="level-item">
-                <div class="control">
-                    <div class="select">
-                        <select>
-                            <option>2023</option>
-                            <option>2024</option>
-                        </select>
+                <div class="level-item">
+                    <label class="label">Rok</label>
+                </div>
+                <div class="level-item">
+                    <div class="control">
+                        <div class="select">
+                            <select value=@yearNumber @onchange="SelectedYearChanged">
+                                @for(int i = 2020; i < DateTime.Now.Year + 1; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
                     </div>
                 </div>
+                <div class="level-item">
+                    <button class="button is-info" @onclick="CurrentDateClick">Bieżący miesiąc</button>
+                </div>
+                <div class="level-item">
+                    <button class="button is-ghost">Konfiguracja ranków</button>
+                </div>
+                <div class="level-item">
+                    <button class="button is-ghost">Konfiguracja generatora</button>
+                </div>
             </div>
-            <div class="level-item">
-                <button class="button is-info">Bieżący miesiąc</button>
-            </div>
-            <div class="level-item">
-                <a>Konfiguracja generatora</a>
+
+
+            <div class="level-right">
+                <div class="level-item">
+                    <button class="button is-ghost">Drukuj</button>
+                </div>
+                <div class="level-item">
+                    <button class="button is-info">Sprawdź</button>
+                </div>
+                <div class="level-item">
+                    <button class="button is-danger">Wyczyść</button>
+                </div>
+                <div class="level-item">
+                    <button class="button is-warning">Generuj</button>
+                </div>
+                <div class="level-item">
+                    <button class="button is-success">Zapisz</button>
+                </div>
             </div>
         </div>
 
-
-        <div class="level-right">
-            <div class="level-item">
-                <button class="button is-info">Drukuj</button>
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <p>
+                        <b>Kwartał:</b> 1
+                    </p>
+                </div>
+                <div class="level-item">
+                    <p>
+                        <b>Norma:</b> 178:00
+                    </p>
+                </div>
+                <div class="level-item">
+                    <p>
+                        <b>Gdodzin urlopu:</b> 178:00
+                    </p>
+                </div>
+                <div class="level-item">
+                    <p>
+                        <b>Przydzielony urlop:</b> 178:00
+                    </p>
+                </div>
             </div>
-            <div class="level-item">
-                <button class="button is-info">Sprawdź</button>
-            </div>
-            <div class="level-item">
-                <button class="button is-danger">Wyczyść</button>
-            </div>
-            <div class="level-item">
-                <button class="button is-warning">Generuj</button>
-            </div>
-            <div class="level-item">
-                <button class="button is-success">Zapisz</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <p>
-                    <b>Norma:</b> 178:00
-                </p>
-            </div>
-            <div class="level-item">
-                <p>
-                    <b>Gdodzin urlopu:</b> 178:00
-                </p>
-            </div>
-            <div class="level-item">
-                <p>
-                    <b>Przydzielony urlop:</b> 178:00
-                </p>
+            <div class="level-right">
+                <p><b>Zapisano!</b></p>
             </div>
         </div>
-        <div class="level-right">
-            <p><b>Zapisano!</b></p>
-        </div>
-    </div>
-
-    <NursesScheduler.BlazorShared.Controls.Schedule.ScheduleTable/>
+    }
 </div>
 
 
 @code {
-    private Quarter _quarter;
+    private bool isLoaded = false;
+    private int monthNumber = DateTime.Now.Month;
+    private int yearNumber = DateTime.Now.Year;
 
-    protected override async Task OnInitializedAsync()
+    private ICollection<NurseViewModel> nurses;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var request = new GetAllNursesRequest();
+            var response = await mediatr.Send(request);
+
+            nurses = mapper.Map<List<NurseViewModel>>(response);
+
+
+            isLoaded = true;
+            StateHasChanged();
+        }
+    }
+
+    private void SelectedYearChanged(ChangeEventArgs e)
+    {
+
+    }
+
+    private void SelectedMonthChanged(ChangeEventArgs e)
+    {
+
+    }
+
+    private void CurrentDateClick()
+    {
+        monthNumber = DateTime.Now.Month;
+        yearNumber = DateTime.Now.Year;
+        SearchSchedule();
+    }
+
+    private async void SearchSchedule()
+    {
+        var request = new GetScheduleRequest
+        {
+            Month = monthNumber,
+
+        };
+        var response = await mediatr.Send(request);
+
+        if (response == null) InitialiseSchedule();
+        else LoadSchedule(response);
+    }
+
+    private void InitialiseSchedule()
+    {
+
+    }
+
+    private void LoadSchedule(GetScheduleResponse response)
     {
         
     }

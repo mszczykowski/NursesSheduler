@@ -1,4 +1,4 @@
-﻿using NursesScheduler.Domain.Entities.Calendar;
+﻿using NursesScheduler.Domain.Models.Calendar;
 
 namespace NursesScheduler.BusinessLogic.Interfaces.Infrastructure
 {

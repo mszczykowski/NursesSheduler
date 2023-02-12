@@ -2,6 +2,7 @@
 {
     public enum TimeOffTypes
     {
-
+        Other,
+        PTO
     }
 }

@@ -1,4 +1,5 @@
-﻿<!--@using NursesScheduler.Domain.Entities.Calendar
+﻿@using NursesScheduler.BlazorShared.Helpers
+@using NursesScheduler.BlazorShared.ViewModels
 
 <h3>ScheduleTable</h3>
 
@@ -9,25 +10,39 @@
             <th class="previous">Poprz.</th>
             @for(int i = 0; i < Month.Days.Length; i++)
             {
-                <th>
-                    @(i + 1) + "." + Month.MonthNumber.ToString().PadLeft(2);
+                <th class="@ScheduleCssHelper.GetDayClass(Month.Days[i])">
+                    <p>@Month.GetDate(i)</p>
+                    <p>@Month.Days[i].GetDayOfWeekAbreviation()</p>
                 </th>
             }
-            <th>Czas pracy</th>
-            <th>Czas pracy</th>
-            <th>Czas pracy</th>
+            <th>Poprzedni okres</th>
+            <th>Przypisane godziny</th>
+            <th>Przypisane w kwartale</th>
+            <th>Przypisany urlop</th>
         </tr>
     </thead>
     <tbody>
-        @for(int i = 0; i < 20; i++)
+        @foreach(var row in RowsData)
         {
             <ScheduleRow/>
         }
     </tbody>
-</table>-->
+</table>
 
 
 @code {
-    //[Parameter]
-    //public Month Month { get; set; }
+    [Parameter]
+    public MonthViewModel Month { get; set; }
+    [Parameter]
+    public ICollection<ScheduleRowViewModel> RowsData { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            
+            StateHasChanged();
+        }
+    }
 }

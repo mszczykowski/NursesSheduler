@@ -1,4 +1,4 @@
-﻿using NursesScheduler.Domain.Entities;
+﻿using NursesScheduler.Domain.DatabaseModels;
 
 namespace NursesScheduler.Domain.Interfaces
 {

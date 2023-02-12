@@ -2,11 +2,10 @@
 
 namespace NursesScheduler.BlazorShared.ViewModels
 {
-    public class DepartamentViewModel
+    public sealed class DepartamentViewModel
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public bool IsDefault { get; set; }
     }
 }

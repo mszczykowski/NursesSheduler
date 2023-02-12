@@ -2,7 +2,7 @@
 using FluentValidation;
 using MediatR;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.DatabaseModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

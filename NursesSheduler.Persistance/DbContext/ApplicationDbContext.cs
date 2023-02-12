@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.DatabaseModels;
+using NursesScheduler.Domain.DatabaseModels.Schedules;
 using NursesScheduler.Infrastructure.Configuration;
 
 namespace NursesScheduler.Infrastructure.Context
@@ -9,6 +10,8 @@ namespace NursesScheduler.Infrastructure.Context
     {
         public DbSet<Nurse> Nurses { get; set; }
         public DbSet<Departament> Departaments { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 
@@ -18,6 +21,7 @@ namespace NursesScheduler.Infrastructure.Context
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(NurseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DepartamentConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ScheduleConfiguration).Assembly);
 
             base.OnModelCreating(modelBuilder);
         }

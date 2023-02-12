@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.DatabaseModels;
 
 namespace NursesScheduler.BusinessLogic.Validation
 {

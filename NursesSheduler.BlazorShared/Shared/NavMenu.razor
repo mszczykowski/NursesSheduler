@@ -1,18 +1,22 @@
-﻿<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav mr-auto">
-      <NavLink class="nav-link active" href="/scheduleView">Home</NavLink>
-      <NavLink class="nav-link" href="/Nurses">Pielęgniarki</NavLink>
-      <a class="nav-link" href="#">Pricing</a>
-      <a class="nav-link active">Disabled</a>
+﻿<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <NavLink class="navbar-item" href="/scheduleView">Grafiki</NavLink>
+      <NavLink class="navbar-item" href="/Nurses">Pielęgniarki</NavLink>
+      <NavLink class="navbar-item" href="/Settings">Ustawienia</NavLink>
+    </div>
+
+    <div class="navbar-end">
+      <b class="navbar-item">
+          Oddział:
+      </b>
+      <div class="navbar-item">
+        <div class="buttons">
+          <NavLink class="button" href="/departaments">Wybierz oddział</NavLink>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="form-inline my-2 my-lg-0">
-      <NavLink class="btn btn btn-outline-primary my-2 my-sm-0" href="/departaments">Zmień oddział</NavLink>
-    </div>
 </nav>
 
 @code {

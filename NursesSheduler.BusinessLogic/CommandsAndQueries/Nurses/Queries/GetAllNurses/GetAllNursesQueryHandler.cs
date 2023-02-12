@@ -19,8 +19,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetAll
         public async Task<List<GetAllNursesResponse>> Handle(GetAllNursesRequest request, CancellationToken cancellationToken)
         {
             return _mapper.Map<List<GetAllNursesResponse>>(await _context.Nurses
-                                                                    .Include(n => n.Departament)
-                                                                    .ToListAsync());
+                                                                .Include(n => n.Departament)
+                                                                .ToListAsync()); 
         }
     }
 }

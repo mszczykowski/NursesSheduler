@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetAllNurses;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.DatabaseModels;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {

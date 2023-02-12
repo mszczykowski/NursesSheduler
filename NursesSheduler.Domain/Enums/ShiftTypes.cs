@@ -2,6 +2,7 @@
 {
     public enum ShiftTypes
     {
+        morning,
         day,
         night,
     }
