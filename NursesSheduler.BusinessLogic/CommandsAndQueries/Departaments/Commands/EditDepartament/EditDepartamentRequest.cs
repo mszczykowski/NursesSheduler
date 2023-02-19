@@ -4,8 +4,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
 {
     public class EditDepartamentRequest : IRequest<EditDepartamentResponse>
     {
-        public int Id { get; set; }
+        public int DepartamentId { get; set; }
         public string Name { get; set; }
-        public bool IsDefault { get; set; }
     }
 }

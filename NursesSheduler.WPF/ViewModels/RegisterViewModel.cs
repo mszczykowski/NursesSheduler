@@ -1,7 +1,10 @@
 ﻿using NursesScheduler.WPF.Commands;
 using NursesScheduler.WPF.Commands.Common;
+using NursesScheduler.WPF.Helpers;
+using NursesScheduler.WPF.Models.Enums;
 using NursesScheduler.WPF.Services.Implementation;
 using NursesScheduler.WPF.Services.Interfaces;
+using NursesScheduler.WPF.Validators;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -12,7 +15,7 @@ namespace NursesScheduler.WPF.ViewModels
     internal class RegisterViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         private string _password;
-        public String Password 
+        public string Password 
         { 
             get => _password; 
             set
@@ -23,7 +26,7 @@ namespace NursesScheduler.WPF.ViewModels
             }
         }
         private string _passwordRepeated;
-        public String PasswordRepeated 
+        public string PasswordRepeated 
         {
             get => _passwordRepeated; 
             set
@@ -42,7 +45,7 @@ namespace NursesScheduler.WPF.ViewModels
         {
             ExitCommand = new ExitCommand();
 
-            CreatePasswordCommand = new CreatePasswordCommand(this, databaseManager, logInViewNavigationService);
+            CreatePasswordCommand = new CreateDbCommand(this, databaseManager, logInViewNavigationService);
 
             _errorsViewModel = new ErrorsViewModel();
 
@@ -76,14 +79,18 @@ namespace NursesScheduler.WPF.ViewModels
         {
             _errorsViewModel.ClearErrors(nameof(Password));
 
-            if (string.IsNullOrEmpty(Password)) _errorsViewModel.AddError(nameof(Password), "Password can't be empty");
+            var validationResult = PasswordValidator.ValidatePassword(Password);
+
+            if (validationResult != PasswordValidationResult.Valid)
+                _errorsViewModel.AddError(nameof(Password), PasswordValidationMessageHelper.GetValidationMessage(validationResult));
         }
 
         private void ValidatePasswordRepeat()
         {
             _errorsViewModel.ClearErrors(nameof(PasswordRepeated));
 
-            if (Password != PasswordRepeated) _errorsViewModel.AddError(nameof(PasswordRepeated), "Password doesn't match");
+            if (Password != PasswordRepeated) 
+                _errorsViewModel.AddError(nameof(PasswordRepeated), "Password doesn't match");
         }
     }
 }

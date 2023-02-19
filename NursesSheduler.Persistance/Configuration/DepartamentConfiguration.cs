@@ -13,7 +13,7 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Departament> builder)
         {
-            builder.HasKey(d => d.Id);
+            builder.HasKey(d => d.DepartamentId);
 
             builder.Property(d => d.Name)
                 .IsRequired()

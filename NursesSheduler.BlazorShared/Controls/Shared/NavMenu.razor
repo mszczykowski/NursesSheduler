@@ -1,0 +1,88 @@
+﻿@using NursesScheduler.BlazorShared.Stores
+
+@inject CurrentDepartamentStore currentDepartamentStore;
+
+@if(isNavVisible)
+{
+<nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+  <div class="container is-fluid">
+    <div class="navbar-start">
+      <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/scheduleView">
+          <p class="control">
+              <span>
+                <i class="far fa-calendar-days" aria-hidden="true"></i>
+              </span>
+              <span>
+                  Grafiki
+              </span>
+          </p>
+      </NavLink>
+      <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Nurses">
+          <p class="control">
+              <span>
+                <i class="fas fa-user-nurse" aria-hidden="true"></i>
+              </span>
+              <span>
+                  Pracownicy
+              </span>
+          </p>
+      </NavLink>
+      <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Settings">
+          <p class="control">
+              <span>
+                <i class="fas fa-gear" aria-hidden="true"></i>
+              </span>
+              <span>
+                  Ustawienia
+              </span>
+          </p>
+      </NavLink>
+    </div>
+
+    <div class="navbar-end">
+      <b class="navbar-item">
+          Oddział: @departamentName
+      </b>
+      <div class="navbar-item">
+        <div class="buttons">
+          <NavLink class="button is-link is-outlined" href="/departaments">Oddziały</NavLink>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+}
+
+
+@code {
+    private bool isNavVisible;
+    private string departamentName;
+    protected override void OnInitialized()
+    {
+        isNavVisible = false;
+
+        if (currentDepartamentStore.CurrentDepartament != null) SetDepartament();
+
+        currentDepartamentStore.OnChange += OnDepartamentChange;
+    }
+
+    public void Dispose()
+    {
+        currentDepartamentStore.OnChange -= OnDepartamentChange;
+    }
+
+    private async void OnDepartamentChange()
+    {
+        // InvokeAsync is inherited, it syncs the call back to the render thread
+        await InvokeAsync(() => {
+            SetDepartament();
+        });
+    }
+
+    private void SetDepartament()
+    {
+        departamentName = currentDepartamentStore.CurrentDepartament.Name;
+        isNavVisible = true;
+        StateHasChanged();
+    }
+}

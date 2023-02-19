@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
 {
-    internal class EditNurseResponse
+    public sealed class EditNurseResponse
     {
+        public int NurseId { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public int DepartamentId { get; set; }
     }
 }

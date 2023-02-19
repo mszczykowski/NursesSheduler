@@ -1,9 +1,102 @@
 ﻿@page "/nurses"
+@inherits PageUsingDepartamentBase
 
-<h3>NursesList</h3>
+@using AutoMapper
+@using MediatR
+@using NursesScheduler.BlazorShared.Helpers
+@using NursesScheduler.BlazorShared.ViewModels
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 
-<NursesScheduler.BlazorShared.Controls.Nurses.NursesTable/>
+@inject IMediator _mediatr
+@inject IMapper _mapper
+
+<div class="container">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Pracownicy</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <p class="control">
+                  <a class="button is-primary" href="/nurses/add">
+                    <span class="icon">
+                      <i class="fas fa-plus" aria-hidden="true"></i>
+                    </span>
+                    <span>Dodaj nowego pracownika</span>
+                  </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @if (_nurses == null)
+    {
+        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+    }
+    else if(_nurses.Count == 0 && false)
+    {
+        <div class="has-text-centered">
+            <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracownika</h4>
+        </div>
+    }
+    else
+    {
+        <div class="tabs is-boxed">
+          <ul>
+            <li class="@CssHelper.SetIsActive(_tabs[0])">
+              <a @onclick="(() => SetTab(0))">
+                <span class="icon is-small"><i class="fas fa-image" aria-hidden="true"></i></span>
+                <span>Aktywni</span>
+              </a>
+            </li>
+            <li class="@CssHelper.SetIsActive(_tabs[1])">
+              <a @onclick="(() => SetTab(1))">
+                <span class="icon is-small"><i class="fas fa-music" aria-hidden="true"></i></span>
+                <span>Nieaktywni</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+    }
+</div>
 
 @code {
+    private List<NurseViewModel> _nurses = null;
+    private bool[] _tabs;
 
+    protected override void OnInitialized()
+    {
+        _tabs = new bool[2];
+        SetTab(0);
+
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) await LoadNurses();
+    }
+
+    private async Task LoadNurses()
+    {
+        var request = new GetNursesFromDepartamentRequest
+        {
+            DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+        };
+        var response = await _mediatr.Send(request);
+
+        _nurses = _mapper.Map<List<NurseViewModel>>(response);
+        StateHasChanged();
+    }
+
+    private void SetTab(int index)
+    {
+        for(int i = 0; i < _tabs.Length; i++)
+        {
+            _tabs[i] = false;            
+        }
+        _tabs[index] = true;
+    }
 }

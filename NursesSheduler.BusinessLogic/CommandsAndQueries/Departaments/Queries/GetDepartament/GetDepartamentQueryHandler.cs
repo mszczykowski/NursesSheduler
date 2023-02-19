@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.
 
         public async Task<GetDepartamentResponse> Handle(GetDepartamentRequest request, CancellationToken cancellationToken)
         {
-            return _mapper.Map<GetDepartamentResponse>(await _context.Departaments.FirstOrDefaultAsync(d => d.Id == request.Id));
+            return _mapper.Map<GetDepartamentResponse>(await _context.Departaments.FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId));
         }
     }
 }

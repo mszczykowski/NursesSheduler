@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NursesScheduler.WPF.Views" 
-             xmlns:components="clr-namespace:PasswordBoxMVVM.Components;assembly=PasswordBoxMVVM"
+             xmlns:components="clr-namespace:PasswordBoxMVVM.Components;assembly=PasswordBoxMVVM" 
+             xmlns:controls="clr-namespace:NursesScheduler.WPF.Controls"
              mc:Ignorable="d">
     <Grid Style="{StaticResource ControlGrid}">
         <Grid.RowDefinitions>
@@ -15,16 +16,24 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        
         <TextBlock Grid.Row="0" Style="{StaticResource Header}" Text="Nurses Sheduler" />
         <TextBlock Grid.Row="1" Style="{StaticResource Info}" Text="This is your first log in. You have to create a password."/>
-        <Label Grid.Row="2" Content="Password:"/>
-        <components:BindablePasswordBox Grid.Row="3" Password="{Binding Password}"/>
-        <Label Grid.Row="4" Content="Repeat password:"/>
-        <components:BindablePasswordBox Grid.Row="5" Password="{Binding PasswordRepeated}"/>
 
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="2">
+            <controls:BulletedItem BulletText="Password needs to have at least 8 characters" />
+            <controls:BulletedItem BulletText="Password has to contain at least one capital and one lower letter" />
+            <controls:BulletedItem BulletText="Password has to contain at least one number" />
+        </StackPanel>
+        
+        <Label Grid.Row="3" Content="Password:"/>
+        <components:BindablePasswordBox Grid.Row="4" Password="{Binding Password}"/>
+        <Label Grid.Row="5" Content="Repeat password:"/>
+        <components:BindablePasswordBox Grid.Row="6" Password="{Binding PasswordRepeated}"/>
+
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Save" Command="{Binding CreatePasswordCommand}"/>
             <Button Content="Exit" Command="{Binding ExitCommand}"/>
         </StackPanel>

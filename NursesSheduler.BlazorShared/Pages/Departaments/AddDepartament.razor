@@ -1,31 +1,29 @@
 ﻿@page "/departaments/add"
 
-@using AutoMapper
-@using MediatR
-@using NursesScheduler.BlazorShared.ViewModels
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
-@inject IMediator mediatr;
-@inject IMapper mapper;
-@inject NavigationManager NavManager
+@inherits PageBase
 
-<NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Dodaj nowy oddział" Departament=@departament SaveOnClick="SaveDepartament"/>
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
+
+@inject IMediator _mediatr;
+@inject IMapper _mapper;
+
+<NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Dodaj nowy oddział" Departament=@_departament SaveOnClick="SaveDepartament"/>
 
 
 @code {
-    protected DepartamentViewModel departament = new DepartamentViewModel();
+    protected DepartamentViewModel _departament = new DepartamentViewModel();
     protected async void SaveDepartament()
     {
         try
         {
-            var request = mapper.Map<CreateDepartamentRequest>(departament);
-            var response = await mediatr.Send(request);
-            Console.WriteLine(response.Id);
+            var request = _mapper.Map<CreateDepartamentRequest>(_departament);
+            var response = await _mediatr.Send(request);
 
-            NavManager.NavigateTo("/departaments");
+            NavigationManager.NavigateTo("/departaments");
         }
         catch (Exception e)
         {
-            NavManager.NavigateTo("/error");
+            base.HandleException(e);
         }
     }
 }

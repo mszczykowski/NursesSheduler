@@ -2,8 +2,7 @@
 {
     public class GetAllDepartamentsResponse
     {
-        public int Id { get; set; }
+        public int DepartamentId { get; set; }
         public string Name { get; set; }
-        public bool IsDefault { get; set; }
     }
 }

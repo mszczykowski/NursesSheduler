@@ -3,15 +3,10 @@ using FluentValidation;
 using MediatR;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
 using NursesScheduler.Domain.DatabaseModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 {
-    public class AddNurseCommandHandler : IRequestHandler<AddNurseRequest, AddNurseResponse>
+    public sealed class AddNurseCommandHandler : IRequestHandler<AddNurseRequest, AddNurseResponse>
     {
         private readonly IMapper _mapper;
         private readonly IValidator<Nurse> _validator;
@@ -30,6 +25,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
 
             var validationResult = await _validator.ValidateAsync(nurse);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+            nurse.IsActive = true;
+            nurse.IsDeleted = false;
 
             await _context.Nurses.AddAsync(nurse);
 

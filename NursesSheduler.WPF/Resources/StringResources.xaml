@@ -1,18 +1,32 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-
-    <system:String x:Key="appName">Nurses Sheduler</system:String>
     
-    <system:String x:Key="register">Register</system:String>
-
-    <system:String x:Key="log_in">Log in</system:String>
-
+    <!--common-->
     <system:String x:Key="passwd">Password</system:String>
+    <system:String x:Key="passwd_repeat">Repeat password</system:String>
+    <system:String x:Key="app_name">Nurses Sheduler</system:String>
+    <system:String x:Key="exit">Exit</system:String>
+    <system:String x:Key="save">Save</system:String>
+    <system:String x:Key="back">Back</system:String>
+    <system:String x:Key="settings">Settings</system:String>
 
-    <system:String x:Key="repeat_passwd">Repeat password</system:String>
+    <!--LogInView-->
+    <system:String x:Key="remember_passwd">Remember password?</system:String>
+    <system:String x:Key="log_in">Log in</system:String>
+    <system:String x:Key="change_passwd">Change password</system:String>
     
-    <system:String x:Key="remember_paswd">Remember password?</system:String>
 
-    <system:String x:Key="first_open">This is your first log in. You have to create password.</system:String>
+    <!--registerView-->
+    <system:String x:Key="register">Register</system:String>
+    <system:String x:Key="create_passwd_message">You have to create password</system:String>
+
+    <!--settingsView-->
+    <system:String x:Key="language">Language</system:String>
+    <system:String x:Key="polish">Polish</system:String>
+    <system:String x:Key="english">English</system:String>
+    <system:String x:Key="delete_db">Remove all data</system:String>
+
+    <!--changePasswordView-->
+    
 </ResourceDictionary>

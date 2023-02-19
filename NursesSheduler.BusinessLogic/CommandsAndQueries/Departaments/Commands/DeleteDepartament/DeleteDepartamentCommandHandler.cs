@@ -17,8 +17,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
 
         public async Task<DeleteDepartamentResponse> Handle(DeleteDepartamentRequest request, CancellationToken cancellationToken)
         {
-            var departament = await _context.Departaments.FirstOrDefaultAsync(d => d.Id == request.Id)
-                ?? throw new EntityNotFoundException(request.Id, nameof(Departament));
+            var departament = await _context.Departaments.FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId)
+                ?? throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
 
             _context.Departaments.Remove(departament);
 

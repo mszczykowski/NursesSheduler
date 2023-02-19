@@ -22,7 +22,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
                                 && s.MonthNumber == request.Month)
                 .Include(s => s.Shifts)
                 .Include(s => s.Holidays)
-                .Include(s => s.TimeOffs)
                 .FirstOrDefaultAsync();
 
             if (result == null) return null;

@@ -1,20 +1,37 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AdysTech.CredentialManager;
 using NursesScheduler.WPF.Services.Interfaces;
-using System.Threading.Tasks;
+using System.Configuration;
+using System.Net;
 
 namespace NursesScheduler.WPF.Services.Implementation
 {
-    internal class PasswordService : IPasswordService
+    internal sealed class PasswordService : IPasswordService
     {
-        public async Task<bool> IsPasswordValid(string connectionString)
+        private readonly string appName;
+        public PasswordService()
         {
-            var optionsBuilder = new DbContextOptionsBuilder();
-            optionsBuilder.UseSqlite(connectionString);
+            appName = ConfigurationManager.AppSettings["appName"];
+        }
+        public void SavePassword(string password)
+        {
+            var credentials = new NetworkCredential(appName, password);
+            CredentialManager.SaveCredentials(appName, credentials);
+        }
 
-            using (var context = new DbContext(optionsBuilder.Options))
-            {
-                return await context.Database.CanConnectAsync();
-            }
+        public void TryRemovePassword()
+        {
+            if(CredentialManager.GetCredentials(appName) != null)
+                CredentialManager.RemoveCredentials(appName);
+        }
+
+        public string? TryRetrievePassword()
+        {
+            var credentials = CredentialManager.GetCredentials(appName);
+
+            if (credentials == null) 
+                return null;
+
+            return credentials.Password;
         }
     }
 }

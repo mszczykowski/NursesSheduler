@@ -9,7 +9,7 @@ namespace NursesScheduler.BusinessLogic.Validation
         {
             RuleFor(n => n.Name)
                 .NotEmpty()
-                .MaximumLength(20);
+                .MaximumLength(40);
         }
     }
 }

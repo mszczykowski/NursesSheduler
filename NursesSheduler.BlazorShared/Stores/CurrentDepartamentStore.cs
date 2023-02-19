@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.BlazorShared.Stores
 {
-    internal sealed class CurrentDepartamentStore
+    public sealed class CurrentDepartamentStore
     {
         private DepartamentViewModel _currentDepartament;
         public event Action OnChange;

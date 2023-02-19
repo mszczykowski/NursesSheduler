@@ -1,25 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
 {
-    internal class GetNurseResponse
+    public sealed class GetNurseResponse
     {
-        public int Id { get; set; }
-
+        public int NurseId { get; set; }
         public string Name { get; set; }
-
         public string Surname { get; set; }
-
-        public DepartamentResponse Departament { get; set; }
-
-        public class DepartamentResponse
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-        }
+        public int DepartamentId { get; set; }
     }
 }

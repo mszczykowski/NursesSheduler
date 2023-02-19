@@ -1,7 +1,39 @@
 ﻿@page "/nurses/add"
 
-<h3>AddNurse</h3>
+@inherits PageUsingDepartamentBase
+
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
+
+@inject IMediator _mediatr;
+@inject IMapper _mapper;
+
+<NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Title="Dodaj nowego pracownika" Nurse=@_nurse SaveOnClick="SaveNurse"/>
+
 
 @code {
+    protected NurseViewModel _nurse;
 
+    protected override void OnInitialized()
+    {
+        _nurse = new NurseViewModel();
+        _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
+
+        base.OnInitialized();
+    }
+
+    protected async void SaveNurse()
+    {
+        try
+        {
+            var request = _mapper.Map<AddNurseRequest>(_nurse);
+            var response = await _mediatr.Send(request);
+
+            NavigationManager.NavigateTo("/nurses");
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
+    }
 }
+

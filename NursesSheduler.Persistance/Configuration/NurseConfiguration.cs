@@ -13,7 +13,7 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Nurse> builder)
         {
-            builder.HasKey(n => n.Id);
+            builder.HasKey(n => n.NurseId);
 
             builder.Property(n => n.Name)
                 .IsRequired()
@@ -21,7 +21,7 @@ namespace NursesScheduler.Infrastructure.Configuration
 
             builder.Property(n => n.Surname)
                 .IsRequired()
-                .HasMaxLength(30);
+                .HasMaxLength(20);
         }
     }
 }

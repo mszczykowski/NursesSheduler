@@ -13,7 +13,7 @@ namespace NursesScheduler.BusinessLogic.Validation
 
             RuleFor(n => n.Surname)
                 .NotEmpty()
-                .MaximumLength(30);
+                .MaximumLength(20);
         }
     }
 }

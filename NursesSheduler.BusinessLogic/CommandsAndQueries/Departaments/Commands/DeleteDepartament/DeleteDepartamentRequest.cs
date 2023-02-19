@@ -2,8 +2,8 @@
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.DeleteDepartament
 {
-    public class DeleteDepartamentRequest : IRequest<DeleteDepartamentResponse>
+    public sealed class DeleteDepartamentRequest : IRequest<DeleteDepartamentResponse>
     {
-        public int Id { get; set; }
+        public int DepartamentId { get; set; }
     }
 }

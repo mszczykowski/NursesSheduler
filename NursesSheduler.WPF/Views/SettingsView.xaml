@@ -21,7 +21,7 @@
             <Button Content="English"/>
             <Button Content="Polish"/>
         </StackPanel>
-        <Button Grid.Row="3" Content="Remove all data"/>
-        <Button Grid.Row="4" Content="Back"/>
+        <Button Grid.Row="3" Content="Remove all data" Command="{Binding RemoveDbCommand}"/>
+        <Button Grid.Row="4" Content="Back" Command="{Binding BackCommand}"/>
     </Grid>
 </UserControl>

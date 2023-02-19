@@ -24,7 +24,7 @@
         <Label Grid.Row="2" Content="Enter password:"/>
         <components:BindablePasswordBox Grid.Row="3" Password="{Binding Password}"/>
 
-        <CheckBox Grid.Row="4" Content="Remember password?"/>
+        <CheckBox Grid.Row="4" Content="Remember password?" IsChecked="{Binding SavePassword}"/>
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Log in" Command="{Binding LogInCommand}"/>

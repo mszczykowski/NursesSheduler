@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.
 {
     public class GetDepartamentResponse
     {
-        public int Id { get; set; }
+        public int DepartamentId { get; set; }
         public string Name { get; set; }
     }
 }

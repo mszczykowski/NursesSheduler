@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NursesScheduler.Domain.DatabaseModels;
 using NursesScheduler.Domain.DatabaseModels.Schedules;
 
@@ -10,5 +11,6 @@ namespace NursesScheduler.BusinessLogic.Interfaces.Infrastructure
         DbSet<Departament> Departaments { get; }
         DbSet<Schedule> Schedules { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        EntityEntry Entry(object entity);
     }
 }

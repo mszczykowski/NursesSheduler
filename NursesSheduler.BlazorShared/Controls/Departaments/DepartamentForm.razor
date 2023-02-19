@@ -1,21 +1,21 @@
 ﻿@using NursesScheduler.BlazorShared.Helpers
 @using NursesScheduler.BlazorShared.ViewModels
 
-
-<div class="level container is-fluid">
-    <div class="level-left">
-        <div class="level-item has-text-centered">
-            <p class="title">@Title</p>
-        </div>
-    </div>
-    <div class="level-right">
-        <div class="level-item">
-            <a class="button is-info" href="/departaments">Powrót</a>
-        </div>
-    </div>
-</div>
-
 <div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">@Title</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a class="button is-info" href="/departaments">Powrót</a>
+            </div>
+        </div>
+    </div>
+
+
     <div class='columns is-mobile is-centered'>
       <div class='column is-5'>
         <div class="card">
@@ -32,14 +32,14 @@
                   </div>
                 </div>
                 <div class="buttons is-right">
-                  <button class="@SubmitButtonCssHelper.GetSubmitButtonCssClass(isLoding)" @onclick="OnSubmitClick" type="submit">Zapisz</button>
+                  <button class="button is-primary @CssHelper.SetIsLoading(isLoading)" @onclick="OnSubmitClick" type="submit">Zapisz</button>
                 </div>
             </EditForm>
           </div>
         </div>
       </div>
     </div>
-  </div>
+</div>
 
 
 @code {
@@ -50,18 +50,21 @@
     [Parameter]
     public EventCallback SaveOnClick { get; set; }
 
-    private bool isLoding;
+    private bool isLoading;
     private EditContext editContext;
 
     private void OnSubmitClick()
     {
-        isLoding = true;
-        StateHasChanged();
+        if(editContext.Validate())
+        {
+            isLoading = true;
+            StateHasChanged();
+        }
     }
 
     protected override void OnInitialized()
     {
-        isLoding = false;
+        isLoading = false;
         editContext = new(Departament);
         editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
     }

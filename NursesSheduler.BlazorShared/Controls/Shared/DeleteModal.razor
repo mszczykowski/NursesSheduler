@@ -1,0 +1,47 @@
+﻿@using NursesScheduler.BlazorShared.Helpers
+
+<div class="modal @CssHelper.SetIsActive(isActive)">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Usuń</p>
+      <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+    </header>
+    <section class="modal-card-body">
+      <section>Czy na pewno chcesz usunąć <b>@Name</b>?</section>
+      @if(IsHardDelete)
+      {
+          <section>Tej operecji nie da się cofnąć.</section>
+      }
+    </section>
+    <footer class="modal-card-foot">
+        <button class="button is-danger @CssHelper.SetIsLoading(isLoading)" @onclick="Delete">Usuń</button>
+        <button class="button" @onclick="ChangeVisibility">Anuluj</button>
+    </footer>
+  </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsHardDelete { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public EventCallback DeleteAction { get; set; }
+
+    private bool isActive;
+    private bool isLoading;
+
+    public void ChangeVisibility()
+    {
+        isActive = !isActive;
+    }
+
+    private async void Delete()
+    {
+        isLoading = true;
+        await Task.Delay(1);
+        await DeleteAction.InvokeAsync();
+    }
+}
+

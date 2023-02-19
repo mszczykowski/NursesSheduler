@@ -1,9 +1,10 @@
 ﻿@page "/scheduleView"
+@inherits PageUsingDepartamentBase
 @using AutoMapper
 @using MediatR
 @using NursesScheduler.BlazorShared.ViewModels
 @using NursesScheduler.BlazorShared.ViewModels.Enums
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetAllNurses
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 @inject IMediator mediatr;
 @inject IMapper mapper;
@@ -64,16 +65,44 @@
                     <button class="button is-ghost">Drukuj</button>
                 </div>
                 <div class="level-item">
-                    <button class="button is-info">Sprawdź</button>
+                    <p class="control">
+                      <a class="button is-info" href="/departaments/add">
+                        <span class="icon">
+                          <i class="fas fa-check" aria-hidden="true"></i>
+                        </span>
+                        <span>Sprawdź</span>
+                      </a>
+                    </p>
                 </div>
                 <div class="level-item">
-                    <button class="button is-danger">Wyczyść</button>
+                    <p class="control">
+                      <a class="button is-danger" href="/departaments/add">
+                        <span class="icon">
+                          <i class="fas fa-xmark" aria-hidden="true"></i>
+                        </span>
+                        <span>Wyczyść</span>
+                      </a>
+                    </p>
                 </div>
                 <div class="level-item">
-                    <button class="button is-warning">Generuj</button>
+                    <p class="control">
+                      <a class="button is-warning" href="/departaments/add">
+                        <span class="icon">
+                          <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                        </span>
+                        <span>Generuj</span>
+                      </a>
+                    </p>
                 </div>
                 <div class="level-item">
-                    <button class="button is-success">Zapisz</button>
+                    <p class="control">
+                      <a class="button is-success" href="/departaments/add">
+                        <span class="icon">
+                          <i class="far fa-floppy-disk" aria-hidden="true"></i>
+                        </span>
+                        <span>Zapisz</span>
+                      </a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -120,11 +149,13 @@
     {
         if(firstRender)
         {
-            var request = new GetAllNursesRequest();
+            var request = new GetNursesFromDepartamentRequest
+            {
+                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+            };
             var response = await mediatr.Send(request);
 
             nurses = mapper.Map<List<NurseViewModel>>(response);
-
 
             isLoaded = true;
             StateHasChanged();

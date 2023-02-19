@@ -10,6 +10,7 @@ namespace NursesScheduler.BlazorShared
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddSingleton<CurrentDepartamentStore>();
+            services.AddSingleton<ExceptionStore>();
         }
     }
 }

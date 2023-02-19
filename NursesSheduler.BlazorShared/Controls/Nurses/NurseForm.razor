@@ -1,5 +1,80 @@
-﻿<h3>NurseForm</h3>
+﻿@using NursesScheduler.BlazorShared.Helpers
+@using NursesScheduler.BlazorShared.ViewModels
+
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">@Title</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a class="button is-info" href="/departaments">Powrót</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class='columns is-mobile is-centered'>
+      <div class='column is-5'>
+        <div class="card">
+          <div class="card-content">
+            <EditForm EditContext="@editContext" OnValidSubmit="@SaveOnClick">
+                <DataAnnotationsValidator />
+                <div class="field">
+                  <label class="label">Imie</label>
+                  <div class="control">
+                    <InputText class="input" @bind-Value="Nurse.Name"/>
+                    <div class="help is-danger">
+                        <ValidationMessage For="@(() => Nurse.Name)" />
+                    </div>
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Nazwisko</label>
+                  <div class="control">
+                    <InputText class="input" @bind-Value="Nurse.Surname"/>
+                    <div class="help is-danger">
+                        <ValidationMessage For="@(() => Nurse.Surname)" />
+                    </div>
+                  </div>
+                </div>
+                <div class="buttons is-right">
+                  <button class="button is-primary @CssHelper.SetIsLoading(isLoading)" @onclick="OnSubmitClick" type="submit">Zapisz</button>
+                </div>
+            </EditForm>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
 
 @code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public NurseViewModel Nurse { get; set; }
+    [Parameter]
+    public EventCallback SaveOnClick { get; set; }
 
+    private bool isLoading;
+    private EditContext editContext;
+
+    private void OnSubmitClick()
+    {
+        if(editContext.Validate())
+        {
+            isLoading = true;
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        isLoading = false;
+        editContext = new(Nurse);
+        editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+    }
 }

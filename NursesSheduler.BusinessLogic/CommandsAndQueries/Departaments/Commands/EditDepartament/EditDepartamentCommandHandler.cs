@@ -28,11 +28,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             var validationResult = await _validator.ValidateAsync(modifiedDepartament);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-            var originalDepartament = await _context.Departaments.FirstOrDefaultAsync(d => d.Id == request.Id) 
-                ?? throw new EntityNotFoundException(request.Id, nameof(Departament));
+            var originalDepartament = await _context.Departaments.FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId) 
+                ?? throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
 
 
-            originalDepartament.Name = modifiedDepartament.Name;
+            _context.Entry(originalDepartament).CurrentValues.SetValues(modifiedDepartament);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 

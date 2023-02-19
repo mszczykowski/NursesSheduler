@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.DeleteDepartament
 {
-    internal class DeleteDepartamentResponse
+    public sealed class DeleteDepartamentResponse
     {
         public bool IsDeleted { get; set; }
 

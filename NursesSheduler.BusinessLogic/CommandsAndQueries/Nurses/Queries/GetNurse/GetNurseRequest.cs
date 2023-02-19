@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
 {
-    internal class GetNurseRequest
+    public sealed class GetNurseRequest : IRequest<GetNurseResponse>
     {
+        public int NurseId { get; set; }
     }
 }

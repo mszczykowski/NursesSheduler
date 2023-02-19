@@ -1,63 +1,88 @@
 ﻿@page "/departaments"
 
-@using NursesScheduler.BlazorShared.ViewModels
-@using MediatR;
-@using AutoMapper;
+@inherits PageBase
+
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
 @using NursesScheduler.BusinessLogic.Interfaces.Infrastructure
-@inject IMediator mediatr;
-@inject IMapper mapper;
 
-<div class="level container is-fluid">
-    <div class="level-left">
-        <div class="level-item has-text-centered">
-            <p class="title">Wybierz oddział</p>
-        </div>
-    </div>
-    <div class="level-right">
-        <div class="level-item">
-            <a class="button is-primary" href="/departaments/add">Dodaj nowy oddział</a>
-        </div>
-    </div>
-</div>
+@inject IMediator _mediatr;
+@inject IMapper _mapper;
 
 <div class="container">
-    @if (Departaments == null)
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Wybierz oddział</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <p class="control">
+                  <a class="button is-primary" href="/departaments/add">
+                    <span class="icon">
+                      <i class="fas fa-plus" aria-hidden="true"></i>
+                    </span>
+                    <span>Dodaj nowy oddział</span>
+                  </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @if (_departaments == null)
     {
         <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
     }
-    else if(Departaments.Count == 0)
+    else if(_departaments.Count == 0)
     {
         <div class="has-text-centered">
-            <h4 class="subtitle is-4">Nie dodano jeszcze oddziału</h4>
+            <h4 class="subtitle is-4">Najpierw <a href="/departaments/add">dodaj</a> oddział</h4>
         </div>
     }
     else
     {
-        <div class="card-group">
-            @foreach(var depatament in Departaments)
+        <div class="columns is-centered is-multiline">
+            @for(int i = 0; i < _departaments.Count(); i++)
             {
-                <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=@depatament/>
+                <div class="column is-one-quarter">
+                    <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=@_departaments[i] DeleteCard="DeleteCard"/>
+                </div>
             }
         </div>
     }
 </div>
 
-
 @code {
-    private List<DepartamentViewModel> Departaments = null;
+    private List<DepartamentViewModel> _departaments;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if(firstRender) await LoadDepartaments();
+
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task LoadDepartaments()
     {
-        var request = new GetAllDepartamentsRequest();
-        var response = await mediatr.Send(request);
+        try
+        {
+            var request = new GetAllDepartamentsRequest();
+            var response = await _mediatr.Send(request);
 
-        Departaments = mapper.Map<List<DepartamentViewModel>>(response);
+            _departaments = _mapper.Map<List<DepartamentViewModel>>(response);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
+    }
+
+    private void DeleteCard(int departamentId)
+    {
+        if(_departaments != null)
+            _departaments.Remove(_departaments.Where(d => d.DepartamentId == departamentId).FirstOrDefault());
+
         StateHasChanged();
     }
 }

@@ -5,6 +5,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.
 {
     public class GetDepartamentRequest : IRequest<GetDepartamentResponse>
     {
-        public int Id { get; set; }
+        public int DepartamentId { get; set; }
     }
 }
