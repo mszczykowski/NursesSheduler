@@ -3,7 +3,7 @@ using System;
 
 namespace NursesScheduler.WPF.Stores
 {
-    internal class NavigationStore
+    internal sealed class NavigationStore
     {
         private ViewModelBase _currentViewModel;
 

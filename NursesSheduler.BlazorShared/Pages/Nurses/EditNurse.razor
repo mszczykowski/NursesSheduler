@@ -1,6 +1,6 @@
 ﻿@page "/nurse/edit/{Id:int}"
 
-@inherits PageUsingDepartamentBase
+@inherits ComponenentUsingDepartament
 
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
@@ -14,7 +14,7 @@
 }
 else
 {
-    <NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Title="Dodaj nowego pracownika" Nurse=@_nurse SaveOnClick="SaveNurse"/>
+    <NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Title="Dodaj nowego pracownika" Nurse=@_nurse SaveNurse="SaveNurse"/>
 }
 
 
@@ -50,7 +50,6 @@ else
         {
             base.HandleException(e);
         }
-        
     }
 
     protected async void SaveNurse()

@@ -4,7 +4,6 @@ using NursesScheduler.WPF.Helpers;
 using NursesScheduler.WPF.Models.Enums;
 using NursesScheduler.WPF.Services.Implementation;
 using NursesScheduler.WPF.Services.Interfaces;
-using NursesScheduler.WPF.Validators;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -12,7 +11,7 @@ using System.Windows.Input;
 
 namespace NursesScheduler.WPF.ViewModels
 {
-    internal class LogInViewModel : ViewModelBase, INotifyDataErrorInfo
+    internal sealed class LogInViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         private string _password;
         public string Password 
@@ -21,7 +20,6 @@ namespace NursesScheduler.WPF.ViewModels
             set
             {
                 _password = value;
-                ValidatePassword();
                 OnPropertyChanged(nameof(Password));
             }
         }
@@ -42,15 +40,19 @@ namespace NursesScheduler.WPF.ViewModels
         public ICommand LogInCommand { get; set; }
         public ICommand ExitCommand { get; set; }
 
+        private readonly IDatabaseService _databaseService;
+
         public LogInViewModel(NavigationService<SettingsViewModel> settingsViewNavigationService,
             NavigationService<ChangePasswordViewModel> changePasswordViewNavigationService,
-            IDatabaseService databaseManager, IPasswordService passwordService)
+            IDatabaseService databaseService, IPasswordService passwordService)
         {
+             _databaseService = databaseService;
+
             NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(settingsViewNavigationService);
 
             NavigateToChangePasswordCommand = new NavigateCommand<ChangePasswordViewModel>(changePasswordViewNavigationService);
 
-            LogInCommand = new LogInCommand(this, databaseManager, passwordService);
+            LogInCommand = new LogInCommand(this, _databaseService, passwordService);
 
             ExitCommand = new ExitCommand();
 
@@ -86,10 +88,9 @@ namespace NursesScheduler.WPF.ViewModels
         {
             _errorsViewModel.ClearErrors(nameof(Password));
 
-            var validationResult = PasswordValidator.ValidatePassword(Password);
-
-            if (validationResult != PasswordValidationResult.Valid) 
-                _errorsViewModel.AddError(nameof(Password), PasswordValidationMessageHelper.GetValidationMessage(validationResult));
+            if (string.IsNullOrEmpty(Password))
+                _errorsViewModel.AddError(nameof(Password),
+                    PasswordValidationMessageHelper.GetValidationMessage(PasswordValidationResult.Empty));
         }
 
         private void TryLoadPassword(IPasswordService passwordService)

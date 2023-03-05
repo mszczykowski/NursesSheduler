@@ -7,7 +7,7 @@ using System;
 
 namespace NursesScheduler.WPF.ViewModels
 {
-    internal class BlazorAppViewModel
+    internal sealed class BlazorAppViewModel
     {
         public IServiceProvider Services => _host.Services;
 

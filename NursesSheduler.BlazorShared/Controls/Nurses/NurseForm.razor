@@ -1,5 +1,4 @@
-﻿@using NursesScheduler.BlazorShared.Helpers
-@using NursesScheduler.BlazorShared.ViewModels
+﻿
 
 <div class='container'>
     <div class="level">
@@ -20,7 +19,7 @@
       <div class='column is-5'>
         <div class="card">
           <div class="card-content">
-            <EditForm EditContext="@editContext" OnValidSubmit="@SaveOnClick">
+            <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
                 <DataAnnotationsValidator />
                 <div class="field">
                   <label class="label">Imie</label>
@@ -41,7 +40,7 @@
                   </div>
                 </div>
                 <div class="buttons is-right">
-                  <button class="button is-primary @CssHelper.SetIsLoading(isLoading)" @onclick="OnSubmitClick" type="submit">Zapisz</button>
+                  <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
                 </div>
             </EditForm>
           </div>
@@ -57,24 +56,25 @@
     [Parameter]
     public NurseViewModel Nurse { get; set; }
     [Parameter]
-    public EventCallback SaveOnClick { get; set; }
+    public EventCallback SaveNurse { get; set; }
 
-    private bool isLoading;
-    private EditContext editContext;
+    private bool _isLoading;
+    private EditContext _editContext;
 
-    private void OnSubmitClick()
+    private async Task OnSubmit()
     {
-        if(editContext.Validate())
+        if(_editContext.Validate())
         {
-            isLoading = true;
-            StateHasChanged();
+            _isLoading = true;
+            await Task.Delay(1);
+            await SaveNurse.InvokeAsync();
         }
     }
 
     protected override void OnInitialized()
     {
-        isLoading = false;
-        editContext = new(Nurse);
-        editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        _isLoading = false;
+        _editContext = new(Nurse);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
     }
 }

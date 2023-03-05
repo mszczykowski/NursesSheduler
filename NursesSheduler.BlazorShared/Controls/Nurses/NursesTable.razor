@@ -1,1 +1,68 @@
-﻿
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
+@using MediatR
+
+@inherits ExceptionHandlingComponent;
+
+@inject IMediator _mediatr
+
+
+<DeleteModal @ref="_deleteModal" DeleteAction="DeleteNurse" />
+
+@if (Nurses.Count == 0)
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
+    </div>
+}
+else
+{
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th style="width: 100%">Imie i nazwisko</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var nurse in Nurses)
+            {
+                <tr>
+                    <td style="width: 100%">@nurse.ToString()</td>
+                    <td><a href="/nurse/edit/@nurse.NurseId">Edytuj</a></td>
+                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(nurse.ToString(), nurse.NurseId))">Usuń</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    [Parameter]
+    public List<NurseViewModel> Nurses { get; set; }
+
+    private DeleteModal _deleteModal;
+
+    private async Task DeleteNurse(int nurseId)
+    {
+        try
+        {
+            var request = new DeleteNurseRequest
+            {
+                NurseId = nurseId,
+            };
+            var response = await _mediatr.Send(request);
+
+            if (!response.Success)
+                throw new ObjectNotDeletedException(nurseId, "Nurse");
+
+            Nurses.RemoveAll(n => n.NurseId == nurseId);
+
+        }
+        catch (Exception e)
+        {
+            HandleException(e);
+        }
+    }
+}

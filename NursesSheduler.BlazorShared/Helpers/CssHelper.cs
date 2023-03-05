@@ -13,5 +13,11 @@
             if (isActive) return "is-active";
             else return "";
         }
+
+        public static string SetVisibility(bool isVisible)
+        {
+            if (!isVisible) return "display: none";
+            else return "";
+        }
     }
 }

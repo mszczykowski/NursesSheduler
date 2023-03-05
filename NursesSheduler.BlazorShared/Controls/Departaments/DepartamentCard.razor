@@ -1,59 +1,24 @@
-﻿@using MediatR
-@using NursesScheduler.BlazorShared.Stores
-@using NursesScheduler.BlazorShared.ViewModels
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.DeleteDepartament
-@inject NavigationManager navManager;
-@inject IMediator mediatr;
-@inject CurrentDepartamentStore currentDepartamentStore;
-@inject ExceptionStore ExceptionStore;
-
-<DeleteModal @ref="deleteModal" IsHardDelete=true Name=@Departament.Name DeleteAction="DeleteDepartament"/>
+﻿
 
 <div class="card">
-  <div class="card-content">
-    <p class="title is-4">@Departament.Name</p>
-  </div>
-  <footer class="card-footer">
-    <a class="card-footer-item button is-link is-inverted" @onclick="OnDepartamentPick">Wybierz</a>
-  </footer>
-  <footer class="card-footer">
-    <a class="card-footer-item button is-link is-inverted" href="/departaments/edit/@Departament.DepartamentId">Edytuj</a>
-    <a class="card-footer-item button is-danger is-inverted" @onclick="(() => deleteModal.ChangeVisibility())">Usuń</a>
-  </footer>
+    <div class="card-content">
+        <p class="title is-4">@Departament.Name</p>
+    </div>
+    <footer class="card-footer">
+        <a class="card-footer-item button is-link is-inverted" @onclick="(async () => await OnDepartamentPick.InvokeAsync(Departament))">Wybierz</a>
+    </footer>
+    <footer class="card-footer">
+        <a class="card-footer-item button is-link is-inverted" href="/departaments/edit/@Departament.DepartamentId">Edytuj</a>
+        <a class="card-footer-item button is-danger is-inverted" @onclick="(async () => await OnDeleteClick.InvokeAsync())">Usuń</a>
+    </footer>
 </div>
+
 
 @code {
     [Parameter]
-    public EventCallback<int> DeleteCard { get; set; }
+    public EventCallback OnDeleteClick { get; set; }
+    [Parameter]
+    public EventCallback<DepartamentViewModel> OnDepartamentPick { get; set; }
     [Parameter]
     public DepartamentViewModel Departament { get; set; }
-
-    private DeleteModal deleteModal;
-
-    private void OnDepartamentPick()
-    {
-        currentDepartamentStore.CurrentDepartament = Departament;
-        navManager.NavigateTo("/scheduleView");
-    }
-
-
-    protected async Task DeleteDepartament()
-    {
-        try
-        {
-            var request = new DeleteDepartamentRequest
-            {
-                DepartamentId = Departament.DepartamentId
-            };
-            var response = await mediatr.Send(request);
-
-            if (response.IsDeleted) await DeleteCard.InvokeAsync(Departament.DepartamentId);
-            else navManager.NavigateTo("/error");
-        }
-        catch (Exception e)
-        {
-            ExceptionStore.Exception = e;
-            navManager.NavigateTo("/error");
-        }
-    }
 }

@@ -1,5 +1,6 @@
 ﻿using NursesScheduler.BlazorShared.ViewModels;
 
+
 namespace NursesScheduler.BlazorShared.Stores
 {
     public sealed class CurrentDepartamentStore

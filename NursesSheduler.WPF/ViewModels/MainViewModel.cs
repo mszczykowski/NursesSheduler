@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.WPF.ViewModels
 {
-    internal class MainViewModel : ViewModelBase
+    internal sealed class MainViewModel : ViewModelBase
     {
         private readonly NavigationStore _navigationStore;
 

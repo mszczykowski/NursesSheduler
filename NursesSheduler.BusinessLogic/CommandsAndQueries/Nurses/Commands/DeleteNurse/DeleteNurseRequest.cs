@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 {
-    internal class DeleteNurseRequest
+    public class DeleteNurseRequest : IRequest<DeleteNurseResponse>
     {
+        public int NurseId { get; set; }
     }
 }

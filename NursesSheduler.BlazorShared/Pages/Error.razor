@@ -1,0 +1,63 @@
+﻿@page "/error"
+
+@using NursesScheduler.BlazorShared.Stores
+
+@inject ExceptionStore _exceptionStore
+
+
+<div class="container">
+    <div class="columns is-vcentered">
+        <div class="column has-text-centered">
+            <h1 class="title">Coś poszło nie tak</h1>
+            @if (exceptionDescription != null)
+            {
+                <p class="subtitle">Możesz przesłać opis błędu na adres: <a href="mailto: szczykowski.m@gmail.com">szczykowski.m@gmail.com</a></p>
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            Opis błędu
+                        </p>
+                        <button class="card-header-icon" aria-label="otwórz" @onclick="ToggleDescription">
+                            <span class="icon">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </header>
+                    @if (isDescriptionVisible)
+                    {
+                        <div class="card-content">
+                            <div class="content">
+                                <div class="subtitle is-6">
+                                    @exceptionDescription
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private string exceptionDescription;
+    private bool isDescriptionVisible;
+
+    protected override void OnInitialized()
+    {
+        isDescriptionVisible = false;
+        if (_exceptionStore.Exception != null)
+        {
+            exceptionDescription = _exceptionStore.Exception.ToString();
+        }
+        _exceptionStore.Exception = null;
+    }
+
+    private void ToggleDescription()
+    {
+        isDescriptionVisible = !isDescriptionVisible;
+        StateHasChanged();
+    }
+}
+

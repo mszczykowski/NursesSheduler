@@ -1,4 +1,5 @@
-﻿using NursesScheduler.WPF.Services.Interfaces;
+﻿using NursesScheduler.WPF.Commands.CommandsBase;
+using NursesScheduler.WPF.Services.Interfaces;
 using System.Windows;
 
 namespace NursesScheduler.WPF.Commands
@@ -19,7 +20,9 @@ namespace NursesScheduler.WPF.Commands
 
         public override void Execute(object? parameter)
         {
-            if (MessageBox.Show("Usunąć wszytskie dane? Tej operacji nie da się cofnąć", "Wyczyść", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            if (MessageBox.Show((string)Application.Current.FindResource("delete_db_message"), 
+                (string)Application.Current.FindResource("clear"), MessageBoxButton.YesNo,
+                MessageBoxImage.Warning) == MessageBoxResult.No)
                 return;
 
             _databaseService.DeleteDb();

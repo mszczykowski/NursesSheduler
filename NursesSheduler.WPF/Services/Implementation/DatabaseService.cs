@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NursesScheduler.Infrastructure.Context;
 using NursesScheduler.WPF.Models.Exceptions;
 using NursesScheduler.WPF.Services.Interfaces;
+using System;
 using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,13 +20,14 @@ namespace NursesScheduler.WPF.Services.Implementation
 
         public async Task ChangeDbPassword(string oldPassword, string newPassword)
         {
-            var connectionString = await GetConnectionStingFromPassword(oldPassword);
+            var connectionString = await TryGetConnectionStingFromPassword(oldPassword);
 
             if (connectionString == null)
                 throw new InvalidPasswordException();
 
             using (SqliteConnection connection = new SqliteConnection(connectionString))
             {
+                connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT quote($newPassword);";
                 command.Parameters.AddWithValue("$newPassword", newPassword);
@@ -33,11 +35,13 @@ namespace NursesScheduler.WPF.Services.Implementation
 
                 command.CommandText = "PRAGMA rekey = " + quotedNewPassword;
                 command.Parameters.Clear();
-                command.ExecuteNonQuery();
+
+                await command.ExecuteNonQueryAsync();
+                connection.Close();
             }
         }
 
-        private string? BuildConnectionString(string password, SqliteOpenMode mode)
+        private string BuildConnectionString(string password, SqliteOpenMode mode)
         {
             return new SqliteConnectionStringBuilder
             {
@@ -51,15 +55,20 @@ namespace NursesScheduler.WPF.Services.Implementation
         {
             var optionBuilder = new DbContextOptionsBuilder();
             optionBuilder.UseSqlite(BuildConnectionString(password, SqliteOpenMode.ReadWriteCreate));
-
+            
             using (var context = new ApplicationDbContext(optionBuilder.Options))
             {
                 await context.Database.MigrateAsync();
+                await context.Database.CloseConnectionAsync();
+                await context.DisposeAsync();
             }
         }
 
         public void DeleteDb()
         {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             if (IsDbCreated())
                 File.Delete(dbLocation);
         }
@@ -69,7 +78,7 @@ namespace NursesScheduler.WPF.Services.Implementation
             return File.Exists(dbLocation);
         }
 
-        public async Task<string?> GetConnectionStingFromPassword(string password)
+        public async Task<string?> TryGetConnectionStingFromPassword(string password)
         {
             if (!IsDbCreated()) 
                 return null;

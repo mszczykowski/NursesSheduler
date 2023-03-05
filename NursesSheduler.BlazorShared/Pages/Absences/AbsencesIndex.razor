@@ -1,0 +1,56 @@
+﻿@page "/absences"
+
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
+
+@inherits ComponenentUsingDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+
+
+<div class="container">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Nieobecności</p>
+            </div>
+        </div>
+    </div>
+    @if (_nurses == null)
+    {
+        <LoadingSpinner/>
+    }
+    else
+    {
+        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable Nurses=_nurses/>
+    }
+</div>
+
+
+@code {
+    private List<NurseViewModel> _nurses = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) await LoadNurses();
+    }
+
+    private async Task LoadNurses()
+    {
+        try
+        {
+            var request = new GetNursesFromDepartamentRequest
+            {
+                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+            };
+            var response = await _mediatr.Send(request);
+
+            _nurses = _mapper.Map<List<NurseViewModel>>(response);
+            StateHasChanged();
+        }
+        catch(Exception e)
+        {
+            HandleException(e);
+        }
+    }
+}

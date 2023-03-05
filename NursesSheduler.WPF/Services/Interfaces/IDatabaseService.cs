@@ -9,7 +9,7 @@ namespace NursesScheduler.WPF.Services.Interfaces
         bool IsDbCreated();
         Task CreateDb(string password);
         void DeleteDb();
-        Task<string?> GetConnectionStingFromPassword(string password);
+        Task<string?> TryGetConnectionStingFromPassword(string password);
         Task ChangeDbPassword(string oldPassword, string newPassword);
     }
 }

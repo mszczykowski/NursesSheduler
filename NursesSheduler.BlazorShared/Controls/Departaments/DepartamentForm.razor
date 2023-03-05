@@ -1,5 +1,4 @@
-﻿@using NursesScheduler.BlazorShared.Helpers
-@using NursesScheduler.BlazorShared.ViewModels
+﻿
 
 <div class='container'>
     <div class="level">
@@ -17,27 +16,27 @@
 
 
     <div class='columns is-mobile is-centered'>
-      <div class='column is-5'>
-        <div class="card">
-          <div class="card-content">
-            <EditForm EditContext="@editContext" OnValidSubmit="@SaveOnClick">
-                <DataAnnotationsValidator />
-                <div class="field">
-                  <label class="label">Nazwa</label>
-                  <div class="control">
-                    <InputText class="input" @bind-Value="Departament.Name"/>
-                    <div class="help is-danger">
-                        <ValidationMessage For="@(() => Departament.Name)" />
-                    </div>
-                  </div>
+        <div class='column is-5'>
+            <div class="card">
+                <div class="card-content">
+                    <EditForm EditContext="@_editContext" OnSubmit="@OnSubmitClick">
+                        <DataAnnotationsValidator />
+                        <div class="field">
+                            <label class="label">Nazwa</label>
+                            <div class="control">
+                                <InputText class="input" @bind-Value="Departament.Name" />
+                                <div class="help is-danger">
+                                    <ValidationMessage For="@(() => Departament.Name)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons is-right">
+                            <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
+                        </div>
+                    </EditForm>
                 </div>
-                <div class="buttons is-right">
-                  <button class="button is-primary @CssHelper.SetIsLoading(isLoading)" @onclick="OnSubmitClick" type="submit">Zapisz</button>
-                </div>
-            </EditForm>
-          </div>
+            </div>
         </div>
-      </div>
     </div>
 </div>
 
@@ -48,25 +47,26 @@
     [Parameter]
     public DepartamentViewModel Departament { get; set; }
     [Parameter]
-    public EventCallback SaveOnClick { get; set; }
+    public EventCallback SaveDepartament { get; set; }
 
-    private bool isLoading;
-    private EditContext editContext;
+    private bool _isLoading;
+    private EditContext _editContext;
 
-    private void OnSubmitClick()
+    private async void OnSubmitClick()
     {
-        if(editContext.Validate())
+        if (_editContext.Validate())
         {
-            isLoading = true;
+            _isLoading = true;
+            await Task.Delay(1);
+            await SaveDepartament.InvokeAsync();
             StateHasChanged();
         }
     }
 
     protected override void OnInitialized()
     {
-        isLoading = false;
-        editContext = new(Departament);
-        editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        _isLoading = false;
+        _editContext = new(Departament);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
     }
 }
- 

@@ -10,6 +10,7 @@ namespace NursesScheduler.BusinessLogic.Interfaces.Infrastructure
         DbSet<Nurse> Nurses { get; }
         DbSet<Departament> Departaments { get; }
         DbSet<Schedule> Schedules { get; }
+        DbSet<Shift> Shifts { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         EntityEntry Entry(object entity);
     }

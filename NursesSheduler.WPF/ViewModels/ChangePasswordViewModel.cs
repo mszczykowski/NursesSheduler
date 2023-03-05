@@ -1,7 +1,10 @@
 ﻿using NursesScheduler.WPF.Commands;
 using NursesScheduler.WPF.Commands.Common;
+using NursesScheduler.WPF.Helpers;
+using NursesScheduler.WPF.Models.Enums;
 using NursesScheduler.WPF.Services.Implementation;
 using NursesScheduler.WPF.Services.Interfaces;
+using NursesScheduler.WPF.Validators;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -9,7 +12,7 @@ using System.Windows.Input;
 
 namespace NursesScheduler.WPF.ViewModels
 {
-    internal class ChangePasswordViewModel : ViewModelBase, INotifyDataErrorInfo
+    internal sealed class ChangePasswordViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         private string _oldPassword;
         public string OldPassword
@@ -18,7 +21,6 @@ namespace NursesScheduler.WPF.ViewModels
             set
             {
                 _oldPassword = value;
-                ValidateForm();
                 OnPropertyChanged(nameof(OldPassword));
             }
         }
@@ -30,7 +32,6 @@ namespace NursesScheduler.WPF.ViewModels
             set
             {
                 _newPassword = value;
-                ValidateForm();
                 OnPropertyChanged(nameof(NewPassword));
             }
         }
@@ -42,22 +43,23 @@ namespace NursesScheduler.WPF.ViewModels
             set
             {
                 _newPasswordRepeated = value;
-                ValidatePasswordRepeat();
                 OnPropertyChanged(nameof(NewPasswordRepeated));
             }
         }
 
         public ICommand ChangePasswordCommand { get; }
-        public ICommand CancelCommand { get; }
+        public ICommand BackCommand { get; }
 
         private readonly IDatabaseService _databaseService;
-        private readonly IPasswordService _passwordService;
 
-        public ChangePasswordViewModel(IDatabaseService databaseManager, NavigationService<LogInViewModel> logInViewNavigationService)
+        public ChangePasswordViewModel(IDatabaseService databaseService, IPasswordService passwordService,
+            NavigationService<LogInViewModel> logInViewNavigationService)
         {
-            CancelCommand = new NavigateCommand<LogInViewModel>(logInViewNavigationService);
+            _databaseService = databaseService;
 
-            ChangePasswordCommand = new ChangeDbPasswordCommand();
+            BackCommand = new NavigateCommand<LogInViewModel>(logInViewNavigationService);
+
+            ChangePasswordCommand = new ChangeDbPasswordCommand(this, databaseService, passwordService, logInViewNavigationService);
 
             _errorsViewModel = new ErrorsViewModel();
 
@@ -83,22 +85,39 @@ namespace NursesScheduler.WPF.ViewModels
 
         public void ValidateForm()
         {
+            ValidateOldPassword();
             ValidateNewPassword();
             ValidatePasswordRepeat();
+        }
+
+        private async void ValidateOldPassword()
+        {
+            _errorsViewModel.ClearErrors(nameof(OldPassword));
+
+            if (string.IsNullOrEmpty(OldPassword))
+                _errorsViewModel.AddError(nameof(OldPassword), 
+                    PasswordValidationMessageHelper.GetValidationMessage(PasswordValidationResult.Empty));
+            else if (await _databaseService.TryGetConnectionStingFromPassword(OldPassword) == null)
+                _errorsViewModel.AddError(nameof(OldPassword), PasswordValidationMessageHelper.GetWrongPasswordMessage());
         }
 
         private void ValidateNewPassword()
         {
             _errorsViewModel.ClearErrors(nameof(NewPassword));
 
-            if (string.IsNullOrEmpty(NewPassword)) _errorsViewModel.AddError(nameof(NewPassword), "Password can't be empty");
+            var validationResult = PasswordValidator.ValidatePassword(NewPassword);
+
+            if(validationResult != PasswordValidationResult.Valid)
+                _errorsViewModel.AddError(nameof(NewPassword),
+                        PasswordValidationMessageHelper.GetValidationMessage(validationResult));
         }
 
         private void ValidatePasswordRepeat()
         {
             _errorsViewModel.ClearErrors(nameof(NewPasswordRepeated));
 
-            if (NewPassword != NewPasswordRepeated) _errorsViewModel.AddError(nameof(NewPasswordRepeated), "Password doesn't match");
+            if (NewPassword != NewPasswordRepeated) 
+                _errorsViewModel.AddError(nameof(NewPasswordRepeated), PasswordValidationMessageHelper.GetNotMatchingPasswordMessage());
         }
     }
 }

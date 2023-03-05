@@ -1,0 +1,59 @@
+﻿@page "/absences/details/{Id:int}"
+
+@inherits ComponenentUsingDepartament
+
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
+
+@inject IMediator _mediatr;
+@inject IMapper _mapper;
+
+
+<div class="container">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Nieobecności: @_nurse.ToString()</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a class="button is-info" href="/Absences">Powrót</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private NurseViewModel _nurse;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) 
+            await LoadNurse();
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task LoadNurse()
+    {
+        try
+        {
+            var request = new GetNurseRequest
+            {
+                NurseId = Id
+            };
+            var response = await _mediatr.Send(request);
+            if (response == null) 
+                NavigationManager.NavigateTo("/notFound");
+            _nurse = _mapper.Map<NurseViewModel>(response);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
+    }
+}

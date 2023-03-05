@@ -1,10 +1,12 @@
-﻿using NursesScheduler.WPF.Services.Interfaces;
+﻿using NursesScheduler.WPF.Commands.CommandsBase;
+using NursesScheduler.WPF.Services.Interfaces;
 using NursesScheduler.WPF.ViewModels;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace NursesScheduler.WPF.Commands
 {
-    internal class CreateDbCommand : CommandBase
+    internal sealed class CreateDbCommand : AsyncCommandBase
     {
         private readonly RegisterViewModel _registerViewModel;
         private readonly IDatabaseService _databaseManager;
@@ -17,17 +19,19 @@ namespace NursesScheduler.WPF.Commands
             _navigationService = navigationService;
         }
 
-        public override async void Execute(object? parameter)
+        public override async Task ExecuteAsync(object? parameter)
         {
             _registerViewModel.ValidateForm();
 
             if (_registerViewModel.HasErrors) return;
 
-            await _databaseManager.CreateDb(_registerViewModel.Password);
+            _registerViewModel.IsLoading = true;
+
+            await Task.Run(async () => await _databaseManager.CreateDb(_registerViewModel.Password));
 
             _navigationService.Navigate();
 
-            MessageBox.Show("Password created. You can log in now.");
+            MessageBox.Show((string)Application.Current.FindResource("passwd_created"));
         }
     }
 }

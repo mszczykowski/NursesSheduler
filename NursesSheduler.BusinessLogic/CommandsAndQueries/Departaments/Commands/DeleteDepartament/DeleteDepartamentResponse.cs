@@ -2,11 +2,11 @@
 {
     public sealed class DeleteDepartamentResponse
     {
-        public bool IsDeleted { get; set; }
+        public bool Success { get; set; }
 
-        public DeleteDepartamentResponse(bool isDeleted)
+        public DeleteDepartamentResponse(bool success)
         {
-            IsDeleted = isDeleted;
+            Success = success;
         }
     }
 }

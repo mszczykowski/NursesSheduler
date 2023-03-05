@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 {
-    internal class DeleteNurseResponse
+    public class DeleteNurseResponse
     {
+        public bool Success { get; set; }
+
+        public DeleteNurseResponse(bool success)
+        {
+            Success = success;
+        }
     }
 }

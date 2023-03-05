@@ -1,12 +1,12 @@
 ﻿@page "/departaments"
 
-@inherits PageBase
-
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
-@using NursesScheduler.BusinessLogic.Interfaces.Infrastructure
+
+@inherits ExceptionHandlingComponent
 
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
+
 
 <div class="container">
     <div class="level">
@@ -33,24 +33,12 @@
     {
         <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
     }
-    else if(_departaments.Count == 0)
-    {
-        <div class="has-text-centered">
-            <h4 class="subtitle is-4">Najpierw <a href="/departaments/add">dodaj</a> oddział</h4>
-        </div>
-    }
     else
     {
-        <div class="columns is-centered is-multiline">
-            @for(int i = 0; i < _departaments.Count(); i++)
-            {
-                <div class="column is-one-quarter">
-                    <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=@_departaments[i] DeleteCard="DeleteCard"/>
-                </div>
-            }
-        </div>
+        <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentsGrid Departaments=_departaments/>
     }
 </div>
+
 
 @code {
     private List<DepartamentViewModel> _departaments;
@@ -76,13 +64,5 @@
         {
             base.HandleException(e);
         }
-    }
-
-    private void DeleteCard(int departamentId)
-    {
-        if(_departaments != null)
-            _departaments.Remove(_departaments.Where(d => d.DepartamentId == departamentId).FirstOrDefault());
-
-        StateHasChanged();
     }
 }

@@ -1,6 +1,6 @@
 ﻿@page "/departaments/edit/{Id:int}"
 
-@inherits PageBase
+@inherits ExceptionHandlingComponent
 
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament
@@ -14,7 +14,7 @@
 }
 else
 {
-    <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveOnClick="SaveDepartament"/>
+    <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveDepartament="SaveDepartament"/>
 }
 
 

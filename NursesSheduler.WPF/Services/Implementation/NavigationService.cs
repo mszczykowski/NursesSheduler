@@ -5,7 +5,7 @@ using System;
 
 namespace NursesScheduler.WPF.Services.Implementation
 {
-    internal class NavigationService<TViewModel> : INavigationService where TViewModel : ViewModelBase
+    internal sealed class NavigationService<TViewModel> : INavigationService where TViewModel : ViewModelBase
     {
         private readonly NavigationStore _navigationStore;
         private readonly Func<TViewModel> _createViewModel;

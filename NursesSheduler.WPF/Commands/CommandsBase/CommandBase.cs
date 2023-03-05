@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace NursesScheduler.WPF.Commands
+namespace NursesScheduler.WPF.Commands.CommandsBase
 {
     internal abstract class CommandBase : ICommand
     {

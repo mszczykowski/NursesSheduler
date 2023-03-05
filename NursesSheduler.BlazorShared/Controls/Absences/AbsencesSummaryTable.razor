@@ -1,0 +1,34 @@
+﻿
+
+@if (Nurses.Count == 0)
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
+    </div>
+}
+else
+{
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th style="width: 100%">Imie i nazwisko</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var nurse in Nurses)
+        {
+            <tr>
+                <td style="width: 100%">@nurse.ToString()</td>
+                <td><a href="/absences/details/@nurse.NurseId">Szczegóły</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    [Parameter]
+    public List<NurseViewModel> Nurses { get; set; }
+}

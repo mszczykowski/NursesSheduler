@@ -3,30 +3,46 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
     <!--common-->
-    <system:String x:Key="passwd">Password</system:String>
-    <system:String x:Key="passwd_repeat">Repeat password</system:String>
+    <system:String x:Key="passwd">Password:</system:String>
+    <system:String x:Key="passwd_repeat">Repeat password:</system:String>
     <system:String x:Key="app_name">Nurses Sheduler</system:String>
     <system:String x:Key="exit">Exit</system:String>
     <system:String x:Key="save">Save</system:String>
     <system:String x:Key="back">Back</system:String>
     <system:String x:Key="settings">Settings</system:String>
+    <system:String x:Key="change_passwd">Change password</system:String>
 
     <!--LogInView-->
     <system:String x:Key="remember_passwd">Remember password?</system:String>
     <system:String x:Key="log_in">Log in</system:String>
-    <system:String x:Key="change_passwd">Change password</system:String>
-    
 
     <!--registerView-->
-    <system:String x:Key="register">Register</system:String>
     <system:String x:Key="create_passwd_message">You have to create password</system:String>
 
     <!--settingsView-->
-    <system:String x:Key="language">Language</system:String>
+    <system:String x:Key="language">Language:</system:String>
     <system:String x:Key="polish">Polish</system:String>
     <system:String x:Key="english">English</system:String>
     <system:String x:Key="delete_db">Remove all data</system:String>
 
     <!--changePasswordView-->
+    <system:String x:Key="old_passwd">Old password:</system:String>
+    <system:String x:Key="new_passwd">New password:</system:String>
+    <system:String x:Key="repeat_new_passwd">Repeat new password:</system:String>
+    
+    <!--password validation-->
+    <system:String x:Key="passwd_min_lenght">Password must have at least 8 characters</system:String>
+    <system:String x:Key="passwd_lower_upper">Password must contain lower and upper characters</system:String>
+    <system:String x:Key="passwd_needs_number">Password must contail at leas one number</system:String>
+    <system:String x:Key="passwd_doesnt_match">Passwords doesn't match</system:String>
+    <system:String x:Key="passwd_empty">Password can't be empty</system:String>
+    <system:String x:Key="wrong_passwd">Wrong password</system:String>
+    
+    <!--message boxes-->
+    <system:String x:Key="close">Close aplication?</system:String>
+    <system:String x:Key="passwd_changed">Password changed</system:String>
+    <system:String x:Key="passwd_created">Password created. You can log in now.</system:String>
+    <system:String x:Key="clear">Clear</system:String>
+    <system:String x:Key="delete_db_message">Clear all data? You can't revert this operation!</system:String>
     
 </ResourceDictionary>

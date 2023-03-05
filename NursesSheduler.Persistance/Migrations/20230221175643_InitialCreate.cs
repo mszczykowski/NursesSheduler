@@ -13,34 +13,35 @@ namespace NursesScheduler.Infrastructure.Migrations
                 name: "Departaments",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    DepartamentId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Departaments", x => x.Id);
+                    table.PrimaryKey("PK_Departaments", x => x.DepartamentId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Nurses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    NurseId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Surname = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
+                    Surname = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
                     DepartamentId = table.Column<int>(type: "INTEGER", nullable: true),
                     IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Nurses", x => x.Id);
+                    table.PrimaryKey("PK_Nurses", x => x.NurseId);
                     table.ForeignKey(
                         name: "FK_Nurses_Departaments_DepartamentId",
                         column: x => x.DepartamentId,
                         principalTable: "Departaments",
-                        principalColumn: "Id");
+                        principalColumn: "DepartamentId");
                 });
 
             migrationBuilder.CreateTable(
@@ -62,7 +63,29 @@ namespace NursesScheduler.Infrastructure.Migrations
                         name: "FK_Schedules_Departaments_DepartamentId",
                         column: x => x.DepartamentId,
                         principalTable: "Departaments",
-                        principalColumn: "Id",
+                        principalColumn: "DepartamentId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TimeOff",
+                columns: table => new
+                {
+                    TimeOffId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    From = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    To = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    NurseId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimeOff", x => x.TimeOffId);
+                    table.ForeignKey(
+                        name: "FK_TimeOff_Nurses_NurseId",
+                        column: x => x.NurseId,
+                        principalTable: "Nurses",
+                        principalColumn: "NurseId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -91,47 +114,20 @@ namespace NursesScheduler.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TimeOff",
-                columns: table => new
-                {
-                    TimeOffId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Day = table.Column<int>(type: "INTEGER", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    NurseId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ScheduleId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TimeOff", x => x.TimeOffId);
-                    table.ForeignKey(
-                        name: "FK_TimeOff_Nurses_NurseId",
-                        column: x => x.NurseId,
-                        principalTable: "Nurses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TimeOff_Schedules_ScheduleId",
-                        column: x => x.ScheduleId,
-                        principalTable: "Schedules",
-                        principalColumn: "ScheduleId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "NurseShift",
                 columns: table => new
                 {
-                    AssignedNursesId = table.Column<int>(type: "INTEGER", nullable: false),
+                    AssignedNursesNurseId = table.Column<int>(type: "INTEGER", nullable: false),
                     ShiftsShiftId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NurseShift", x => new { x.AssignedNursesId, x.ShiftsShiftId });
+                    table.PrimaryKey("PK_NurseShift", x => new { x.AssignedNursesNurseId, x.ShiftsShiftId });
                     table.ForeignKey(
-                        name: "FK_NurseShift_Nurses_AssignedNursesId",
-                        column: x => x.AssignedNursesId,
+                        name: "FK_NurseShift_Nurses_AssignedNursesNurseId",
+                        column: x => x.AssignedNursesNurseId,
                         principalTable: "Nurses",
-                        principalColumn: "Id",
+                        principalColumn: "NurseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_NurseShift_Shift_ShiftsShiftId",
@@ -165,11 +161,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                 name: "IX_TimeOff_NurseId",
                 table: "TimeOff",
                 column: "NurseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TimeOff_ScheduleId",
-                table: "TimeOff",
-                column: "ScheduleId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

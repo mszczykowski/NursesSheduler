@@ -18,7 +18,7 @@ builder.Services.AddInfrastructureLayer(new SqliteConnectionStringBuilder
                                                 {
                                                     DataSource = @"D:\Projekty\inżynierka\NursesSheduler\NursesSheduler.WPF\bin\Debug\net6.0-windows\scheduler1.db",
                                                     Mode = SqliteOpenMode.ReadWrite,
-                                                    Password = "test",
+                                                    Password = "test24ABC",
                                                 }.ToString());
 
 var app = builder.Build();

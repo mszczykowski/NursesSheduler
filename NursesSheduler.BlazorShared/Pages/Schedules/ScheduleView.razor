@@ -1,13 +1,13 @@
 ﻿@page "/scheduleView"
-@inherits PageUsingDepartamentBase
-@using AutoMapper
-@using MediatR
-@using NursesScheduler.BlazorShared.ViewModels
-@using NursesScheduler.BlazorShared.ViewModels.Enums
+
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+
+@inherits ComponenentUsingDepartament
+
 @inject IMediator mediatr;
 @inject IMapper mapper;
+
 
 <div class="container is-fluid">
     @if(!isLoaded)
@@ -16,6 +16,19 @@
     }
     else
     {
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <a>Konfiguracja ranków</a>
+                </div>
+                <div class="level-item">
+                    <a>Konfiguracja generatora</a>
+                </div>
+                <div class="level-item">
+                    <a>Drukuj</a>
+                </div>
+            </div>
+        </div>
         <div class="level">
             <div class="level-left">
                 <div class="level-item">
@@ -51,19 +64,10 @@
                 <div class="level-item">
                     <button class="button is-info" @onclick="CurrentDateClick">Bieżący miesiąc</button>
                 </div>
-                <div class="level-item">
-                    <button class="button is-ghost">Konfiguracja ranków</button>
-                </div>
-                <div class="level-item">
-                    <button class="button is-ghost">Konfiguracja generatora</button>
-                </div>
             </div>
 
 
             <div class="level-right">
-                <div class="level-item">
-                    <button class="button is-ghost">Drukuj</button>
-                </div>
                 <div class="level-item">
                     <p class="control">
                       <a class="button is-info" href="/departaments/add">

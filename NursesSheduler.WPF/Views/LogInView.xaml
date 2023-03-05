@@ -17,21 +17,21 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Button Style="{StaticResource LinkButton}" Grid.Row="0" Content="Settings" HorizontalAlignment="Right" Margin="5"
+        <Button Style="{StaticResource LinkButton}" Grid.Row="0" Content="{StaticResource settings}" HorizontalAlignment="Right" Margin="5"
                 Command="{Binding NavigateToSettingsCommand}"/>
 
-        <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="Nurses Sheduler" Padding="0 0 0 10"/>
-        <Label Grid.Row="2" Content="Enter password:"/>
+        <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="{StaticResource app_name}" Padding="0 0 0 10"/>
+        <Label Grid.Row="2" Content="{StaticResource passwd}"/>
         <components:BindablePasswordBox Grid.Row="3" Password="{Binding Password}"/>
 
-        <CheckBox Grid.Row="4" Content="Remember password?" IsChecked="{Binding SavePassword}"/>
+        <CheckBox Grid.Row="4" Content="{StaticResource remember_passwd}" IsChecked="{Binding SavePassword}"/>
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Log in" Command="{Binding LogInCommand}"/>
-            <Button Content="Exit" Command="{Binding ExitCommand}"/>
+            <Button Content="{StaticResource log_in}" Command="{Binding LogInCommand}"/>
+            <Button Content="{StaticResource exit}" Command="{Binding ExitCommand}"/>
         </StackPanel>
 
-        <Button Style="{StaticResource LinkButton}" Grid.Row="6" Content="Change password" HorizontalAlignment="Center" Margin="5"
+        <Button Style="{StaticResource LinkButton}" Grid.Row="6" Content="{StaticResource change_passwd}" HorizontalAlignment="Center" Margin="5"
                 Command="{Binding NavigateToChangePasswordCommand}"/>
     </Grid>
 </UserControl>

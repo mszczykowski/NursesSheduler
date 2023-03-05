@@ -12,8 +12,29 @@ using System.Windows.Input;
 
 namespace NursesScheduler.WPF.ViewModels
 {
-    internal class RegisterViewModel : ViewModelBase, INotifyDataErrorInfo
+    internal sealed class RegisterViewModel : ViewModelBase, INotifyDataErrorInfo
     {
+        private bool _isFormActive;
+        public bool IsFormActive
+        {
+            get => _isFormActive;
+            set
+            {
+                _isFormActive = value;
+                OnPropertyChanged(nameof(IsFormActive));
+            }
+        }
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                IsFormActive = !value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
         private string _password;
         public string Password 
         { 
@@ -21,7 +42,6 @@ namespace NursesScheduler.WPF.ViewModels
             set
             {
                 _password = value;
-                ValidateForm();
                 OnPropertyChanged(nameof(Password));
             }
         }
@@ -32,7 +52,6 @@ namespace NursesScheduler.WPF.ViewModels
             set
             {
                 _passwordRepeated = value;
-                ValidatePasswordRepeat();
                 OnPropertyChanged(nameof(PasswordRepeated));
             }
         }
@@ -43,6 +62,8 @@ namespace NursesScheduler.WPF.ViewModels
 
         public RegisterViewModel(IDatabaseService databaseManager, NavigationService<LogInViewModel> logInViewNavigationService)
         {
+            IsFormActive = true;
+
             ExitCommand = new ExitCommand();
 
             CreatePasswordCommand = new CreateDbCommand(this, databaseManager, logInViewNavigationService);
@@ -82,15 +103,18 @@ namespace NursesScheduler.WPF.ViewModels
             var validationResult = PasswordValidator.ValidatePassword(Password);
 
             if (validationResult != PasswordValidationResult.Valid)
-                _errorsViewModel.AddError(nameof(Password), PasswordValidationMessageHelper.GetValidationMessage(validationResult));
+            {
+                _errorsViewModel.AddError(nameof(Password),
+                    PasswordValidationMessageHelper.GetValidationMessage(validationResult));
+            }
         }
 
         private void ValidatePasswordRepeat()
         {
             _errorsViewModel.ClearErrors(nameof(PasswordRepeated));
 
-            if (Password != PasswordRepeated) 
-                _errorsViewModel.AddError(nameof(PasswordRepeated), "Password doesn't match");
+            if (Password != PasswordRepeated)
+                _errorsViewModel.AddError(nameof(PasswordRepeated), PasswordValidationMessageHelper.GetNotMatchingPasswordMessage());
         }
     }
 }

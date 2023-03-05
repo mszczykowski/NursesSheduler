@@ -11,6 +11,7 @@ namespace NursesScheduler.Infrastructure.Context
         public DbSet<Nurse> Nurses { get; set; }
         public DbSet<Departament> Departaments { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<Shift> Shifts { get; set; }
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

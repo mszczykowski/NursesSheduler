@@ -1,15 +1,11 @@
-﻿using NursesScheduler.WPF.Services.Interfaces;
+﻿using NursesScheduler.WPF.Commands.CommandsBase;
+using NursesScheduler.WPF.Services.Interfaces;
 using NursesScheduler.WPF.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace NursesScheduler.WPF.Commands
 {
-    internal class LogInCommand : CommandBase
+    internal sealed class LogInCommand : CommandBase
     {
         private readonly LogInViewModel _logInViewModel;
         private readonly IDatabaseService _databaseService;
@@ -29,11 +25,11 @@ namespace NursesScheduler.WPF.Commands
 
             if (_logInViewModel.HasErrors) return;
 
-            var connectionString = await _databaseService.GetConnectionStingFromPassword(_logInViewModel.Password);
+            var connectionString = await _databaseService.TryGetConnectionStingFromPassword(_logInViewModel.Password);
 
             if (connectionString == null)
             {
-                MessageBox.Show("Password invalid");
+                MessageBox.Show((string)Application.Current.FindResource("wrong_passwd"));
                 return;
             }
 
