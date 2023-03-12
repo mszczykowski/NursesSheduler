@@ -6,6 +6,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
     {
         public string Name { get; set; }
         public string Surname { get; set; }
+        public int PTOentitlement { get; set; }
         public int DepartamentId { get; set; }
 
     }

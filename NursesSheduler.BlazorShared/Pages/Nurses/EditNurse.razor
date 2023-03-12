@@ -42,7 +42,8 @@ else
                 NurseId = Id
             };
             var response = await _mediatr.Send(request);
-            if (response == null) NavigationManager.NavigateTo("/notFound");
+            if (response == null) 
+                NavigationManager.NavigateTo("/notFound");
             _nurse = _mapper.Map<NurseViewModel>(response);
             StateHasChanged();
         }

@@ -134,3 +134,7 @@
     text-orientation: mixed;
     font-size: 3px;
 }
+
+.is-fullwidht{
+    width: 100%;
+}

@@ -1,4 +1,4 @@
-﻿using NursesScheduler.Domain.DatabaseModels;
+﻿using NursesScheduler.Domain.DomainModels;
 using NursesScheduler.Domain.Interfaces;
 
 namespace NursesScheduler.Domain.Models.Settings.Constraints

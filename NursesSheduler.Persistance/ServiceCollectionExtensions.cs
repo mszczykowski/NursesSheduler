@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using NursesScheduler.Infrastructure.Context;
 using NursesScheduler.Infrastructure.HttpClients;
 using System.Configuration;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
+using NursesScheduler.Infrastructure.Context;
 
 namespace NursesScheduler.Infrastructure
 {

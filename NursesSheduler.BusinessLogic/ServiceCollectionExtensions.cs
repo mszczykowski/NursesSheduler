@@ -5,7 +5,7 @@ using FluentValidation;
 using NursesScheduler.BusinessLogic.Validation;
 using NursesScheduler.BusinessLogic.Interfaces.Services;
 using NursesScheduler.BusinessLogic.Services;
-using NursesScheduler.Domain.DatabaseModels;
+using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic
 {

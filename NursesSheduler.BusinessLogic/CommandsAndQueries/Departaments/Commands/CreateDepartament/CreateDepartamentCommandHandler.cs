@@ -2,7 +2,7 @@
 using FluentValidation;
 using MediatR;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using NursesScheduler.Domain.DatabaseModels;
+using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
 {

@@ -3,6 +3,8 @@
     public enum TimeOffTypes
     {
         Other,
-        PTO
+        PaidTimeOff,
+        LeaveOnRequest,
+        SickLeave,
     }
 }

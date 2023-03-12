@@ -1,26 +1,91 @@
-﻿@inherits ExceptionHandlingComponent;
-
-<div class="card">
-    <div class="card-content">
-        <EditForm EditContext="@_editContext" OnSubmit="@OnSubmitClick">
-            <DataAnnotationsValidator />
-            <div class="field">
-                <label class="label">Nazwa</label>
-                <div class="control">
-                    <InputText class="input" @bind-Value="Departament.Name" />
-                    <div class="help is-danger">
-                        <ValidationMessage For="@(() => Departament.Name)" />
+﻿<EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+    <DataAnnotationsValidator />
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Początek</label>
+                    <div class="control">
+                        <InputDate class="input" @bind-Value="Absence.From" min="@GetMinDate()" max="@GetMaxDate()"/>
+                        <div class="help is-danger">
+                            <ValidationMessage For="@(() => Absence.From)" />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="buttons is-right">
-                <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Koniec</label>
+                    <InputDate class="input" @bind-Value="Absence.To" min="@GetMinDate()" max="@GetMaxDate()"/>
+                    <div class="help is-danger">
+                        <ValidationMessage For="@(() => Absence.To)" />
+                    </div>
+                </div>
             </div>
-        </EditForm>
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Typ</label>
+                    <InputSelect @bind-Value="Absence.Type">
+                        <select>
+                            @foreach(var absenceTypes in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                            {
+                                <option value="@absenceTypes">@absenceTypes.GetEnumDisplayName()</option>
+                            }
+                        </select>
+                    </InputSelect>
+                </div>
+
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <button type="submit" class="button is-success">Zapisz nieobecność</button>
+            </div>
+        </div>
     </div>
-</div>
+</EditForm>
 
 
 @code {
-    int i = 1;
+    [Parameter]
+    public int AbsenceYear { get; set; }
+    [Parameter]
+    public AbsenceViewModel Absence { get; set; }
+    [Parameter]
+    public EventCallback SaveAbsence { get; set; }
+
+    private bool _isLoading;
+    private EditContext _editContext;
+
+    private async Task OnSubmit()
+    {
+        if (_editContext.Validate())
+        {
+            _isLoading = true;
+            await Task.Delay(1);
+            await SaveAbsence.InvokeAsync();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _isLoading = false;
+        _editContext = new(Absence);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+
+        if(Absence == null)
+        {
+            Absence = new AbsenceViewModel();
+        }
+    }
+
+    private string GetMinDate()
+    {
+        return $"{AbsenceYear}-01-01";
+    }
+
+    private string GetMaxDate()
+    {
+        return $"{AbsenceYear}-12-31";
+    }
 }

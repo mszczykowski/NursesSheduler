@@ -2,7 +2,7 @@
 using FluentValidation;
 using MediatR;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using NursesScheduler.Domain.DatabaseModels;
+using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 {
@@ -26,7 +26,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
             var validationResult = await _validator.ValidateAsync(nurse);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-            nurse.IsActive = true;
             nurse.IsDeleted = false;
 
             await _context.Nurses.AddAsync(nurse);

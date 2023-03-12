@@ -12,7 +12,9 @@ namespace NursesScheduler.BlazorShared.ViewModels
         [StringLength(30, ErrorMessage = "Nzwisko jest zbyt długie (maksymalnie 30 znaków).")]
         public string Surname { get; set; }
         public int DepartamentId { get; set; }
-        public bool IsActive { get; set; }
+        [Required(ErrorMessage = "Należy wybrać opcję")]
+        [Range(20,26, ErrorMessage = "Należy wybrać prawidłową wartość")]
+        public int PTOentitlement { get; set; }
         public bool IsDeleted { get; set; }
         public override string ToString()
         {

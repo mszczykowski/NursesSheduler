@@ -1,0 +1,74 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.DeleteAbsence
+
+@inherits ExceptionHandlingComponent
+
+@inject IMediator _mediatr
+
+
+<DeleteModal @ref="_deleteModal" DeleteAction="DeleteAbsence" />
+
+@if (Absences == null || !Absences.Any())
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Brak wprowadzonych nieobecności</h4>
+    </div>
+}
+else
+{
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th>Początek</th>
+                <th>Koniec</th>
+                <th>Długość</th>
+                <th>Przypisanych godzin pracy</th>
+                <th>Typ</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var absence in Absences)
+            {
+                <tr>
+                    <td>@absence.From</td>
+                    <td>@absence.To</td>
+                    <td>@absence.Lenght</td>
+                    <td>@absence.Type.GetEnumDisplayName()</td>
+                    <td><a>Edytuj</a></td>
+                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private DeleteModal _deleteModal;
+
+    [Parameter]
+    public List<AbsenceViewModel> Absences { get; set; }
+
+    private async Task DeleteAbsence(int absenceId)
+    {
+        try
+        {
+            var request = new DeleteAbsenceRequest
+            {
+                AbsenceId = absenceId,
+            };
+            var response = await _mediatr.Send(request);
+
+            if (!response.Success)
+                throw new EntityNotDeletedException(absenceId, nameof(AbsenceViewModel));
+
+            Absences.RemoveAll(a => a.AbsenceId == absenceId);
+
+        }
+        catch (Exception e)
+        {
+            HandleException(e);
+        }
+    }
+}

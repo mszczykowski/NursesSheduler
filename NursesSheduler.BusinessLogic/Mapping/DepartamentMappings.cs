@@ -3,7 +3,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.Cre
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament;
-using NursesScheduler.Domain.DatabaseModels;
+using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {

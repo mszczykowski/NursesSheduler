@@ -3,7 +3,7 @@ using NursesScheduler.BlazorShared.ViewModels.Enums;
 
 namespace NursesScheduler.BlazorShared.Helpers
 {
-    public static class ScheduleCssHelper
+    internal static class ScheduleCssHelper
     {
         public static string GetDayClass(DayViewModel dayViewModel)
         {

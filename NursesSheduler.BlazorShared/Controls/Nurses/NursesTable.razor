@@ -1,5 +1,4 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
-@using MediatR
 
 @inherits ExceptionHandlingComponent;
 
@@ -8,7 +7,7 @@
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteNurse" />
 
-@if (Nurses.Count == 0)
+@if (Nurses == null || !Nurses.Any())
 {
     <div class="has-text-centered">
         <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
@@ -55,7 +54,7 @@ else
             var response = await _mediatr.Send(request);
 
             if (!response.Success)
-                throw new ObjectNotDeletedException(nurseId, "Nurse");
+                throw new EntityNotDeletedException(nurseId, "Nurse");
 
             Nurses.RemoveAll(n => n.NurseId == nurseId);
 

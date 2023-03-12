@@ -32,7 +32,35 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.ToTable("NurseShift");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Departament", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Absence", b =>
+                {
+                    b.Property<int>("AbsenceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("AssignedWorkingHours")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("From")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("To")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("YearlyAbsencesId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AbsenceId");
+
+                    b.HasIndex("YearlyAbsencesId");
+
+                    b.ToTable("Absences");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Departament", b =>
                 {
                     b.Property<int>("DepartamentId")
                         .ValueGeneratedOnAdd()
@@ -48,13 +76,13 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.ToTable("Departaments");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Nurse", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Nurse", b =>
                 {
                     b.Property<int>("NurseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("DepartamentId")
+                    b.Property<int>("DepartamentId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsActive")
@@ -68,6 +96,9 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("PTOentitlement")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -80,7 +111,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.ToTable("Nurses");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Schedules.Schedule", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Schedules.Schedule", b =>
                 {
                     b.Property<int>("ScheduleId")
                         .ValueGeneratedOnAdd()
@@ -109,7 +140,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.ToTable("Schedules");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Schedules.Shift", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Schedules.Shift", b =>
                 {
                     b.Property<int>("ShiftId")
                         .ValueGeneratedOnAdd()
@@ -140,58 +171,77 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.ToTable("Shifts");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.TimeOff", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.YearlyAbsencesSummary", b =>
                 {
-                    b.Property<int>("TimeOffId")
+                    b.Property<int>("YearlyAbsencesSummaryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateOnly>("From")
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("NurseId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateOnly>("To")
+                    b.Property<TimeSpan>("PTO")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("PTODays")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("TimeOffId");
+                    b.Property<TimeSpan>("PTOLeftFromPreviousYear")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("PTOUsed")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("YearlyAbsencesSummaryId");
 
                     b.HasIndex("NurseId");
 
-                    b.ToTable("TimeOff");
+                    b.ToTable("YearlyAbsences");
                 });
 
             modelBuilder.Entity("NurseShift", b =>
                 {
-                    b.HasOne("NursesScheduler.Domain.DatabaseModels.Nurse", null)
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Nurse", null)
                         .WithMany()
                         .HasForeignKey("AssignedNursesNurseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NursesScheduler.Domain.DatabaseModels.Schedules.Shift", null)
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Schedules.Shift", null)
                         .WithMany()
                         .HasForeignKey("ShiftsShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Nurse", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Absence", b =>
                 {
-                    b.HasOne("NursesScheduler.Domain.DatabaseModels.Departament", "Departament")
+                    b.HasOne("NursesScheduler.Domain.DomainModels.YearlyAbsencesSummary", "YearlyAbsences")
+                        .WithMany("Absences")
+                        .HasForeignKey("YearlyAbsencesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("YearlyAbsences");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Nurse", b =>
+                {
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Departament", "Departament")
                         .WithMany("Nurses")
-                        .HasForeignKey("DepartamentId");
+                        .HasForeignKey("DepartamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Departament");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Schedules.Schedule", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Schedules.Schedule", b =>
                 {
-                    b.HasOne("NursesScheduler.Domain.DatabaseModels.Departament", "Departament")
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Departament", "Departament")
                         .WithMany("Schedules")
                         .HasForeignKey("DepartamentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -200,9 +250,9 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Navigation("Departament");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Schedules.Shift", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Schedules.Shift", b =>
                 {
-                    b.HasOne("NursesScheduler.Domain.DatabaseModels.Schedules.Schedule", "Schedule")
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Schedules.Schedule", "Schedule")
                         .WithMany("Shifts")
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -211,10 +261,10 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.TimeOff", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.YearlyAbsencesSummary", b =>
                 {
-                    b.HasOne("NursesScheduler.Domain.DatabaseModels.Nurse", "Nurse")
-                        .WithMany("TimeOffs")
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Nurse", "Nurse")
+                        .WithMany("YearlyAbsencesSummary")
                         .HasForeignKey("NurseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -222,21 +272,26 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Navigation("Nurse");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Departament", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Departament", b =>
                 {
                     b.Navigation("Nurses");
 
                     b.Navigation("Schedules");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Nurse", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Nurse", b =>
                 {
-                    b.Navigation("TimeOffs");
+                    b.Navigation("YearlyAbsencesSummary");
                 });
 
-            modelBuilder.Entity("NursesScheduler.Domain.DatabaseModels.Schedules.Schedule", b =>
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Schedules.Schedule", b =>
                 {
                     b.Navigation("Shifts");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.YearlyAbsencesSummary", b =>
+                {
+                    b.Navigation("Absences");
                 });
 #pragma warning restore 612, 618
         }

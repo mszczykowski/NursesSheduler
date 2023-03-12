@@ -12,6 +12,9 @@ else
         <thead>
             <tr>
                 <th style="width: 100%">Imie i nazwisko</th>
+                <th>Przypisany urlop</th>
+                <th>Pozostały urlop</th>
+                <th>Zaległy urlop</th>
                 <th></th>
             </tr>
         </thead>
@@ -20,7 +23,10 @@ else
         {
             <tr>
                 <td style="width: 100%">@nurse.ToString()</td>
-                <td><a href="/absences/details/@nurse.NurseId">Szczegóły</a></td>
+                <td>178:00</td>
+                <td>178:00</td>
+                <td>178:00</td>
+                <td><a href="/absences/details/@nurse.NurseId">Więcej</a></td>
             </tr>
         }
         </tbody>

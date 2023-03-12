@@ -16,36 +16,50 @@
 
 
     <div class='columns is-mobile is-centered'>
-      <div class='column is-5'>
-        <div class="card">
-          <div class="card-content">
-            <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
-                <DataAnnotationsValidator />
-                <div class="field">
-                  <label class="label">Imie</label>
-                  <div class="control">
-                    <InputText class="input" @bind-Value="Nurse.Name"/>
-                    <div class="help is-danger">
-                        <ValidationMessage For="@(() => Nurse.Name)" />
-                    </div>
-                  </div>
+        <div class='column is-5'>
+            <div class="card">
+                <div class="card-content">
+                    <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+                        <DataAnnotationsValidator />
+                        <div class="field">
+                            <label class="label">Imie</label>
+                            <div class="control">
+                                <InputText class="input" @bind-Value="Nurse.Name" />
+                                <div class="help is-danger">
+                                    <ValidationMessage For="@(() => Nurse.Name)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Nazwisko</label>
+                            <div class="control">
+                                <InputText class="input" @bind-Value="Nurse.Surname" />
+                                <div class="help is-danger">
+                                    <ValidationMessage For="@(() => Nurse.Surname)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Wymiar urlopu</label>
+                            <div class="control">
+                                <div class="select is-fullwidht">
+                                    <InputSelect @bind-Value="Nurse.PTOentitlement">
+                                        <option value="26">26</option>
+                                        <option value="20">20</option>
+                                    </InputSelect>
+                                </div>
+                                <div class="help is-danger">
+                                    <ValidationMessage For="@(() => Nurse.PTOentitlement)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons is-right">
+                            <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
+                        </div>
+                    </EditForm>
                 </div>
-                <div class="field">
-                  <label class="label">Nazwisko</label>
-                  <div class="control">
-                    <InputText class="input" @bind-Value="Nurse.Surname"/>
-                    <div class="help is-danger">
-                        <ValidationMessage For="@(() => Nurse.Surname)" />
-                    </div>
-                  </div>
-                </div>
-                <div class="buttons is-right">
-                  <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
-                </div>
-            </EditForm>
-          </div>
+            </div>
         </div>
-      </div>
     </div>
 </div>
 
@@ -63,7 +77,7 @@
 
     private async Task OnSubmit()
     {
-        if(_editContext.Validate())
+        if (_editContext.Validate())
         {
             _isLoading = true;
             await Task.Delay(1);

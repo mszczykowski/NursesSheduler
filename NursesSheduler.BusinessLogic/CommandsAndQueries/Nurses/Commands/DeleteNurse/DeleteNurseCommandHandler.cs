@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using NursesScheduler.Domain.DatabaseModels;
-using NursesScheduler.Domain.Exceptions;
+using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 {

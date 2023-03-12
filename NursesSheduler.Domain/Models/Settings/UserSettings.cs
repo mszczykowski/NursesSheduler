@@ -1,4 +1,4 @@
-﻿using NursesScheduler.Domain.DatabaseModels;
+﻿using NursesScheduler.Domain.DomainModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

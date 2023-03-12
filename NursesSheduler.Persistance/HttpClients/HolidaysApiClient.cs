@@ -23,7 +23,7 @@ namespace NursesScheduler.Infrastructure.HttpClients
 
             if(!_memoryCache.TryGetValue(year, out result))
             {
-                result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstraints.CountryCode}");
+                result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstants.CountryCode}");
 
                 if (result == null) return null;
 

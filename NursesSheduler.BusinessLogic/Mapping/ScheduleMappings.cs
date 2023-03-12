@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
-using NursesScheduler.Domain.DatabaseModels.Schedules;
+using NursesScheduler.Domain.DomainModels.Schedules;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {

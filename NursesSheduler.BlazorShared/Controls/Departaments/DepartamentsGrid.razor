@@ -52,7 +52,7 @@ else
             var response = await _mediatr.Send(request);
 
             if (!response.Success)
-                throw new ObjectNotDeletedException(departamentId, "Departament");
+                throw new EntityNotDeletedException(departamentId, "Departament");
 
             if (_currentDepartamentStore.CurrentDepartament.DepartamentId == departamentId)
                 _currentDepartamentStore.CurrentDepartament = null;

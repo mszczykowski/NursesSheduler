@@ -13,6 +13,6 @@ namespace NursesScheduler.BlazorShared.ViewModels
         }
 
         public bool IsTimeOff { get; set; }
-        public TimeOffType TimeOffType { get; set; }
+        public AbsenceTypes TimeOffType { get; set; }
     }
 }

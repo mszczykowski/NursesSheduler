@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using NursesScheduler.Domain.DatabaseModels;
+using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.Validation
 {
@@ -14,6 +14,9 @@ namespace NursesScheduler.BusinessLogic.Validation
             RuleFor(n => n.Surname)
                 .NotEmpty()
                 .MaximumLength(20);
+
+            RuleFor(n => n.PTOentitlement)
+                .NotEmpty();
         }
     }
 }

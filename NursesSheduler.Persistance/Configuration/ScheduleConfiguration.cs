@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
-using NursesScheduler.Domain.DatabaseModels.Schedules;
+using NursesScheduler.Domain.DomainModels.Schedules;
 
 namespace NursesScheduler.Infrastructure.Configuration
 {
