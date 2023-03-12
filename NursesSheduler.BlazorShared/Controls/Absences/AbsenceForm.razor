@@ -1,4 +1,9 @@
-﻿<EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+﻿
+
+<ErrorModal @ref=_errorModal />
+
+
+<EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
     <DataAnnotationsValidator />
     <div class="level">
         <div class="level-left">
@@ -6,7 +11,7 @@
                 <div class="field">
                     <label class="label">Początek</label>
                     <div class="control">
-                        <InputDate class="input" @bind-Value="Absence.From" min="@GetMinDate()" max="@GetMaxDate()"/>
+                        <InputDate class="input" @bind-Value="Absence.From" min="@GetMinDate()" max="@GetMaxDate()" />
                         <div class="help is-danger">
                             <ValidationMessage For="@(() => Absence.From)" />
                         </div>
@@ -16,7 +21,7 @@
             <div class="level-item">
                 <div class="field">
                     <label class="label">Koniec</label>
-                    <InputDate class="input" @bind-Value="Absence.To" min="@GetMinDate()" max="@GetMaxDate()"/>
+                    <InputDate class="input" @bind-Value="Absence.To" min="@GetMinDate()" max="@GetMaxDate()" />
                     <div class="help is-danger">
                         <ValidationMessage For="@(() => Absence.To)" />
                     </div>
@@ -25,21 +30,27 @@
             <div class="level-item">
                 <div class="field">
                     <label class="label">Typ</label>
-                    <InputSelect @bind-Value="Absence.Type">
-                        <select>
-                            @foreach(var absenceTypes in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                    <div class="select">
+                        <InputSelect @bind-Value="Absence.Type">
+                            @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
                             {
-                                <option value="@absenceTypes">@absenceTypes.GetEnumDisplayName()</option>
+                                <option value="@absenceType">@absenceType.GetEnumDisplayName()</option>
                             }
-                        </select>
-                    </InputSelect>
+                        </InputSelect>
+                    </div>
                 </div>
-
             </div>
         </div>
         <div class="level-right">
             <div class="level-item">
                 <button type="submit" class="button is-success">Zapisz nieobecność</button>
+            </div>
+        </div>
+    </div>
+    <div class="level">
+        <div class="level-right level-item">
+            <div class="has-text-danger">
+                <ValidationSummary />
             </div>
         </div>
     </div>
@@ -56,6 +67,12 @@
 
     private bool _isLoading;
     private EditContext _editContext;
+    private ErrorModal _errorModal;
+
+    public void HandleInvalidAbsence(AbsenceVeryficationResult result)
+    {
+        _errorModal.ShowError(result.GetEnumDisplayName());
+    }
 
     private async Task OnSubmit()
     {
@@ -64,6 +81,7 @@
             _isLoading = true;
             await Task.Delay(1);
             await SaveAbsence.InvokeAsync();
+            _isLoading = false;
         }
     }
 
@@ -72,11 +90,7 @@
         _isLoading = false;
         _editContext = new(Absence);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
-
-        if(Absence == null)
-        {
-            Absence = new AbsenceViewModel();
-        }
+        base.OnInitialized();
     }
 
     private string GetMinDate()

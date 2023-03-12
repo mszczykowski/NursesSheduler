@@ -12,8 +12,8 @@ namespace NursesScheduler.BlazorShared.ViewModels
         public DateOnly To { get; set; }
         [Required(ErrorMessage = "Należy wybrać typ")]
         public AbsenceTypes Type { get; set; }
-
         public TimeSpan AssignedWorkingHours { get; set; }
+        public int YearlyAbsencesSummaryId { get; set; }
 
         public int Lenght => To.DayNumber - From.DayNumber;
 
@@ -24,7 +24,10 @@ namespace NursesScheduler.BlazorShared.ViewModels
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new NotImplementedException();
+            if(To < From)
+            {
+                yield return new ValidationResult("Data końcowa nie może być wcześniejsza niż początkowa");
+            }
         }
     }
 }

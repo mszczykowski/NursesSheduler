@@ -45,7 +45,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender) await LoadNurses();
+        if(firstRender) 
+            await LoadNurses();
     }
 
     private async Task LoadNurses()

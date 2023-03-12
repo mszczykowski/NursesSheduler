@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.YearlyAbsencesSummari
             public DateOnly From { get; set; }
             public DateOnly To { get; set; }
             public TimeSpan AssignedWorkingHours { get; set; }
-            public TimeOffTypes Type { get; set; }
+            public AbsenceTypes Type { get; set; }
         }
     }
 }

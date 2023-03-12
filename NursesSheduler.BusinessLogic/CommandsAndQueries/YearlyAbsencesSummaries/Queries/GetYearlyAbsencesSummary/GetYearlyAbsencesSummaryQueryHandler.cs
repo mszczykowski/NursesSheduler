@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.YearlyAbsencesSummari
         public async Task<ICollection<GetYearlyAbsencesSummaryResponse>> Handle(GetYearlyAbsencesSummaryRequest request, CancellationToken cancellationToken)
         {
             return _mapper.Map<ICollection<GetYearlyAbsencesSummaryResponse>>(await _context.YearlyAbsences
-                .Where(y => y.NurseId == request.NurseId).Include(y => y.Absences).ToListAsync());
+                        .Where(y => y.NurseId == request.NurseId).Include(y => y.Absences).ToListAsync());
         }
     }
 }

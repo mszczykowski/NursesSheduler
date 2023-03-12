@@ -20,9 +20,9 @@
         public bool IsHoliday { get; }
         public string? HolidayName { get; }
 
-        private readonly DateTime _date;
+        private readonly DateOnly _date;
 
-        public Day(DateTime date)
+        public Day(DateOnly date)
         {
             _date = date;
             IsHoliday = false;

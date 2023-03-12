@@ -20,9 +20,9 @@ else
             <tr>
                 <th>Początek</th>
                 <th>Koniec</th>
-                <th>Długość</th>
+                <th>Długość(dni)</th>
                 <th>Przypisanych godzin pracy</th>
-                <th>Typ</th>
+                <th class="is-fullwidht">Typ</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -34,7 +34,8 @@ else
                     <td>@absence.From</td>
                     <td>@absence.To</td>
                     <td>@absence.Lenght</td>
-                    <td>@absence.Type.GetEnumDisplayName()</td>
+                    <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
+                    <td class="is-fullwidht">@absence.Type.GetEnumDisplayName()</td>
                     <td><a>Edytuj</a></td>
                     <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
                 </tr>

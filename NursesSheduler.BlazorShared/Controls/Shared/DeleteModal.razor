@@ -1,6 +1,7 @@
-﻿
+﻿@inherits ModalBase
 
-<div class="modal @CssHelper.SetIsActive(_isActive)">
+
+<div class="modal @CssHelper.SetIsActive(_isVisible)">
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
@@ -23,15 +24,9 @@
     [Parameter]
     public EventCallback<int> DeleteAction { get; set; }
 
-    private bool _isActive;
     private bool _isLoading;
     private string _name;
     private int _id;
-
-    private void ChangeVisibility()
-    {
-        _isActive = !_isActive;
-    }
 
     public void SetModal(string name, int id)
     {

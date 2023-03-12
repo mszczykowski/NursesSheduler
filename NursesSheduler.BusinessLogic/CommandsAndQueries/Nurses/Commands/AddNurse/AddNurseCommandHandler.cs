@@ -24,7 +24,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
             var nurse = _mapper.Map<Nurse>(request);
 
             var validationResult = await _validator.ValidateAsync(nurse);
-            if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+            if (!validationResult.IsValid) 
+                throw new ValidationException(validationResult.Errors);
 
             nurse.IsDeleted = false;
 

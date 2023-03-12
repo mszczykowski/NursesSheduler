@@ -15,6 +15,7 @@ namespace NursesScheduler.BusinessLogic
         {
             services.AddTransient<IValidator<Nurse>, NurseValidator>();
             services.AddTransient<IValidator<Departament>, DepartamentValidator>();
+            services.AddTransient<IValidator<Absence>, AbsenceValidator>();
             services.AddTransient<ICalendarService, CalendarService>();
             services.AddSingleton<IScheduleConfigurationService, ScheduleConfigurationService>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

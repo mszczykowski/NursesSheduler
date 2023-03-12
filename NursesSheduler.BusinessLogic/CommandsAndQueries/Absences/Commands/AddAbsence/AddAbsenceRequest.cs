@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
 {
-    internal class AddAbsenceRequest
+    public sealed class AddAbsenceRequest : IRequest<AddAbsenceResponse>
     {
+        public int YearlyAbsencesSummaryId { get; set; }
+        public DateOnly From { get; set; }
+        public DateOnly To { get; set; }
+        public AbsenceTypes Type { get; set; }
     }
 }

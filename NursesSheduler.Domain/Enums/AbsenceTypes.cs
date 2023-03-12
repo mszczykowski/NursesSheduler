@@ -1,10 +1,11 @@
 ﻿namespace NursesScheduler.Domain.Enums
 {
-    public enum TimeOffTypes
+    public enum AbsenceTypes
     {
-        Other,
-        PaidTimeOff,
+        PersonalTimeOff,
         LeaveOnRequest,
+        ParentalLeave,
         SickLeave,
+        Other
     }
 }

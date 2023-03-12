@@ -25,7 +25,8 @@ namespace NursesScheduler.Infrastructure.HttpClients
             {
                 result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstants.CountryCode}");
 
-                if (result == null) return null;
+                if (result == null) 
+                    return null;
 
                 _memoryCache.Set(year, result, DateTime.Now.AddDays(1));
             }

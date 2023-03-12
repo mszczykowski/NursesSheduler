@@ -29,7 +29,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         public sealed class TimeOff
         {
             public int Day { get; set; }
-            public TimeOffTypes Type { get; set; }
+            public AbsenceTypes Type { get; set; }
             public int NurseId { get; set; }
         }
     }

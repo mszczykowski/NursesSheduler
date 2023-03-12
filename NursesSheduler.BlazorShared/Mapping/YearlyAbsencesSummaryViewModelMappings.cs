@@ -8,7 +8,8 @@ namespace NursesScheduler.BlazorShared.Mapping
     {
         public YearlyAbsencesSummaryViewModelMappings()
         {
-            CreateMap<YearlyAbsencesSummaryViewModel, GetYearlyAbsencesSummaryResponse>();
+            CreateMap<GetYearlyAbsencesSummaryResponse, YearlyAbsencesSummaryViewModel>();
+            CreateMap<GetYearlyAbsencesSummaryResponse.AbsenceResponse, AbsenceViewModel>();
         }
     }
 }

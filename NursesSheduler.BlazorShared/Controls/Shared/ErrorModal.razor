@@ -1,5 +1,6 @@
 ﻿@inherits ModalBase
 
+
 <div class="modal @CssHelper.SetIsActive(_isVisible)">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -8,12 +9,22 @@
             <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
         </header>
         <section class="modal-card-body">
-            <AbsenceForm/>
+            <section>@_message</section>
         </section>
+        <footer class="modal-card-foot">
+            <button class="button is-danger" @onclick="ChangeVisibility">Zamknij</button>
+        </footer>
     </div>
 </div>
 
 
 @code {
+    private string _message { get; set; }
 
+    public void ShowError(string message)
+    {
+        _message = message;
+        base.ChangeVisibility();
+    }
 }
+

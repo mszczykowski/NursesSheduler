@@ -10,7 +10,9 @@ namespace NursesScheduler.BusinessLogic.Mapping
         public YearlyAbsencesSummaryMappings()
         {
             CreateMap<YearlyAbsencesSummary, GetYearlyAbsencesSummaryResponse>();
+            CreateMap<Absence, GetYearlyAbsencesSummaryResponse.AbsenceResponse>();
             CreateMap<YearlyAbsencesSummary, AddYearlyAbsencesSummaryResponse>();
+            CreateMap<Absence, AddYearlyAbsencesSummaryResponse.AbsenceResponse>();
         }
     }
 }
