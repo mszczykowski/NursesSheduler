@@ -38,9 +38,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("AssignedWorkingHours")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateOnly>("From")
                         .HasColumnType("TEXT");
 
@@ -49,6 +46,9 @@ namespace NursesScheduler.Infrastructure.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("WorkingHoursToAssign")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("YearlyAbsencesSummaryId")
                         .HasColumnType("INTEGER");
@@ -146,6 +146,9 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("AssignedAbsencesAbsenceId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Day")
                         .HasColumnType("INTEGER");
 
@@ -165,6 +168,8 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ShiftId");
+
+                    b.HasIndex("AssignedAbsencesAbsenceId");
 
                     b.HasIndex("ScheduleId");
 
@@ -252,11 +257,19 @@ namespace NursesScheduler.Infrastructure.Migrations
 
             modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Schedules.Shift", b =>
                 {
+                    b.HasOne("NursesScheduler.Domain.DomainModels.Absence", "AssignedAbsences")
+                        .WithMany("AssignedShifts")
+                        .HasForeignKey("AssignedAbsencesAbsenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("NursesScheduler.Domain.DomainModels.Schedules.Schedule", "Schedule")
                         .WithMany("Shifts")
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AssignedAbsences");
 
                     b.Navigation("Schedule");
                 });
@@ -270,6 +283,11 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Nurse");
+                });
+
+            modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Absence", b =>
+                {
+                    b.Navigation("AssignedShifts");
                 });
 
             modelBuilder.Entity("NursesScheduler.Domain.DomainModels.Departament", b =>

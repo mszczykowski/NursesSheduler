@@ -7,7 +7,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
         public int AbsenceId { get; set; }
         public DateOnly From { get; set; }
         public DateOnly To { get; set; }
-        public TimeSpan AssignedWorkingHours { get; set; }
+        public TimeSpan WorkingHoursToAssign { get; set; }
         public AbsenceTypes Type { get; set; }
         public AbsenceVeryficationResult VeryficationResult { get; set; }
     }

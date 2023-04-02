@@ -5,7 +5,7 @@ namespace NursesScheduler.BusinessLogic.Veryfication
 {
     internal static class AbsenceVeryficator
     {
-        public static AbsenceVeryficationResult VerifyAbsence(YearlyAbsencesSummary yearlyAbsences, Absence absence)
+        public static AbsenceVeryficationResult VerifyAbsence(AbsencesSummary yearlyAbsences, Absence absence)
         {
             if (yearlyAbsences.Year != absence.From.Year || yearlyAbsences.Year != absence.To.Year)
                 return AbsenceVeryficationResult.InvalidYear;

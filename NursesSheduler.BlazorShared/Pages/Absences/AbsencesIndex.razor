@@ -15,24 +15,52 @@
                 <p class="title">Nieobecności</p>
             </div>
         </div>
+        <div class="level-right">
+            <div class="level-item">
+                <div class="level-item">
+                    <label class="label">Rok</label>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="level-item">
+                    <div class="control">
+                        <div class="select">
+                            <select value=@_selectedYear @onchange="SelectedYearChanged">
+                                @foreach (var summary in _yearlyAbsencesSummaries)
+                                {
+                                    <option value="@summary.Year">@summary.Year</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     @if (_nurses == null)
     {
-        <LoadingSpinner/>
+        <LoadingSpinner />
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable Nurses=_nurses/>
+        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable Nurses=_nurses />
     }
 </div>
 
 
 @code {
     private List<NurseViewModel> _nurses = null;
+    private int _selectedYear;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender) await LoadNurses();
+        if (firstRender) await LoadNurses();
+    }
+
+    private void SelectedYearChanged()
+    {
+        _currentYearlyAbsencesSummary = _yearlyAbsencesSummaries.FirstOrDefault(y => y.Year == _selectedYear);
+        InitialiseAbsenceForm();
     }
 
     private async Task LoadNurses()
@@ -40,15 +68,15 @@
         try
         {
             var request = new GetNursesFromDepartamentRequest
-            {
-                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
-            };
+                {
+                    DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+                };
             var response = await _mediatr.Send(request);
 
             _nurses = _mapper.Map<List<NurseViewModel>>(response);
             StateHasChanged();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             HandleException(e);
         }

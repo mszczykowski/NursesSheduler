@@ -1,11 +1,14 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.DeleteAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence
 
 @inherits ExceptionHandlingComponent
 
 @inject IMediator _mediatr
+@inject IMapper _mapper
 
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteAbsence" />
+<EditAbsenceModal @ref="_editModal" EditAction="EditAbsence"/>
 
 @if (Absences == null || !Absences.Any())
 {
@@ -21,6 +24,7 @@ else
                 <th>Początek</th>
                 <th>Koniec</th>
                 <th>Długość(dni)</th>
+                <th>Godzin pracy</th>
                 <th>Przypisanych godzin pracy</th>
                 <th class="is-fullwidht">Typ</th>
                 <th></th>
@@ -28,12 +32,13 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach(var absence in Absences)
+            @foreach(var absence in Absences.OrderByDescending(a => a.From))
             {
                 <tr>
                     <td>@absence.From</td>
                     <td>@absence.To</td>
                     <td>@absence.Lenght</td>
+                    <td>@absence.WorkingHoursToAssign.GetTotalHoursAndMinutes()</td>
                     <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
                     <td class="is-fullwidht">@absence.Type.GetEnumDisplayName()</td>
                     <td><a>Edytuj</a></td>
@@ -47,6 +52,7 @@ else
 
 @code {
     private DeleteModal _deleteModal;
+    private EditAbsenceModal _editModal;
 
     [Parameter]
     public List<AbsenceViewModel> Absences { get; set; }
@@ -70,6 +76,37 @@ else
         catch (Exception e)
         {
             HandleException(e);
+        }
+    }
+
+    private async Task EditAbsence(AbsenceViewModel absence)
+    {
+        try
+        {
+            EditAbsenceRequest request = _mapper.Map<EditAbsenceRequest>(absence);
+
+            var response = await _mediatr.Send(request);
+
+            if (response == null)
+                throw new EntityNotAddedException(nameof(AbsenceViewModel));
+
+            var veryficationResult = (AbsenceVeryficationResult)response.VeryficationResult;
+
+            if (veryficationResult != AbsenceVeryficationResult.Valid)
+            {
+                _editModal.HandleInvalidAbsence(veryficationResult);
+            }
+            else
+            {
+                var editedAbsence = _mapper.Map<AbsenceViewModel>(response);
+                Absences.RemoveAll(a => a.AbsenceId == editedAbsence.AbsenceId);
+                Absences.Add(editedAbsence);
+            }
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
         }
     }
 }

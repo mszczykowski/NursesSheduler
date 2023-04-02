@@ -32,10 +32,11 @@
     {
         _name = name;
         _id = id;
+        _isLoading = false;
         ChangeVisibility();
     }
 
-    private async void Delete()
+    private async Task Delete()
     {
         _isLoading = true;
         await Task.Delay(1);

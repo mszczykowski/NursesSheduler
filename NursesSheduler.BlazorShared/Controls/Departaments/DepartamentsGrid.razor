@@ -1,4 +1,5 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.DeleteDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament
 
 @inherits ExceptionHandlingComponent
 
@@ -35,10 +36,26 @@ else
 
     private DeleteModal _deleteModal;
 
-    private void OnDepartamentPick(DepartamentViewModel departament)
+    private async Task OnDepartamentPick(DepartamentViewModel departament)
     {
-        _currentDepartamentStore.CurrentDepartament = departament;
-        base.NavigationManager.NavigateTo("/scheduleView");
+        try
+        {
+            var request = new PickDepartamentRequest
+            {
+                DepartamentId = departament.DepartamentId,
+            };
+            var response = await _mediatr.Send(request);
+
+            if (response == null)
+                throw new EntityNotFoundException(departament.DepartamentId, nameof(DepartamentViewModel));
+
+            _currentDepartamentStore.CurrentDepartament = _mapper.Map<DepartamentViewModel>(response);
+            base.NavigationManager.NavigateTo("/scheduleView");
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
     }
 
     private async Task DeleteDepratament(int departamentId)
@@ -58,7 +75,6 @@ else
                 _currentDepartamentStore.CurrentDepartament = null;
 
             Departaments.RemoveAll(n => n.DepartamentId == departamentId);
-
         }
         catch (Exception e)
         {

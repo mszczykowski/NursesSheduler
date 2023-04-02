@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.Domain.DomainModels;
 using NursesScheduler.Domain.DomainModels.Schedules;
 using NursesScheduler.Infrastructure.Configuration;
@@ -13,7 +13,7 @@ namespace NursesScheduler.Infrastructure.Context
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<Absence> Absences { get; set; }
-        public DbSet<YearlyAbsencesSummary> YearlyAbsences { get; set; }
+        public DbSet<AbsencesSummary> YearlyAbsencesSummaries { get; set; }
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

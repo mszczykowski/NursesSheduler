@@ -7,10 +7,11 @@ namespace NursesScheduler.Domain.DomainModels
         public int AbsenceId { get; set; }
         public DateOnly From { get; set; }
         public DateOnly To { get; set; }
+        public TimeSpan WorkingHoursToAssign { get; set; }
         public TimeSpan AssignedWorkingHours { get; set; }
         public AbsenceTypes Type { get; set; }
 
         public int YearlyAbsencesSummaryId { get; set; }
-        public YearlyAbsencesSummary YearlyAbsencesSummary { get; set; }
+        public AbsencesSummary YearlyAbsencesSummary { get; set; }
     }
 }

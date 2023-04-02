@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
-using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
 {

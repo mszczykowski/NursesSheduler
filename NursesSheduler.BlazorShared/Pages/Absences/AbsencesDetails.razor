@@ -41,7 +41,7 @@ else
                     </div>
                     <div class="level-item">
                         <p>
-                            <b>Przypisany urlop:</b> @_currentYearlyAbsencesSummary.PTOUsed.GetTotalHoursAndMinutes()
+                            <b>Wykorzystany urlop:</b> @_currentYearlyAbsencesSummary.PTOUsed.GetTotalHoursAndMinutes()
                         </p>
                     </div>
                     <div class="level-item">
@@ -78,7 +78,7 @@ else
                 <AbsenceForm @ref=_newAbsenceForm AbsenceYear=_selectedYear Absence=_newAbsence SaveAbsence="AddAbsence" />
             </div>
         </div>
-        <NursesScheduler.BlazorShared.Controls.Absences.NurseAbsencesTable Absences=_currentYearlyAbsencesSummary.Absences.ToList()/>
+        <NursesScheduler.BlazorShared.Controls.Absences.NurseAbsencesTable Absences=_currentYearlyAbsencesSummary.Absences/>
     </div>
 }
 
@@ -89,8 +89,8 @@ else
 
     private int _selectedYear = DateTime.Now.Year;
     private NurseViewModel _nurse;
-    private ICollection<YearlyAbsencesSummaryViewModel> _yearlyAbsencesSummaries;
-    private YearlyAbsencesSummaryViewModel _currentYearlyAbsencesSummary;
+    private ICollection<AbsencesSummaryViewModel> _yearlyAbsencesSummaries;
+    private AbsencesSummaryViewModel _currentYearlyAbsencesSummary;
 
     private AbsenceViewModel _newAbsence;
     private AbsenceForm _newAbsenceForm;
@@ -146,7 +146,7 @@ else
         if (response == null)
             NavigationManager.NavigateTo("/notFound");
 
-        _yearlyAbsencesSummaries = _mapper.Map<ICollection<YearlyAbsencesSummaryViewModel>>(response);
+        _yearlyAbsencesSummaries = _mapper.Map<ICollection<AbsencesSummaryViewModel>>(response);
     }
 
     private async Task AddCurrentYearAbsencesSummary(int year)
@@ -160,7 +160,7 @@ else
         var response = await _mediatr.Send(request);
 
         if (response == null)
-            throw new EntityNotAddedException(nameof(YearlyAbsencesSummaryViewModel));
+            throw new EntityNotAddedException(nameof(AbsencesSummaryViewModel));
     }
 
     private async Task AddAbsence()
@@ -182,8 +182,8 @@ else
             }
             else
             {
-                _currentYearlyAbsencesSummary.Absences.Add(_newAbsence);
-                InitialiseAbsence();
+                _currentYearlyAbsencesSummary.Absences.Add(_mapper.Map<AbsenceViewModel>(response));
+                InitialiseAbsenceForm();
             }
             StateHasChanged();
         }
@@ -196,17 +196,17 @@ else
     private void SelectedYearChanged()
     {
         _currentYearlyAbsencesSummary = _yearlyAbsencesSummaries.FirstOrDefault(y => y.Year == _selectedYear);
-        InitialiseAbsence();
+        InitialiseAbsenceForm();
     }
 
-    private void InitialiseAbsence()
+    private void InitialiseAbsenceForm()
     {
         _newAbsence = new AbsenceViewModel()
             {
                 From = DateOnly.FromDateTime(DateTime.Now),
                 To = DateOnly.FromDateTime(DateTime.Now),
                 Type = (AbsenceTypes)0,
-                YearlyAbsencesSummaryId = _currentYearlyAbsencesSummary.YearlyAbsencesSummaryId,
+                YearlyAbsencesSummaryId = _currentYearlyAbsencesSummary.AbsencesSummaryId,
             };
     }
 }

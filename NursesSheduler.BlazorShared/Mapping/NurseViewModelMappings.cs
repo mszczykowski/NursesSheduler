@@ -11,16 +11,11 @@ namespace NursesScheduler.BlazorShared.Mapping
     {
         public NurseViewModelMappings()
         {
-            CreateMap<NurseViewModel, AddNurseRequest>()
-                .ReverseMap();
-            CreateMap<NurseViewModel, AddNurseResponse>()
-                .ReverseMap();
-            CreateMap<NurseViewModel, GetNursesFromDepartamentResponse>()
-                .ReverseMap();
-            CreateMap<NurseViewModel, GetNurseResponse>()
-                .ReverseMap();
-            CreateMap<NurseViewModel, EditNurseRequest>()
-                .ReverseMap();
+            CreateMap<NurseViewModel, AddNurseRequest>();
+            CreateMap<AddNurseResponse, NurseViewModel>();
+            CreateMap<GetNursesFromDepartamentResponse, NurseViewModel>();
+            CreateMap<GetNurseResponse, NurseViewModel>();
+            CreateMap<NurseViewModel, EditNurseRequest>();
         }
     }
 }

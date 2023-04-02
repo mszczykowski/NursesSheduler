@@ -43,7 +43,7 @@
         </div>
         <div class="level-right">
             <div class="level-item">
-                <button type="submit" class="button is-success">Zapisz nieobecność</button>
+                <button type="submit" class="button is-success @CssHelper.SetIsLoading(_isLoading)">Zapisz nieobecność</button>
             </div>
         </div>
     </div>
@@ -58,8 +58,6 @@
 
 
 @code {
-    [Parameter]
-    public int AbsenceYear { get; set; }
     [Parameter]
     public AbsenceViewModel Absence { get; set; }
     [Parameter]
@@ -95,11 +93,11 @@
 
     private string GetMinDate()
     {
-        return $"{AbsenceYear}-01-01";
+        return $"{Absence.From.Year}-01-01";
     }
 
     private string GetMaxDate()
     {
-        return $"{AbsenceYear}-12-31";
+        return $"{Absence.From.Year}-12-31";
     }
 }

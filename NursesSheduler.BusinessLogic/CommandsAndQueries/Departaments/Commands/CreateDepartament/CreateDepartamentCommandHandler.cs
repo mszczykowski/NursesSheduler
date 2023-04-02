@@ -1,28 +1,33 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using MediatR;
-using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
 {
-    public class CreateDepartamentCommandHandler : IRequestHandler<CreateDepartamentRequest, CreateDepartamentResponse>
+    internal class CreateDepartamentCommandHandler : IRequestHandler<CreateDepartamentRequest, CreateDepartamentResponse>
     {
         private readonly IMapper _mapper;
         private readonly IValidator<Departament> _validator;
         private readonly IApplicationDbContext _context;
+        private readonly ICurrentDateService _currentDateService;
 
         public CreateDepartamentCommandHandler(IMapper mapper, IValidator<Departament> validator,
-            IApplicationDbContext context)
+            IApplicationDbContext context, ICurrentDateService currentDateService)
         {
             _validator = validator;
             _mapper = mapper;
             _context = context;
+            _currentDateService = currentDateService;
         }
 
         public async Task<CreateDepartamentResponse> Handle(CreateDepartamentRequest request, CancellationToken cancellationToken)
         {
             var departamnt = _mapper.Map<Departament>(request);
+
+            departamnt.CreationYear = _currentDateService.GetCurrentDate().Year;
 
             var validationResult = await _validator.ValidateAsync(departamnt);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);

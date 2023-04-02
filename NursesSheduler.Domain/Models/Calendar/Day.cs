@@ -28,7 +28,7 @@
             IsHoliday = false;
         }
 
-        public Day(DateTime date, string holidayName)
+        public Day(DateOnly date, string holidayName)
         {
             _date = date;
             IsHoliday = true;

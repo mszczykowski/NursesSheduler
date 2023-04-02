@@ -4,7 +4,8 @@
     {
         public static string GetTotalHoursAndMinutes(this TimeSpan timeSpan)
         {
-            return timeSpan.TotalHours.ToString().PadLeft(2, '0') + ":" + timeSpan.Minutes.ToString().PadLeft(2, '0');
+            return Math.Round(timeSpan.TotalHours).ToString().PadLeft(2, '0') + ":" + 
+                                                            timeSpan.Minutes.ToString().PadLeft(2, '0');
         }
     }
 }

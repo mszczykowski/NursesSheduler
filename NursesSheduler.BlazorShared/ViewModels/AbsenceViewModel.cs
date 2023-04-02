@@ -12,10 +12,11 @@ namespace NursesScheduler.BlazorShared.ViewModels
         public DateOnly To { get; set; }
         [Required(ErrorMessage = "Należy wybrać typ")]
         public AbsenceTypes Type { get; set; }
+        public TimeSpan WorkingHoursToAssign { get; set; }
         public TimeSpan AssignedWorkingHours { get; set; }
         public int YearlyAbsencesSummaryId { get; set; }
 
-        public int Lenght => To.DayNumber - From.DayNumber;
+        public int Lenght => To.DayNumber - From.DayNumber + 1;
 
         public override string ToString()
         {

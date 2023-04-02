@@ -2,8 +2,9 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
-using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
 using NursesScheduler.BusinessLogic.Veryfication;
 using NursesScheduler.Domain.DomainModels;
 using NursesScheduler.Domain.Enums;
@@ -15,19 +16,24 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IValidator<Absence> _validator;
+        private readonly IWorkTimeService _workTimeService;
+        private readonly IAbsencesService _absencesService;
 
-        public EditAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, IValidator<Absence> validator)
+        public EditAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, IValidator<Absence> validator,
+                                                    IWorkTimeService workTimeService, IAbsencesService absencesService)
         {
             _context = context;
             _mapper = mapper;
             _validator = validator;
+            _workTimeService = workTimeService;
+            _absencesService = absencesService;
         }
 
         public async Task<EditAbsenceResponse> Handle(EditAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var yearlyAbsenceSummary = await _context.YearlyAbsences.Include(y => y.Absences)
-                .FirstOrDefaultAsync(y => y.YearlyAbsencesSummaryId == request.YearlyAbsencesSummaryId)
-                ?? throw new EntityNotFoundException(request.YearlyAbsencesSummaryId, nameof(YearlyAbsencesSummary));
+            var yearlyAbsenceSummary = await _context.YearlyAbsencesSummaries.Include(y => y.Absences)
+                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.YearlyAbsencesSummaryId)
+                ?? throw new EntityNotFoundException(request.YearlyAbsencesSummaryId, nameof(AbsencesSummary));
 
             var originalAbsence = yearlyAbsenceSummary.Absences.FirstOrDefault(a => a.AbsenceId == request.AbsenceId) 
                 ?? throw new EntityNotFoundException(request.AbsenceId, nameof(Absence));
@@ -45,6 +51,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
                 {
                     VeryficationResult = absenceVeryficationResult
                 };
+
+            modifiedAbsence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHours(modifiedAbsence.From, 
+                                                                                                    modifiedAbsence.To);
+            modifiedAbsence.AssignedWorkingHours = await _absencesService.CalculateAbsenceAssignedWorkingTime(modifiedAbsence);
 
             _context.Entry(originalAbsence).CurrentValues.SetValues(modifiedAbsence);
 

@@ -7,7 +7,7 @@ namespace NursesScheduler.Domain.DomainModels.Schedules
     {
         [Key]
         public int ShiftId { get; set; }
-        public int Day { get; set; }
+        public DateOnly Date { get; set; }
 
         public int ScheduleId { get; set; }
         public Schedule Schedule { get; set; }

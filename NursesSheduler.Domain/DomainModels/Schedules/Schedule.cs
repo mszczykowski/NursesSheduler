@@ -10,7 +10,7 @@
         public virtual ICollection<int> Holidays { get; set; }
         public virtual ICollection<Shift> Shifts { get; set; }
 
-
+         
         public int DepartamentId { get; set; }
         public Departament Departament { get; set; }
     }

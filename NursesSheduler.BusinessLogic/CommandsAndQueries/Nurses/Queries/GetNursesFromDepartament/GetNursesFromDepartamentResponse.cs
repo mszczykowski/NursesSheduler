@@ -7,6 +7,5 @@
         public string Surname { get; set; }
         public int DepartamentId { get; set; }
         public bool IsDeleted { get; set; }
-        public bool IsActive { get; set; }
     }
 }

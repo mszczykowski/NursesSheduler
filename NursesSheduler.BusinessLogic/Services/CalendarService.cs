@@ -1,5 +1,6 @@
-﻿using NursesScheduler.BusinessLogic.Interfaces.Infrastructure;
-using NursesScheduler.BusinessLogic.Interfaces.Services;
+﻿using Microsoft.Extensions.Caching.Memory;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Models.Calendar;
 
 namespace NursesScheduler.BusinessLogic.Services
@@ -8,13 +9,16 @@ namespace NursesScheduler.BusinessLogic.Services
     {
         private readonly IScheduleConfigurationService _scheduleConfiguration;
         private readonly IHolidaysApiClient _holidaysApiClient;
+        private readonly IMemoryCache _memoryCache;
 
         private ICollection<Holiday> _holidays;
 
-        public CalendarService(IHolidaysApiClient holidaysApiClient, IScheduleConfigurationService scheduleConfiguration)
+        public CalendarService(IHolidaysApiClient holidaysApiClient, IScheduleConfigurationService scheduleConfiguration, 
+            IMemoryCache memoryCache)
         {
             _holidaysApiClient = holidaysApiClient;
             _scheduleConfiguration = scheduleConfiguration;
+            _memoryCache = memoryCache;
         }
 
         public async Task<Quarter> GetQuarter(int whichQuarter, int year)
@@ -33,7 +37,6 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     month = 1;
                     year++;
-                    _holidays = null;
                 }
                 quarter.Months[i] = await GetMonth(month, year);
                 quarter.Months[i].MonthInQuarter = i + 1;
@@ -49,33 +52,41 @@ namespace NursesScheduler.BusinessLogic.Services
 
         public async Task<Month> GetMonth(int monthNumber, int yearNumber)
         {
-            if (_holidays == null || _holidays.Any() && _holidays.First().Date.Year != yearNumber) 
-                _holidays = await _holidaysApiClient.GetHolidays(yearNumber);
+            Month monthResult;
+            var key = $"Month-{monthNumber}.{yearNumber}";
 
-            List<Holiday> holidaysInRequestedMonth = _holidays.Where(h => h.Date.Month == monthNumber).ToList();
-
-            int daysInMonth = DateTime.DaysInMonth(yearNumber, monthNumber);
-
-            Month month = new Month();
-            month.MonthNumber = monthNumber;
-            month.Year = yearNumber;
-
-            month.Days = new Day[daysInMonth];
-
-            holidaysInRequestedMonth.ForEach(holiday =>
+            if(!_memoryCache.TryGetValue(key, out monthResult))
             {
-                month.Days[holiday.Date.Day - 1] = new Day(holiday.Date, holiday.Name);
-            });
+                if (_holidays == null || _holidays.Any() && _holidays.First().Date.Year != yearNumber)
+                    _holidays = await _holidaysApiClient.GetHolidays(yearNumber);
 
-            for (int i = 0; i < daysInMonth; i++)
-            {
-                if (month.Days[i] == null)
+                List<Holiday> holidaysInRequestedMonth = _holidays.Where(h => h.Date.Month == monthNumber).ToList();
+
+                int daysInMonth = DateTime.DaysInMonth(yearNumber, monthNumber);
+
+                monthResult = new Month();
+                monthResult.MonthNumber = monthNumber;
+                monthResult.Year = yearNumber;
+
+                monthResult.Days = new Day[daysInMonth];
+
+                holidaysInRequestedMonth.ForEach(holiday =>
                 {
-                    month.Days[i] = new Day(new DateTime(yearNumber, monthNumber, i + 1));
+                    monthResult.Days[holiday.Date.Day - 1] = new Day(DateOnly.FromDateTime(holiday.Date), holiday.Name);
+                });
+
+                for (int i = 0; i < daysInMonth; i++)
+                {
+                    if (monthResult.Days[i] == null)
+                    {
+                        monthResult.Days[i] = new Day(new DateOnly(yearNumber, monthNumber, i + 1));
+                    }
                 }
+
+                _memoryCache.Set(key, monthResult, DateTime.Now.AddDays(1));
             }
 
-            return month;
+            return monthResult;
         }
     }
 }
