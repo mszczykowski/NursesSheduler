@@ -13,7 +13,7 @@ namespace NursesScheduler.Infrastructure.Context
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<Absence> Absences { get; set; }
-        public DbSet<AbsencesSummary> YearlyAbsencesSummaries { get; set; }
+        public DbSet<AbsencesSummary> AbsencesSummaries { get; set; }
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

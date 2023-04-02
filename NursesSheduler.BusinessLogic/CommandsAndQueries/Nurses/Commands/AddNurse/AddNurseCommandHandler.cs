@@ -8,7 +8,7 @@ using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 {
-    public sealed class AddNurseCommandHandler : IRequestHandler<AddNurseRequest, AddNurseResponse>
+    internal sealed class AddNurseCommandHandler : IRequestHandler<AddNurseRequest, AddNurseResponse>
     {
         private readonly IMapper _mapper;
         private readonly IValidator<Nurse> _validator;

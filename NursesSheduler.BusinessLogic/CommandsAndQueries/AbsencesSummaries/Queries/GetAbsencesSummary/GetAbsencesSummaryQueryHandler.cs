@@ -5,22 +5,22 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary
 {
-    public sealed class GetYearlyAbsencesSummaryQueryHandler : IRequestHandler<GetYearlyAbsencesSummaryRequest,
-                                                                        ICollection<GetYearlyAbsencesSummaryResponse>>
+    public sealed class GetAbsencesSummaryQueryHandler : IRequestHandler<GetAbsencesSummaryRequest,
+                                                                        ICollection<GetAbsencesSummaryResponse>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public GetYearlyAbsencesSummaryQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetAbsencesSummaryQueryHandler(IApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<ICollection<GetYearlyAbsencesSummaryResponse>> Handle(GetYearlyAbsencesSummaryRequest request,
+        public async Task<ICollection<GetAbsencesSummaryResponse>> Handle(GetAbsencesSummaryRequest request,
                                                                                     CancellationToken cancellationToken)
         {
-            return _mapper.Map<ICollection<GetYearlyAbsencesSummaryResponse>>(await _context.YearlyAbsencesSummaries
+            return _mapper.Map<ICollection<GetAbsencesSummaryResponse>>(await _context.AbsencesSummaries
                         .Where(y => y.NurseId == request.NurseId).Include(y => y.Absences).ToListAsync());
         }
     }

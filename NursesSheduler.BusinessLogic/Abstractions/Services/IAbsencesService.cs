@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
-    public interface IAbsencesService
+    internal interface IAbsencesService
     {
         Task<TimeSpan> CalculateAbsenceAssignedWorkingTime(Absence absence);
         Task InitializeDepartamentAbsencesSummary(Departament departament, CancellationToken cancellationToken);

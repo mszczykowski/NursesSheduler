@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.YearlyAbsencesSummaries.Commands.InitializeYearlyAbsencesSummary;
 using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<Nurse, GetNurseResponse>();
             CreateMap<EditNurseRequest, Nurse>();
             CreateMap<Nurse, EditNurseResponse>();
-            CreateMap<Nurse, InitializeYearlyAbsencesSummariesResponse>();
+            CreateMap<Nurse, GetAbsencesSummaryByDepartamentResponse>();
         }
     }
 }

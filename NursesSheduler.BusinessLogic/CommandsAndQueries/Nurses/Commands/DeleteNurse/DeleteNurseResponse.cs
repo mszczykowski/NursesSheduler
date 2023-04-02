@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 {
-    public class DeleteNurseResponse
+    public sealed class DeleteNurseResponse
     {
         public bool Success { get; set; }
 

@@ -12,7 +12,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure
         DbSet<Schedule> Schedules { get; }
         DbSet<Shift> Shifts { get; }
         DbSet<Absence> Absences { get; }
-        DbSet<AbsencesSummary> YearlyAbsencesSummaries { get; }
+        DbSet<AbsencesSummary> AbsencesSummaries { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         EntityEntry Entry(object entity);
     }

@@ -5,7 +5,7 @@ using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    public sealed class AbsencesService : IAbsencesService
+    internal sealed class AbsencesService : IAbsencesService
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentDateService _currentDateService;

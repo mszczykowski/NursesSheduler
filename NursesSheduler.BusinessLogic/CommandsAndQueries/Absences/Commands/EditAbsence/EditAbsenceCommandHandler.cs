@@ -31,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
 
         public async Task<EditAbsenceResponse> Handle(EditAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var yearlyAbsenceSummary = await _context.YearlyAbsencesSummaries.Include(y => y.Absences)
+            var yearlyAbsenceSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
                 .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.YearlyAbsencesSummaryId)
                 ?? throw new EntityNotFoundException(request.YearlyAbsencesSummaryId, nameof(AbsencesSummary));
 
@@ -59,6 +59,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
             _context.Entry(originalAbsence).CurrentValues.SetValues(modifiedAbsence);
 
             yearlyAbsenceSummary.Absences.Add(modifiedAbsence);
+            yearlyAbsenceSummary.PTOTimeUsed = yearlyAbsenceSummary.PTOTimeUsed - originalAbsence.AssignedWorkingHours
+                                                    + modifiedAbsence.AssignedWorkingHours;
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 

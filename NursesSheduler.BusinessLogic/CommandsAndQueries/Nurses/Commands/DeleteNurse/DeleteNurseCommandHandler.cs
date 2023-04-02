@@ -6,7 +6,7 @@ using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 {
-    public class DeleteNurseCommandHandler : IRequestHandler<DeleteNurseRequest, DeleteNurseResponse>
+    internal sealed class DeleteNurseCommandHandler : IRequestHandler<DeleteNurseRequest, DeleteNurseResponse>
     {
         private readonly IApplicationDbContext _context;
 

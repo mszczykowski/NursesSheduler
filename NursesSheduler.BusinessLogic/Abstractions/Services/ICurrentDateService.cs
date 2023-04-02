@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
-    public interface ICurrentDateService
+    internal interface ICurrentDateService
     {
         DateOnly GetCurrentDate();
     }

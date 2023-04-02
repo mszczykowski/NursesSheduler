@@ -7,7 +7,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesF
 
 namespace NursesScheduler.BlazorShared.Mapping
 {
-    public class NurseViewModelMappings : Profile
+    internal class NurseViewModelMappings : Profile
     {
         public NurseViewModelMappings()
         {

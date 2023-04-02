@@ -8,7 +8,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetD
 
 namespace NursesScheduler.BlazorShared.Mapping
 {
-    public class DepartamentViewModelMappings : Profile
+    internal class DepartamentViewModelMappings : Profile
     {
         public DepartamentViewModelMappings()
         {

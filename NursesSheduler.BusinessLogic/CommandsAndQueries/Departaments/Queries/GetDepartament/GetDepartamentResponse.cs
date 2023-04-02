@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
 {
-    public class GetDepartamentResponse
+    public sealed class GetDepartamentResponse
     {
         public int DepartamentId { get; set; }
         public string Name { get; set; }

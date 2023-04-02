@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary
 {
-    public class GetYearlyAbsencesSummaryResponse
+    public class GetAbsencesSummaryResponse
     {
         public int YearlyAbsencesSummaryId { get; set; }
         public int Year { get; set; }

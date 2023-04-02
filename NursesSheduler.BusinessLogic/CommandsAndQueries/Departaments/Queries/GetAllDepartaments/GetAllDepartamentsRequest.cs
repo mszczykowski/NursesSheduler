@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
 {
-    public class GetAllDepartamentsRequest : IRequest<List<GetAllDepartamentsResponse>>
+    public sealed class GetAllDepartamentsRequest : IRequest<List<GetAllDepartamentsResponse>>
     {
 
     }

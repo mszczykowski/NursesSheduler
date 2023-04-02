@@ -31,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
         public async Task<AddAbsenceResponse> Handle(AddAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var yearlyAbsenceSummary = await _context.YearlyAbsencesSummaries.Include(y => y.Absences)
+            var yearlyAbsenceSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
                 .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.YearlyAbsencesSummaryId)
                 ?? throw new EntityNotFoundException(request.YearlyAbsencesSummaryId, nameof(AbsencesSummary));
 

@@ -1,5 +1,6 @@
 ﻿@page "/absences"
 
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 
 @inherits ComponenentUsingDepartament
@@ -25,60 +26,84 @@
                 <div class="level-item">
                     <div class="control">
                         <div class="select">
-                            <select value=@_selectedYear @onchange="SelectedYearChanged">
-                                @foreach (var summary in _yearlyAbsencesSummaries)
+                            <select value=@_selectedYear>
+                                @for(int i = _minYear; i <= _maxYear; i++)
                                 {
-                                    <option value="@summary.Year">@summary.Year</option>
+                                    <option value="@i">@i</option>
                                 }
                             </select>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="level-item">
+                <button @onclick="(() => _selectedYear = _currentYear)">Bierzący rok</button>
+            </div>
         </div>
     </div>
-    @if (_nurses == null)
+    @if (_nursesWithSummary == null)
     {
         <LoadingSpinner />
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable Nurses=_nurses />
+        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable Nurses=_nursesWithSummary 
+                                                                                            SelectedYear=_selectedYear/>
     }
 </div>
 
 
 @code {
-    private List<NurseViewModel> _nurses = null;
+    private ICollection<NurseWithAbsencesSummariesViewModel> _nursesWithSummary;
+    private int _minYear, _maxYear;
     private int _selectedYear;
+    private int _currentYear = DateTime.Now.Year;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await LoadNurses();
+        if (firstRender)
+        { 
+            await LoadNursesWithAbsencesSummary();
+            CalculateYearScope();
+            StateHasChanged();
+        }
     }
 
-    private void SelectedYearChanged()
-    {
-        _currentYearlyAbsencesSummary = _yearlyAbsencesSummaries.FirstOrDefault(y => y.Year == _selectedYear);
-        InitialiseAbsenceForm();
-    }
-
-    private async Task LoadNurses()
+    private async Task LoadNursesWithAbsencesSummary()
     {
         try
         {
-            var request = new GetNursesFromDepartamentRequest
+            var request = new GetAbsencesSummaryByDepartamentRequest
                 {
                     DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
                 };
             var response = await _mediatr.Send(request);
 
-            _nurses = _mapper.Map<List<NurseViewModel>>(response);
-            StateHasChanged();
+            _nursesWithSummary = _mapper.Map<ICollection<NurseWithAbsencesSummariesViewModel>>(response);
         }
         catch (Exception e)
         {
             HandleException(e);
+        }
+    }
+
+    private void CalculateYearScope()
+    {
+        _minYear = _maxYear = _currentYear;
+
+        foreach(var _nurse in _nursesWithSummary)
+        {
+            var min = _nurse.YearlyAbsencesSummaries.Min(s => s.Year);
+            var max = _nurse.YearlyAbsencesSummaries.Max(s => s.Year);
+
+            if(min < _minYear)
+            {
+                _minYear = min;
+            }
+            if(max > _maxYear)
+            {
+                _maxYear = max;
+            }
         }
     }
 }

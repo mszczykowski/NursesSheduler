@@ -5,7 +5,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
 {
-    public class GetDepartamentQueryHandler : IRequestHandler<GetDepartamentRequest, GetDepartamentResponse>
+    internal sealed class GetDepartamentQueryHandler : IRequestHandler<GetDepartamentRequest, GetDepartamentResponse>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;

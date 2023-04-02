@@ -1,16 +1,18 @@
-﻿@page "/absences/details/{Id:int}"
+﻿@page "/absences/details/{Id:int}/{Year:int}"
 
 @inherits ExceptionHandlingComponent
 
 @using NursesScheduler.BlazorShared.Controls.Absences
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.YearlyAbsencesSummaries.Commands.AddYearlyAbsencesSummary
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.YearlyAbsencesSummaries.Queries.GetYearlyAbsencesSummary
 
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
+<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" @RecalculateAction="RecalculateSummary" @EditAction="EditSummary"/>
 
 @if (_nurse == null || _yearlyAbsencesSummaries == null)
 {
@@ -33,23 +35,29 @@ else
         </div>
         <div class="mb-4">
             <div class="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <p>
-                            <b>Przysługujący urlop(zaległy):</b> @_currentYearlyAbsencesSummary.PTO.Days dni (@_currentYearlyAbsencesSummary.PTOLeftFromPreviousYear.GetTotalHoursAndMinutes())
-                        </p>
+                @if (_selectedYear <= _currentYear)
+                {
+                    <div class="level-left">
+                        <div class="level-item">
+                            <p>
+                                <b>Przysługujący urlop(zaległy):</b> @_currentYearlyAbsencesSummary.PTODays dni (@_currentYearlyAbsencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes())
+                            </p>
+                        </div>
+                        <div class="level-item">
+                            <p>
+                                <b>Wykorzystany urlop:</b> @_currentYearlyAbsencesSummary.PTOTimeUsed.GetTotalHoursAndMinutes()
+                            </p>
+                        </div>
+                        <div class="level-item">
+                            <p>
+                                <b>Pozostały urlop:</b> @_currentYearlyAbsencesSummary.PTOLeft.GetTotalHoursAndMinutes()
+                            </p>
+                        </div>
+                        <div class="level-item">
+                            <a @onclick="(() => _editAbsencesSummaryModal.SetModal(_currentYearlyAbsencesSummary))">Edytuj</a>
+                        </div>
                     </div>
-                    <div class="level-item">
-                        <p>
-                            <b>Wykorzystany urlop:</b> @_currentYearlyAbsencesSummary.PTOUsed.GetTotalHoursAndMinutes()
-                        </p>
-                    </div>
-                    <div class="level-item">
-                        <p>
-                            <b>Pozostały urlop:</b> @_currentYearlyAbsencesSummary.PTOLeft.GetTotalHoursAndMinutes()
-                        </p>
-                    </div>
-                </div>
+                }
                 <div class="level-right">
                     <div class="level-item">
                         <div class="level-item">
@@ -78,7 +86,7 @@ else
                 <AbsenceForm @ref=_newAbsenceForm AbsenceYear=_selectedYear Absence=_newAbsence SaveAbsence="AddAbsence" />
             </div>
         </div>
-        <NursesScheduler.BlazorShared.Controls.Absences.NurseAbsencesTable Absences=_currentYearlyAbsencesSummary.Absences/>
+        <NursesScheduler.BlazorShared.Controls.Absences.NurseAbsencesTable Absences=_currentYearlyAbsencesSummary.Absences />
     </div>
 }
 
@@ -86,19 +94,24 @@ else
 @code {
     [Parameter]
     public int Id { get; set; }
+    [Parameter]
+    public int Year { get; set; }
 
-    private int _selectedYear = DateTime.Now.Year;
+    private int _selectedYear;
+    private int _currentYear = DateTime.Now.Year;
     private NurseViewModel _nurse;
     private ICollection<AbsencesSummaryViewModel> _yearlyAbsencesSummaries;
     private AbsencesSummaryViewModel _currentYearlyAbsencesSummary;
 
     private AbsenceViewModel _newAbsence;
     private AbsenceForm _newAbsenceForm;
+    private EditAbsencesSummaryModal _editAbsencesSummaryModal;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            _selectedYear = Year;
             await LoadData();
         }
     }
@@ -109,11 +122,6 @@ else
         {
             await LoadNurse();
             await LoadAbsencesSummary();
-            if (!_yearlyAbsencesSummaries.Any(y => y.Year == _selectedYear))
-            {
-                await AddCurrentYearAbsencesSummary(_selectedYear);
-                await LoadAbsencesSummary();
-            }
             SelectedYearChanged();
             StateHasChanged();
         }
@@ -137,7 +145,7 @@ else
 
     private async Task LoadAbsencesSummary()
     {
-        var request = new GetYearlyAbsencesSummaryRequest
+        var request = new GetAbsencesSummaryRequest
             {
                 NurseId = Id
             };
@@ -147,20 +155,6 @@ else
             NavigationManager.NavigateTo("/notFound");
 
         _yearlyAbsencesSummaries = _mapper.Map<ICollection<AbsencesSummaryViewModel>>(response);
-    }
-
-    private async Task AddCurrentYearAbsencesSummary(int year)
-    {
-        var request = new AddYearlyAbsencesSummaryRequest()
-            {
-                NurseId = Id,
-                Year = year,
-            };
-
-        var response = await _mediatr.Send(request);
-
-        if (response == null)
-            throw new EntityNotAddedException(nameof(AbsencesSummaryViewModel));
     }
 
     private async Task AddAbsence()
@@ -208,5 +202,44 @@ else
                 Type = (AbsenceTypes)0,
                 YearlyAbsencesSummaryId = _currentYearlyAbsencesSummary.AbsencesSummaryId,
             };
+    }
+
+    private async Task EditSummary(AbsencesSummaryEditViewModel summary)
+    {
+        try
+        {
+            var request = _mapper.Map<EditAbsencesSummaryRequest>(summary);
+
+            var respone = await _mediatr.Send(request);
+
+            if (respone == null)
+                throw new EntityNotEditedException(summary.AbsencesSummaryId, nameof(AbsencesSummaryEditViewModel));
+
+            await LoadAbsencesSummary();
+            SelectedYearChanged();
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
+    }
+
+    private async Task RecalculateSummary(AbsencesSummaryEditViewModel summary)
+    {
+        try
+        {
+            var request = new RecalculateAbsencesSummaryRequest
+                {
+                    AbsencesSummaryId = summary.AbsencesSummaryId,
+                };
+
+            var respone = await _mediatr.Send(request);
+
+            summary = _mapper.Map<AbsencesSummaryEditViewModel>(respone);
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
     }
 }

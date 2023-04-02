@@ -3,7 +3,6 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbse
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence;
 using NursesScheduler.Domain.DomainModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.AddYearlyAbsencesSummary;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {
@@ -17,8 +16,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<EditAbsenceRequest, Absence>();
             CreateMap<Absence, EditAbsenceResponse>();
 
-            CreateMap<Absence, GetYearlyAbsencesSummaryResponse.AbsenceResponse>();
-            CreateMap<Absence, AddYearlyAbsencesSummaryResponse.AbsenceResponse>();
+            CreateMap<Absence, GetAbsencesSummaryResponse.AbsenceResponse>();
         }
     }
 }
