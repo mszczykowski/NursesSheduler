@@ -3,7 +3,7 @@ using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.Validation
 {
-    internal class AbsenceValidator : AbstractValidator<Absence>
+    internal sealed class AbsenceValidator : AbstractValidator<Absence>
     {
         public AbsenceValidator()
         {

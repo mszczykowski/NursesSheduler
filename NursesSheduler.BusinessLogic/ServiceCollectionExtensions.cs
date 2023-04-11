@@ -16,18 +16,22 @@ namespace NursesScheduler.BusinessLogic
     {
         public static void AddBusinessLogicLayer(this IServiceCollection services)
         {
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddTransient<IMemoryCache, MemoryCache>();
+
+            //validators
             services.AddTransient<IValidator<Nurse>, NurseValidator>();
             services.AddTransient<IValidator<Departament>, DepartamentValidator>();
             services.AddTransient<IValidator<Absence>, AbsenceValidator>();
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
+            services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
 
+            //services
             services.AddTransient<IHolidaysManager, HolidaysManager>();
             services.AddTransient<IWorkTimeConfigurationManager, WorkTimeConfigurationManager>();
             services.AddTransient<IWorkTimeService, WorkTimeService>();
-            services.AddTransient<IMemoryCache, MemoryCache>();
             services.AddTransient<IAbsencesService, AbsencesService>();
-
             services.AddSingleton<ICurrentDateService, CurrentDateService>();
         }
     }

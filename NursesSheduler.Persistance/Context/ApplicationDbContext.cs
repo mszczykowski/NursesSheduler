@@ -14,6 +14,7 @@ namespace NursesScheduler.Infrastructure.Context
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<Absence> Absences { get; set; }
         public DbSet<AbsencesSummary> AbsencesSummaries { get; set; }
+        public DbSet<DepartamentSettings> Settings { get; set; }
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

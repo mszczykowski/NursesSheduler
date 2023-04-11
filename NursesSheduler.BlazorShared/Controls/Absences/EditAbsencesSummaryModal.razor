@@ -21,24 +21,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="field">
-                    <label class="label">Godzin wykorzystanego urlopu</label>
-                    <div class="control">
-                        <InputDate Type="InputDateType.Time" class="input" @bind-Value="_absencesSummary.PTOTimeUsed" />
-                        <div class="help is-danger">
-                            <ValidationMessage For="@(() => _absencesSummary.PTOTimeUsed)" />
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Godzin pozostałego urlopu z zeszłego roku</label>
-                    <div class="control">
-                        <InputDate Type="InputDateType.Time" class="input" @bind-Value="_absencesSummary.PTOTimeLeftFromPreviousYear" />
-                        <div class="help is-danger">
-                            <ValidationMessage For="@(() => _absencesSummary.PTOTimeLeftFromPreviousYear)" />
-                        </div>
-                    </div>
-                </div>
+                <TimeSpanInput Label="Godzin wykorzystanego urlopu" @bind-Value="_absencesSummary.PTOTimeUsed" ValidationFor="@(() => _absencesSummary.PTOTimeUsed)" />
+                <TimeSpanInput Label="Godzin pozostałego urlopu z zeszłego roku" @bind-Value="_absencesSummary.PTOTimeLeftFromPreviousYear" ValidationFor="@(() => _absencesSummary.PTOTimeLeftFromPreviousYear)" />
             </section>
             <footer class="modal-card-foot">
                 <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSubmit)" type="submit">Zapisz</button>
@@ -83,7 +67,6 @@
             await Task.Delay(1);
             await EditAction.InvokeAsync(_absencesSummary);
             ChangeVisibility();
-            StateHasChanged();
         }
     }
 
@@ -91,10 +74,10 @@
     {
         if (_editContext.Validate())
         {
-            _isLoadingSubmit = true;
+            _isLoadingRecalculate = true;
             await Task.Delay(1);
             await RecalculateAction.InvokeAsync(_absencesSummary);
-            ChangeVisibility();
+            _isLoadingRecalculate = false;
             StateHasChanged();
         }
     }

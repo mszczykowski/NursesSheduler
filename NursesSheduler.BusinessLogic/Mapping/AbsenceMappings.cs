@@ -2,7 +2,7 @@
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence;
 using NursesScheduler.Domain.DomainModels;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {

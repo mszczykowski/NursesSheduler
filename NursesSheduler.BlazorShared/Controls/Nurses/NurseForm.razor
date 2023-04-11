@@ -1,63 +1,47 @@
 ﻿
 
-<div class='container'>
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item has-text-centered">
-                <p class="title">@Title</p>
-            </div>
-        </div>
-        <div class="level-right">
-            <div class="level-item">
-                <a class="button is-info" href="/departaments">Powrót</a>
-            </div>
-        </div>
-    </div>
-
-
-    <div class='columns is-mobile is-centered'>
-        <div class='column is-5'>
-            <div class="card">
-                <div class="card-content">
-                    <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
-                        <DataAnnotationsValidator />
-                        <div class="field">
-                            <label class="label">Imie</label>
-                            <div class="control">
-                                <InputText class="input" @bind-Value="Nurse.Name" />
-                                <div class="help is-danger">
-                                    <ValidationMessage For="@(() => Nurse.Name)" />
-                                </div>
+<div class='columns is-mobile is-centered'>
+    <div class='column is-5'>
+        <div class="card">
+            <div class="card-content">
+                <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+                    <DataAnnotationsValidator />
+                    <div class="field">
+                        <label class="label">Imie</label>
+                        <div class="control">
+                            <InputText class="input" @bind-Value="Nurse.Name" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => Nurse.Name)" />
                             </div>
                         </div>
-                        <div class="field">
-                            <label class="label">Nazwisko</label>
-                            <div class="control">
-                                <InputText class="input" @bind-Value="Nurse.Surname" />
-                                <div class="help is-danger">
-                                    <ValidationMessage For="@(() => Nurse.Surname)" />
-                                </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Nazwisko</label>
+                        <div class="control">
+                            <InputText class="input" @bind-Value="Nurse.Surname" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => Nurse.Surname)" />
                             </div>
                         </div>
-                        <div class="field">
-                            <label class="label">Wymiar urlopu</label>
-                            <div class="control">
-                                <div class="select is-fullwidht">
-                                    <InputSelect @bind-Value="Nurse.PTOentitlement">
-                                        <option value="26">26 dni</option>
-                                        <option value="20">20 dni</option>
-                                    </InputSelect>
-                                </div>
-                                <div class="help is-danger">
-                                    <ValidationMessage For="@(() => Nurse.PTOentitlement)" />
-                                </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Wymiar urlopu</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <InputSelect @bind-Value="Nurse.PTOentitlement">
+                                    <option value="26">26 dni</option>
+                                    <option value="20">20 dni</option>
+                                </InputSelect>
+                            </div>
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => Nurse.PTOentitlement)" />
                             </div>
                         </div>
-                        <div class="buttons is-right">
-                            <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
-                        </div>
-                    </EditForm>
-                </div>
+                    </div>
+                    <div class="buttons is-right">
+                        <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
+                    </div>
+                </EditForm>
             </div>
         </div>
     </div>
@@ -65,8 +49,6 @@
 
 
 @code {
-    [Parameter]
-    public string Title { get; set; }
     [Parameter]
     public NurseViewModel Nurse { get; set; }
     [Parameter]

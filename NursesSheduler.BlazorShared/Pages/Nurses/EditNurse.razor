@@ -8,22 +8,35 @@
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
-@if(_nurse == null)
-{
-    <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
-}
-else
-{
-    <NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Title="Dodaj nowego pracownika" Nurse=@_nurse SaveNurse="SaveNurse"/>
-}
-
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Edytuj pracownika</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a class="button is-info" href="/nurses">Powrót</a>
+            </div>
+        </div>
+    </div>
+    @if(_nurse == null)
+    {
+        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+    }
+    else
+    {
+        <NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Title="Dodaj nowego pracownika" Nurse=@_nurse SaveNurse="SaveNurse"/>
+    }
+</div>
 
 
 @code {
-    protected NurseViewModel _nurse;
-
     [Parameter]
     public int Id { get; set; }
+
+    protected NurseViewModel _nurse;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

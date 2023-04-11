@@ -9,7 +9,5 @@ namespace NursesScheduler.BlazorShared.ViewModels
         [Required(ErrorMessage = "Nazwa jest wymagana")]
         [StringLength(40, ErrorMessage = "Nazwa zbyt długa (maksymalnie 40 znaków).")]
         public string Name { get; set; }
-
-        public int CreationYear { get; set; }
     }
 }

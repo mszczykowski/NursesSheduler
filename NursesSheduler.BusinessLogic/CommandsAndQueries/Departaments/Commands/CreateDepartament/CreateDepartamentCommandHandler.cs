@@ -32,6 +32,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             var validationResult = await _validator.ValidateAsync(departamnt);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
+            departamnt.DepartamentSettings = new DepartamentSettings();
+
             await _context.Departaments.AddAsync(departamnt);
 
             var result = await _context.SaveChangesAsync(cancellationToken);

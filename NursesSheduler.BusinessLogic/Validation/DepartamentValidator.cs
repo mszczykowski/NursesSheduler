@@ -3,7 +3,7 @@ using NursesScheduler.Domain.DomainModels;
 
 namespace NursesScheduler.BusinessLogic.Validation
 {
-    internal class DepartamentValidator : AbstractValidator<Departament>
+    internal sealed class DepartamentValidator : AbstractValidator<Departament>
     {
         public DepartamentValidator()
         {

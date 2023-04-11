@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary
 {
     public sealed class GetAbsencesSummaryQueryHandler : IRequestHandler<GetAbsencesSummaryRequest,
                                                                         ICollection<GetAbsencesSummaryResponse>>

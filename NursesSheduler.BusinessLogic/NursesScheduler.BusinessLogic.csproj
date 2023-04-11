@@ -8,8 +8,11 @@
 
   <ItemGroup>
     <Compile Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
+    <Compile Remove="CommandsAndQueries\DepartamentsSettings\Queries\GetAllSettings\**" />
     <EmbeddedResource Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
+    <EmbeddedResource Remove="CommandsAndQueries\DepartamentsSettings\Queries\GetAllSettings\**" />
     <None Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
+    <None Remove="CommandsAndQueries\DepartamentsSettings\Queries\GetAllSettings\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,9 +35,6 @@
     <Folder Include="CommandsAndQueries\Schedules\Commands\AddSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\EditSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
-    <Folder Include="CommandsAndQueries\Settings\Commands\" />
-    <Folder Include="CommandsAndQueries\Settings\Queries\GetSetting\" />
-    <Folder Include="CommandsAndQueries\Settings\Queries\GetAllSettings\" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament;
 using NursesScheduler.Domain.DomainModels;
@@ -11,18 +12,13 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public DepartamentMappings()
         {
-            CreateMap<Departament, GetAllDepartamentsResponse>()
-                .ReverseMap();
-            CreateMap<Departament, GetDepartamentResponse>()
-                .ReverseMap();
-            CreateMap<Departament, CreateDepartamentRequest>()
-                .ReverseMap();
-            CreateMap<Departament, CreateDepartamentResponse>()
-                .ReverseMap();
-            CreateMap<Departament, EditDepartamentRequest>()
-                .ReverseMap();
-            CreateMap<Departament, EditDepartamentResponse>()
-                .ReverseMap();
+            CreateMap<Departament, GetAllDepartamentsResponse>();
+            CreateMap<Departament, GetDepartamentResponse>();
+            CreateMap<CreateDepartamentRequest, Departament>();
+            CreateMap<Departament, CreateDepartamentResponse>();
+            CreateMap<EditDepartamentRequest, Departament>();
+            CreateMap<Departament, EditDepartamentResponse>();
+            CreateMap<Departament, PickDepartamentResponse>();
         }
     }
 }

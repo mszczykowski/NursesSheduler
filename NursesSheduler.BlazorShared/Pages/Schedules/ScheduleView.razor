@@ -38,7 +38,7 @@
                     <div class="control">
                         <div class="select">
                             <select value=@monthNumber @onchange="SelectedMonthChanged">
-                                @for(int i = 1; i < 13; i++)
+                                @for(int i = 1; i <= 12; i++)
                                 {
                                     <option value="@i">@((Months)i)</option>
                                 }

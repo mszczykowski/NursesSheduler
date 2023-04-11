@@ -1,12 +1,12 @@
 ﻿@page "/absences/details/{Id:int}/{Year:int}"
 
-@inherits ExceptionHandlingComponent
+@inherits ComponenentUsingDepartament
 
 @using NursesScheduler.BlazorShared.Controls.Absences
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetYearlyAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
 
 @inject IMediator _mediatr;
