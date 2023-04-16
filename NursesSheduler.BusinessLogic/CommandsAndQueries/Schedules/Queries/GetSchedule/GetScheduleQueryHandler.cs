@@ -26,7 +26,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
 
             if (result == null) return null;
 
-            return _mapper.Map<GetScheduleResponse>(result);
+            return null;
         }
     }
 }

@@ -62,9 +62,12 @@
                             </div>
                         </div>
                     </div>
+                    <p class="title is-6">
+                        Uwaga! Zmiana ustawień uniemożliwi edycję obecnie zapisanych grafików!
+                    </p>
                     <div class="buttons is-right">
                         <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSave)" type="submit">Zapisz</button>
-                        <button class="button @CssHelper.SetIsLoading(_isLoadingCancel)" type="button" onclick="Cancel">Anuluj</button>
+                        <button class="button @CssHelper.SetIsLoading(_isLoadingCancel)" type="button" @onclick="OnCancel">Anuluj</button>
                     </div>
                 </EditForm>
             </div>

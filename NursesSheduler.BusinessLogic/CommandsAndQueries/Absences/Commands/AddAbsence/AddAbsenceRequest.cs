@@ -5,7 +5,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 {
     public sealed class AddAbsenceRequest : IRequest<AddAbsenceResponse>
     {
-        public int YearlyAbsencesSummaryId { get; set; }
+        public int AbsencesSummaryId { get; set; }
         public DateOnly From { get; set; }
         public DateOnly To { get; set; }
         public AbsenceTypes Type { get; set; }

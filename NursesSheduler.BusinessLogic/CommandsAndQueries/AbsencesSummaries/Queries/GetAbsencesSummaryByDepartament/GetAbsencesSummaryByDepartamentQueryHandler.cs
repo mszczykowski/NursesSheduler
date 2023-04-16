@@ -20,10 +20,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Que
         public async Task<ICollection<GetAbsencesSummaryByDepartamentResponse>> Handle(
             GetAbsencesSummaryByDepartamentRequest request, CancellationToken cancellationToken)
         {
-            return _mapper.Map<ICollection<GetAbsencesSummaryByDepartamentResponse>>(await _context.Nurses
+            var x = _mapper.Map<ICollection<GetAbsencesSummaryByDepartamentResponse>>(await _context.Nurses
                         .Where(n => n.DepartamentId == request.DepartamentId)
-                        .Include(n => n.YearlyAbsencesSummaries)
+                        .Include(n => n.AbsencesSummaries)
                         .ToListAsync());
+
+            return x;
         }
     }
 }

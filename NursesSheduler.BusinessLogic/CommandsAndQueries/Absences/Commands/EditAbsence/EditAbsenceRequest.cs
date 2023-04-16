@@ -5,7 +5,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
 {
     public sealed class EditAbsenceRequest : IRequest<EditAbsenceResponse>
     {
-        public int YearlyAbsencesSummaryId { get; set; }
+        public int AbsencesSummaryId { get; set; }
         public int AbsenceId { get; set; }
         public DateOnly From { get; set; }
         public DateOnly To { get; set; }

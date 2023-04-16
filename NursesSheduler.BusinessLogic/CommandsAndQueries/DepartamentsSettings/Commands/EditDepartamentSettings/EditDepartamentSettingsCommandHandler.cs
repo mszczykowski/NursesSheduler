@@ -26,20 +26,25 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
         public async Task<EditDepartamentSettingsResponse> Handle(EditDepartamentSettingsRequest request,
                                                                                     CancellationToken cancellationToken)
         {
-            var modifiedSettings = _mapper.Map<DepartamentSettings>(request);
+            var newSettings = _mapper.Map<DepartamentSettings>(request);
 
-            var validationResult = await _validator.ValidateAsync(modifiedSettings);
+            var validationResult = await _validator.ValidateAsync(newSettings);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-            var originalSettings = await _context.Settings
+            var oldSettings = await _context.Settings
                 .FirstOrDefaultAsync(s => s.DepartamentSettingsId == request.DepartamentSettingsId)
                 ?? throw new EntityNotFoundException(request.DepartamentSettingsId, nameof(DepartamentSettings));
 
-            _context.Entry(originalSettings).CurrentValues.SetValues(modifiedSettings);
+            if (oldSettings.Equals(newSettings))
+                return _mapper.Map<EditDepartamentSettingsResponse>(oldSettings);
+
+            oldSettings.SettingsVersion++;
+
+            _context.Entry(oldSettings).CurrentValues.SetValues(request);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            return result > 0 ? _mapper.Map<EditDepartamentSettingsResponse>(originalSettings) : null;
+            return result > 0 ? _mapper.Map<EditDepartamentSettingsResponse>(oldSettings) : null;
         }
     }
 }

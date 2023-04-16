@@ -14,7 +14,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
         public AbsenceTypes Type { get; set; }
         public TimeSpan WorkingHoursToAssign { get; set; }
         public TimeSpan AssignedWorkingHours { get; set; }
-        public int YearlyAbsencesSummaryId { get; set; }
+        public int AbsencesSummaryId { get; set; }
 
         public int Lenght => To.DayNumber - From.DayNumber + 1;
 

@@ -1,7 +1,7 @@
 ﻿using NursesScheduler.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace NursesScheduler.Domain.DomainModels.Schedules
+namespace NursesScheduler.Domain.DomainModels
 {
     public sealed class Shift
     {

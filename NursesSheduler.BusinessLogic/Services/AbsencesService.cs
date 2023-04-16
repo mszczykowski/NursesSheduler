@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task<TimeSpan> CalculateAbsenceAssignedWorkingTime(Absence absence)
         {
             var assignedShifts = await _context.Shifts.Where(s => s.Date >= absence.From && s.Date <= absence.To &&
-                                                           s.AssignedNurses.Any(n => n.NurseId == absence.YearlyAbsencesSummary.NurseId))
+                                                           s.AssignedNurses.Any(n => n.NurseId == absence.AbsencesSummary.NurseId))
                                                                                                             .ToListAsync();
 
             var assignedWorkingTime = TimeSpan.Zero;
@@ -32,46 +32,38 @@ namespace NursesScheduler.BusinessLogic.Services
             return assignedWorkingTime;
         }
 
-        public async Task InitializeDepartamentAbsencesSummary(Departament departament, CancellationToken cancellationToken)
+        public async Task InitializeDepartamentAbsencesSummaries(Departament departament, CancellationToken cancellationToken)
         {
             var shouldBeInitializedToYear = _currentDateService.GetCurrentDate().Year + 1;
 
             var nurses = await _context.Nurses
-                .Include(n => n.YearlyAbsencesSummaries)
+                .Include(n => n.AbsencesSummaries)
                 .Where(n => n.DepartamentId == departament.DepartamentId && n.IsDeleted == false)
                 .ToListAsync();
 
             foreach (var nurse in nurses)
             {
-                await InitializeNurseAbsencesSummary(nurse, departament, cancellationToken);
+                InitializeNurseAbsencesSummary(nurse, departament);
+                RecalculatePreviousYearAbsencesSummary(nurse, departament);
             }
+
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task InitializeNurseAbsencesSummary(Nurse nurse, Departament departament,
-                                                                                    CancellationToken cancellationToken)
+        public void InitializeNewNurseAbsencesSummaries(Nurse nurse, Departament departament)
+        {
+            nurse.AbsencesSummaries = new List<AbsencesSummary>();
+            InitializeNurseAbsencesSummary(nurse, departament);
+        }
+
+        private void RecalculatePreviousYearAbsencesSummary(Nurse nurse, Departament departament)
         {
             var currentYear = _currentDateService.GetCurrentDate().Year;
 
-            var shouldBeInitializedToYear = _currentDateService.GetCurrentDate().Year + 1;
-
-            for (int i = departament.CreationYear; i <= shouldBeInitializedToYear; i++)
-            {
-                if (!nurse.YearlyAbsencesSummaries.Any(n => n.Year == i))
-                {
-                    nurse.YearlyAbsencesSummaries.Add(
-                        new AbsencesSummary
-                        {
-                            NurseId = nurse.NurseId,
-                            Year = i,
-                            PTOTime = nurse.PTOentitlement * TimeSpan.FromDays(1),
-                        });
-                }
-            }
-
-            var currentYearSummary = nurse.YearlyAbsencesSummaries
+            var currentYearSummary = nurse.AbsencesSummaries
                                             .FirstOrDefault(y => y.Year == currentYear);
 
-            var previousYearSummary = nurse.YearlyAbsencesSummaries
+            var previousYearSummary = nurse.AbsencesSummaries
                                             .FirstOrDefault(y => y.Year == currentYear - 1);
 
             if (currentYearSummary != null && previousYearSummary != null)
@@ -80,8 +72,27 @@ namespace NursesScheduler.BusinessLogic.Services
                     previousYearSummary.PTOTimeLeftFromPreviousYear + previousYearSummary.PTOTime
                     - previousYearSummary.PTOTimeUsed;
             }
+        }
 
-            await _context.SaveChangesAsync(cancellationToken);
+        private void InitializeNurseAbsencesSummary(Nurse nurse, Departament departament)
+        {
+            var currentYear = _currentDateService.GetCurrentDate().Year;
+
+            var shouldBeInitializedToYear = _currentDateService.GetCurrentDate().Year + 1;
+
+            for (int i = departament.CreationYear; i <= shouldBeInitializedToYear; i++)
+            {
+                if (!nurse.AbsencesSummaries.Any(n => n.Year == i))
+                {
+                    nurse.AbsencesSummaries.Add(
+                        new AbsencesSummary
+                        {
+                            NurseId = nurse.NurseId,
+                            Year = i,
+                            PTOTime = nurse.PTOentitlement * TimeSpan.FromDays(1),
+                        });
+                }
+            }
         }
     }
 }

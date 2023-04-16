@@ -5,7 +5,7 @@
         public int NurseId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
-        public ICollection<AbsencesSummaryResponse> YearlyAbsencesSummaries { get; set; }
+        public ICollection<AbsencesSummaryResponse> AbsencesSummaries { get; set; }
 
         public sealed class AbsencesSummaryResponse
         {

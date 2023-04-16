@@ -29,9 +29,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditN
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
             var originalNurse = await _context.Nurses.FirstOrDefaultAsync(n => n.NurseId == request.NurseId)
-                ?? throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
+                ?? throw new EntityNotFoundException(request.NurseId, nameof(Nurse));
 
-            _context.Entry(originalNurse).CurrentValues.SetValues(modifiedNurse);
+            _context.Entry(originalNurse).CurrentValues.SetValues(request);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 

@@ -10,7 +10,7 @@
 
 
 <div class="container is-fluid">
-    @if(!isLoaded)
+    @if(_nurses == null)
     {
         <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
     }
@@ -147,7 +147,7 @@
     private int monthNumber = DateTime.Now.Month;
     private int yearNumber = DateTime.Now.Year;
 
-    private ICollection<NurseViewModel> nurses;
+    private ICollection<NurseViewModel> _nurses;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -159,7 +159,7 @@
             };
             var response = await mediatr.Send(request);
 
-            nurses = mapper.Map<List<NurseViewModel>>(response);
+            _nurses = mapper.Map<List<NurseViewModel>>(response);
 
             isLoaded = true;
             StateHasChanged();

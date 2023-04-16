@@ -29,7 +29,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             if (departament == null)
                 throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
 
-            await _absencesService.InitializeDepartamentAbsencesSummary(departament, cancellationToken);
+            await _absencesService.InitializeDepartamentAbsencesSummaries(departament, cancellationToken);
 
             return _mapper.Map<PickDepartamentResponse>(departament);
         }

@@ -14,8 +14,8 @@ namespace NursesScheduler.BusinessLogic.Validation
 
             RuleFor(s => s.MaximalWeekWorkingTime)
                 .NotEmpty()
-                .GreaterThanOrEqualTo(TimeSpan.FromHours(1))
-                .LessThanOrEqualTo(TimeSpan.FromHours(12));
+                .GreaterThanOrEqualTo(TimeSpan.FromHours(7))
+                .LessThanOrEqualTo(TimeSpan.FromHours(84));
 
             RuleFor(s => s.MinmalShiftBreak)
                 .NotEmpty()

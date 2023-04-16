@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NursesScheduler.Domain.DomainModels;
-using NursesScheduler.Domain.DomainModels.Schedules;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure
 {

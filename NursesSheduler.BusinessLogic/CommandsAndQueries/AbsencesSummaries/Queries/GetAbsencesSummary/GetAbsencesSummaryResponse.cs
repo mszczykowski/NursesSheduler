@@ -4,7 +4,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Que
 {
     public class GetAbsencesSummaryResponse
     {
-        public int YearlyAbsencesSummaryId { get; set; }
+        public int AbsencesSummaryId { get; set; }
         public int Year { get; set; }
         public int PTODays { get; set; }
         public TimeSpan PTOTime { get; set; }
@@ -20,7 +20,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Que
             public TimeSpan WorkingHoursToAssign { get; set; }
             public TimeSpan AssignedWorkingHours { get; set; }
             public AbsenceTypes Type { get; set; }
-            public int YearlyAbsencesSummaryId { get; set; }
+            public int AbsencesSummaryId { get; set; }
         }
     }
 }

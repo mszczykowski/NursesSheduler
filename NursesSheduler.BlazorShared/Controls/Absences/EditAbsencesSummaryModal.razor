@@ -2,53 +2,52 @@
 
 @inject IMapper _mapper;
 
-<div class="modal @CssHelper.SetIsActive(_isVisible)">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Edytuj posumowanie roku @_absencesSummary.Year</p>
-            <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
-        </header>
-        <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
-            <section class="modal-card-body">
-                <DataAnnotationsValidator />
-                <div class="field">
-                    <label class="label">Ilośc przysługującego urlopu (dni)</label>
-                    <div class="control">
-                        <InputNumber class="input" @bind-Value="_absencesSummary.PTODays" />
-                        <div class="help is-danger">
-                            <ValidationMessage For="@(() => _absencesSummary.PTODays)" />
+@if (_absencesSummary != null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edytuj posumowanie roku @_absencesSummary.Year</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+                <section class="modal-card-body">
+                    <DataAnnotationsValidator />
+                    <div class="field">
+                        <label class="label">Ilośc przysługującego urlopu (dni)</label>
+                        <div class="control">
+                            <InputNumber class="input" @bind-Value="_absencesSummary.PTODays" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => _absencesSummary.PTODays)" />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <TimeSpanInput Label="Godzin wykorzystanego urlopu" @bind-Value="_absencesSummary.PTOTimeUsed" ValidationFor="@(() => _absencesSummary.PTOTimeUsed)" />
-                <TimeSpanInput Label="Godzin pozostałego urlopu z zeszłego roku" @bind-Value="_absencesSummary.PTOTimeLeftFromPreviousYear" ValidationFor="@(() => _absencesSummary.PTOTimeLeftFromPreviousYear)" />
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSubmit)" type="submit">Zapisz</button>
-                <button class="button is-warning @CssHelper.SetIsLoading(_isLoadingRecalculate)">Przelicz</button>
-                <button class="button" @onclick="ChangeVisibility">Anuluj</button>
-            </footer>
-        </EditForm>
+                    <TimeSpanInput Label="Godzin wykorzystanego urlopu" @bind-Value="_absencesSummary.PTOTimeUsed" ValidationFor="@(() => _absencesSummary.PTOTimeUsed)" />
+                    <TimeSpanInput Label="Godzin pozostałego urlopu z zeszłego roku" @bind-Value="_absencesSummary.PTOTimeLeftFromPreviousYear" ValidationFor="@(() => _absencesSummary.PTOTimeLeftFromPreviousYear)" />
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSubmit)" type="submit">Zapisz</button>
+                    <button class="button is-warning @CssHelper.SetIsLoading(_isLoadingRecalculate)">Przelicz</button>
+                    <button class="button" @onclick="ChangeVisibility">Anuluj</button>
+                </footer>
+            </EditForm>
+        </div>
     </div>
-</div>
+}
+
 
 
 @code {
     [Parameter]
-    public EventCallback<AbsencesSummaryEditViewModel> EditAction { get; set; }
+    public EventCallback<AbsencesSummaryEditViewModel> Save { get; set; }
     [Parameter]
-    public EventCallback<AbsencesSummaryEditViewModel> RecalculateAction { get; set; }
+    public EventCallback<AbsencesSummaryEditViewModel> Recalculate { get; set; }
 
     private AbsencesSummaryEditViewModel _absencesSummary;
     private bool _isLoadingSubmit;
     private bool _isLoadingRecalculate;
     private EditContext _editContext;
-
-    protected override void OnInitialized()
-    {
-        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
-    }
 
     public void SetModal(AbsencesSummaryViewModel absencesSummary)
     {
@@ -56,6 +55,7 @@
         _isLoadingRecalculate = false;
         _absencesSummary = _mapper.Map<AbsencesSummaryEditViewModel>(absencesSummary);
         _editContext = new(_absencesSummary);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
         ChangeVisibility();
     }
 
@@ -65,7 +65,7 @@
         {
             _isLoadingSubmit = true;
             await Task.Delay(1);
-            await EditAction.InvokeAsync(_absencesSummary);
+            await Save.InvokeAsync(_absencesSummary);
             ChangeVisibility();
         }
     }
@@ -76,7 +76,7 @@
         {
             _isLoadingRecalculate = true;
             await Task.Delay(1);
-            await RecalculateAction.InvokeAsync(_absencesSummary);
+            await Recalculate.InvokeAsync(_absencesSummary);
             _isLoadingRecalculate = false;
             StateHasChanged();
         }

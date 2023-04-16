@@ -5,18 +5,18 @@ namespace NursesScheduler.BusinessLogic.Veryfication
 {
     internal static class AbsenceVeryficator
     {
-        public static AbsenceVeryficationResult VerifyAbsence(AbsencesSummary yearlyAbsences, Absence absence)
+        public static AbsenceVeryficationResult VerifyAbsence(AbsencesSummary absencesSummary, Absence absence)
         {
-            if (yearlyAbsences.Year != absence.From.Year || yearlyAbsences.Year != absence.To.Year)
+            if (absencesSummary.Year != absence.From.Year || absencesSummary.Year != absence.To.Year)
                 return AbsenceVeryficationResult.InvalidYear;
 
-            if (yearlyAbsences.Absences.Any(a => (
+            if (absencesSummary.Absences.Any(a => (
                         (a.From == absence.From || a.To == absence.From || a.From == absence.To || a.To == absence.To) 
                         || (a.From > absence.From && a.To < absence.From)
                         || (a.From > absence.To && a.To < absence.To)) && a.AbsenceId != absence.AbsenceId))
                 return AbsenceVeryficationResult.AbsenceAlreadyExists;
 
-            if (yearlyAbsences.Absences.Any(a => ((a.From == absence.From && a.To == absence.From)
+            if (absencesSummary.Absences.Any(a => ((a.From == absence.From && a.To == absence.From)
                      || (a.From > absence.To && a.To < absence.To)) && a.AbsenceId != absence.AbsenceId))
                 return AbsenceVeryficationResult.AbsenceAlreadyExists;
 

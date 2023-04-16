@@ -25,7 +25,7 @@
 
 
 @code {
-    protected NurseViewModel _nurse;
+    private NurseViewModel _nurse;
 
     protected override void OnInitialized()
     {
@@ -35,7 +35,7 @@
         _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
     }
 
-    protected async void SaveNurse()
+    private async void SaveNurse()
     {
         try
         {

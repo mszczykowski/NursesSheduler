@@ -4,6 +4,8 @@ namespace NursesScheduler.BlazorShared.ViewModels
 {
     public sealed class DepratamentSettingsViewModel
     {
+        public int DepartamentSettingsId { get; set; }
+
         [Required(ErrorMessage = "Należy wpisać dzienny wymiar pracy")]
         [Range(typeof(TimeSpan), "01:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 1h, maksymalna 12h")]
         public TimeSpan WorkingTime { get; set; }
@@ -21,7 +23,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
         public int FirstQuarterStart { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać godzinę rozpoczęcia pierwszej zmiany")]
-        [Range(typeof(TimeOnly), "00:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 00:00, maksymalna 12:00")]
+        [RegularExpression("^(0?[0-9]|1[0-1]):[0-5][0-9]$", ErrorMessage = "Pierwsza zmiana może zaczynać się tylko przed 12:00")]
         public TimeOnly FirstShiftStartTime { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać docelową liczbę pracowników na zmianie")]

@@ -5,6 +5,6 @@
         public int NurseId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
-        public ICollection<AbsencesSummaryViewModel> YearlyAbsencesSummaries { get; set; }
+        public ICollection<AbsencesSummaryViewModel> AbsencesSummaries { get; set; }
     }
 }

@@ -66,6 +66,9 @@
         {
             var request = _mapper.Map<EditDepartamentSettingsRequest>(_settings);
             var response = await _mediatr.Send(request);
+
+            if (response == null)
+                throw new EntityNotEditedException(_settings.DepartamentSettingsId, nameof(DepartamentViewModel));
         }
         catch (Exception e)
         {

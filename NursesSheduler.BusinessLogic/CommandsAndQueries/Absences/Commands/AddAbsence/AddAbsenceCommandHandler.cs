@@ -31,9 +31,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
         public async Task<AddAbsenceResponse> Handle(AddAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var yearlyAbsenceSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
-                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.YearlyAbsencesSummaryId)
-                ?? throw new EntityNotFoundException(request.YearlyAbsencesSummaryId, nameof(AbsencesSummary));
+            var absencesSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
+                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
+                ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
             var absence = _mapper.Map<Absence>(request);
 
@@ -41,7 +41,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var absenceVeryficationResult = AbsenceVeryficator.VerifyAbsence(yearlyAbsenceSummary, absence);
+            var absenceVeryficationResult = AbsenceVeryficator.VerifyAbsence(absencesSummary, absence);
 
             if (absenceVeryficationResult != AbsenceVeryficationResult.Valid)
                 return new AddAbsenceResponse
@@ -52,7 +52,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             absence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHours(absence.From, absence.To);
             absence.AssignedWorkingHours = await _absencesService.CalculateAbsenceAssignedWorkingTime(absence);
 
-            yearlyAbsenceSummary.Absences.Add(absence);
+            absencesSummary.Absences.Add(absence);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 

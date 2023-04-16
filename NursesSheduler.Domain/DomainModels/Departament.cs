@@ -1,6 +1,4 @@
-﻿using NursesScheduler.Domain.DomainModels.Schedules;
-
-namespace NursesScheduler.Domain.DomainModels
+﻿namespace NursesScheduler.Domain.DomainModels
 {
     public class Departament
     {

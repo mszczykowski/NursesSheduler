@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.Domain.DomainModels
 {
-    public sealed class DepartamentSettings
+    public sealed class DepartamentSettings : IEquatable<DepartamentSettings>
     {
         public int DepartamentSettingsId { get; set; }
 
@@ -20,6 +20,8 @@
 
         public int DefaultGeneratorRetryValue { get; set; }
 
+        public int SettingsVersion { get; set; }
+
         public int DepartamentId { get; set; }
         public Departament Departament { get; set; }
 
@@ -33,6 +35,23 @@
             TargetNumberOfNursesOnShift = 4;
             TargetMinimalMorningShiftLenght = new TimeSpan(6, 0, 0);
             DefaultGeneratorRetryValue = 4;
+            SettingsVersion = 0;
+        }
+
+        public bool Equals(DepartamentSettings? other)
+        {
+            if (other == null)
+                return false;
+
+            return WorkingTime == other.WorkingTime && 
+                MaximalWeekWorkingTime == other.MaximalWeekWorkingTime &&
+                MinmalShiftBreak == other.MinmalShiftBreak && 
+                FirstQuarterStart == other.FirstQuarterStart &&
+                FirstShiftStartTime == other.FirstShiftStartTime && 
+                TargetNumberOfNursesOnShift == other.TargetNumberOfNursesOnShift &&
+                TargetMinimalMorningShiftLenght == other.TargetMinimalMorningShiftLenght && 
+                DefaultGeneratorRetryValue == other.DefaultGeneratorRetryValue;
+
         }
     }
 }

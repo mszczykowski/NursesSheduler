@@ -11,7 +11,7 @@ namespace NursesScheduler.Domain.DomainModels
         public TimeSpan AssignedWorkingHours { get; set; }
         public AbsenceTypes Type { get; set; }
 
-        public int YearlyAbsencesSummaryId { get; set; }
-        public AbsencesSummary YearlyAbsencesSummary { get; set; }
+        public int AbsencesSummaryId { get; set; }
+        public AbsencesSummary AbsencesSummary { get; set; }
     }
 }

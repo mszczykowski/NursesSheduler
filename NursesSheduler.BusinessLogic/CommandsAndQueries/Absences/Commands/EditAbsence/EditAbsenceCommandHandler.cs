@@ -31,11 +31,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
 
         public async Task<EditAbsenceResponse> Handle(EditAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var yearlyAbsenceSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
-                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.YearlyAbsencesSummaryId)
-                ?? throw new EntityNotFoundException(request.YearlyAbsencesSummaryId, nameof(AbsencesSummary));
+            var absencesSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
+                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
+                ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
-            var originalAbsence = yearlyAbsenceSummary.Absences.FirstOrDefault(a => a.AbsenceId == request.AbsenceId) 
+            var originalAbsence = absencesSummary.Absences.FirstOrDefault(a => a.AbsenceId == request.AbsenceId) 
                 ?? throw new EntityNotFoundException(request.AbsenceId, nameof(Absence));
 
             var modifiedAbsence = _mapper.Map<Absence>(request);
@@ -44,7 +44,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var absenceVeryficationResult = AbsenceVeryficator.VerifyAbsence(yearlyAbsenceSummary, modifiedAbsence);
+            var absenceVeryficationResult = AbsenceVeryficator.VerifyAbsence(absencesSummary, modifiedAbsence);
 
             if (absenceVeryficationResult != AbsenceVeryficationResult.Valid)
                 return new EditAbsenceResponse
@@ -58,8 +58,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
 
             _context.Entry(originalAbsence).CurrentValues.SetValues(modifiedAbsence);
 
-            yearlyAbsenceSummary.Absences.Add(modifiedAbsence);
-            yearlyAbsenceSummary.PTOTimeUsed = yearlyAbsenceSummary.PTOTimeUsed - originalAbsence.AssignedWorkingHours
+            absencesSummary.Absences.Add(modifiedAbsence);
+            absencesSummary.PTOTimeUsed = absencesSummary.PTOTimeUsed - originalAbsence.AssignedWorkingHours
                                                     + modifiedAbsence.AssignedWorkingHours;
 
             var result = await _context.SaveChangesAsync(cancellationToken);

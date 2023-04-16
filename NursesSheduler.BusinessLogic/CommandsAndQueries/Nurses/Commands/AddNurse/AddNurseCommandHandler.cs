@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
@@ -27,7 +28,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
         public async Task<AddNurseResponse> Handle(AddNurseRequest request, CancellationToken cancellationToken)
         {
             var nurse = _mapper.Map<Nurse>(request);
-            var departamet = _context.Departaments.FirstOrDefault(d => d.DepartamentId == request.DepartamentId);
+            var departamet = _context.Departaments.Include(d => d.Nurses).FirstOrDefault(d => d.DepartamentId == request.DepartamentId);
 
             if(departamet == null)
             {
@@ -40,12 +41,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
 
             nurse.IsDeleted = false;
 
+            _absencesService.InitializeNewNurseAbsencesSummaries(nurse, departamet);
+
             departamet.Nurses.Add(nurse);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
-
-            if(result > 0)
-                await _absencesService.InitializeNurseAbsencesSummary(nurse, departamet, cancellationToken);
 
             return result > 0 ? _mapper.Map<AddNurseResponse>(nurse) : null;
         }

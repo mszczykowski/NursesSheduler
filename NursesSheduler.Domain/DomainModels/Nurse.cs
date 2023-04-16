@@ -1,5 +1,4 @@
-﻿using NursesScheduler.Domain.DomainModels.Schedules;
-using NursesScheduler.Domain.Interfaces;
+﻿using NursesScheduler.Domain.Interfaces;
 
 namespace NursesScheduler.Domain.DomainModels
 {
@@ -13,7 +12,7 @@ namespace NursesScheduler.Domain.DomainModels
         public Departament Departament { get; set; }
 
         public virtual ICollection<Shift> Shifts { get; set; }
-        public virtual ICollection<AbsencesSummary> YearlyAbsencesSummaries { get; set; }
+        public virtual ICollection<AbsencesSummary> AbsencesSummaries { get; set; }
 
         public bool IsDeleted { get; set; }
     }

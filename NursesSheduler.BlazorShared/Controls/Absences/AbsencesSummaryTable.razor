@@ -1,4 +1,4 @@
-﻿@if (NursesWithSummary.Count == 0)
+﻿@if (!NursesWithSummary.Any())
 {
     <div class="has-text-centered">
         <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
@@ -21,9 +21,9 @@ else
         @foreach (var nurse in NursesWithSummary)
         {
             <tr>
-                <td style="width: 100%">@nurse.Name + @nurse.Surname</td>
+                <td style="width: 100%">@nurse.Name @nurse.Surname</td>
                 @{
-                    _absencesSummary = nurse.YearlyAbsencesSummaries.FirstOrDefault(s => s.Year == SelectedYear);
+                    _absencesSummary = nurse.AbsencesSummaries.FirstOrDefault(s => s.Year == SelectedYear);
                 }
                 @if(_absencesSummary == null || currentYear < SelectedYear)
                 {

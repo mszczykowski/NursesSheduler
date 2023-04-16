@@ -5,7 +5,8 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 {
-    public class GetNursesFromDepartamentQueryHandler : IRequestHandler<GetNursesFromDepartamentRequest, List<GetNursesFromDepartamentResponse>>
+    public class GetNursesFromDepartamentQueryHandler : IRequestHandler<GetNursesFromDepartamentRequest, 
+                                                                                List<GetNursesFromDepartamentResponse>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -16,9 +17,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNur
             _mapper = mapper;
         }
 
-        public async Task<List<GetNursesFromDepartamentResponse>> Handle(GetNursesFromDepartamentRequest request, CancellationToken cancellationToken)
+        public async Task<List<GetNursesFromDepartamentResponse>> Handle(GetNursesFromDepartamentRequest request, 
+                                                                                    CancellationToken cancellationToken)
         {
-            return _mapper.Map<List<GetNursesFromDepartamentResponse>>(await _context.Nurses.Where(n => n.DepartamentId == request.DepartamentId).ToListAsync());
+            return _mapper.Map<List<GetNursesFromDepartamentResponse>>(await _context.Nurses
+                .Where(n => n.DepartamentId == request.DepartamentId && !n.IsDeleted)
+                .ToListAsync());
         }
     }
 }

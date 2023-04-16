@@ -17,28 +17,31 @@
             </div>
         </div>
         <div class="level-right">
-            <div class="level-item">
+            @if (_nursesWithSummary != null && _nursesWithSummary.Any())
+            {
                 <div class="level-item">
-                    <label class="label">Rok</label>
+                    <div class="level-item">
+                        <label class="label">Rok</label>
+                    </div>
                 </div>
-            </div>
-            <div class="level-item">
                 <div class="level-item">
-                    <div class="control">
-                        <div class="select">
-                            <select value=@_selectedYear>
-                                @for(int i = _minYear; i <= _maxYear; i++)
-                                {
-                                    <option value="@i">@i</option>
-                                }
-                            </select>
+                    <div class="level-item">
+                        <div class="control">
+                            <div class="select">
+                                <select value=@_selectedYear>
+                                    @for (int i = _minYear; i <= _maxYear; i++)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="level-item">
-                <button class="button is-info" @onclick="(() => _selectedYear = _currentYear)">Bieżący rok</button>
-            </div>
+                <div class="level-item">
+                    <button class="button is-info" @onclick="CurrentYearClick">Bieżący rok</button>
+                </div>
+            }
         </div>
     </div>
     @if (_nursesWithSummary == null)
@@ -47,8 +50,8 @@
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable Nurses=_nursesWithSummary 
-                                                                                            SelectedYear=_selectedYear/>
+        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable NursesWithSummary=_nursesWithSummary
+                                                                         SelectedYear=_selectedYear />
     }
 </div>
 
@@ -62,9 +65,10 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        { 
+        {
             await LoadNursesWithAbsencesSummary();
             CalculateYearScope();
+            _selectedYear = _currentYear;
             StateHasChanged();
         }
     }
@@ -91,19 +95,28 @@
     {
         _minYear = _maxYear = _currentYear;
 
-        foreach(var _nurse in _nursesWithSummary)
+        foreach (var _nurse in _nursesWithSummary)
         {
-            var min = _nurse.YearlyAbsencesSummaries.Min(s => s.Year);
-            var max = _nurse.YearlyAbsencesSummaries.Max(s => s.Year);
+            if (_nurse.AbsencesSummaries == null || !_nurse.AbsencesSummaries.Any())
+                continue;
 
-            if(min < _minYear)
+            var min = _nurse.AbsencesSummaries.Min(s => s.Year);
+            var max = _nurse.AbsencesSummaries.Max(s => s.Year);
+
+            if (min < _minYear)
             {
                 _minYear = min;
             }
-            if(max > _maxYear)
+            if (max > _maxYear)
             {
                 _maxYear = max;
             }
         }
+    }
+
+    private void CurrentYearClick()
+    {
+        _selectedYear = _currentYear;
+        StateHasChanged();
     }
 }
