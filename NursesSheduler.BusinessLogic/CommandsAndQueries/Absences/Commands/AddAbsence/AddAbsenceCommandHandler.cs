@@ -31,7 +31,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
         public async Task<AddAbsenceResponse> Handle(AddAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var absencesSummary = await _context.AbsencesSummaries.Include(y => y.Absences)
+            var absencesSummary = await _context.AbsencesSummaries
+                .Include(y => y.Absences)
+                .Include(y => y.Nurse)
                 .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
                 ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
@@ -49,7 +51,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
                     VeryficationResult = absenceVeryficationResult
                 };
 
-            absence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHours(absence.From, absence.To);
+            absence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHoursFromTo(absence.From, absence.To, 
+                                                                                    absencesSummary.Nurse.DepartamentId);
             absence.AssignedWorkingHours = await _absencesService.CalculateAbsenceAssignedWorkingTime(absence);
 
             absencesSummary.Absences.Add(absence);

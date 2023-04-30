@@ -9,6 +9,6 @@
         public virtual ICollection<Nurse> Nurses { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }
 
-        public DepartamentSettings DepartamentSettings { get; set; }
+        public virtual DepartamentSettings DepartamentSettings { get; set; }
     }
 }

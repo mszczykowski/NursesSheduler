@@ -27,12 +27,16 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
             services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
 
-            //services
+            //managers
             services.AddTransient<IHolidaysManager, HolidaysManager>();
-            services.AddTransient<IWorkTimeConfigurationManager, WorkTimeConfigurationManager>();
+            services.AddTransient<IDepartamentSettingsManager, DepartamentSettingsManager>();
+
+            //services
             services.AddTransient<IWorkTimeService, WorkTimeService>();
             services.AddTransient<IAbsencesService, AbsencesService>();
             services.AddSingleton<ICurrentDateService, CurrentDateService>();
+            services.AddTransient<ISchedulesService, SchedulesService>();
+            services.AddTransient<ICalendarService, CalendarService>();
         }
     }
 }

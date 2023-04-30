@@ -1,27 +1,51 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Managers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain.Models.Calendar;
+using NursesScheduler.Domain.Models;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    public sealed class CalendarService : ICalendarService
+    internal sealed class CalendarService : ICalendarService
     {
-        private readonly IScheduleConfigurationService _scheduleConfiguration;
-        private readonly IHolidaysApiClient _holidaysApiClient;
-        private readonly IMemoryCache _memoryCache;
+        private readonly IHolidaysManager _holidaysManager;
 
-        private ICollection<Holiday> _holidays;
-
-        public CalendarService(IHolidaysApiClient holidaysApiClient, IScheduleConfigurationService scheduleConfiguration, 
-            IMemoryCache memoryCache)
+        public CalendarService(IHolidaysManager holidaysManager)
         {
-            _holidaysApiClient = holidaysApiClient;
-            _scheduleConfiguration = scheduleConfiguration;
-            _memoryCache = memoryCache;
+            _holidaysManager = holidaysManager;
         }
 
-        public async Task<Quarter> GetQuarter(int whichQuarter, int year)
+        public async Task<ICollection<Holiday>> GetHolidaysInMonth(int monthNumber, int yearNumber)
+        {
+            var holidays = await _holidaysManager.GetHolidays(yearNumber);
+
+            return holidays.Where(h => h.Date.Month == monthNumber).ToList();
+        }
+
+        public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber)
+        {
+            var holidays = await _holidaysManager.GetHolidays(yearNumber);
+
+            holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
+
+            var monthDays = new Day[DateTime.DaysInMonth(yearNumber, monthNumber)];
+
+            for(int i = 0; i < monthDays.Length; i++)
+            {
+                monthDays[i] = new Day
+                {
+                    Date = new DateOnly(yearNumber, monthNumber, i + 1),
+                };
+            }
+
+            foreach(var holiday in holidays)
+            {
+                monthDays[holiday.Date.Day - 1].IsHoliday = true;
+                monthDays[holiday.Date.Day - 1].HolidayName = holiday.LocalName;
+            }
+
+            return monthDays;
+        }
+
+        /*public async Task<Quarter> GetQuarter(int whichQuarter, int year)
         {
             Quarter quarter = new Quarter();
 
@@ -87,6 +111,6 @@ namespace NursesScheduler.BusinessLogic.Services
             }
 
             return monthResult;
-        }
+        }*/
     }
 }

@@ -4,6 +4,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 
 namespace NursesScheduler.BlazorShared.Mapping
 {
@@ -16,6 +17,7 @@ namespace NursesScheduler.BlazorShared.Mapping
             CreateMap<GetNursesFromDepartamentResponse, NurseViewModel>();
             CreateMap<GetNurseResponse, NurseViewModel>();
             CreateMap<NurseViewModel, EditNurseRequest>();
+            CreateMap<GetScheduleResponse.NurseResponse, NurseViewModel>();
         }
     }
 }

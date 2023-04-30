@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.Domain.DomainModels
 {
-    public sealed class Absence
+    public class Absence
     {
         public int AbsenceId { get; set; }
         public DateOnly From { get; set; }
@@ -12,6 +12,8 @@ namespace NursesScheduler.Domain.DomainModels
         public AbsenceTypes Type { get; set; }
 
         public int AbsencesSummaryId { get; set; }
-        public AbsencesSummary AbsencesSummary { get; set; }
+        public virtual AbsencesSummary AbsencesSummary { get; set; }
+
+        public virtual ICollection<NurseWorkDay> NurseWorkDays { get; set; }
     }
 }

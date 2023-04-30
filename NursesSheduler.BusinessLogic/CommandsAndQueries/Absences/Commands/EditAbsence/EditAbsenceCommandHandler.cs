@@ -52,9 +52,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
                     VeryficationResult = absenceVeryficationResult
                 };
 
-            modifiedAbsence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHours(modifiedAbsence.From, 
-                                                                                                    modifiedAbsence.To);
-            modifiedAbsence.AssignedWorkingHours = await _absencesService.CalculateAbsenceAssignedWorkingTime(modifiedAbsence);
+            modifiedAbsence.WorkingHoursToAssign = await _workTimeService
+                .GetTotalWorkingHoursFromTo(modifiedAbsence.From, modifiedAbsence.To, request.DepartamentId);
+            modifiedAbsence.AssignedWorkingHours = await _absencesService
+                .CalculateAbsenceAssignedWorkingTime(modifiedAbsence);
 
             _context.Entry(originalAbsence).CurrentValues.SetValues(modifiedAbsence);
 

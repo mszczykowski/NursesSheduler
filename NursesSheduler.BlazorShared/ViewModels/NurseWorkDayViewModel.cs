@@ -2,17 +2,14 @@
 
 namespace NursesScheduler.BlazorShared.ViewModels
 {
-    public sealed class ShiftViewModel
+    public sealed class NurseWorkDayViewModel
     {
+        public int NurseWorkDayId { get; set; }
         public ShiftTypes ShiftType { get; set; }
+        public int DayNumber { get; set; }
         public TimeOnly ShiftStart { get; set; }
-        public TimeSpan ShiftEnd { get; set; }
-        public override string ToString()
-        {
-            return ShiftStart + " : " + ShiftEnd;
-        }
-
+        public TimeOnly ShiftEnd { get; set; }
         public bool IsTimeOff { get; set; }
-        public AbsenceTypes TimeOffType { get; set; }
+        public int MorningShiftId { get; set; }
     }
 }

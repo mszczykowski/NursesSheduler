@@ -1,7 +1,7 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.DeleteAbsence
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence
 
-@inherits ExceptionHandlingComponent
+@inherits ComponenentUsingDepartament
 
 @inject IMediator _mediatr
 @inject IMapper _mapper
@@ -84,6 +84,7 @@ else
         try
         {
             EditAbsenceRequest request = _mapper.Map<EditAbsenceRequest>(absence);
+            request.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
 
             var response = await _mediatr.Send(request);
 

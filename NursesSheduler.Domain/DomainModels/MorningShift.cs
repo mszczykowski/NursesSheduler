@@ -1,8 +1,8 @@
 ﻿namespace NursesScheduler.Domain.DomainModels
 {
-    public sealed class MorningShifts
+    public sealed class MorningShift
     {
-        public int Id { get; set; }
+        public int MorningShiftId { get; set; }
         public TimeSpan Lenght { get; set; }
     }
 }

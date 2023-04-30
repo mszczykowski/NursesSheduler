@@ -8,47 +8,60 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         public int DepartamentId { get; set; }
         public int MonthNumber { get; set; }
         public int Year { get; set; }
-        public int Quarter { get; set; }
+        public int QuarterNumber { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
-        public TimeSpan PTOTimeAvailableToAssgin { get; set; }
-        public TimeSpan PTOTimeAssigned { get; set; }
-        public DayResponse[] Days { get; set; }
+        public TimeSpan WorkTimeInQuarter { get; set; }
+        public TimeSpan TimeOffAvailableToAssgin { get; set; }
+        public TimeSpan TimeOffAssigned { get; set; }
+        public DayResponse[] MonthDays { get; set; }
         public MorningShiftsResponse[] MorningShifts { get; set; }
         public bool ReadOnly { get; set; }
-        public List<ScheduleRowResponse> ScheduleRows { get; set; }
+        public ICollection<ScheduleNurseResponse> ScheduleNurses { get; set; }
 
         public sealed class DayResponse
         {
-            public int DayNumber { get; set; }
+            public DateOnly Date { get; set; }
             public bool IsHoliday { get; set; }
+            public string HolidayName { get; set; }
         }
 
-        public sealed class ScheduleRowResponse
+        public sealed class ScheduleNurseResponse
         {
+            public int ScheduleNurseId { get; set; }
             public int NurseId { get; init; }
+            public NurseResponse Nurse { get; set; }
             public PreviousNurseStates PreviousState { get; set; }
             public int DaysFromLastShift { get; set; }
 
-            public ScheduleShiftResponse[] Shifts { get; }
-            public TimeSpan PreviousMonthTime { get; init; }
-            public TimeSpan AssignedTime { get; set; }
+            public NurseWorkDayResponse[] NurseWorkDays { get; set; }
+            public TimeSpan PreviousMonthTime { get; set; }
+            public TimeSpan TimeToAssingInMonth { get; set; }
             public TimeSpan TimeToAssingInQuarterLeft { get; set; }
-            public TimeSpan PTOTimeToAssign { get; set; }
+            public TimeSpan TimeOffToAssign { get; set; }
         }
 
-        public sealed class ScheduleShiftResponse
+        public sealed class NurseWorkDayResponse
         {
+            public int NurseWorkDayId { get; set; }
             public ShiftTypes ShiftType { get; set; }
+            public int DayNumber { get; set; }
             public TimeOnly ShiftStart { get; set; }
-            public TimeSpan ShiftEnd { get; set; }
+            public TimeOnly ShiftEnd { get; set; }
             public bool IsTimeOff { get; set; }
-            public AbsenceTypes TimeOffType { get; set; }
+            public int MorningShiftId { get; set; }
         }
 
         public sealed class MorningShiftsResponse
         {
-            public int MonningShiftId { get; set; }
-            public TimeSpan[] MorningShiftsLenght { get; set; }
+            public int MorningShiftId { get; set; }
+            public TimeSpan Lenght { get; set; }
+        }
+
+        public sealed class NurseResponse
+        {
+            public int NurseId { get; set; }
+            public string Name { get; set; }
+            public string Surname { get; set; }
         }
     }
 }

@@ -1,18 +1,32 @@
 ﻿
 
-<td>
-    <div class="">
-        <select>
-            <option> </option>
-            <option>D</option>
-            <option>N</option>
-            <option>R</option>
-        </select>
-    </div>
+<td class="day @_currentCssCalss">
+    <select value="3">
+        <option> </option>
+        <option>D</option>
+        <option>N</option>
+        <optgroup label="Ranki">     
+	        <option label="dupx">R1 fdsdfsf</option>
+            <option>R2</option>
+            <option value="3">R3</option>
+	    </optgroup>
+    </select>
 </td>
 
 
 @code {
     [Parameter]
-    public ShiftViewModel Shift { get; set; }
+    public NurseWorkDayViewModel WorkDay { get; set; }
+    [Parameter]
+    public DayViewModel Day { get; set; }
+
+    private string _currentCssCalss;
+    private string _defaultCssClass;
+
+    protected override Task OnInitializedAsync()
+    {
+        _defaultCssClass = ScheduleCssHelper.GetDayClass(Day);
+        _currentCssCalss = _defaultCssClass;
+        return base.OnInitializedAsync();
+    }
 }

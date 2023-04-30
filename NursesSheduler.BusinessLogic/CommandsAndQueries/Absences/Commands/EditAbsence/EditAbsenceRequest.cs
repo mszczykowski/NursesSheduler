@@ -10,5 +10,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
         public DateOnly From { get; set; }
         public DateOnly To { get; set; }
         public AbsenceTypes Type { get; set; }
+        public int DepartamentId { get; set; }
     }
 }

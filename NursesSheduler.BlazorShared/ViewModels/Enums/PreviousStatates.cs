@@ -2,8 +2,10 @@
 {
     public enum PreviousStatates
     {
-        Day,
-        Night,
-        Prioritise
+        morning,
+        day,
+        night,
+        prioritise,
+        none,
     }
 }

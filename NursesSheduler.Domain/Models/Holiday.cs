@@ -1,4 +1,4 @@
-﻿namespace NursesScheduler.Domain.Models.Calendar
+﻿namespace NursesScheduler.Domain.Models
 {
     public sealed class Holiday
     {

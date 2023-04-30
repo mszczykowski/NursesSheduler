@@ -2,31 +2,58 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Managers;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 {
-    public class GetScheduleQueryHandler : IRequestHandler<GetScheduleRequest, GetScheduleResponse>
+    internal class GetScheduleQueryHandler : IRequestHandler<GetScheduleRequest, GetScheduleResponse>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ISchedulesService _schedulesService;
+        private readonly IDepartamentSettingsManager _departamentSettingsManager;
+        private readonly ICalendarService _calendarService;
 
-        public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper, ISchedulesService schedulesService,
+            IDepartamentSettingsManager departamentSettingsManager, ICalendarService calendarService)
         {
             _context = context;
             _mapper = mapper;
+            _schedulesService = schedulesService;
+            _departamentSettingsManager = departamentSettingsManager;
+            _calendarService = calendarService;
         }
         public async Task<GetScheduleResponse> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
         {
-            var result = await _context.Schedules
-                .Where(s => s.DepartamentId == request.DepartamentId && s.Year == request.Year
-                                && s.MonthNumber == request.Month)
-                .Include(s => s.Shifts)
-                .Include(s => s.Holidays)
-                .FirstOrDefaultAsync();
+            bool readOnly = false;
 
-            if (result == null) return null;
+            var schedule = await _context.Schedules
+                .Include(s => s.Quarter)
+                .ThenInclude(s => s.NurseQuarterStats)
+                .Include(s => s.ScheduleNurses)
+                .FirstOrDefaultAsync(s => s.DepartamentId == request.DepartamentId &&
+                    s.Year == request.Year &&
+                    s.MonthNumber == request.Month);
 
-            return null;
+            var currentSettings= await _departamentSettingsManager.GetDepartamentSettings(request.DepartamentId);
+
+            if (schedule != null && currentSettings.SettingsVersion != schedule.SettingsVersion)
+                readOnly = true;
+
+            if (schedule == null)
+                schedule = await _schedulesService.GetNewSchedule(request.Month, request.Year, request.DepartamentId);
+
+            await _schedulesService.SetTimeOffs(schedule);
+            await _schedulesService.SetNurseWorkTimes(schedule);
+
+            var response = _mapper.Map<GetScheduleResponse>(schedule);
+
+            var monthDays = await _calendarService.GetMonthDays(request.Month, request.Year);
+
+            response.MonthDays = _mapper.Map<GetScheduleResponse.DayResponse[]>(monthDays);
+
+            return response;
         }
     }
 }

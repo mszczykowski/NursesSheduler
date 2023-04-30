@@ -1,15 +1,24 @@
-﻿namespace NursesScheduler.Domain.DomainModels
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace NursesScheduler.Domain.DomainModels
 {
-    public sealed class NurseQuarterStats
+    public class NurseQuarterStats
     {
+        public int NurseQuarterStatsId { get; set; }
         public TimeSpan WorkTimeInQuarterToAssign { get; set; }
-        public TimeSpan WorkTimeInQuarterToAssigned { get; set; }
-        public TimeSpan[] WorkTimeAssignedInWeek { get; set; }
+        
+        public virtual ICollection<WorkTimeInWeek> WorkTimeAssignedInWeek { get; set; }
 
 
         public TimeSpan HolidayPaidHoursAssigned { get; set; }
         public int NumberOfNightShifts { get; set; }
 
-        public ICollection<MorningShifts> MorningShiftsAssigned { get; set; }
+        public virtual ICollection<MorningShift> MorningShiftsAssigned { get; set; }
+
+        public int NurseId { get; set; }
+        public virtual Nurse Nurse { get; set; }
+
+        [NotMapped]
+        public TimeSpan WorkTimeInQuarterToAssigned { get; set; }
     }
 }

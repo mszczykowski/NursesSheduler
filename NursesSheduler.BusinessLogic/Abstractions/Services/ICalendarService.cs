@@ -1,10 +1,10 @@
-﻿using NursesScheduler.Domain.Models.Calendar;
+﻿using NursesScheduler.Domain.Models;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
     public interface ICalendarService
     {
-        Task<Quarter> GetQuarter(int whichQuarter, int year);
-        Task<Month> GetMonth(int monthNumber, int yearNumber);
+        Task<ICollection<Holiday>> GetHolidaysInMonth(int monthNumber, int yearNumber);
+        Task<Day[]> GetMonthDays(int monthNumber, int yearNumber);
     }
 }

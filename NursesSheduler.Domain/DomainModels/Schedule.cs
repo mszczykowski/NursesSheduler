@@ -6,17 +6,18 @@
         public int MonthNumber { get; set; }
         public int MonthInQuarter { get; set; }
         public int Year { get; set; }
-        public int Quarter{ get; set; }
+        public int QuarterId{ get; set; }
+        public virtual Quarter Quarter { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
-        public TimeSpan PTOTimeAvailableToAssgin { get; set; }
-        public TimeSpan PTOTimeAssigned { get; set; }
+        public TimeSpan TimeOffAvailableToAssgin { get; set; }
+        public TimeSpan TimeOffAssigned { get; set; }
         public int SettingsVersion { get; set; }
 
-        public virtual ICollection<int> Holidays { get; set; }
-        public virtual ICollection<Shift> Shifts { get; set; }
+        public ICollection<int> Holidays { get; set; }
+        public virtual ICollection<ScheduleNurse> ScheduleNurses{ get; set; }
 
 
         public int DepartamentId { get; set; }
-        public Departament Departament { get; set; }
+        public virtual Departament Departament { get; set; }
     }
 }

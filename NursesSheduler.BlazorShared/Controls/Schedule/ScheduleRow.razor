@@ -1,21 +1,22 @@
 ﻿
 
 <tr>
-    <td>@RowData.Nurse.ToString();</td>
-    @foreach(var shift in RowData.Shifts)
+    <td>@ScheduleNurse.Nurse.ToString();</td>
+    <td></td>
+    @foreach(var workDay in ScheduleNurse.NurseWorkDays)
     {
-        <ScheduleShift/>
+        <ScheduleShift WorkDay=workDay Day=MonthDays[workDay.DayNumber-1]/>
     }
-    <td>@RowData.PreviousMonthTime</td>
-    <td>@RowData.AssignedTime</td>
-    <td>@RowData.AssignedTimeInQuarter</td>
-    <td>@RowData.AssignedPTO</td>
+    <td>@ScheduleNurse.PreviousMonthTime.GetTotalHoursAndMinutes()</td>
+    <td>@ScheduleNurse.TimeToAssingInMonth.GetTotalHoursAndMinutes()</td>
+    <td>@ScheduleNurse.TimeToAssingInQuarterLeft.GetTotalHoursAndMinutes()</td>
+    <td>@ScheduleNurse.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
 </tr>
 
 
 @code {
     [Parameter]
-    public MonthViewModel Month { get; set; }
+    public ScheduleNurseViewModel ScheduleNurse { get; set; }
     [Parameter]
-    public ScheduleRowViewModel RowData { get; set; }
+    public DayViewModel[] MonthDays { get; set; }
 }

@@ -1,8 +1,8 @@
 ﻿using NursesScheduler.Domain;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
-using NursesScheduler.Domain.Models.Calendar;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.Domain.Models;
 
 namespace NursesScheduler.Infrastructure.HttpClients
 {

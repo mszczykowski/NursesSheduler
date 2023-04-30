@@ -2,7 +2,7 @@
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Managers;
 using NursesScheduler.BusinessLogic.Exceptions;
-using NursesScheduler.Domain.Models.Calendar;
+using NursesScheduler.Domain.Models;
 
 namespace NursesScheduler.BusinessLogic.Managers
 {

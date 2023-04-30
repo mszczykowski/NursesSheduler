@@ -9,30 +9,25 @@ namespace NursesScheduler.BusinessLogic.Services
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentDateService _currentDateService;
+        private readonly IWorkTimeService _workTimeService;
 
-        public AbsencesService(IApplicationDbContext context, ICurrentDateService currentDateService)
+        public AbsencesService(IApplicationDbContext context, ICurrentDateService currentDateService,
+            IWorkTimeService workTimeService)
         {
             _context = context;
             _currentDateService = currentDateService;
+            _workTimeService = workTimeService;
         }
 
         public async Task<TimeSpan> CalculateAbsenceAssignedWorkingTime(Absence absence)
         {
-            var assignedShifts = await _context.Shifts.Where(s => s.Date >= absence.From && s.Date <= absence.To &&
-                                                           s.AssignedNurses.Any(n => n.NurseId == absence.AbsencesSummary.NurseId))
-                                                                                                            .ToListAsync();
+            var absenceWorkDays = absence.NurseWorkDays;
 
-            var assignedWorkingTime = TimeSpan.Zero;
-
-            foreach (var shift in assignedShifts)
-            {
-                assignedWorkingTime += shift.ShiftEnd - shift.ShiftStart;
-            }
-
-            return assignedWorkingTime;
+            return _workTimeService.GetWorkingTimeFromWorkDays(absenceWorkDays);
         }
 
-        public async Task InitializeDepartamentAbsencesSummaries(Departament departament, CancellationToken cancellationToken)
+        public async Task InitializeDepartamentAbsencesSummaries(Departament departament, 
+            CancellationToken cancellationToken)
         {
             var shouldBeInitializedToYear = _currentDateService.GetCurrentDate().Year + 1;
 

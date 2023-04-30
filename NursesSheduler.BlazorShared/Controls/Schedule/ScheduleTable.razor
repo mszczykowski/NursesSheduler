@@ -5,23 +5,29 @@
         <tr>
             <th>Pracownik</th>
             <th class="previous">Poprz.</th>
-            @for(int i = 0; i < Month.Days.Length; i++)
+            @foreach (var day in MonthDays)
             {
-                <th class="@ScheduleCssHelper.GetDayClass(Month.Days[i])">
-                    <p>@Month.GetDate(i)</p>
-                    <p>@Month.Days[i].GetDayOfWeekAbreviation()</p>
+                <th class="@ScheduleCssHelper.GetDayClass(day) day">
+                    <div class="tooltip">
+                        <p>@day.ToString()</p>
+                        <p>@day.GetDayOfWeekAbreviation()</p>
+                        @if (day.IsHoliday && !String.IsNullOrEmpty(day.HolidayName))
+                        {
+                            <div class="tooltiptext">@day.HolidayName</div>
+                        }
+                    </div>
                 </th>
             }
-            <th>Poprzedni okres</th>
-            <th>Przypisane godziny</th>
-            <th>Przypisane w kwartale</th>
-            <th>Przypisany urlop</th>
+            <th class="summary">Poprzedni okres</th>
+            <th class="summary">Pozostałe godziny w miesiącu</th>
+            <th class="summary">Pozostałe godziny w kwartale</th>
+            <th class="summary">Przypisany urlop</th>
         </tr>
     </thead>
     <tbody>
-        @foreach(var row in RowsData)
+        @foreach (var nurse in ScheduleNurses)
         {
-            <ScheduleRow/>
+            <ScheduleRow ScheduleNurse=nurse MonthDays=MonthDays/>
         }
     </tbody>
 </table>
@@ -29,17 +35,7 @@
 
 @code {
     [Parameter]
-    public MonthViewModel Month { get; set; }
+    public DayViewModel[] MonthDays { get; set; }
     [Parameter]
-    public ICollection<ScheduleRowViewModel> RowsData { get; set; }
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            
-            StateHasChanged();
-        }
-    }
+    public ICollection<ScheduleNurseViewModel> ScheduleNurses { get; set; }
 }

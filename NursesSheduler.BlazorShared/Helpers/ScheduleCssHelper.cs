@@ -1,5 +1,4 @@
 ﻿using NursesScheduler.BlazorShared.ViewModels;
-using NursesScheduler.BlazorShared.ViewModels.Enums;
 
 namespace NursesScheduler.BlazorShared.Helpers
 {
@@ -7,15 +6,19 @@ namespace NursesScheduler.BlazorShared.Helpers
     {
         public static string GetDayClass(DayViewModel dayViewModel)
         {
-            switch(dayViewModel.DayType)
-            {
-                case DayType.Work_free:
-                    return "day holiday";
-                case DayType.Holiday:
-                    return "day free-day";
-                default:
-                    return "day";
-            }
+            if(dayViewModel == null)
+                return "";
+
+            if(dayViewModel.IsHoliday)
+                return "holiday sunday";
+
+            if (dayViewModel.Date.DayOfWeek == DayOfWeek.Saturday)
+                return "saturday";
+
+            if (dayViewModel.Date.DayOfWeek == DayOfWeek.Sunday)
+                return "sunday";
+
+            return "";
         }
     }
 }
