@@ -41,7 +41,7 @@
 
 
 @code {
-    private List<NurseViewModel> _nurses = null;
+    private List<NurseViewModel> _nurses;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -59,7 +59,7 @@
             };
             var response = await _mediatr.Send(request);
 
-            _nurses = _mapper.Map<List<NurseViewModel>>(response);
+            _nurses = _mapper.Map<List<NurseViewModel>>(response).OrderBy(n => n.Name).ToList();
             StateHasChanged();
         }
         catch(Exception e)

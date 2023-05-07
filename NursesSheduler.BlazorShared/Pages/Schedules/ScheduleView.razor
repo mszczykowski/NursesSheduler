@@ -1,5 +1,7 @@
 ﻿@page "/scheduleView"
 
+@using NursesScheduler.BlazorShared.Controls.Schedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 
@@ -8,18 +10,19 @@
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
-
-<div class="container is-fluid">
-    @if (_schedule == null)
-    {
-        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner />
-    }
-    else
-    {
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Recalculate="CalculateMorningShifts" Save="SaveMorningShifts"/>
+<!--<SolverSettingsModal/>-->
+@if (_schedule == null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="container is-fluid">
         <div class="level">
             <div class="level-left">
                 <div class="level-item">
-                    <a>Konfiguracja ranków</a>
+                    <a @onclick="(() => _morningShiftsSettingsModal.SetModal(_schedule.MorningShifts, _schedule.TimeForMorningShifts))">Konfiguracja ranków</a>
                 </div>
                 <div class="level-item">
                     <a>Konfiguracja generatora</a>
@@ -143,14 +146,16 @@
                 <p><b>Zapisano!</b></p>
             </div>
         </div>
+    </div>
 
-        <NursesScheduler.BlazorShared.Controls.Schedule.ScheduleTable MonthDays=_schedule.MonthDays ScheduleNurses=_schedule.ScheduleNurses />
-    }
-</div>
+    <ScheduleTable MonthDays=_schedule.MonthDays ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_schedule.MorningShifts/>
+}
 
 
 @code {
-    private bool isLoaded = false;
+    private MorningShiftsSettingsModal _morningShiftsSettingsModal;
+    private SolverSettingsModal _solverSettingsModal;
+
     private int _monthNumber = DateTime.Now.Month;
     private int _yearNumber = DateTime.Now.Year;
 
@@ -160,25 +165,27 @@
     {
         if (firstRender)
         {
-            GetSchedule();
+            await GetSchedule();
         }
     }
 
-    private void SelectedYearChanged(ChangeEventArgs e)
+    private async Task SelectedYearChanged(ChangeEventArgs e)
     {
-
+        _yearNumber = Int32.Parse(e.Value.ToString());
+        await GetSchedule();
     }
 
-    private void SelectedMonthChanged(ChangeEventArgs e)
+    private async Task SelectedMonthChanged(ChangeEventArgs e)
     {
-
+        _monthNumber = Int32.Parse(e.Value.ToString());
+        await GetSchedule();
     }
 
-    private void CurrentDateClick()
+    private async Task CurrentDateClick()
     {
         _monthNumber = DateTime.Now.Month;
         _yearNumber = DateTime.Now.Year;
-        GetSchedule();
+        await GetSchedule();
     }
 
     private async Task GetSchedule()
@@ -196,7 +203,7 @@
             _schedule = _mapper.Map<ScheduleViewModel>(response);
             StateHasChanged();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             base.HandleException(e);
         }
@@ -210,5 +217,29 @@
     private void LoadSchedule(GetScheduleResponse response)
     {
 
+    }
+
+    private void SaveMorningShifts(MorningShiftsEditViewModel morningShiftsEditViewModel)
+    {
+        _schedule.MorningShifts = morningShiftsEditViewModel.MorningShifts;
+    }
+
+    private async Task CalculateMorningShifts(MorningShiftsEditViewModel morningShiftsEditViewModel)
+    {
+        try
+        {
+            var request = new CalculateMorningShiftsRequest
+                {
+                    TimeForMorningShifts = _schedule.TimeForMorningShifts,
+                    DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                };
+            var response = await _mediatr.Send(request);
+
+            morningShiftsEditViewModel.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
+        }
+        catch (Exception e)
+        {
+            base.HandleException(e);
+        }
     }
 }

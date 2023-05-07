@@ -2,7 +2,7 @@
 {
     public enum DayOfWeekAbreviations
     {
-        Niedz,
+        Nie,
         Pon,
         Wt,
         Śr,

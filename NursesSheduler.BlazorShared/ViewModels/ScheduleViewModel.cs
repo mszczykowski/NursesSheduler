@@ -15,5 +15,6 @@
         public MorningShiftViewModel[] MorningShifts { get; set; }
         public bool ReadOnly { get; set; }
         public ICollection<ScheduleNurseViewModel> ScheduleNurses { get; set; }
+        public TimeSpan TimeForMorningShifts { get; set; }
     }
 }

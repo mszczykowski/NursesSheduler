@@ -18,18 +18,20 @@ else
     <table class="table is-striped is-fullwidth">
         <thead>
             <tr>
+                <th>L.p.</th>
                 <th style="width: 100%">Imie i nazwisko</th>
                 <th></th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var nurse in Nurses)
+            @for(int i = 0; i < Nurses.Count; i++)
             {
                 <tr>
-                    <td style="width: 100%">@nurse.ToString()</td>
-                    <td><a href="/nurse/edit/@nurse.NurseId">Edytuj</a></td>
-                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(nurse.ToString(), nurse.NurseId))">Usuń</a></td>
+                    <td>@(i + 1)</td>
+                    <td class="is-fullwidth">@Nurses[i].ToString()</td>
+                    <td><a href="/nurse/edit/@Nurses[i].NurseId">Edytuj</a></td>
+                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(Nurses[i].ToString(), Nurses[i].NurseId))">Usuń</a></td>
                 </tr>
             }
         </tbody>

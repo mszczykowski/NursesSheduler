@@ -3,7 +3,8 @@
 <table class="table-schedule">
     <thead>
         <tr>
-            <th>Pracownik</th>
+            <th class="no">L.p.</th>
+            <th class="name">Pracownik</th>
             <th class="previous">Poprz.</th>
             @foreach (var day in MonthDays)
             {
@@ -18,16 +19,19 @@
                     </div>
                 </th>
             }
-            <th class="summary">Poprzedni okres</th>
-            <th class="summary">Pozostałe godziny w miesiącu</th>
-            <th class="summary">Pozostałe godziny w kwartale</th>
-            <th class="summary">Przypisany urlop</th>
+            <th class="summary">Poprz. mies.</th>
+            <th class="summary">Poz. godz. w mies.</th>
+            <th class="summary">Poz. godz. w kwar.</th>
+            <th class="summary">Przyp. wolne</th>
         </tr>
     </thead>
     <tbody>
+        @{
+            i = 1;
+        }
         @foreach (var nurse in ScheduleNurses)
         {
-            <ScheduleRow ScheduleNurse=nurse MonthDays=MonthDays/>
+            <ScheduleRow No=i++ ScheduleNurse=nurse MonthDays=MonthDays MorningShifts=MorningShifts/>
         }
     </tbody>
 </table>
@@ -38,4 +42,8 @@
     public DayViewModel[] MonthDays { get; set; }
     [Parameter]
     public ICollection<ScheduleNurseViewModel> ScheduleNurses { get; set; }
+    [Parameter]
+    public MorningShiftViewModel[] MorningShifts { get; set; }
+
+    private int i;
 }

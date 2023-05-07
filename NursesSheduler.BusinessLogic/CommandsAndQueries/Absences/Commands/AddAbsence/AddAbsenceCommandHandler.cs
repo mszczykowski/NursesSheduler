@@ -52,7 +52,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
                 };
 
             absence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHoursFromTo(absence.From, absence.To, 
-                                                                                    absencesSummary.Nurse.DepartamentId);
+                                                                                     null);
             absence.AssignedWorkingHours = await _absencesService.CalculateAbsenceAssignedWorkingTime(absence);
 
             absencesSummary.Absences.Add(absence);

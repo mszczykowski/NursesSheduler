@@ -1,5 +1,14 @@
-﻿<h3>SchedulePrevState</h3>
+﻿<td class="previous">
+    <select @bind="@PreviousStatate">
+        <option value="@PreviousStatates.None"> </option>
+        <option value="@PreviousStatates.Day">D</option>
+        <option value="@PreviousStatates.Night">N</option>
+        <option value="@PreviousStatates.Morning">R</option>
+        <option value="@PreviousStatates.Prioritise">P</option>
+    </select>
+</td>
 
 @code {
-
+    [Parameter]
+    public PreviousStatates PreviousStatate { get; set; }
 }

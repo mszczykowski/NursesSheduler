@@ -2,6 +2,7 @@
 
 @inherits ComponenentUsingDepartament
 
+@using NursesScheduler.BlazorShared.Controls.Nurses
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
 
@@ -23,11 +24,11 @@
     </div>
     @if(_nurse == null)
     {
-        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+        <LoadingSpinner/>
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Title="Dodaj nowego pracownika" Nurse=@_nurse SaveNurse="SaveNurse"/>
+        <NurseForm Nurse=@_nurse SaveNurse="SaveNurse"/>
     }
 </div>
 

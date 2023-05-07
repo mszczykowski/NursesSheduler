@@ -53,7 +53,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
                 };
 
             modifiedAbsence.WorkingHoursToAssign = await _workTimeService
-                .GetTotalWorkingHoursFromTo(modifiedAbsence.From, modifiedAbsence.To, request.DepartamentId);
+                .GetTotalWorkingHoursFromTo(modifiedAbsence.From, modifiedAbsence.To, null);
             modifiedAbsence.AssignedWorkingHours = await _absencesService
                 .CalculateAbsenceAssignedWorkingTime(modifiedAbsence);
 

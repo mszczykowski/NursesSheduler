@@ -7,7 +7,7 @@ namespace NursesScheduler.BlazorShared.Helpers
         public static string GetDayClass(DayViewModel dayViewModel)
         {
             if(dayViewModel == null)
-                return "";
+                return String.Empty;
 
             if(dayViewModel.IsHoliday)
                 return "holiday sunday";
@@ -18,7 +18,13 @@ namespace NursesScheduler.BlazorShared.Helpers
             if (dayViewModel.Date.DayOfWeek == DayOfWeek.Sunday)
                 return "sunday";
 
-            return "";
+            return String.Empty;
+        }
+
+        public static string SetIsTimeOff(bool isTimeOff)
+        {
+            if (isTimeOff) return "time-off";
+            return String.Empty;
         }
     }
 }

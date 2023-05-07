@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
-using NursesScheduler.BusinessLogic.Abstractions.Managers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.DomainModels;
 
@@ -9,20 +8,18 @@ namespace NursesScheduler.BusinessLogic.Services
     internal sealed class SchedulesService : ISchedulesService
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDepartamentSettingsManager _departamentSettingsManager;
         private readonly IWorkTimeService _workTimeService;
 
-        public SchedulesService(IApplicationDbContext context, IDepartamentSettingsManager departamentSettingsManager, IWorkTimeService workTimeService)
+        public SchedulesService(IApplicationDbContext context, IWorkTimeService workTimeService)
         {
             _context = context;
-            _departamentSettingsManager = departamentSettingsManager;
             _workTimeService = workTimeService;
         }
 
-        public async Task<Schedule> GetNewSchedule(int monthNumber, int yearNumber, int departamentId)
+        public async Task<Schedule> GetNewSchedule(int monthNumber, int yearNumber, int departamentId, 
+            DepartamentSettings departamentSettings)
         {
-            var settings = await _departamentSettingsManager.GetDepartamentSettings(departamentId);
-            var quarterNumber = await _workTimeService.GetQuarterNumber(monthNumber, departamentId);
+            var quarterNumber = await _workTimeService.GetQuarterNumber(monthNumber, departamentSettings);
 
             var nurses = await _context.Nurses
                 .Where(n => n.IsDeleted == false && n.DepartamentId == departamentId)
@@ -36,20 +33,20 @@ namespace NursesScheduler.BusinessLogic.Services
                 TimeOffAssigned = TimeSpan.Zero,
             };
 
-            schedule.Quarter = await GetQuarter(yearNumber, quarterNumber, departamentId, settings, nurses);
+            schedule.Quarter = await GetQuarter(yearNumber, quarterNumber, departamentId, departamentSettings, nurses);
 
             schedule.WorkTimeInMonth = await _workTimeService
-                .GetTotalWorkingHoursInMonth(monthNumber, yearNumber, departamentId);
+                .GetTotalWorkingHoursInMonth(monthNumber, yearNumber, departamentSettings);
 
             schedule.TimeOffAvailableToAssgin = await _workTimeService
-                .GetSurplusWorkTime(monthNumber, yearNumber, nurses.Count, departamentId);
+                .GetSurplusWorkTime(monthNumber, yearNumber, nurses.Count, departamentSettings);
 
             InitialiseScheduleNurses(nurses, schedule, DateTime.DaysInMonth(yearNumber, monthNumber));
 
             return schedule;
         }
 
-        public async Task SetTimeOffs(Schedule schedule)
+        public async Task SetTimeOffs(Schedule schedule, DepartamentSettings departamentSettings)
         {
             var absenceSummaries = await _context.AbsencesSummaries
                 .Where(a => a.Year == schedule.Year &&
@@ -86,7 +83,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
 
                 scheduleNurse.TimeOffToAssign = await _workTimeService
-                    .GetTotalWorkingHoursFromDateArray(absenceDates, schedule.DepartamentId);
+                    .GetTotalWorkingHoursFromDateArray(absenceDates, departamentSettings);
             }
         }
 
@@ -117,22 +114,22 @@ namespace NursesScheduler.BusinessLogic.Services
         }
 
         private async Task<Quarter> GetQuarter(int yearNumber, int quarterNumber, int departamentId,
-            DepartamentSettings settings, ICollection<Nurse> nurses)
+            DepartamentSettings departamentSettings, ICollection<Nurse> nurses)
         {
             var quarter = await _context.Quarters
                 .Include(q => q.NurseQuarterStats)
                 .Include(q => q.MorningShifts)
                 .FirstOrDefaultAsync(q => q.DepartamentId == departamentId
-                                        && q.SettingsVersion == settings.SettingsVersion
+                                        && q.SettingsVersion == departamentSettings.SettingsVersion
                                         && q.QuarterNumber == quarterNumber
                                         && q.QuarterYear == yearNumber);
 
             if (quarter == null)
             {
-                quarter = await CreateNewQuarter(yearNumber, quarterNumber, departamentId, settings);
+                quarter = await CreateNewQuarter(yearNumber, quarterNumber, departamentId, departamentSettings);
             }
 
-            await InitializeNurseQuarterStats(quarter, nurses);
+            await InitializeNurseQuarterStats(quarter, nurses, departamentSettings);
 
             return quarter;
         }
@@ -151,12 +148,13 @@ namespace NursesScheduler.BusinessLogic.Services
             quarter.MorningShifts = new List<MorningShift>();
             quarter.NurseQuarterStats = new List<NurseQuarterStats>();
             quarter.WorkTimeInQuarterToAssign = await _workTimeService
-                        .GetTotalWorkingHoursInQuarter(quarter.QuarterNumber, quarter.QuarterYear, quarter.DepartamentId);
+                        .GetTotalWorkingHoursInQuarter(quarter.QuarterNumber, quarter.QuarterYear, settings);
 
             return quarter;
         }
 
-        private async Task InitializeNurseQuarterStats(Quarter quarter, ICollection<Nurse> nurses)
+        private async Task InitializeNurseQuarterStats(Quarter quarter, ICollection<Nurse> nurses, 
+            DepartamentSettings departamentSettings)
         {
             bool statsChanged = false;
             TimeSpan workTimeToAssignInQuarter = TimeSpan.Zero;
@@ -169,7 +167,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 if (workTimeToAssignInQuarter == TimeSpan.Zero)
                 {
                     workTimeToAssignInQuarter = await _workTimeService
-                        .GetTotalWorkingHoursInQuarter(quarter.QuarterNumber, quarter.QuarterYear, quarter.DepartamentId);
+                        .GetTotalWorkingHoursInQuarter(quarter.QuarterNumber, quarter.QuarterYear, departamentSettings);
                 }
 
                 quarter.NurseQuarterStats.Add(new NurseQuarterStats

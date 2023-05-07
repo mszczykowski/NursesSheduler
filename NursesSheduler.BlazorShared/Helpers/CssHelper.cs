@@ -5,19 +5,19 @@
         public static string SetIsLoading(bool isLoading)
         {
             if (isLoading) return "is-loading";
-            else return "";
+            return String.Empty;
         }
 
         public static string SetIsActive(bool isActive)
         {
             if (isActive) return "is-active";
-            else return "";
+            return String.Empty;
         }
 
         public static string SetVisibility(bool isVisible)
         {
             if (!isVisible) return "display: none";
-            else return "";
+            return String.Empty;
         }
     }
 }

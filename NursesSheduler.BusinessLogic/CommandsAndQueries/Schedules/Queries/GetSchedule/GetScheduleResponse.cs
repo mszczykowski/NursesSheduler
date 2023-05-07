@@ -17,6 +17,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         public MorningShiftsResponse[] MorningShifts { get; set; }
         public bool ReadOnly { get; set; }
         public ICollection<ScheduleNurseResponse> ScheduleNurses { get; set; }
+        public TimeSpan TimeForMorningShifts { get; set; }
 
         public sealed class DayResponse
         {
@@ -53,8 +54,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
 
         public sealed class MorningShiftsResponse
         {
-            public int MorningShiftId { get; set; }
-            public TimeSpan Lenght { get; set; }
+            public MorningShiftIndex Index { get; set; }
+            public TimeSpan ShiftLength { get; set; }
         }
 
         public sealed class NurseResponse

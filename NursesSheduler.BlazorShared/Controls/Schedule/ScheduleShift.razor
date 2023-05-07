@@ -1,15 +1,22 @@
 ﻿
 
-<td class="day @_currentCssCalss">
-    <select value="3">
-        <option> </option>
-        <option>D</option>
-        <option>N</option>
-        <optgroup label="Ranki">     
-	        <option label="dupx">R1 fdsdfsf</option>
-            <option>R2</option>
-            <option value="3">R3</option>
-	    </optgroup>
+<td class="day @ScheduleCssHelper.GetDayClass(Day) @ScheduleCssHelper.SetIsTimeOff(WorkDay.IsTimeOff)" @oncontextmenu="SetTimeOff" @oncontextmenu:preventDefault="true">
+    <select @onchange="AssignShift" value="@_selectedValue">
+        <option value="@nameof(ShiftTypes.None)"> </option>
+        <option value="@nameof(ShiftTypes.Day)">D</option>
+        <option value="@nameof(ShiftTypes.Night)">N</option>
+        @if (MorningShifts != null && MorningShifts.Any(m => m.ShiftLength != TimeSpan.Zero))
+        {
+            <optgroup label="Ranki">
+                @foreach (var morningShift in MorningShifts)
+                {
+                    @if(morningShift.ShiftLength != TimeSpan.Zero)
+                    {
+                        <option value="@nameof(morningShift.Index)">@morningShift.ShiftLength.GetTotalHoursAndMinutes()</option>
+                    }
+                }
+            </optgroup>
+        }
     </select>
 </td>
 
@@ -19,14 +26,65 @@
     public NurseWorkDayViewModel WorkDay { get; set; }
     [Parameter]
     public DayViewModel Day { get; set; }
+    [Parameter]
+    public ICollection<MorningShiftViewModel> MorningShifts { get; set; }
+    [Parameter]
+    public EventCallback RecalculateRow { get; set; }
 
-    private string _currentCssCalss;
-    private string _defaultCssClass;
+    private string _selectedValue;
 
-    protected override Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
-        _defaultCssClass = ScheduleCssHelper.GetDayClass(Day);
-        _currentCssCalss = _defaultCssClass;
-        return base.OnInitializedAsync();
+        base.OnParametersSet();
+
+        if (WorkDay == null)
+            return;
+
+        if (WorkDay.ShiftType == ShiftTypes.Morning)
+        {
+            _selectedValue = WorkDay.MorningShiftIndex.ToString();
+        }
+        else
+        {
+            _selectedValue = WorkDay.ShiftType.ToString();
+        }
+    }
+
+    private async Task AssignShift(ChangeEventArgs e)
+    {
+        _selectedValue = e.Value.ToString();
+
+        switch (_selectedValue)
+        {
+            case nameof(ShiftTypes.None):
+                WorkDay.ShiftType = ShiftTypes.None;
+                break;
+            case nameof(ShiftTypes.Day):
+                WorkDay.ShiftType = ShiftTypes.Day;
+                break;
+            case nameof(ShiftTypes.Night):
+                WorkDay.ShiftType = ShiftTypes.Night;
+                break;
+            case nameof(MorningShiftIndexes.R1):
+                WorkDay.ShiftType = ShiftTypes.Morning;
+                WorkDay.MorningShiftIndex = MorningShiftIndexes.R1;
+                break;
+            case nameof(MorningShiftIndexes.R2):
+                WorkDay.ShiftType = ShiftTypes.Morning;
+                WorkDay.MorningShiftIndex = MorningShiftIndexes.R2;
+                break;
+            case nameof(MorningShiftIndexes.R3):
+                WorkDay.ShiftType = ShiftTypes.Morning;
+                WorkDay.MorningShiftIndex = MorningShiftIndexes.R3;
+                break;
+        }
+
+        await RecalculateRow.InvokeAsync();
+    }
+
+    private async Task SetTimeOff(MouseEventArgs args)
+    {
+        WorkDay.IsTimeOff = !WorkDay.IsTimeOff;
+        await RecalculateRow.InvokeAsync();
     }
 }
