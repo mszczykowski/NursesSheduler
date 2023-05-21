@@ -3,8 +3,8 @@
     public enum ShiftTypes
     {
         None,
-        Morning,
-        Day,
         Night,
+        Day,
+        Morning,
     }
 }

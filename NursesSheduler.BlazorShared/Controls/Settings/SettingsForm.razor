@@ -28,6 +28,12 @@
                     </div>
                     <br />
                     <p class="title is-4">
+                        Konfigruracja świąt
+                    </p>
+                    <TimeSpanInput Label="Ilość godzin świątecznych należna za zmianę dzienną" @bind-Value="Settings.DayShiftHolidayEligibleHours" ValidationFor="@(() => Settings.DayShiftHolidayEligibleHours)" />
+                    <TimeSpanInput Label="Ilość godzin świątecznych należna za zmianę nocną" @bind-Value="Settings.NightShiftHolidayEligibleHours" ValidationFor="@(() => Settings.NightShiftHolidayEligibleHours)" />
+                    <br />
+                    <p class="title is-4">
                         Konfigruracja generatora
                     </p>
                     <div class="field">

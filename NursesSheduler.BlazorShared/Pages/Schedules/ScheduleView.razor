@@ -11,8 +11,9 @@
 @inject IMapper _mapper;
 
 <MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Recalculate="CalculateMorningShifts" Save="SaveMorningShifts"/>
-<!--<SolverSettingsModal/>-->
-@if (_schedule == null)
+<SolverSettingsModal @ref="_solverSettingsModal" Save="SaveSolverSettings"/>
+
+@if (_schedule == null || _isLoading)
 {
     <LoadingSpinner />
 }
@@ -25,7 +26,7 @@ else
                     <a @onclick="(() => _morningShiftsSettingsModal.SetModal(_schedule.MorningShifts, _schedule.TimeForMorningShifts))">Konfiguracja ranków</a>
                 </div>
                 <div class="level-item">
-                    <a>Konfiguracja generatora</a>
+                    <a @onclick="(() => _solverSettingsModal.SetModal(_generatorSeed, _numberOfReties))">Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
                     <a>Drukuj</a>
@@ -38,34 +39,16 @@ else
                     <label class="label">Miesiąc</label>
                 </div>
                 <div class="level-item">
-                    <div class="control">
-                        <div class="select">
-                            <select value=@_monthNumber @onchange="SelectedMonthChanged">
-                                @for (int i = 1; i <= 12; i++)
-                                {
-                                    <option value="@i">@((Months)i)</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
+                    <MonthSelect MonthViewModel=_dateViewModel OnChange="ReloadSchedule"/>
                 </div>
                 <div class="level-item">
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <div class="control">
-                        <div class="select">
-                            <select value=@_yearNumber @onchange="SelectedYearChanged">
-                                @for (int i = 2020; i < DateTime.Now.Year + 1; i++)
-                                {
-                                    <option value="@i">@i</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
+                    <YearSelect YearViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="ReloadSchedule"/>
                 </div>
                 <div class="level-item">
-                    <button class="button is-info" @onclick="CurrentDateClick">Bieżący miesiąc</button>
+                    <button class="button is-info" @onclick="(async () => await ReloadSchedule())">Bieżący miesiąc</button>
                 </div>
             </div>
 
@@ -156,10 +139,18 @@ else
     private MorningShiftsSettingsModal _morningShiftsSettingsModal;
     private SolverSettingsModal _solverSettingsModal;
 
-    private int _monthNumber = DateTime.Now.Month;
-    private int _yearNumber = DateTime.Now.Year;
+    private int _numberOfReties;
+    private string _generatorSeed;
+
+    private DateViewModel _dateViewModel = new DateViewModel
+        {
+            YearNumber = DateTime.Now.Year,
+            MonthNumber = DateTime.Now.Month,
+        };
 
     private ScheduleViewModel _schedule;
+
+    private bool _isLoading;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -169,22 +160,16 @@ else
         }
     }
 
-    private async Task SelectedYearChanged(ChangeEventArgs e)
+    private async Task ReloadSchedule()
     {
-        _yearNumber = Int32.Parse(e.Value.ToString());
+        _isLoading = true;
+        await Task.Delay(1);
         await GetSchedule();
     }
 
     private async Task SelectedMonthChanged(ChangeEventArgs e)
     {
-        _monthNumber = Int32.Parse(e.Value.ToString());
-        await GetSchedule();
-    }
-
-    private async Task CurrentDateClick()
-    {
-        _monthNumber = DateTime.Now.Month;
-        _yearNumber = DateTime.Now.Year;
+        _dateViewModel.MonthNumber = Int32.Parse(e.Value.ToString());
         await GetSchedule();
     }
 
@@ -194,13 +179,14 @@ else
         {
             var request = new GetScheduleRequest
                 {
-                    Month = _monthNumber,
-                    Year = _yearNumber,
+                    Month = _dateViewModel.MonthNumber,
+                    Year = _dateViewModel.YearNumber,
                     DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
                 };
             var response = await _mediatr.Send(request);
 
             _schedule = _mapper.Map<ScheduleViewModel>(response);
+            _isLoading = false;
             StateHasChanged();
         }
         catch (Exception e)
@@ -241,5 +227,11 @@ else
         {
             base.HandleException(e);
         }
+    }
+
+    private void SaveSolverSettings(SolverSettingsViewModel solverSettingsViewModel)
+    {
+        _numberOfReties = solverSettingsViewModel.NumberOfRetries;
+        _generatorSeed = solverSettingsViewModel.GeneratorSeed;
     }
 }

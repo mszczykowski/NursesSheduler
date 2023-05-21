@@ -5,7 +5,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {

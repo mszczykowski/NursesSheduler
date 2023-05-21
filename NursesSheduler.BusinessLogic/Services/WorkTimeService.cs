@@ -1,6 +1,7 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Managers;
+﻿using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain;
+using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.Models;
 
@@ -9,8 +10,6 @@ namespace NursesScheduler.BusinessLogic.Services
     internal sealed class WorkTimeService : IWorkTimeService
     {
         private readonly IHolidaysManager _hoidaysManager;
-
-        private readonly static TimeSpan REGULAR_SHIFT_LENGHT = TimeSpan.FromHours(12);
 
         public WorkTimeService(IHolidaysManager hoidaysManager)
         {
@@ -91,7 +90,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var totalNursesWorkTime = workingTimeInMonthPerNurse * nurseCount;
             var minimalTotalWorkTimeToAssign =
                 departamentSettings.TargetNumberOfNursesOnShift * 2
-                * REGULAR_SHIFT_LENGHT
+                * GeneralConstants.RegularShiftLenght
                 * DateTime.DaysInMonth(yearNumber, monthNumber);
 
             return totalNursesWorkTime - minimalTotalWorkTimeToAssign;
@@ -113,6 +112,21 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             return date.DayOfWeek != DayOfWeek.Sunday && date.DayOfWeek != DayOfWeek.Saturday
                 && !holidays.Any(h => DateOnly.FromDateTime(h.Date) == date);
+        }
+        private bool IsWorkingDay(Day day)
+        {
+            return !day.IsHoliday && day.Date.DayOfWeek != DayOfWeek.Sunday && day.Date.DayOfWeek != DayOfWeek.Saturday;
+        }
+
+        public int GetNumberOfWorkingDays(Day[] days)
+        {
+            var result = 0;
+            foreach(var day in days)
+            {
+                if(IsWorkingDay(day))
+                    result++;
+            }
+            return result;
         }
 
         private async Task<int> GetNumberOfWorkingDays(DateOnly from, DateOnly to)
@@ -146,8 +160,8 @@ namespace NursesScheduler.BusinessLogic.Services
                 
                 var workTimeInMonth = await GetTotalWorkingHoursInMonth(monthNumber, yearNumber, departamentSettings);
 
-                timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth / REGULAR_SHIFT_LENGHT)
-                    * REGULAR_SHIFT_LENGHT;
+                timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth / GeneralConstants.RegularShiftLenght)
+                    * GeneralConstants.RegularShiftLenght;
             }
 
             return timeForMorningShifts;
@@ -160,17 +174,17 @@ namespace NursesScheduler.BusinessLogic.Services
 
             if(timeForMorningShifts < departamentSettings.TargetMinimalMorningShiftLenght)
             {
-                timeForMorningShifts += REGULAR_SHIFT_LENGHT;
+                timeForMorningShifts += GeneralConstants.RegularShiftLenght;
             }
 
-            while (timeForMorningShifts > REGULAR_SHIFT_LENGHT
-                && timeForMorningShifts - REGULAR_SHIFT_LENGHT > departamentSettings.TargetMinimalMorningShiftLenght)
+            while (timeForMorningShifts > GeneralConstants.RegularShiftLenght
+                && timeForMorningShifts - GeneralConstants.RegularShiftLenght > departamentSettings.TargetMinimalMorningShiftLenght)
             {
-                timeForMorningShifts -= REGULAR_SHIFT_LENGHT;
-                lengths.Add(REGULAR_SHIFT_LENGHT);
+                timeForMorningShifts -= GeneralConstants.RegularShiftLenght;
+                lengths.Add(GeneralConstants.RegularShiftLenght);
             }
 
-            if (timeForMorningShifts > REGULAR_SHIFT_LENGHT)
+            if (timeForMorningShifts > GeneralConstants.RegularShiftLenght)
             {
                 lengths.Add(timeForMorningShifts / 2);
                 lengths.Add(timeForMorningShifts / 2);

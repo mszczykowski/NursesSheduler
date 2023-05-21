@@ -100,15 +100,16 @@
     left: 50%;
     margin-left: -60px;
     position: absolute;
-    z-index: 5;
+    z-index: 100;
 }
 
 /*table*/
 
 table.table-schedule {
-    margin: 20px 2px;
+    margin: 20px auto;
     table-layout: fixed;
     width: 100%;
+    max-width: 1600px;
 }
 
 

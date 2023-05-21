@@ -1,4 +1,4 @@
-﻿using NursesScheduler.Domain.DomainModels;
+﻿using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {

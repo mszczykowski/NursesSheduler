@@ -22,9 +22,13 @@ namespace NursesScheduler.BlazorShared.ViewModels
         [Range(1, 12, ErrorMessage = "Wartość musi być miesiącem")]
         public int FirstQuarterStart { get; set; }
 
-        [Required(ErrorMessage = "Należy wpisać godzinę rozpoczęcia pierwszej zmiany")]
-        [RegularExpression("^(0?[0-9]|1[0-1]):[0-5][0-9]$", ErrorMessage = "Pierwsza zmiana może zaczynać się tylko przed 12:00")]
-        public TimeOnly FirstShiftStartTime { get; set; }
+        [Required(ErrorMessage = "Należy wpisać ilość godzin świątecznych należną za zmianę dzienną")]
+        [Range(typeof(TimeSpan), "00:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 12h")]
+        public TimeSpan DayShiftHolidayEligibleHours { get; set; }
+
+        [Required(ErrorMessage = "Należy wpisać ilość godzin świątecznych należną za zmianę nocną")]
+        [Range(typeof(TimeSpan), "00:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 12h")]
+        public TimeSpan NightShiftHolidayEligibleHours { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać docelową liczbę pracowników na zmianie")]
         [Range(1, 100, ErrorMessage = "Minmalna wartość to 1 pracownik, maksymalna 100")]

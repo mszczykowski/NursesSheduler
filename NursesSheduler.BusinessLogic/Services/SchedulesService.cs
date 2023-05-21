@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
@@ -262,6 +262,11 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
 
             }
+        }
+
+        public void ValidateSchedule()
+        {
+
         }
     }
 }

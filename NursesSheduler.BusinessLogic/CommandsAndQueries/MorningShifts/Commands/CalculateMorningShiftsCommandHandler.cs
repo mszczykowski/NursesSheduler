@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using NursesScheduler.BusinessLogic.Abstractions.Managers;
+using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
 

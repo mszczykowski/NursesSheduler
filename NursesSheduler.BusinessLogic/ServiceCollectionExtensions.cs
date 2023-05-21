@@ -4,11 +4,11 @@ using MediatR;
 using FluentValidation;
 using NursesScheduler.BusinessLogic.Validation;
 using NursesScheduler.BusinessLogic.Services;
-using NursesScheduler.Domain.DomainModels;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.BusinessLogic.Abstractions.Managers;
-using NursesScheduler.BusinessLogic.Managers;
 using Microsoft.Extensions.Caching.Memory;
+using NursesScheduler.BusinessLogic.CacheManagers;
+using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic
 {
@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddTransient<IMemoryCache, MemoryCache>();
+            services.AddSingleton<IMemoryCache, MemoryCache>();
 
             //validators
             services.AddTransient<IValidator<Nurse>, NurseValidator>();

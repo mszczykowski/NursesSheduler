@@ -1,4 +1,5 @@
-﻿using NursesScheduler.Domain.DomainModels;
+﻿using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Models;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
@@ -19,5 +20,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
             DepartamentSettings departamentSettings);
         ICollection<MorningShift> CalculateMorningShifts(TimeSpan timeForMorningShifts,
             DepartamentSettings departamentSettings);
+        int GetNumberOfWorkingDays(Day[] days);
     }
 }

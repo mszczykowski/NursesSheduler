@@ -3,5 +3,6 @@
     internal interface ICurrentDateService
     {
         DateOnly GetCurrentDate();
+        DateTime GetCurrentDateTime();
     }
 }

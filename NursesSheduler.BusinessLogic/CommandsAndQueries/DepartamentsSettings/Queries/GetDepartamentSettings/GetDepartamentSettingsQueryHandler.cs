@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using NursesScheduler.BusinessLogic.Abstractions.Managers;
+using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
 {

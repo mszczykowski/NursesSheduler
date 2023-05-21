@@ -4,7 +4,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.Edi
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {
