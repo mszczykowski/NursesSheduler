@@ -1,5 +1,6 @@
 ﻿@page "/departaments"
 
+@using NursesScheduler.BlazorShared.Pages.Departaments.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
 
 @inherits ExceptionHandlingComponent
@@ -31,11 +32,11 @@
 
     @if (_departaments == null)
     {
-        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+        <LoadingSpinner/>
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentsGrid Departaments=_departaments/>
+        <DepartamentsGrid Departaments=_departaments/>
     }
 </div>
 

@@ -2,7 +2,7 @@
 
 @inherits ComponenentUsingDepartament
 
-@using NursesScheduler.BlazorShared.Controls.Absences
+@using NursesScheduler.BlazorShared.Pages.Absences.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
@@ -83,10 +83,10 @@ else
         </div>
         <div class="card mb-4">
             <div class="card-content">
-                <AbsenceForm @ref=_newAbsenceForm AbsenceYear=_selectedYear Absence=_newAbsence SaveAbsence="AddAbsence" />
+                <AbsenceForm @ref=_newAbsenceForm Absence=_newAbsence SaveAbsence="AddAbsence" />
             </div>
         </div>
-        <NursesScheduler.BlazorShared.Controls.Absences.NurseAbsencesTable Absences=_currentAbsencesSummary.Absences />
+        <NurseAbsencesTable Absences=_currentAbsencesSummary.Absences />
     </div>
 }
 

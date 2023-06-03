@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace NursesScheduler.BlazorShared.Shared
+namespace NursesScheduler.BlazorShared.Abstracions
 {
     public abstract class ModalBase : ComponentBase
     {

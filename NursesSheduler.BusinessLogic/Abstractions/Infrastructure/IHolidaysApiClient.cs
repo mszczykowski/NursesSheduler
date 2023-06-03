@@ -1,9 +1,9 @@
-﻿using NursesScheduler.Domain.Models;
+﻿using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure
 {
     public interface IHolidaysApiClient
     {
-        Task<List<Holiday>?> GetHolidays(int year);
+        Task<List<Holiday>> GetHolidays(int year);
     }
 }

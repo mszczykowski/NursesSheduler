@@ -3,7 +3,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Command
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament;
 using NursesScheduler.BusinessLogic.Mapping.CustomResolvers;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {

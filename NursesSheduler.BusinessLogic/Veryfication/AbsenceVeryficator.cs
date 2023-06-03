@@ -1,4 +1,4 @@
-﻿using NursesScheduler.Domain.DomainModels;
+﻿using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Veryfication

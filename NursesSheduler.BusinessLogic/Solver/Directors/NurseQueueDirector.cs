@@ -17,20 +17,20 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
 
         private INurseQueueBuilder _nurseQueueBuilder;
 
-        public Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isHolidayShift,
+        public Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isWorkingDay,
             List<int> previousDayShift, ICollection<INurseState> nurses, int currentDay)
         {
             _nurseQueueBuilder = new NurseQueueBuilder(nurses, _random);
 
-            switch (shiftIndex, isHolidayShift)
+            switch (shiftIndex, isWorkingDay)
             {
-                case (ShiftIndex.Day, false):
-                    return GetEmployeesForDayShift(currentDay);
                 case (ShiftIndex.Day, true):
+                    return GetEmployeesForDayShift(currentDay);
+                case (ShiftIndex.Day, false):
                     return GetEmployeesForDayHolidayShift(currentDay);
-                case (ShiftIndex.Night, false):
-                    return GetEmployeesForNightShift(currentDay, previousDayShift);
                 case (ShiftIndex.Night, true):
+                    return GetEmployeesForNightShift(currentDay, previousDayShift);
+                case (ShiftIndex.Night, false):
                     return GetEmployeesForNightHolidayShift(currentDay, previousDayShift);
                 default:
                     return _nurseQueueBuilder.GetResult();

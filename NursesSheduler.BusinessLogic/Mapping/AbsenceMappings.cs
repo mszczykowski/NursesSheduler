@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
 
 namespace NursesScheduler.BusinessLogic.Mapping

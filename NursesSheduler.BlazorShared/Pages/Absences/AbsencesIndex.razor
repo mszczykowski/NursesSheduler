@@ -1,5 +1,6 @@
 ﻿@page "/absences"
 
+@using NursesScheduler.BlazorShared.Pages.Absences.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 
@@ -50,8 +51,7 @@
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Absences.AbsencesSummaryTable NursesWithSummary=_nursesWithSummary
-                                                                         SelectedYear=_selectedYear />
+        <AbsencesSummaryTable NursesWithSummary=_nursesWithSummary SelectedYear=_selectedYear />
     }
 </div>
 

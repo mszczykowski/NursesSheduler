@@ -1,25 +1,26 @@
 ﻿using NursesScheduler.BusinessLogic.Solver.Enums;
-using NursesScheduler.Domain.Models.Settings;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
 {
     internal interface INurseState
     {
-        int NurseId { get; }
+        List<int> AssignedMorningShiftsIds { get; set; }
+        TimeSpan HolidayPaidHoursAssigned { get; set; }
         TimeSpan HoursFromLastShift { get; set; }
         TimeSpan HoursToNextShift { get; set; }
         int NumberOfNightShifts { get; set; }
-        int NumberOfShiftsToAssign { get; set; }
-        TimeSpan HolidayPaidHoursAssigned { get; set; }
-        bool[] TimeOff { get; }
+        int NumberOfRegularShiftsToAssign { get; set; }
+        int NurseId { get; set; }
         TimeSpan PTOTimeToAssign { get; set; }
+        bool[] TimeOff { get; }
+        TimeSpan[] WorkTimeAssignedInWeek { get; set; }
         TimeSpan WorkTimeToAssign { get; set; }
         TimeSpan WorkTimeToAssignInQuarter { get; set; }
-        TimeSpan[] WorkTimeAssignedInWeek { get; set; }
-        List<TimeSpan> AssignedMorningShifts { get; set; }
-        void UpdateStateOnAssign(TimeSpan shiftLength, int weekInQuarter);
-        void UpdateStateOnAssign(bool isHoliday, ShiftIndex shiftIndex, WorkTimeConfiguration workTimeConfiguration,
-            int weekInQuarter);
-        void AdvanceDaysFromLastShift();
+        bool HadMorningShiftAssigned { get; }
+
+        void AdvanceState(TimeSpan hoursToNextShift);
+        void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter, TimeSpan hoursToNextShift);
+        void UpdateStateOnRegularShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter, DepartamentSettings departamentSettings, TimeSpan hoursToNextShift);
     }
 }

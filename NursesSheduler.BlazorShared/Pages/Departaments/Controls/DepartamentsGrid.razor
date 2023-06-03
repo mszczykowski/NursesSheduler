@@ -22,7 +22,7 @@ else
     @foreach (var departament in Departaments)
     {
         <div class="column is-one-quarter">
-            <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentCard Departament=departament 
+            <DepartamentCard Departament=departament 
                 OnDepartamentPick="OnDepartamentPick" OnDeleteClick="(() => _deleteModal.SetModal(departament.Name, departament.DepartamentId))"/>
         </div>
     }

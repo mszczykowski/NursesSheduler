@@ -3,8 +3,6 @@ using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
 using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.Enums;
-using NursesScheduler.Domain.Models;
 
 namespace NursesScheduler.BusinessLogic.Solver.Managers
 {
@@ -16,6 +14,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         private readonly Random _random;
 
         private int[,] _shiftCapacities;
+        private int[] _morningShiftCapacities;
 
         public ShiftCapacityManager(DepartamentSettings departamentSettings, Day[] month, ICollection<INurseState> nurses,
             Random random)
@@ -25,7 +24,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             _nurses = nurses;
             _random = random;
 
-            _shiftCapacities = new int[_month.Length, GeneralConstants.NumberOfShifts + 1];
+            _shiftCapacities = new int[_month.Length, GeneralConstants.NumberOfShifts];
+            _morningShiftCapacities = new int[_month.Length];
         }
 
         public void InitialiseShiftCapacities()
@@ -130,13 +130,18 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
             for (int i = 0; i < shortShifts.GetLength(0); i++)
             {
-                _shiftCapacities[shortShifts[i, 0], (int)ShiftTypes.Morning] = shortShifts[i, 1];
+                _morningShiftCapacities[shortShifts[i, 0]] = shortShifts[i, 1];
             }
         }
 
-        public int GetNumberOfNursesForShift(ShiftIndex shiftIndex, int dayNumber)
+        public int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber)
         {
             return _shiftCapacities[dayNumber - 1, (int)shiftIndex];
+        }
+
+        public int GetNumberOfNursesForMorningShift(int dayNumber)
+        {
+            return _morningShiftCapacities[dayNumber - 1];
         }
 
         private int GetTotalNumberOfShiftsToAssign(ICollection<INurseState> nurses)

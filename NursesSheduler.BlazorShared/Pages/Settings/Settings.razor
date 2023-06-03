@@ -2,6 +2,7 @@
 
 @inherits ComponenentUsingDepartament
 
+@using NursesScheduler.BlazorShared.Pages.Settings.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Commands.EditDepartamentSettings
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
 
@@ -18,11 +19,11 @@
     </div>
     @if(_settings == null)
     {
-        <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+        <LoadingSpinner/>
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Settings.SettingsForm Settings=_settings SaveSettings="SaveSettings" Cancel="LoadSettings"/>
+        <SettingsForm Settings=_settings SaveSettings="SaveSettings" Cancel="LoadSettings"/>
     }
 </div>
 

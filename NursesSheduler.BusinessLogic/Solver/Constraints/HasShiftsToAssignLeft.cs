@@ -7,7 +7,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
     {
         public bool IsSatisfied(ISolverState currentSolverState, INurseState currentNurseState, TimeSpan shiftLengthToAssing)
         {
-            return currentNurseState.NumberOfShiftsToAssign > 0;
+            return currentNurseState.NumberOfRegularShiftsToAssign > 0;
         }
     }
 }

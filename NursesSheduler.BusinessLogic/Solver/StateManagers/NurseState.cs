@@ -1,6 +1,7 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
 using NursesScheduler.BusinessLogic.Solver.Enums;
-using NursesScheduler.Domain.Models.Settings;
+using NursesScheduler.Domain;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 {
@@ -17,62 +18,87 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         public TimeSpan HoursToNextShift { get; set; }
 
         public int NumberOfNightShifts { get; set; }
-        public int NumberOfShiftsToAssign { get; set; }
+        public int NumberOfRegularShiftsToAssign { get; set; }
 
         public TimeSpan HolidayPaidHoursAssigned { get; set; }
 
         public bool[] TimeOff { get; private set; }
 
-        public List<TimeSpan> AssignedMorningShifts { get; set; }
+        public List<int> AssignedMorningShiftsIds { get; set; }
 
-        public NurseState(INurseState employee)
+        public bool HadMorningShiftAssigned { get; private set; }
+
+        public NurseState(INurseState nurse)
         {
-            NurseId = employee.NurseId;
-            WorkTimeToAssign = employee.WorkTimeToAssign;
-            HoursFromLastShift = employee.HoursFromLastShift;
-            HoursToNextShift = employee.HoursToNextShift;
-            HolidayPaidHoursAssigned = employee.HolidayPaidHoursAssigned;
-            NumberOfNightShifts = employee.NumberOfNightShifts;
-            TimeOff = employee.TimeOff;
-            AssignedMorningShifts = new List<TimeSpan>(employee.AssignedMorningShifts);
-            NumberOfShiftsToAssign = employee.NumberOfShiftsToAssign;
-            WorkTimeAssignedInWeek = new TimeSpan[employee.WorkTimeAssignedInWeek.Length];
-            Array.Copy(employee.WorkTimeAssignedInWeek, WorkTimeAssignedInWeek, WorkTimeAssignedInWeek.Length);
+            NurseId = nurse.NurseId;
+            WorkTimeToAssign = nurse.WorkTimeToAssign;
+            HoursFromLastShift = nurse.HoursFromLastShift;
+            HoursToNextShift = nurse.HoursToNextShift;
+            HolidayPaidHoursAssigned = nurse.HolidayPaidHoursAssigned;
+            NumberOfNightShifts = nurse.NumberOfNightShifts;
+            TimeOff = nurse.TimeOff;
+            AssignedMorningShiftsIds = new List<int>(nurse.AssignedMorningShiftsIds);
+            NumberOfRegularShiftsToAssign = nurse.NumberOfRegularShiftsToAssign;
+            WorkTimeAssignedInWeek = new TimeSpan[nurse.WorkTimeAssignedInWeek.Length];
+            Array.Copy(nurse.WorkTimeAssignedInWeek, WorkTimeAssignedInWeek, WorkTimeAssignedInWeek.Length);
+            HadMorningShiftAssigned = nurse.HadMorningShiftAssigned;
         }
 
-        public void UpdateStateOnAssign(TimeSpan shiftLenght, int weekInQuarter)
+        public void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter,
+            TimeSpan hoursToNextShift)
         {
-            AssignedMorningShifts.Add(shiftLenght);
-            UpdateWorkTimes(shiftLenght, weekInQuarter);
-        }
+            HadMorningShiftAssigned = true;
 
-        private void UpdateWorkTimes(TimeSpan shiftLenght, int weekInQuarter)
-        {
-            DaysFromLastShift = 0;
+            AssignedMorningShiftsIds.Add(morningShift.MorningShiftId);
 
-            WorkTimeToAssign -= shiftLenght;
-            WorkTimeAssignedInWeek[weekInQuarter - 1] += shiftLenght;
-        }
-
-        public void AdvanceDaysFromLastShift()
-        {
-            DaysFromLastShift++;
-        }
-
-        public void UpdateStateOnAssign(bool isHoliday, ShiftIndex shiftIndex, 
-            WorkTimeConfiguration workTimeConfiguration, int weekInQuarter)
-        {
-            if (isHoliday)
+            if(morningShift.ShiftLength > TimeSpan.Zero)
             {
-                HolidayPaidHoursAssigned += workTimeConfiguration.ShiftDetails.Single(s => s.ShiftType == shiftType)
-                    .HolidayEligibleHours;
+                HoursFromLastShift = GeneralConstants.RegularShiftLenght - morningShift.ShiftLength;
+                UpdateWorkTimes(morningShift.ShiftLength, weekInQuarter, hoursToNextShift);
+            }
+            else
+            {
+                AdvanceState(hoursToNextShift);
+            }
+        }
+
+        public void UpdateStateOnRegularShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter,
+            DepartamentSettings departamentSettings, TimeSpan hoursToNextShift)
+        {
+            HoursFromLastShift = TimeSpan.Zero;
+            NumberOfRegularShiftsToAssign--;
+
+            switch (shiftIndex)
+            {
+                case (ShiftIndex.Day):
+                    if (isHoliday)
+                    {
+                        HolidayPaidHoursAssigned += departamentSettings.DayShiftHolidayEligibleHours;
+                    }
+                    break;
+                case (ShiftIndex.Night):
+                    if (isHoliday)
+                    {
+                        HolidayPaidHoursAssigned += departamentSettings.NightShiftHolidayEligibleHours;
+                    }
+                    NumberOfNightShifts++;
+                    break;
             }
 
-            if (shiftType == ShiftType.night) NumberOfNightShifts++;
+            UpdateWorkTimes(GeneralConstants.RegularShiftLenght, weekInQuarter, hoursToNextShift);
+        }
 
-            NumberOfShiftsToAssign--;
+        private void UpdateWorkTimes(TimeSpan shiftLenght, int weekInQuarter, TimeSpan hoursToNextShift)
+        {
+            WorkTimeToAssign -= shiftLenght;
+            WorkTimeAssignedInWeek[weekInQuarter - 1] += shiftLenght;
+            HoursToNextShift = hoursToNextShift;
+        }
 
-            UpdateWorkTimes(workTimeConfiguration.ShiftLenght, weekInQuarter);
+        public void AdvanceState(TimeSpan hoursToNextShift)
+        {
+            HoursFromLastShift += GeneralConstants.RegularShiftLenght;
+            HoursToNextShift = hoursToNextShift;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page "/nurses"
 
+@using NursesScheduler.BlazorShared.Pages.Nurses.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 
 @inherits ComponenentUsingDepartament
@@ -35,7 +36,7 @@
     }
     else
     {
-        <NursesScheduler.BlazorShared.Controls.Nurses.NursesTable Nurses=_nurses/>
+        <NursesTable Nurses=_nurses/>
     }
 </div>
 

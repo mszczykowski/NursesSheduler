@@ -2,6 +2,7 @@
 
 @inherits ExceptionHandlingComponent
 
+@using NursesScheduler.BlazorShared.Pages.Departaments.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament
 
@@ -10,11 +11,11 @@
 
 @if(_departament == null)
 {
-    <NursesScheduler.BlazorShared.Controls.Shared.LoadingSpinner/>
+    <LoadingSpinner/>
 }
 else
 {
-    <NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveDepartament="SaveDepartament"/>
+    <DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveDepartament="SaveDepartament"/>
 }
 
 

@@ -26,11 +26,6 @@ namespace NursesScheduler.BusinessLogic.Validation
                 .GreaterThanOrEqualTo(1)
                 .LessThanOrEqualTo(12);
 
-            RuleFor(s => s.FirstShiftStartTime)
-                .NotEmpty()
-                .GreaterThanOrEqualTo(new TimeOnly(0, 0))
-                .LessThanOrEqualTo(new TimeOnly(12, 0));
-
             RuleFor(s => s.TargetNumberOfNursesOnShift)
                 .NotEmpty()
                 .GreaterThanOrEqualTo(1)

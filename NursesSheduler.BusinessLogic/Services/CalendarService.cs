@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain.Models;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Services
 {

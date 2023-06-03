@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.GenerateSchedule
 {

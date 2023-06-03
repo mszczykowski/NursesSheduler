@@ -3,19 +3,21 @@
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
-
-<div class="modal @CssHelper.SetIsActive(_isVisible)">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Edytuj @_absence.ToString()</p>
-            <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
-        </header>
-        <section class="modal-card-body">
-            <AbsenceForm @ref="_absenceForm" Absence=@_absence SaveAbsence="Edit"/>
-        </section>
+@if (_absence != null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edytuj @_absence.ToString()</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <section class="modal-card-body">
+                <AbsenceForm @ref="_absenceForm" Absence=@_absence SaveAbsence="Edit" />
+            </section>
+        </div>
     </div>
-</div>
+}
 
 
 @code {

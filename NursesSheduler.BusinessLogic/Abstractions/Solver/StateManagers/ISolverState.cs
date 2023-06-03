@@ -1,20 +1,27 @@
-﻿namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
+﻿using NursesScheduler.BusinessLogic.Solver.Enums;
+using NursesScheduler.Domain.Entities;
+
+namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
 {
     internal interface ISolverState
     {
         int CurrentDay { get; set; }
+        int CurrentDayIndex { get; }
+        ShiftIndex CurrentShift { get; set; }
         int DayNumberInQuarter { get; set; }
-        int CurrentShift { get; set; }
         int EmployeesToAssignForCurrentShift { get; set; }
-        int ShortShiftsToAssign { get; set; }
+        List<int>[] MorningShiftsState { get; }
         List<INurseState> Nurses { get; }
         List<int>[,] ScheduleState { get; }
+        int ShortShiftsToAssign { get; set; }
+        int WeekInQuarter { get; }
+
         void AdvanceState();
-        void AssignEmployee(INurseState employee, bool isHoliday, int weekInQuarter);
-        void AssignEmployeeToShortShift(INurseState employee, TimeSpan shortShiftLenght, int weekInQuarter);
+        void AssignEmployeeToMorningShift(INurseState nurse, MorningShift morningShift);
+        void AssignNurseToRegularShift(INurseState nurse, bool isHoliday, DepartamentSettings departamentSettings);
+        TimeSpan GetHoursToScheduleEnd();
+        List<int> GetNextShift();
         List<int> GetPreviousDayShift();
         List<int> GetPreviousShift();
-        List<int> GetNextShift();
-        List<int>[] AssignedShortShifts { get; }
     }
 }

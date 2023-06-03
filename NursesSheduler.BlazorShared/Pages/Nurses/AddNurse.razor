@@ -2,6 +2,7 @@
 
 @inherits ComponenentUsingDepartament
 
+@using NursesScheduler.BlazorShared.Pages.Nurses.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 
 @inject IMediator _mediatr;
@@ -20,7 +21,7 @@
             </div>
         </div>
     </div>
-    <NursesScheduler.BlazorShared.Controls.Nurses.NurseForm Nurse=_nurse SaveNurse="SaveNurse"/>
+    <NurseForm Nurse=_nurse SaveNurse="SaveNurse"/>
 </div>
 
 

@@ -1,17 +1,22 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Solver.Enums;
+using NursesScheduler.Domain;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 {
     internal sealed class SolverState : ISolverState
     {
         public int CurrentDay { get; set; }
+        public int CurrentDayIndex => CurrentDay - 1;
         public int DayNumberInQuarter { get; set; }
-        public int CurrentShift { get; set; }
+        public int WeekInQuarter => (int)Math.Ceiling((decimal)DayNumberInQuarter / 7) - 1;
+        public ShiftIndex CurrentShift { get; set; }
         public int EmployeesToAssignForCurrentShift { get; set; }
         public int ShortShiftsToAssign { get; set; }
         public List<INurseState> Nurses { get; }
         public List<int>[,] ScheduleState { get; }
-        public List<int>[] AssignedShortShifts { get; }
+        public List<int>[] MorningShiftsState { get; }
         public SolverState(List<INurseState> nurses, int numberOfDays, int numberOfShifts)
         {
             CurrentDay = 1;
@@ -23,7 +28,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 Nurses.Add(new NurseState(nurse));
             });
             ScheduleState = new List<int>[numberOfDays, numberOfShifts];
-            AssignedShortShifts = new List<int>[numberOfDays];
+            MorningShiftsState = new List<int>[numberOfDays];
         }
 
         public SolverState(ISolverState stateToCopy)
@@ -55,20 +60,20 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 }
             }
 
-            AssignedShortShifts = new List<int>[stateToCopy.AssignedShortShifts.Length];
+            MorningShiftsState = new List<int>[stateToCopy.MorningShiftsState.Length];
 
-            for (int i = 0; i < AssignedShortShifts.Length; i++)
+            for (int i = 0; i < MorningShiftsState.Length; i++)
             {
-                if (stateToCopy.AssignedShortShifts[i] != null)
+                if (stateToCopy.MorningShiftsState[i] != null)
                 {
-                    AssignedShortShifts[i] = new List<int>(stateToCopy.AssignedShortShifts[i]);
+                    MorningShiftsState[i] = new List<int>(stateToCopy.MorningShiftsState[i]);
                 }
             }
 
             ShortShiftsToAssign = stateToCopy.ShortShiftsToAssign;
         }
 
-        public void AdvanceState(Month currentMonth)
+        public void AdvanceState()
         {
             if (EmployeesToAssignForCurrentShift > 0)
             {
@@ -78,19 +83,21 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             {
                 ShortShiftsToAssign--;
             }
+
             if (EmployeesToAssignForCurrentShift <= 0 && ShortShiftsToAssign <= 0)
             {
                 CurrentShift++;
-                if (CurrentShift >= ScheduleState.GetLength(1))
+                if ((int)CurrentShift >= GeneralConstants.NumberOfShifts)
                 {
                     CurrentShift = 0;
                     CurrentDay++;
+                    DayNumberInQuarter++;
 
                     if (CurrentDay - 1 < ScheduleState.GetLength(0))
                     {
                         foreach (var e in Nurses)
                         {
-                            e.AdvanceDaysFromLastShift();
+                            e.AdvanceState(CalculateNurseHoursToNextShift(e.NurseId));
                         }
                     }
                 }
@@ -99,44 +106,65 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         public List<int> GetPreviousDayShift()
         {
-            if (CurrentDay == 1) return new List<int>();
+            if (CurrentDay == 1)
+            {
+                return new List<int>();
+            }
 
             List<int> result;
 
-            if (CurrentShift == (int)ShiftType.day)
+            if (CurrentShift == ShiftIndex.Day)
             {
-                result = ScheduleState[CurrentDay - 2, (int)ShiftType.day];
-                if (AssignedShortShifts[CurrentDay - 2] != null) result.AddRange(AssignedShortShifts[CurrentDay - 2]);
+                result = ScheduleState[CurrentDayIndex - 1, (int)ShiftIndex.Day];
+                if (MorningShiftsState[CurrentDayIndex - 1] != null)
+                {
+                    result.AddRange(MorningShiftsState[CurrentDayIndex - 1]);
+                }
             }
             else
             {
-                result = ScheduleState[CurrentDay - 1, (int)ShiftType.day];
-                if (AssignedShortShifts[CurrentDay - 1] != null) result.AddRange(AssignedShortShifts[CurrentDay - 1]);
+                result = ScheduleState[CurrentDayIndex, (int)ShiftIndex.Day];
+                if (MorningShiftsState[CurrentDayIndex] != null)
+                {
+                    result.AddRange(MorningShiftsState[CurrentDayIndex]);
+                }
             }
 
             return result;
         }
 
-        public void AssignEmployee(IEmployeeState employee, bool isHoliday, WorkTimeConfiguration workTimeConfiguration,
-            int weekInQuarter)
+        public void AssignNurseToRegularShift(INurseState nurse, bool isHoliday,
+            DepartamentSettings departamentSettings)
         {
-            if (ScheduleState[CurrentDay - 1, CurrentShift] == null)
-                ScheduleState[CurrentDay - 1, CurrentShift] = new List<int> { employee.Id };
+            if (ScheduleState[CurrentDayIndex, (int)CurrentShift] == null)
+            {
+                ScheduleState[CurrentDayIndex, (int)CurrentShift] = new List<int>
+                {
+                    nurse.NurseId
+                };
+            }
+            else
+            {
+                ScheduleState[CurrentDayIndex, (int)CurrentShift].Add(nurse.NurseId);
+            }
 
-            else ScheduleState[CurrentDay - 1, CurrentShift].Add(employee.Id);
-
-            employee.UpdateStateOnAssign(isHoliday, (ShiftType)CurrentShift, workTimeConfiguration, weekInQuarter);
+            nurse.UpdateStateOnRegularShiftAssign(isHoliday, CurrentShift, WeekInQuarter, departamentSettings,
+                CalculateNurseHoursToNextShift(nurse.NurseId));
         }
 
-        public void AssignEmployeeToShortShift(IEmployeeState employee, TimeSpan shortShiftLenght,
-            int weekInQuarter)
+        public void AssignEmployeeToMorningShift(INurseState nurse, MorningShift morningShift)
         {
-            if (AssignedShortShifts[CurrentDay - 1] == null)
-                AssignedShortShifts[CurrentDay - 1] = new List<int> { employee.Id };
+            if (MorningShiftsState[CurrentDayIndex] == null)
+            {
+                MorningShiftsState[CurrentDayIndex] = new List<int> { nurse.NurseId };
+            }
+            else
+            {
+                MorningShiftsState[CurrentDayIndex].Add(nurse.NurseId);
+            }
 
-            else AssignedShortShifts[CurrentDay - 1].Add(employee.Id);
-
-            employee.UpdateStateOnAssign(shortShiftLenght, weekInQuarter);
+            nurse.UpdateStateOnMorningShiftAssign(morningShift, WeekInQuarter,
+                CalculateNurseHoursToNextShift(nurse.NurseId));
         }
 
         public List<int> GetPreviousShift()
@@ -148,10 +176,55 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         }
         public List<int> GetNextShift()
         {
-            int nextShift = CurrentShift + 1 > 1 ? 0 : 1;
+            int nextShift = (int)CurrentShift + 1 > 1 ? 0 : 1;
             int nextDay = nextShift == 1 ? CurrentDay : CurrentDay + 1;
             if (nextDay - 1 >= ScheduleState.GetLength(0)) return null;
             return ScheduleState[nextDay - 1, nextShift];
+        }
+
+        public TimeSpan GetHoursToScheduleEnd()
+        {
+            var result = TimeSpan.Zero;
+
+            var shift = (int)CurrentShift + 1;
+
+            for (int day = CurrentDayIndex; day < ScheduleState.GetLength(0); day++)
+            {
+                for (; shift < ScheduleState.GetLength(1); shift++)
+                {
+                    result += GeneralConstants.RegularShiftLenght;
+                }
+                shift = 0;
+            }
+
+            return result;
+        }
+
+        private TimeSpan CalculateNurseHoursToNextShift(int nurseId)
+        {
+            var hoursToNextShift = TimeSpan.Zero;
+
+            var shift = (int)CurrentShift + 1;
+
+            for (int day = CurrentDayIndex; day < ScheduleState.GetLength(0); day++)
+            {
+                for (; shift < ScheduleState.GetLength(1); shift++)
+                {
+                    if (ScheduleState[day, shift] != null && ScheduleState[day, shift].Contains(nurseId))
+                    {
+                        break;
+                    }
+                    if (shift == (int)ShiftIndex.Day && MorningShiftsState[day] != null && MorningShiftsState[day]
+                        .Contains(nurseId))
+                    {
+                        break;
+                    }
+                    hoursToNextShift += GeneralConstants.RegularShiftLenght;
+                }
+                shift = 0;
+            }
+
+            return hoursToNextShift;
         }
     }
 }

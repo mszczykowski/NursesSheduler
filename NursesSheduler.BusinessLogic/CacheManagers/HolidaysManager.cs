@@ -2,7 +2,7 @@
 using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Exceptions;
-using NursesScheduler.Domain.Models;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.CacheManagers
 {

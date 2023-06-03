@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NursesScheduler.BlazorShared.Stores;
 
-namespace NursesScheduler.BlazorShared.Shared
+namespace NursesScheduler.BlazorShared.Abstracions
 {
     public abstract class ComponenentUsingDepartament : ExceptionHandlingComponent
     {

@@ -2,12 +2,13 @@
 
 @inherits ExceptionHandlingComponent
 
+@using NursesScheduler.BlazorShared.Pages.Departaments.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
 
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
-<NursesScheduler.BlazorShared.Controls.Departaments.DepartamentForm Title="Dodaj nowy oddział" Departament=@_departament SaveDepartament="SaveDepartament"/>
+<DepartamentForm Title="Dodaj nowy oddział" Departament=@_departament SaveDepartament="SaveDepartament"/>
 
 
 @code {

@@ -15,7 +15,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
             TimeSpan shiftLengthToAssing)
         {
             return (currentNurseState
-                .WorkTimeAssignedInWeek[(int)Math.Ceiling((decimal)currentSolverState.DayNumberInQuarter / 7) - 1] 
+                .WorkTimeAssignedInWeek[currentSolverState.WeekInQuarter] 
                 + shiftLengthToAssing) 
                 < _maxWorkTimeInMonth;
         }

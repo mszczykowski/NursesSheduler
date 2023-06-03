@@ -52,17 +52,15 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        SolverSettings = new();
         _editContext = new(SolverSettings);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
     }
 
     public void SetModal(string seed, int numberOfRetries)
     {
-        SolverSettings = new SolverSettingsViewModel
-            {
-                GeneratorSeed = seed,
-                NumberOfRetries = numberOfRetries,
-            };
+        SolverSettings.GeneratorSeed = seed;
+        SolverSettings.NumberOfRetries = numberOfRetries;
         ChangeVisibility();
     }
 

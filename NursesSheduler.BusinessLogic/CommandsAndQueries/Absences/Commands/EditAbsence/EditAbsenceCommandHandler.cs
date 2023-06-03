@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.BusinessLogic.Veryfication;
-using NursesScheduler.Domain.DomainModels;
+using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence
