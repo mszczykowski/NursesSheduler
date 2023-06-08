@@ -3,7 +3,7 @@
     public enum AbsenceVeryficationResult
     {
         Valid,
-        InvalidYear,
+        ClosedMonth,
         AbsenceAlreadyExists,
     }
 }

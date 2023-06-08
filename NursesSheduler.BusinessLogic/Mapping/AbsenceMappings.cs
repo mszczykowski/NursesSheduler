@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {
@@ -13,8 +13,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<AddAbsenceRequest, Absence>();
             CreateMap<Absence, AddAbsenceResponse>();
 
-            CreateMap<EditAbsenceRequest, Absence>();
-            CreateMap<Absence, EditAbsenceResponse>();
+            CreateMap<Absence, GetAbsencesResponse>();
 
             CreateMap<Absence, GetAbsencesSummaryResponse.AbsenceResponse>();
         }

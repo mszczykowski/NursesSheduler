@@ -12,6 +12,7 @@
         public TimeSpan TimeOffAvailableToAssgin { get; set; }
         public TimeSpan TimeOffAssigned { get; set; }
         public int SettingsVersion { get; set; }
+        public bool IsClosed { get; set; }
 
         public ICollection<int> Holidays { get; set; }
         public virtual ICollection<ScheduleNurse> ScheduleNurses { get; set; }

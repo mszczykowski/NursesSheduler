@@ -10,8 +10,7 @@ namespace NursesScheduler.BlazorShared.Mapping
     {
         public AbsenceViewModelMappings()
         {
-            CreateMap<AbsenceViewModel, AddAbsenceRequest>();
-            CreateMap<AbsenceViewModel, EditAbsenceRequest>();
+            CreateMap<AbsenceFormViewModel, AddAbsenceRequest>();
             CreateMap<AddAbsenceResponse, AbsenceViewModel>();
             CreateMap<GetAbsencesSummaryResponse.AbsenceResponse, AbsenceViewModel>();
         }

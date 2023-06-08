@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
@@ -49,6 +51,53 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             nurse.AbsencesSummaries = new List<AbsencesSummary>();
             InitializeNurseAbsencesSummary(nurse, departament);
+        }
+
+        public ICollection<Absence> GetAbsencesFromAddAbsenceRequest(AddAbsenceRequest absenceRequest)
+        {
+            var result = new List<Absence>();
+
+            var currentAbsence = new Absence(absenceRequest.From.Month);
+
+            result.Add(currentAbsence);
+
+            for (var date = absenceRequest.From; date <= absenceRequest.To; date = date.AddDays(1))
+            {
+                if (date.Month != currentAbsence.Month)
+                {
+                    currentAbsence = new Absence(date.Month);
+                    result.Add(currentAbsence);
+                }
+
+                currentAbsence.Days.Add(date.Day);
+            }
+
+            foreach(var absence in result)
+            {
+                absence.AbsencesSummaryId = absenceRequest.AbsencesSummaryId;
+                absence.Type = absenceRequest.Type;
+            }
+            
+            return result;
+        }
+
+        public async Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence)
+        {
+            if (absencesSummary.Absences.Any(a => a.Month == absence.Month && a.Days.Intersect(absence.Days).Any()))
+            {
+                return AbsenceVeryficationResult.AbsenceAlreadyExists;
+            }
+
+            if (await _context.Schedules
+                .AnyAsync(s => s.DepartamentId == absencesSummary.Nurse.DepartamentId &&
+                    s.Year == absencesSummary.Year &&
+                    s.MonthNumber == absence.Month &&
+                    s.IsClosed))
+            {
+                return AbsenceVeryficationResult.ClosedMonth;
+            }
+
+            return AbsenceVeryficationResult.Valid;
         }
 
         private void RecalculatePreviousYearAbsencesSummary(Nurse nurse, Departament departament)

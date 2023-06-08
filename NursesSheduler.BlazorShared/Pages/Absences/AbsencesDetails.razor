@@ -12,9 +12,9 @@
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
-<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" Recalculate="RecalculateSummary" Save="EditSummary"/>
+<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" Recalculate="RecalculateSummary" Save="EditSummary" />
 
-@if (_nurse == null || _AbsencesSummaries == null)
+@if (_nurse == null || _absencesSummaries == null)
 {
     <LoadingSpinner />
 }
@@ -35,7 +35,7 @@ else
         </div>
         <div class="mb-4">
             <div class="level">
-                @if (_selectedYear <= _currentYear)
+                @if (_dateViewModel.YearNumber <= _currentDate.Year)
                 {
                     <div class="level-left">
                         <div class="level-item">
@@ -65,18 +65,8 @@ else
                         </div>
                     </div>
                     <div class="level-item">
-                        <div class="level-item">
-                            <div class="control">
-                                <div class="select">
-                                    <select value=@_selectedYear @onchange="SelectedYearChanged">
-                                        @foreach (var summary in _AbsencesSummaries)
-                                        {
-                                            <option value="@summary.Year">@summary.Year</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                        <YearSelect YearViewModel=_dateViewModel FirstYear=@_absencesSummaries.Min(a => a.Year) 
+                            OnChange="SelectedYearChanged"/>
                     </div>
                 </div>
             </div>
@@ -86,7 +76,19 @@ else
                 <AbsenceForm @ref=_newAbsenceForm Absence=_newAbsence SaveAbsence="AddAbsence" />
             </div>
         </div>
-        <NurseAbsencesTable Absences=_currentAbsencesSummary.Absences />
+        <div class="level">
+            <div class="level-right">
+                <div class="level-item">
+                    <div class="level-item">
+                        <label class="label">Miesiąc</label>
+                    </div>
+                </div>
+                <div class="level-item">
+                    <MonthSelect MonthViewModel=_dateViewModel OnChange="ReloadSchedule"/>
+                </div>
+            </div>
+        </div>
+        <NurseAbsencesTable Absences=_currentAbsencesSummary.Absences.Where() />
     </div>
 }
 
@@ -97,21 +99,32 @@ else
     [Parameter]
     public int Year { get; set; }
 
-    private int _selectedYear;
-    private int _currentYear = DateTime.Now.Year;
     private NurseViewModel _nurse;
-    private ICollection<AbsencesSummaryViewModel> _AbsencesSummaries;
+    private ICollection<AbsencesSummaryViewModel> _absencesSummaries;
     private AbsencesSummaryViewModel _currentAbsencesSummary;
 
     private AbsenceViewModel _newAbsence;
     private AbsenceForm _newAbsenceForm;
     private EditAbsencesSummaryModal _editAbsencesSummaryModal;
 
+    private DateViewModel _dateViewModel = new();
+    private DateTime _currentDate = DateTime.Now;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _selectedYear = Year;
+            _dateViewModel.YearNumber = Year;
+
+            if(_currentDate.Year == Year)
+            {
+                _dateViewModel.MonthNumber = _currentDate.Month;
+            }
+            else
+            {
+                _dateViewModel.MonthNumber = 1;
+            }
+
             await LoadData();
         }
     }
@@ -137,9 +150,13 @@ else
             {
                 NurseId = Id
             };
+
         var response = await _mediatr.Send(request);
         if (response == null)
+        {
             NavigationManager.NavigateTo("/notFound");
+        }
+
         _nurse = _mapper.Map<NurseViewModel>(response);
     }
 
@@ -154,7 +171,7 @@ else
         if (response == null)
             NavigationManager.NavigateTo("/notFound");
 
-        _AbsencesSummaries = _mapper.Map<ICollection<AbsencesSummaryViewModel>>(response);
+        _absencesSummaries = _mapper.Map<ICollection<AbsencesSummaryViewModel>>(response);
     }
 
     private async Task AddAbsence()
@@ -189,7 +206,7 @@ else
 
     private void SelectedYearChanged()
     {
-        _currentAbsencesSummary = _AbsencesSummaries.FirstOrDefault(y => y.Year == _selectedYear);
+        _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _dateViewModel.YearNumber);
         InitialiseAbsenceForm();
     }
 

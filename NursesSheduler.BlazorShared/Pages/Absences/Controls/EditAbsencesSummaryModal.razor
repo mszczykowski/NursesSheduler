@@ -28,8 +28,8 @@
                 </section>
                 <footer class="modal-card-foot">
                     <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSubmit)" type="submit">Zapisz</button>
-                    <button class="button is-warning @CssHelper.SetIsLoading(_isLoadingRecalculate)">Przelicz</button>
-                    <button class="button" @onclick="ChangeVisibility">Anuluj</button>
+                    <button class="button is-warning @CssHelper.SetIsLoading(_isLoadingRecalculate)" type="button">Przelicz</button>
+                    <button class="button" @onclick="ChangeVisibility" type="button">Anuluj</button>
                 </footer>
             </EditForm>
         </div>

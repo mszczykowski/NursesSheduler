@@ -2,10 +2,10 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
-using NursesScheduler.BusinessLogic.Veryfication;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
@@ -15,54 +15,69 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IValidator<Absence> _validator;
+        private readonly IValidator<AddAbsenceRequest> _validator;
         private readonly IWorkTimeService _workTimeService;
         private readonly IAbsencesService _absencesService;
+        private readonly ICalendarService _calendarService;
+        private readonly IDepartamentSettingsManager _settingsManager;
 
-        public AddAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, IValidator<Absence> validator, 
-                                                    IWorkTimeService workTimeService, IAbsencesService absencesService)
+        public AddAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, 
+            IValidator<AddAbsenceRequest> validator, IWorkTimeService workTimeService, IAbsencesService absencesService,
+            ICalendarService calendarService, IDepartamentSettingsManager settingsManager)
         {
             _context = context;
             _mapper = mapper;
             _validator = validator;
             _workTimeService = workTimeService;
             _absencesService = absencesService;
+            _calendarService = calendarService;
+            _settingsManager = settingsManager;
         }
 
         public async Task<AddAbsenceResponse> Handle(AddAbsenceRequest request, CancellationToken cancellationToken)
         {
+            var validationResult = await _validator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
+
+            var absences = _absencesService.GetAbsencesFromAddAbsenceRequest(request);
+
             var absencesSummary = await _context.AbsencesSummaries
                 .Include(y => y.Absences)
                 .Include(y => y.Nurse)
                 .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
                 ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
-            var absence = _mapper.Map<Absence>(request);
+            var veryficationResult = AbsenceVeryficationResult.Valid;
+            foreach (var absence in absences)
+            {
+                veryficationResult = await _absencesService.VerifyAbsence(absencesSummary, absence);
 
-            var validationResult = await _validator.ValidateAsync(absence);
-            if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
-
-            var absenceVeryficationResult = AbsenceVeryficator.VerifyAbsence(absencesSummary, absence);
-
-            if (absenceVeryficationResult != AbsenceVeryficationResult.Valid)
-                return new AddAbsenceResponse
+                if(veryficationResult != AbsenceVeryficationResult.Valid)
                 {
-                    VeryficationResult = absenceVeryficationResult
-                };
+                    break;
+                }
+            }
 
-            absence.WorkingHoursToAssign = await _workTimeService.GetTotalWorkingHoursFromTo(absence.From, absence.To, 
-                                                                                     null);
-            absence.AssignedWorkingHours = await _absencesService.CalculateAbsenceAssignedWorkingTime(absence);
+            if (veryficationResult != AbsenceVeryficationResult.Valid)
+            {
+                return new AddAbsenceResponse(veryficationResult);
+            }
 
-            absencesSummary.Absences.Add(absence);
+            var departamentSettings = await _settingsManager.GetDepartamentSettings(absencesSummary.Nurse.DepartamentId);
+
+            foreach (var absence in absences)
+            {
+                var days = await _calendarService.GetDaysFromDayNumbers(absence.Month, absencesSummary.Year, 
+                    absence.Days);
+                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings);
+
+                absencesSummary.Absences.Add(absence);
+            }
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            var absenceResponse = _mapper.Map<AddAbsenceResponse>(absence);
-            absenceResponse.VeryficationResult = absenceVeryficationResult;
-
-            return result > 0 ? absenceResponse : null;
+            return result > 0 ? new AddAbsenceResponse(AbsenceVeryficationResult.Valid) : null;
         }
     }
 }

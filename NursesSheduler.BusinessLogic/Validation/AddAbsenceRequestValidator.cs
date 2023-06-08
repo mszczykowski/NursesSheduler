@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 
 namespace NursesScheduler.BusinessLogic.Validation
 {
-    internal sealed class AbsenceValidator : AbstractValidator<Absence>
+    internal sealed class AddAbsenceRequestValidator : AbstractValidator<AddAbsenceRequest>
     {
-        public AbsenceValidator()
+        public AddAbsenceRequestValidator()
         {
             RuleFor(a => a.From)
                 .NotEmpty();

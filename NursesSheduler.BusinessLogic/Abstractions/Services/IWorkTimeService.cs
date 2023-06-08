@@ -20,5 +20,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         ICollection<MorningShift> CalculateMorningShifts(TimeSpan timeForMorningShifts,
             DepartamentSettings departamentSettings);
         int GetNumberOfWorkingDays(Day[] days);
+        TimeSpan GetWorkTimeFromDays(ICollection<Day> days, DepartamentSettings departamentSettings);
     }
 }

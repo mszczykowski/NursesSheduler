@@ -15,6 +15,21 @@ namespace NursesScheduler.BusinessLogic.Services
             _hoidaysManager = hoidaysManager;
         }
 
+        public TimeSpan GetWorkTimeFromDays(ICollection<Day> days, DepartamentSettings departamentSettings)
+        {
+            var workTime = TimeSpan.Zero;
+
+            foreach(var day in days)
+            {
+                if(day.IsWorkingDay)
+                {
+                    workTime += departamentSettings.WorkingTime;
+                }
+            }
+
+            return workTime;
+        }
+
         public async Task<TimeSpan> GetTotalWorkingHoursInMonth(int monthNumber, int yearNumber, 
             DepartamentSettings departamentSettings)
         {

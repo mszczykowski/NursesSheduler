@@ -30,10 +30,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             for(int i = 0; i < monthDays.Length; i++)
             {
-                monthDays[i] = new Day
-                {
-                    Date = new DateOnly(yearNumber, monthNumber, i + 1),
-                };
+                monthDays[i] = new Day(i + 1, monthNumber, yearNumber);
             }
 
             foreach(var holiday in holidays)
@@ -45,72 +42,31 @@ namespace NursesScheduler.BusinessLogic.Services
             return monthDays;
         }
 
-        /*public async Task<Quarter> GetQuarter(int whichQuarter, int year)
+        public async Task<ICollection<Day>> GetDaysFromDayNumbers(int monthNumber, int yearNumber, 
+            ICollection<int> dayNumbers)
         {
-            Quarter quarter = new Quarter();
+            var holidays = await _holidaysManager.GetHolidays(yearNumber);
 
-            int quarterStart = _scheduleConfiguration.GetQuarterStart();
+            holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
 
-            int month;
-            int dayInQuarterIterator = 1;
+            var daysResult = new HashSet<Day>();
 
-            for (int i = 0; i < 3; i++)
+            foreach(var dayNumber in dayNumbers)
             {
-                month = quarterStart + i + whichQuarter * 3;
-                if (month > 12)
-                {
-                    month = 1;
-                    year++;
-                }
-                quarter.Months[i] = await GetMonth(month, year);
-                quarter.Months[i].MonthInQuarter = i + 1;
+                daysResult.Add(new Day(dayNumber, monthNumber, yearNumber));
+            }
 
-                foreach(var day in quarter.Months[i].Days)
+            foreach (var holiday in holidays)
+            {
+                var day = daysResult.FirstOrDefault(d => d.Date.Day == holiday.Date.Day);
+                if (day != null)
                 {
-                    day.DayInQuarter = dayInQuarterIterator++;
+                    day.IsHoliday = true;
+                    day.HolidayName = holiday.LocalName;
                 }
             }
 
-            return quarter;
+            return daysResult;
         }
-
-        public async Task<Month> GetMonth(int monthNumber, int yearNumber)
-        {
-            Month monthResult;
-            var key = $"Month-{monthNumber}.{yearNumber}";
-
-            if(!_memoryCache.TryGetValue(key, out monthResult))
-            {
-                if (_holidays == null || _holidays.Any() && _holidays.First().Date.Year != yearNumber)
-                    _holidays = await _holidaysApiClient.GetHolidays(yearNumber);
-
-                List<Holiday> holidaysInRequestedMonth = _holidays.Where(h => h.Date.Month == monthNumber).ToList();
-
-                int daysInMonth = DateTime.DaysInMonth(yearNumber, monthNumber);
-
-                monthResult = new Month();
-                monthResult.MonthNumber = monthNumber;
-                monthResult.Year = yearNumber;
-
-                monthResult.Days = new Day[daysInMonth];
-
-                holidaysInRequestedMonth.ForEach(holiday =>
-                {
-                    monthResult.Days[holiday.Date.Day - 1] = new Day(DateOnly.FromDateTime(holiday.Date), holiday.Name);
-                });
-
-                for (int i = 0; i < daysInMonth; i++)
-                {
-                    if (monthResult.Days[i] == null)
-                    {
-                        monthResult.Days[i] = new Day(new DateOnly(yearNumber, monthNumber, i + 1));
-                    }
-                }
-
-                _memoryCache.Set(key, monthResult, DateTime.Now.AddDays(1));
-            }
-
-            return monthResult;
-        }*/
     }
 }

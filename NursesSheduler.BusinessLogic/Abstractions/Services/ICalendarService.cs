@@ -6,5 +6,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
     {
         Task<ICollection<Holiday>> GetHolidaysInMonth(int monthNumber, int yearNumber);
         Task<Day[]> GetMonthDays(int monthNumber, int yearNumber);
+        Task<ICollection<Day>> GetDaysFromDayNumbers(int monthNumber, int yearNumber,
+            ICollection<int> dayNumbers);
     }
 }

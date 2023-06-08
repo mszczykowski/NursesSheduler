@@ -30,6 +30,7 @@ namespace NursesScheduler.Infrastructure.Context
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(NurseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DepartamentConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ScheduleConfiguration).Assembly);
+            modelBuilder.ApplyConfiguration(typeof(Absence).Assembly);
 
             base.OnModelCreating(modelBuilder);
         }

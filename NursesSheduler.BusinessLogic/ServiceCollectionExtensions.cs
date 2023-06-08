@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using NursesScheduler.BusinessLogic.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 
 namespace NursesScheduler.BusinessLogic
 {
@@ -23,7 +24,7 @@ namespace NursesScheduler.BusinessLogic
             //validators
             services.AddTransient<IValidator<Nurse>, NurseValidator>();
             services.AddTransient<IValidator<Departament>, DepartamentValidator>();
-            services.AddTransient<IValidator<Absence>, AbsenceValidator>();
+            services.AddTransient<IValidator<AddAbsenceRequest>, AddAbsenceRequestValidator>();
             services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
             services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
 

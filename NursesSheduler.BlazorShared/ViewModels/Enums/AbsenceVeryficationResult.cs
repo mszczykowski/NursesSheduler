@@ -5,8 +5,8 @@ namespace NursesScheduler.BlazorShared.ViewModels.Enums
     public enum AbsenceVeryficationResult
     {
         Valid,
-        [Display(Name = "Rok nie może być różny od aktywnego roku podsumowania")]
-        InvalidYear,
+        [Display(Name = "Nie można dodac urlopu do zamkniętego już miesiąca")]
+        ClosedMonth,
         [Display(Name = "Istnieje już urlop który zawiera się w wybranym zakresie. Urlop nie został zapisany.")]
         AbsenceAlreadyExists,
     }

@@ -15,8 +15,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Que
         public class AbsenceResponse
         {
             public int AbsenceId { get; set; }
-            public DateOnly From { get; set; }
-            public DateOnly To { get; set; }
+            public int Month { get; set; }
+            public ICollection<int> Days { get; set; }
             public TimeSpan WorkingHoursToAssign { get; set; }
             public TimeSpan AssignedWorkingHours { get; set; }
             public AbsenceTypes Type { get; set; }
