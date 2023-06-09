@@ -10,14 +10,11 @@ namespace NursesScheduler.Domain.Entities
         public int ScheduleNurseId { get; set; }
         public virtual ScheduleNurse ScheduleNurse { get; set; }
 
-        public ShiftTypes Type { get; set; }
-        public TimeOnly ShiftStart { get; set; }
-        public TimeOnly ShiftEnd { get; set; }
+        public ShiftTypes ShiftType { get; set; }
 
         public int? MorningShiftId { get; set; }
         public virtual MorningShift MorningShift { get; set; }
 
-        public int? AbsenceId { get; set; }
-        public virtual Absence Absence { get; set; }
+        public bool IsTimeOff { get; set; }
     }
 }

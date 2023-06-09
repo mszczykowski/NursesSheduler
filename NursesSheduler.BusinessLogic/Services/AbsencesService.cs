@@ -21,13 +21,6 @@ namespace NursesScheduler.BusinessLogic.Services
             _workTimeService = workTimeService;
         }
 
-        public async Task<TimeSpan> CalculateAbsenceAssignedWorkingTime(Absence absence)
-        {
-            var absenceWorkDays = absence.NurseWorkDays;
-
-            return _workTimeService.GetWorkingTimeFromWorkDays(absenceWorkDays);
-        }
-
         public async Task InitializeDepartamentAbsencesSummaries(Departament departament, 
             CancellationToken cancellationToken)
         {

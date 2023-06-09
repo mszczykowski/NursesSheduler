@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
 
 namespace NursesScheduler.BlazorShared.Mapping
@@ -13,6 +13,7 @@ namespace NursesScheduler.BlazorShared.Mapping
             CreateMap<AbsenceFormViewModel, AddAbsenceRequest>();
             CreateMap<AddAbsenceResponse, AbsenceViewModel>();
             CreateMap<GetAbsencesSummaryResponse.AbsenceResponse, AbsenceViewModel>();
+            CreateMap<GetAbsencesResponse, AbsenceViewModel>();
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿@page "/absences/details/{Id:int}/{Year:int}"
+﻿@page "/absences/details/{NurseId:int}/{Year:int}"
 
 @inherits ComponenentUsingDepartament
 
 @using NursesScheduler.BlazorShared.Pages.Absences.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary
@@ -65,15 +66,15 @@ else
                         </div>
                     </div>
                     <div class="level-item">
-                        <YearSelect YearViewModel=_dateViewModel FirstYear=@_absencesSummaries.Min(a => a.Year) 
-                            OnChange="SelectedYearChanged"/>
+                        <YearSelect YearViewModel=_dateViewModel FirstYear=@_absencesSummaries.Min(a => a.Year)
+                                OnChange="SelectedYearChanged" />
                     </div>
                 </div>
             </div>
         </div>
         <div class="card mb-4">
             <div class="card-content">
-                <AbsenceForm @ref=_newAbsenceForm Absence=_newAbsence SaveAbsence="AddAbsence" />
+                <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" Year=@_currentAbsencesSummary.Year />
             </div>
         </div>
         <div class="level">
@@ -84,18 +85,18 @@ else
                     </div>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthViewModel=_dateViewModel OnChange="ReloadSchedule"/>
+                    <MonthSelect MonthViewModel=_dateViewModel OnChange="(() => StateHasChanged())" />
                 </div>
             </div>
         </div>
-        <NurseAbsencesTable Absences=_currentAbsencesSummary.Absences.Where() />
+        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences.Where(a => a.Month == _dateViewModel.MonthNumber).ToList() />
     </div>
 }
 
 
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public int NurseId { get; set; }
     [Parameter]
     public int Year { get; set; }
 
@@ -103,7 +104,6 @@ else
     private ICollection<AbsencesSummaryViewModel> _absencesSummaries;
     private AbsencesSummaryViewModel _currentAbsencesSummary;
 
-    private AbsenceViewModel _newAbsence;
     private AbsenceForm _newAbsenceForm;
     private EditAbsencesSummaryModal _editAbsencesSummaryModal;
 
@@ -116,7 +116,7 @@ else
         {
             _dateViewModel.YearNumber = Year;
 
-            if(_currentDate.Year == Year)
+            if (_currentDate.Year == Year)
             {
                 _dateViewModel.MonthNumber = _currentDate.Month;
             }
@@ -148,7 +148,7 @@ else
     {
         var request = new GetNurseRequest
             {
-                NurseId = Id
+                NurseId = NurseId
             };
 
         var response = await _mediatr.Send(request);
@@ -164,7 +164,7 @@ else
     {
         var request = new GetAbsencesSummaryRequest
             {
-                NurseId = Id
+                NurseId = NurseId
             };
         var response = await _mediatr.Send(request);
 
@@ -174,28 +174,36 @@ else
         _absencesSummaries = _mapper.Map<ICollection<AbsencesSummaryViewModel>>(response);
     }
 
-    private async Task AddAbsence()
+    private async Task AddAbsence(AbsenceFormViewModel _newAbsence)
     {
         try
         {
-            var request = _mapper.Map<AddAbsenceRequest>(_newAbsence);
+            var addRequest = _mapper.Map<AddAbsenceRequest>(_newAbsence);
 
-            var response = await _mediatr.Send(request);
+            var addResponse = await _mediatr.Send(addRequest);
 
-            if (response == null)
+            if (addResponse == null)
                 throw new EntityNotAddedException(nameof(AbsenceViewModel));
 
-            var veryficationResult = (AbsenceVeryficationResult)response.VeryficationResult;
+            var veryficationResult = (AbsenceVeryficationResult)addResponse.VeryficationResult;
 
             if (veryficationResult != AbsenceVeryficationResult.Valid)
             {
                 _newAbsenceForm.HandleInvalidAbsence(veryficationResult);
+                return;
             }
-            else
-            {
-                _currentAbsencesSummary.Absences.Add(_mapper.Map<AbsenceViewModel>(response));
-                InitialiseAbsenceForm();
-            }
+
+            var getRequest = new GetAbsencesRequest
+                {
+                    AbsencesSummaryId = _currentAbsencesSummary.AbsencesSummaryId
+                };
+
+            var getResponse = await _mediatr.Send(getRequest);
+
+            _currentAbsencesSummary.Absences = _mapper.Map<ICollection<AbsenceViewModel>>(getResponse).ToList();
+
+            _newAbsenceForm.ResetForm();
+
             StateHasChanged();
         }
         catch (Exception e)
@@ -207,18 +215,7 @@ else
     private void SelectedYearChanged()
     {
         _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _dateViewModel.YearNumber);
-        InitialiseAbsenceForm();
-    }
-
-    private void InitialiseAbsenceForm()
-    {
-        _newAbsence = new AbsenceViewModel()
-            {
-                From = DateOnly.FromDateTime(DateTime.Now),
-                To = DateOnly.FromDateTime(DateTime.Now),
-                Type = (AbsenceTypes)0,
-                AbsencesSummaryId = _currentAbsencesSummary.AbsencesSummaryId,
-            };
+        _newAbsenceForm.ResetForm();
     }
 
     private async Task EditSummary(AbsencesSummaryEditViewModel summary)

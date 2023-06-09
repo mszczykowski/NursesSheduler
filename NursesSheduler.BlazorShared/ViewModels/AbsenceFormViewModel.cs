@@ -11,6 +11,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
         public DateOnly To { get; set; }
         [Required(ErrorMessage = "Należy wybrać typ")]
         public AbsenceTypes Type { get; set; }
+        public int AbsencesSummaryId { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (To < From)

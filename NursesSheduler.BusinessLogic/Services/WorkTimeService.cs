@@ -116,7 +116,14 @@ namespace NursesScheduler.BusinessLogic.Services
 
             foreach(var workDay in nurserWorkDays)
             {
-                workTime += workDay.ShiftEnd - workDay.ShiftStart;
+                if(workDay.MorningShift != null)
+                {
+                    workTime += workDay.MorningShift.ShiftLength;
+                }
+                else if(workDay.ShiftType != ShiftTypes.None)
+                {
+                    workTime += GeneralConstants.RegularShiftLenght;
+                }
             }
 
             return workTime;

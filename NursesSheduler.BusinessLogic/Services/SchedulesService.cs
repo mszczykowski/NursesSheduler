@@ -60,30 +60,21 @@ namespace NursesScheduler.BusinessLogic.Services
             foreach(var scheduleNurse in schedule.ScheduleNurses)
             {
                 var absences = absenceSummaries
-                    .FirstOrDefault(a => a.NurseId == scheduleNurse.NurseId)?
-                    .Absences?.Where(a => a.From.Month <= schedule.MonthNumber && a.To.Month >= schedule.MonthNumber)
+                    .FirstOrDefault(a => a.NurseId == scheduleNurse.NurseId && a.Year == schedule.Year)?
+                    .Absences?.Where(a => a.Month == schedule.MonthNumber)
                     .ToList();
-
-                var absenceDates = new List<DateOnly>();
 
                 if (absences == null)
                     continue;
 
                 foreach(var absence in absences)
                 {
-                    for (var date = absence.From; date <= absence.To; date = date.AddDays(1))
+                    foreach(var day in absence.Days)
                     {
-                        if (date.Month != schedule.MonthNumber)
-                            continue;
-
-                        scheduleNurse.NurseWorkDays.First(d => d.DayNumber == date.DayNumber).Absence = absence;
-
-                        absenceDates.Add(date);
+                        scheduleNurse.NurseWorkDays.First(d => d.DayNumber == day).IsTimeOff = true;
                     }
+                    scheduleNurse.TimeOffToAssign += absence.WorkTimeToAssign;
                 }
-
-                scheduleNurse.TimeOffToAssign = await _workTimeService
-                    .GetTotalWorkingHoursFromDateArray(absenceDates, departamentSettings);
             }
         }
 
@@ -106,7 +97,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     scheduleNurse.NurseWorkDays.Add(new NurseWorkDay
                     {
                         DayNumber = i + 1,
-                        Type = Domain.Enums.ShiftTypes.None
+                        ShiftType = Domain.Enums.ShiftTypes.None
                     });
                 }
                 schedule.ScheduleNurses.Add(scheduleNurse);
