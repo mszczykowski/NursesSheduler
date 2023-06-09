@@ -27,10 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="_Imports.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
@@ -41,6 +37,10 @@
     <None Include="wwwroot\webfonts\fa-regular-400.woff2" />
     <None Include="wwwroot\webfonts\fa-solid-900.woff2" />
     <None Include="wwwroot\webfonts\fa-v4compatibility.woff2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj" />
   </ItemGroup>
 
   <ItemGroup>

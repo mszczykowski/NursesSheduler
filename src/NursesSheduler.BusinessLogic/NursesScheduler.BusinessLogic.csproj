@@ -28,13 +28,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="CommandsAndQueries\Schedules\Commands\AddSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\EditSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
   </ItemGroup>
 
 </Project>

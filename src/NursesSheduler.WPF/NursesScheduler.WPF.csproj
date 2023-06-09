@@ -24,12 +24,12 @@
     <PackageReference Include="PasswordBoxMVVM" Version="1.0.5" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\NursesSheduler.BlazorShared\NursesScheduler.BlazorShared.csproj" />
-    <ProjectReference Include="..\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj" />
-    <ProjectReference Include="..\NursesSheduler.Persistance\NursesScheduler.Infrastructure.csproj" />
-  </ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\NursesSheduler.BlazorShared\NursesScheduler.BlazorShared.csproj" />
+	  <ProjectReference Include="..\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj" />
+	  <ProjectReference Include="..\NursesSheduler.Persistance\NursesScheduler.Infrastructure.csproj" />
+	</ItemGroup>
 
   <ItemGroup>
     <Content Update="wwwroot\**">

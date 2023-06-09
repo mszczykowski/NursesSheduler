@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NursesSheduler.BlazorShared\NursesScheduler.BlazorShared.csproj" />
+    <ProjectReference Include="..\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj" />
     <ProjectReference Include="..\NursesSheduler.Persistance\NursesScheduler.Infrastructure.csproj" />
   </ItemGroup>
 

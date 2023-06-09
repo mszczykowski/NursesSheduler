@@ -5,17 +5,21 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5D91F67A-0526-42B8-8570-28A65BC94777}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.Domain", "NursesSheduler.Domain\NursesScheduler.Domain.csproj", "{E802569E-E0DA-46B5-85D5-1F4F6F505FD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.Domain", "src\NursesSheduler.Domain\NursesScheduler.Domain.csproj", "{E802569E-E0DA-46B5-85D5-1F4F6F505FD5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.Infrastructure", "NursesSheduler.Persistance\NursesScheduler.Infrastructure.csproj", "{F28C8098-E5F8-4E15-81BB-AAB9EAC2B19A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.Infrastructure", "src\NursesSheduler.Persistance\NursesScheduler.Infrastructure.csproj", "{F28C8098-E5F8-4E15-81BB-AAB9EAC2B19A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BlazorServerApp", "NursesSheduler.BlazorServerApp\NursesScheduler.BlazorServerApp.csproj", "{196BB60E-765F-4872-BC56-227B2BE884D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BlazorServerApp", "src\NursesSheduler.BlazorServerApp\NursesScheduler.BlazorServerApp.csproj", "{196BB60E-765F-4872-BC56-227B2BE884D5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4314B214-8751-4964-9C25-9FA7AD201DDF} = {4314B214-8751-4964-9C25-9FA7AD201DDF}
+		{F28C8098-E5F8-4E15-81BB-AAB9EAC2B19A} = {F28C8098-E5F8-4E15-81BB-AAB9EAC2B19A}
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.WPF", "NursesSheduler.WPF\NursesScheduler.WPF.csproj", "{823F168A-567C-4918-A3D8-F98D9DD89B6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.WPF", "src\NursesSheduler.WPF\NursesScheduler.WPF.csproj", "{823F168A-567C-4918-A3D8-F98D9DD89B6C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BlazorShared", "NursesSheduler.BlazorShared\NursesScheduler.BlazorShared.csproj", "{4314B214-8751-4964-9C25-9FA7AD201DDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BlazorShared", "src\NursesSheduler.BlazorShared\NursesScheduler.BlazorShared.csproj", "{4314B214-8751-4964-9C25-9FA7AD201DDF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BusinessLogic", "NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj", "{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BusinessLogic", "src\NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj", "{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
