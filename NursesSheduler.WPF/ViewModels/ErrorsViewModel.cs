@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace NursesScheduler.WPF.ViewModels
 {
-    internal class ErrorsViewModel : INotifyDataErrorInfo
+    internal sealed class ErrorsViewModel : INotifyDataErrorInfo
     {
         private readonly Dictionary<string, List<string>> _propertyErrors = new Dictionary<string, List<string>>();
 

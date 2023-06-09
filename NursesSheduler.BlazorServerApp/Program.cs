@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using NursesScheduler.BlazorShared.Data;
+﻿using Microsoft.Data.Sqlite;
+using NursesScheduler.BlazorShared;
 using NursesScheduler.BusinessLogic;
-using NursesScheduler.Persistance;
+using NursesScheduler.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,16 @@ builder.Services.AddBusinessLogicLayer();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+
+//add layers here
+builder.Services.AddPresentationLayer();
+builder.Services.AddBusinessLogicLayer();
+builder.Services.AddInfrastructureLayer(new SqliteConnectionStringBuilder
+                                                {
+                                                    DataSource = @"D:\Projekty\inżynierka\NursesSheduler\NursesSheduler.WPF\bin\Debug\net6.0-windows\scheduler1.db",
+                                                    Mode = SqliteOpenMode.ReadWrite,
+                                                    Password = "test24ABC",
+                                                }.ToString());
 
 var app = builder.Build();
 

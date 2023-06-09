@@ -7,6 +7,10 @@
 	  <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\css\bootstrap.css" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
@@ -18,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.5" />
   </ItemGroup>
 
@@ -32,10 +37,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controls\Departaments\" />
-    <Folder Include="Controls\Settings\" />
-    <Folder Include="Controls\Schdules\" />
-    <Folder Include="ViewModels\" />
+    <None Include="wwwroot\webfonts\fa-brands-400.woff2" />
+    <None Include="wwwroot\webfonts\fa-regular-400.woff2" />
+    <None Include="wwwroot\webfonts\fa-solid-900.woff2" />
+    <None Include="wwwroot\webfonts\fa-v4compatibility.woff2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="wwwroot\css\bootstrap.css" />
   </ItemGroup>
 
 </Project>

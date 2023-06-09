@@ -1,0 +1,58 @@
+﻿@if (!NursesWithSummary.Any())
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
+    </div>
+}
+else
+{
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th style="width: 100%">Imie i nazwisko</th>
+                <th>Wykorzystany urlop</th>
+                <th>Pozostały urlop</th>
+                <th>Przysługujący urlop (dni)</th>
+                <th>Zaległy urlop</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var nurse in NursesWithSummary)
+        {
+            <tr>
+                <td style="width: 100%">@nurse.Name @nurse.Surname</td>
+                @{
+                    _absencesSummary = nurse.AbsencesSummaries.FirstOrDefault(s => s.Year == SelectedYear);
+                }
+                @if(_absencesSummary == null || currentYear < SelectedYear)
+                {
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                }
+                else
+                {
+                    <td>@_absencesSummary.PTOTimeUsed.GetTotalHoursAndMinutes()</td>
+                    <td>@_absencesSummary.PTOLeft.GetTotalHoursAndMinutes()</td>
+                    <td>@_absencesSummary.PTODays</td>
+                    <td>@_absencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()</td>
+                }
+                <td><a href="/absences/details/@nurse.NurseId/@SelectedYear">Więcej</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    [Parameter]
+    public ICollection<NurseWithAbsencesSummariesViewModel> NursesWithSummary { get; set; }
+    [Parameter]
+    public int SelectedYear { get; set; }
+
+    private int currentYear = DateTime.Now.Year;
+    private AbsencesSummaryViewModel _absencesSummary;
+}

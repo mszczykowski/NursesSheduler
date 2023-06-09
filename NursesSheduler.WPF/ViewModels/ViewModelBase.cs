@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 
-
 namespace NursesScheduler.WPF.ViewModels
 {
     internal class ViewModelBase : INotifyPropertyChanged

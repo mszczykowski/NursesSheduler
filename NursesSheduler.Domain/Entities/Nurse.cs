@@ -2,24 +2,18 @@
 
 namespace NursesScheduler.Domain.Entities
 {
-    public sealed class Nurse : ISoftDelete
+    public class Nurse : ISoftDelete
     {
-        public int Id { get; set; }
+        public int NurseId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
+        public int PTOentitlement { get; set; }
 
-        public int? DepartamentId { get; set; }
+        public int DepartamentId { get; set; }
+        public virtual Departament Departament { get; set; }
 
-        private Departament _departament;
-        public Departament Departament
-        {
-            get => _departament;
-            set
-            {
-                DepartamentId = value?.Id;
-                _departament = value;
-            }
-        }
+        public virtual ICollection<NurseWorkDay> Shifts { get; set; }
+        public virtual ICollection<AbsencesSummary> AbsencesSummaries { get; set; }
 
         public bool IsDeleted { get; set; }
     }

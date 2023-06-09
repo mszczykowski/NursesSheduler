@@ -1,4 +1,47 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <!--common-->
+    <system:String x:Key="passwd">Hasło:</system:String>
+    <system:String x:Key="passwd_repeat">Powtórz hasło:</system:String>
+    <system:String x:Key="app_name">Planer pracy</system:String>
+    <system:String x:Key="exit">Wyjście</system:String>
+    <system:String x:Key="save">Zapisz</system:String>
+    <system:String x:Key="back">Powrót</system:String>
+    <system:String x:Key="settings">Ustawienia</system:String>
+    <system:String x:Key="change_passwd">Zmień hasło</system:String>
+
+    <!--LogInView-->
+    <system:String x:Key="remember_passwd">Zapamiętać hasło?</system:String>
+    <system:String x:Key="log_in">Zaloguj</system:String>
+
+    <!--registerView-->
+    <system:String x:Key="create_passwd_message">Należy utworzyć hasło</system:String>
+
+    <!--settingsView-->
+    <system:String x:Key="language">Język:</system:String>
+    <system:String x:Key="polish">Polski</system:String>
+    <system:String x:Key="english">Angielski</system:String>
+    <system:String x:Key="delete_db">Usuń wszystkie dane</system:String>
+
+    <!--changePasswordView-->
+    <system:String x:Key="old_passwd">Stare hasło:</system:String>
+    <system:String x:Key="new_passwd">Nowe hasło:</system:String>
+    <system:String x:Key="repeat_new_passwd">Powrórz nowe hasło:</system:String>
+
+    <!--password validation-->
+    <system:String x:Key="passwd_min_lenght">Hasło musi zawierać conajmniej 8 znaków</system:String>
+    <system:String x:Key="passwd_lower_upper">Hasło musi zawierać wielkie i małe litery</system:String>
+    <system:String x:Key="passwd_needs_number">Hasło musi zawierać conajmniej jedną cyfrę</system:String>
+    <system:String x:Key="passwd_doesnt_match">Hasła różnią się</system:String>
+    <system:String x:Key="passwd_empty">Hasło nie może być puste</system:String>
+    <system:String x:Key="wrong_passwd">Złe hasło</system:String>
+
+    <!--message boxes-->
+    <system:String x:Key="close">Zamknąć program?</system:String>
+    <system:String x:Key="passwd_changed">Hasło zmienione</system:String>
+    <system:String x:Key="passwd_created">Hasło utworzone. Możesz się teraz zalogować</system:String>
+    <system:String x:Key="clear">Wyczyść</system:String>
+    <system:String x:Key="delete_db_message">Wyczyścić wszytskie dane? Tej operacji nie da się cofnąć!</system:String>
+
 </ResourceDictionary>

@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NursesScheduler.WPF.Commands.CommandsBase;
 using System.Windows;
 
 namespace NursesScheduler.WPF.Commands.Common
 {
-    internal class ExitCommand : CommandBase
+    internal sealed class ExitCommand : CommandBase
     {
         public override void Execute(object? parameter)
         {
-            if (MessageBox.Show("Close Application?", "Exit", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+            if (MessageBox.Show((string)Application.Current.FindResource("close"), 
+                (string)Application.Current.FindResource("exit"), MessageBoxButton.YesNo, 
+                MessageBoxImage.Question) == MessageBoxResult.No) return;
 
             System.Windows.Application.Current.Shutdown();
         }

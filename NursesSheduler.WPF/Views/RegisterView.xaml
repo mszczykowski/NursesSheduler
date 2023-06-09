@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NursesScheduler.WPF.Views" 
-             xmlns:components="clr-namespace:PasswordBoxMVVM.Components;assembly=PasswordBoxMVVM"
+             xmlns:components="clr-namespace:PasswordBoxMVVM.Components;assembly=PasswordBoxMVVM" 
+             xmlns:controls="clr-namespace:NursesScheduler.WPF.Controls" xmlns:loadingspinnercontrol="clr-namespace:LoadingSpinnerControl;assembly=LoadingSpinnerControl"
              mc:Ignorable="d">
     <Grid Style="{StaticResource ControlGrid}">
         <Grid.RowDefinitions>
@@ -15,18 +16,28 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Style="{StaticResource Header}" Text="Nurses Sheduler" />
-        <TextBlock Grid.Row="1" Style="{StaticResource Info}" Text="This is your first log in. You have to create a password."/>
-        <Label Grid.Row="2" Content="Password:"/>
-        <components:BindablePasswordBox Grid.Row="3" Password="{Binding Password}"/>
-        <Label Grid.Row="4" Content="Repeat password:"/>
-        <components:BindablePasswordBox Grid.Row="5" Password="{Binding PasswordRepeated}"/>
+        <loadingspinnercontrol:LoadingSpinner Grid.Row="0" Grid.RowSpan="8" Panel.ZIndex="1" Thickness="5" Color="Gray" Diameter="150" IsLoading="{Binding IsLoading}"/>
 
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Save" Command="{Binding CreatePasswordCommand}"/>
-            <Button Content="Exit" Command="{Binding ExitCommand}"/>
+        <TextBlock Grid.Row="0" Style="{StaticResource Header}" Text="{StaticResource app_name}" />
+        <TextBlock Grid.Row="1" Style="{StaticResource Info}" Text="{StaticResource create_passwd_message}"/>
+
+        <StackPanel Grid.Row="2">
+            <controls:BulletedItem BulletText="{StaticResource passwd_min_lenght}" />
+            <controls:BulletedItem BulletText="{StaticResource passwd_lower_upper}" />
+            <controls:BulletedItem BulletText="{StaticResource passwd_needs_number}" />
+        </StackPanel>
+        
+        <Label Grid.Row="3" Content="{StaticResource passwd}"/>
+        <components:BindablePasswordBox Grid.Row="4" Password="{Binding Password}" IsEnabled="{Binding IsFormActive}"/>
+        <Label Grid.Row="5" Content="{StaticResource passwd_repeat}"/>
+        <components:BindablePasswordBox Grid.Row="6" Password="{Binding PasswordRepeated}" IsEnabled="{Binding IsFormActive}"/>
+
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="{StaticResource save}" Command="{Binding CreatePasswordCommand}"/>
+            <Button Content="{StaticResource exit}" Command="{Binding ExitCommand}" IsEnabled="{Binding IsFormActive}"/>
         </StackPanel>
     </Grid>
 </UserControl>

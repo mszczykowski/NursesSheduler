@@ -14,14 +14,14 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Settings" Style="{StaticResource Info}"/>
+        <TextBlock Grid.Row="0" Text="{StaticResource settings}" Style="{StaticResource Info}"/>
         
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Label Content="Language:" VerticalAlignment="Center"/>
-            <Button Content="English"/>
-            <Button Content="Polish"/>
+            <Label Content="{StaticResource language}" VerticalAlignment="Center"/>
+            <Button Content="{StaticResource english}" Command="{Binding SetEnglishLanguageCommand}"/>
+            <Button Content="{StaticResource polish}" Command="{Binding SetPolishLanguageCommand}"/>
         </StackPanel>
-        <Button Grid.Row="3" Content="Remove all data"/>
-        <Button Grid.Row="4" Content="Back"/>
+        <Button Grid.Row="3" Content="{StaticResource delete_db}" Command="{Binding RemoveDbCommand}"/>
+        <Button Grid.Row="4" Content="{StaticResource back}" Command="{Binding BackCommand}"/>
     </Grid>
 </UserControl>

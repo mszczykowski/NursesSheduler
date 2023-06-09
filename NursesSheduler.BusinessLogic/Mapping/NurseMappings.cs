@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using NursesScheduler.BusinessLogic.Nurses.Commands.CreateNurse;
-using NursesScheduler.BusinessLogic.Nurses.Queries.GetAllNurses;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 using NursesScheduler.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NursesScheduler.BusinessLogic.Mapping
 {
@@ -14,13 +13,14 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public NurseMappings()
         {
-            CreateMap<Nurse, CreateNurseRequest>()
-                .ReverseMap();
-            CreateMap<Nurse, CreateNurseResponse>()
-                .ReverseMap();
-
-            CreateMap<Nurse, GetAllNursesResponse>()
-                .ReverseMap();
+            CreateMap<AddNurseRequest, Nurse>();
+            CreateMap<Nurse, AddNurseResponse>();
+            CreateMap<Nurse, GetNursesFromDepartamentResponse>();
+            CreateMap<Nurse, GetNurseResponse>();
+            CreateMap<EditNurseRequest, Nurse>();
+            CreateMap<Nurse, EditNurseResponse>();
+            CreateMap<Nurse, GetAbsencesSummaryByDepartamentResponse>();
+            CreateMap<Nurse, GetScheduleResponse.NurseResponse>();
         }
     }
 }

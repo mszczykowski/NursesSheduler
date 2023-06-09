@@ -2,8 +2,14 @@
 using System.Reflection;
 using MediatR;
 using FluentValidation;
-using NursesScheduler.BusinessLogic.Validation.Nurse;
-using NursesScheduler.BusinessLogic.Nurses.Commands.CreateNurse;
+using NursesScheduler.BusinessLogic.Validation;
+using NursesScheduler.BusinessLogic.Services;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
+using Microsoft.Extensions.Caching.Memory;
+using NursesScheduler.BusinessLogic.CacheManagers;
+using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
+using NursesScheduler.Domain.Entities;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 
 namespace NursesScheduler.BusinessLogic
 {
@@ -11,9 +17,27 @@ namespace NursesScheduler.BusinessLogic
     {
         public static void AddBusinessLogicLayer(this IServiceCollection services)
         {
-            services.AddScoped<IValidator<CreateNurseRequest>, CreateNurseRequestValidator>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddSingleton<IMemoryCache, MemoryCache>();
+
+            //validators
+            services.AddTransient<IValidator<Nurse>, NurseValidator>();
+            services.AddTransient<IValidator<Departament>, DepartamentValidator>();
+            services.AddTransient<IValidator<AddAbsenceRequest>, AddAbsenceRequestValidator>();
+            services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
+            services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
+
+            //managers
+            services.AddTransient<IHolidaysManager, HolidaysManager>();
+            services.AddTransient<IDepartamentSettingsManager, DepartamentSettingsManager>();
+
+            //services
+            services.AddTransient<IWorkTimeService, WorkTimeService>();
+            services.AddTransient<IAbsencesService, AbsencesService>();
+            services.AddSingleton<ICurrentDateService, CurrentDateService>();
+            services.AddTransient<ISchedulesService, SchedulesService>();
+            services.AddTransient<ICalendarService, CalendarService>();
         }
     }
 }

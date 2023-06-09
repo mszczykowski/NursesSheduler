@@ -1,0 +1,135 @@
+﻿
+
+<ErrorModal @ref=_errorModal />
+
+
+<EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+    <DataAnnotationsValidator />
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Początek</label>
+                    <div class="control">
+                        <InputDate class="input" @bind-Value="_absence.From" min="@GetMinDate()" max="@GetMaxDate()" onchange="FromChanged" />
+                        <div class="help is-danger">
+                            <ValidationMessage For="@(() => _absence.From)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Koniec</label>
+                    <InputDate class="input" @bind-Value="_absence.To" min="@GetMinDate()" max="@GetMaxDate()" />
+                    <div class="help is-danger">
+                        <ValidationMessage For="@(() => _absence.To)" />
+                    </div>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Typ</label>
+                    <div class="select">
+                        <InputSelect @bind-Value="_absence.Type">
+                            @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                            {
+                                <option value="@absenceType">@absenceType.GetEnumDisplayName()</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <button type="submit" class="button is-success @CssHelper.SetIsLoading(_isLoading)">Zapisz nieobecność</button>
+            </div>
+        </div>
+    </div>
+    <div class="level">
+        <div class="level-right level-item">
+            <div class="has-text-danger">
+                <ValidationSummary />
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int Year { get; set; }
+    [Parameter]
+    public EventCallback<AbsenceFormViewModel> SaveAbsence { get; set; }
+
+    private bool _isLoading;
+    private EditContext _editContext;
+    private ErrorModal _errorModal;
+    private AbsenceFormViewModel _absence;
+
+    public void ResetForm()
+    {
+        if (Year == DateTime.Now.Year)
+        {
+            _absence = new AbsenceFormViewModel
+                {
+                    From = DateOnly.FromDateTime(DateTime.Now),
+                    To = DateOnly.FromDateTime(DateTime.Now),
+                };
+        }
+        else
+        {
+            _absence = new AbsenceFormViewModel
+                {
+                    From = new DateOnly(Year, 1, 1),
+                    To = new DateOnly(Year, 1, 1),
+                };
+        }
+    }
+
+    public void HandleInvalidAbsence(AbsenceVeryficationResult result)
+    {
+        _errorModal.ShowError(result.GetEnumDisplayName());
+    }
+
+    private async Task OnSubmit()
+    {
+        if (_editContext.Validate())
+        {
+            _isLoading = true;
+            await Task.Delay(1);
+            await SaveAbsence.InvokeAsync();
+            _isLoading = false;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _isLoading = false;
+
+        ResetForm();
+
+        _editContext = new(_absence);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        base.OnInitialized();
+    }
+
+    private string GetMinDate()
+    {
+        return $"{Year}-01-01";
+    }
+
+    private string GetMaxDate()
+    {
+        return $"{Year}-12-31";
+    }
+
+    private void FromChanged()
+    {
+        if (_absence.From > _absence.To)
+        {
+            _absence.To = _absence.From;
+        }
+    }
+}

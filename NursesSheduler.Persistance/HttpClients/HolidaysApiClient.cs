@@ -1,8 +1,8 @@
-﻿using NursesScheduler.Domain.Entities.Calendar;
-using NursesScheduler.Domain;
+﻿using NursesScheduler.Domain;
 using System.Net.Http.Json;
-using NursesScheduler.Infrastructure.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.Infrastructure.HttpClients
 {
@@ -17,17 +17,19 @@ namespace NursesScheduler.Infrastructure.HttpClients
             _memoryCache = memoryCache;
         }
 
-        public async Task<List<Holiday>?> GetHolidays(int year)
+        public async Task<List<Holiday>> GetHolidays(int year)
         {
-            List<Holiday>? result;
+            List<Holiday> result;
+            var key = $"Holidays-{year}";
 
-            if(!_memoryCache.TryGetValue(year, out result))
+            if(!_memoryCache.TryGetValue(key, out result))
             {
-                result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstraints.CountryCode}");
+                result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstants.CountryCode}");
 
-                if (result == null) return null;
+                if (result == null) 
+                    return null;
 
-                _memoryCache.Set(year, result, DateTime.Now.AddDays(1));
+                _memoryCache.Set(key, result, DateTime.Now.AddDays(1));
             }
             return result;
         }

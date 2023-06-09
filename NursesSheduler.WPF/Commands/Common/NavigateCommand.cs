@@ -1,9 +1,10 @@
-﻿using NursesScheduler.WPF.Services.Implementation;
+﻿using NursesScheduler.WPF.Commands.CommandsBase;
+using NursesScheduler.WPF.Services.Implementation;
 using NursesScheduler.WPF.ViewModels;
 
 namespace NursesScheduler.WPF.Commands.Common
 {
-    internal class NavigateCommand<TViewModel> : CommandBase where TViewModel : ViewModelBase
+    internal sealed class NavigateCommand<TViewModel> : CommandBase where TViewModel : ViewModelBase
     {
         private readonly NavigationService<TViewModel> _navigationService;
 

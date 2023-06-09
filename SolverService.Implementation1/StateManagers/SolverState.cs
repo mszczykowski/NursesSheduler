@@ -1,9 +1,9 @@
-﻿using SheduleSolver.Domain.Enums;
-using SheduleSolver.Domain.Models;
-using SheduleSolver.Domain.Models.Calendar;
-using SolverService.Interfaces.StateManagers;
+﻿using ScheduleSolver.Domain.Enums;
+using ScheduleSolver.Domain.Models;
+using ScheduleSolver.Domain.Models.Calendar;
+using ScheduleSolver.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.StateManagers
+namespace ScheduleSolver.Implementation.StateManagers
 {
     public sealed class SolverState : ISolverState
     {

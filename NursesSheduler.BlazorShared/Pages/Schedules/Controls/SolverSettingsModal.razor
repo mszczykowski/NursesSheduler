@@ -1,0 +1,72 @@
+﻿@inherits ModalBase
+
+@if (SolverSettings != null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Ustawienia generatora</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <EditForm EditContext="@_editContext" OnValidSubmit="@OnSubmit">
+                <section class="modal-card-body">
+                    <DataAnnotationsValidator />
+                    <div class="field">
+                        <label class="label">Liczba prób generatora</label>
+                        <div class="control">
+                            <InputNumber class="input" @bind-Value="SolverSettings.NumberOfRetries" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => SolverSettings.NumberOfRetries)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Ziarno generatora</label>
+                        <div class="control">
+                            <InputText class="input" @bind-Value="SolverSettings.GeneratorSeed" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => SolverSettings.GeneratorSeed)" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-primary" type="submit">Zapisz</button>
+                    <button class="button" @onclick="ChangeVisibility">Anuluj</button>
+                </footer>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<SolverSettingsViewModel> Save { get; set; }
+
+    [Parameter]
+    public SolverSettingsViewModel SolverSettings { get; set; }
+
+    private EditContext _editContext;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SolverSettings = new();
+        _editContext = new(SolverSettings);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+    }
+
+    public void SetModal(string seed, int numberOfRetries)
+    {
+        SolverSettings.GeneratorSeed = seed;
+        SolverSettings.NumberOfRetries = numberOfRetries;
+        ChangeVisibility();
+    }
+
+    private async Task OnSubmit()
+    {
+        await Save.InvokeAsync(SolverSettings);
+        ChangeVisibility();
+    }
+}

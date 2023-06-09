@@ -1,10 +1,10 @@
 ﻿using System.Linq.Dynamic.Core;
 using System.Text;
-using SolverService.Implementation.StateManagers;
-using SolverService.Interfaces.Builders;
-using SolverService.Interfaces.StateManagers;
+using ScheduleSolver.Implementation.StateManagers;
+using ScheduleSolver.Interfaces.Builders;
+using ScheduleSolver.Interfaces.StateManagers;
 
-namespace SolverService.Implementation.Builders
+namespace ScheduleSolver.Implementation.Builders
 {
     internal sealed class EmployeeQueueBuilder : IEmployeeQueueBuilder
     {

@@ -13,7 +13,7 @@ namespace NursesScheduler.WPF
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public sealed partial class App : Application
     {
         private readonly IHost _host;
 
@@ -57,7 +57,7 @@ namespace NursesScheduler.WPF
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            SetLanguageDictionary();
+            SetLanguageDictionary(Thread.CurrentThread.CurrentCulture.ToString());
 
             _host.Start();
 
@@ -91,19 +91,24 @@ namespace NursesScheduler.WPF
             base.OnExit(e);
         }
 
-        private void SetLanguageDictionary()
+        public void SetLanguageDictionary(string language)
         {
-            ResourceDictionary dict = new ResourceDictionary();
-            switch (Thread.CurrentThread.CurrentCulture.ToString())
+            var culture = new System.Globalization.CultureInfo(language);
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+
+            var languageDictionary = new ResourceDictionary();
+            switch (language)
             {
-                case "en-US":
-                    dict.Source = new Uri("..\\Resources\\StringResources.xaml", UriKind.Relative);
+                case "pl-PL":
+                    languageDictionary.Source = new Uri(@"..\Resources\StringResources.pl-PL.xaml", UriKind.Relative);
                     break;
                 default:
-                    dict.Source = new Uri("..\\Resources\\StringResources.xaml", UriKind.Relative);
+                    languageDictionary.Source = new Uri(@"..\Resources\StringResources.xaml", UriKind.Relative);
                     break;
             }
-            this.Resources.MergedDictionaries.Add(dict);
+            this.Resources.MergedDictionaries.Clear();
+            this.Resources.MergedDictionaries.Add(languageDictionary);
         }
         
         public void DisposeHost()

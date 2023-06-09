@@ -1,0 +1,45 @@
+﻿@inherits ModalBase
+
+@inject IMediator _mediatr;
+@inject IMapper _mapper;
+
+@if (_absence != null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edytuj @_absence.ToString()</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <section class="modal-card-body">
+                <AbsenceForm @ref="_absenceForm" Absence=@_absence SaveAbsence="Edit" />
+            </section>
+        </div>
+    </div>
+}
+
+
+@code {
+    private AbsenceForm _absenceForm;
+    private AbsenceViewModel _absence;
+    [Parameter]
+    public EventCallback<AbsenceViewModel> EditAction { get; set; }
+
+    public void SetModal(AbsenceViewModel absence)
+    {
+        _absence = absence;
+        ChangeVisibility();
+    }
+
+    private async Task Edit()
+    {
+        await EditAction.InvokeAsync(_absence);
+        ChangeVisibility();
+    }
+
+    public void HandleInvalidAbsence(AbsenceVeryficationResult result)
+    {
+        _absenceForm.HandleInvalidAbsence(result);
+    }
+}

@@ -1,260 +1,235 @@
-﻿using SheduleSolver.Domain.Enums;
-using SheduleSolver.Domain.Models;
-using SheduleSolver.Domain.Models.Calendar;
-using SolverService.Interfaces.Services;
-using SolverService.Interfaces.StateManagers;
+﻿using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
+using NursesScheduler.Domain;
+using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Enums;
 
-namespace SolverService.Implementation.Services
+namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class WorkTimeService : IWorkTimeService
     {
-        private readonly Quarter _currentQuarter;
-        private readonly Month _currentMonth;
-        private readonly WorkTimeConfiguration _workTimeConfiguration;
+        private readonly IHolidaysManager _hoidaysManager;
 
-        private int[,] shiftCapacities;
-        private int minimalNumberOfWorkersOnShift;
-        private int[,] shortShiftsCapacities;
-
-
-        public WorkTimeService(Quarter quarter, int currentMonthIndex, WorkTimeConfiguration workTimeConfiguration)
+        public WorkTimeService(IHolidaysManager hoidaysManager)
         {
-            _currentQuarter = quarter;
-            _currentMonth = _currentQuarter.Months[currentMonthIndex];
-            _workTimeConfiguration = workTimeConfiguration;
+            _hoidaysManager = hoidaysManager;
         }
 
-        public bool IsHoliday(Day day)
+        public TimeSpan GetWorkTimeFromDays(ICollection<Day> days, DepartamentSettings departamentSettings)
         {
-            return day.IsHoliday == true || day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
-        }
+            var workTime = TimeSpan.Zero;
 
-        public int GetNumberOfWorkingDays(Month month)
-        {
-            int workingDays = 0;
-            foreach (var day in month.Days)
+            foreach(var day in days)
             {
-                if (!IsHoliday(day)) workingDays++;
-                if (day.IsHoliday == true && day.DayOfWeek == DayOfWeek.Saturday)
-                    workingDays--;
-            }
-            return workingDays;
-        }
-
-        private TimeSpan GetWorkingTimePerNurse(Month month)
-        {
-            return GetNumberOfWorkingDays(month) * _workTimeConfiguration.WorkTimePerDay;
-        }
-
-
-        public void InitialiseEmployeeTimeToAssign(List<IEmployeeState> employees)
-        {
-            var workingTimePerNurse = GetWorkingTimePerNurse(_currentMonth);
-            foreach (var employee in employees)
-            {
-                employee.WorkTimeToAssign += workingTimePerNurse;
-
-                int PTORegularDays = 0;
-
-                for (int i = 0; i < employee.PTO.Length; i++)
+                if(day.IsWorkingDay)
                 {
-                    if (employee.PTO[i] == true && !IsHoliday(_currentMonth.Days[i])) PTORegularDays++;
-                }
-
-                employee.PTOTimeToAssign = Math.Floor(PTORegularDays * _workTimeConfiguration.WorkTimePerDay /
-                    _workTimeConfiguration.ShiftLenght) * _workTimeConfiguration.ShiftLenght;
-
-                employee.WorkTimeToAssign -= employee.PTOTimeToAssign;
-
-                employee.NumberOfShiftsToAssign =
-                    (int)Math.Floor(employee.WorkTimeToAssign / _workTimeConfiguration.ShiftLenght);
-
-                int numberOfDays = 0;
-
-                foreach (var m in _currentQuarter.Months)
-                {
-                    numberOfDays += m.Days.Length;
-                }
-
-                int numberOfWeeksInQuarter = (int)Math.Ceiling((decimal)numberOfDays / 7);
-
-                employee.WorkTimeAssignedInWeek = new TimeSpan[numberOfWeeksInQuarter];
-            }
-        }
-
-        public void InitialiseShiftCapacities(List<IEmployeeState> employees, Random random)
-        {
-            var totalNumberOfShiftsToAssign = GetTotalNumberOfShiftsToAssign(employees);
-
-            minimalNumberOfWorkersOnShift = GetMinimalNumberOfNursesOnShift(totalNumberOfShiftsToAssign);
-
-            var numberOfSurplusShifts = GetNumberOfSurplusShifts(totalNumberOfShiftsToAssign, minimalNumberOfWorkersOnShift);
-
-            var numberOfWorkingDays = GetNumberOfWorkingDays(_currentMonth);
-
-            var regularDayShiftCapacities = new int[numberOfWorkingDays];
-            var nightShiftsCapacities = new int[_currentMonth.Days.Count()];
-            var holidayDayShiftCapacities = new int[_currentMonth.Days.Count() - numberOfWorkingDays];
-
-            Array.Fill(regularDayShiftCapacities, minimalNumberOfWorkersOnShift);
-            Array.Fill(nightShiftsCapacities, minimalNumberOfWorkersOnShift);
-            Array.Fill(holidayDayShiftCapacities, minimalNumberOfWorkersOnShift);
-
-            if (minimalNumberOfWorkersOnShift < _workTimeConfiguration.TargetNumberOfNursesOnShift)
-            {
-                if (numberOfSurplusShifts > 0)
-                {
-                    for (int i = 0; i < regularDayShiftCapacities.Length; i++)
-                    {
-                        regularDayShiftCapacities[i]++;
-                        numberOfSurplusShifts--;
-                        if (numberOfSurplusShifts == 0) break;
-                    }
-                }
-
-                if (numberOfSurplusShifts > 0)
-                {
-                    for (int i = 0; i < holidayDayShiftCapacities.Length; i++)
-                    {
-                        regularDayShiftCapacities[i]++;
-                        numberOfSurplusShifts--;
-                        if (numberOfSurplusShifts == 0) break;
-                    }
-                }
-
-                if (numberOfSurplusShifts > 0)
-                {
-                    for (int i = 0; i < nightShiftsCapacities.Length; i++)
-                    {
-                        regularDayShiftCapacities[i]++;
-                        numberOfSurplusShifts--;
-                        if (numberOfSurplusShifts == 0) break;
-                    }
-                }
-            }
-            else
-            {
-                int arrayIterator = 0;
-                while (numberOfSurplusShifts > 0)
-                {
-                    regularDayShiftCapacities[arrayIterator++]++;
-                    numberOfSurplusShifts--;
-                    if (arrayIterator >= regularDayShiftCapacities.Length) arrayIterator = 0;
+                    workTime += departamentSettings.WorkingTime;
                 }
             }
 
-            regularDayShiftCapacities = regularDayShiftCapacities.OrderBy(i => random.Next()).ToArray();
-            holidayDayShiftCapacities = holidayDayShiftCapacities.OrderBy(i => random.Next()).ToArray();
-            nightShiftsCapacities = nightShiftsCapacities.OrderBy(i => random.Next()).ToArray();
+            return workTime;
+        }
 
-            int regularShiftIterator = 0;
-            int nightShiftIterator = 0;
-            int holidayShiftIterator = 0;
+        public async Task<TimeSpan> GetTotalWorkingHoursInMonth(int monthNumber, int yearNumber, 
+            DepartamentSettings departamentSettings)
+        {
+            return await GetTotalWorkingHoursFromTo(new DateOnly(yearNumber, monthNumber, 1),
+                new DateOnly(yearNumber, monthNumber, DateTime.DaysInMonth(yearNumber, monthNumber)), departamentSettings);
+        }
 
-            List<int> regularDays = new List<int>();
+        public async Task<TimeSpan> GetTotalWorkingHoursInQuarter(int quarterNumber, int yearNumber, 
+            DepartamentSettings departamentSettings)
+        {
+            var workTimeInQuarter = TimeSpan.Zero;
+            var quarterStart = departamentSettings.FirstQuarterStart;
+            
+            int monthNumber;
 
-            shiftCapacities = new int[_currentMonth.Days.Length, 2];
-            for (int i = 0; i < _currentMonth.Days.Length; i++)
+            for (int i = 0; i < 3; i++)
             {
-                shiftCapacities[i, (int)ShiftType.night] = nightShiftsCapacities[nightShiftIterator++];
-
-                if (IsHoliday(_currentMonth.Days[i]))
-                    shiftCapacities[i, (int)ShiftType.day] = holidayDayShiftCapacities[holidayShiftIterator++];
-
-                else
+                monthNumber = quarterStart + i + quarterNumber * 3;
+                if (monthNumber > 12)
                 {
-                    shiftCapacities[i, (int)ShiftType.day] = regularDayShiftCapacities[regularShiftIterator++];
-                    regularDays.Add(i);
+                    monthNumber = 1;
+                    yearNumber++;
+                }
+
+                workTimeInQuarter += await GetTotalWorkingHoursInMonth(monthNumber, yearNumber, departamentSettings);
+            }
+
+            return workTimeInQuarter;
+        }
+
+        public async Task<TimeSpan> GetTotalWorkingHoursFromTo(DateOnly from, DateOnly to, 
+            DepartamentSettings departamentSettings)
+        {
+            var numberOfWorkingDays = await GetNumberOfWorkingDays(from, to);
+
+            return numberOfWorkingDays * departamentSettings.WorkingTime;
+        }
+
+        public async Task<TimeSpan> GetTotalWorkingHoursFromDateArray(ICollection<DateOnly> dates, 
+            DepartamentSettings departamentSettings)
+        {
+            var numberOfWorkingDays = 0;
+
+            foreach(var date in dates)
+            {
+                if (IsWorkingDay(date, await _hoidaysManager.GetHolidays(date.Year)))
+                    numberOfWorkingDays++;
+            }
+
+            return numberOfWorkingDays * departamentSettings.WorkingTime;
+        }
+
+        public async Task<int> GetQuarterNumber(int monthNumber, DepartamentSettings departamentSettings)
+        {
+            var firstQuarterStart = departamentSettings.FirstQuarterStart;
+
+            var relativeMonthNumber = 1;
+
+            for (int i = firstQuarterStart; i != monthNumber; i = (i % 12) + 1)
+            {
+                relativeMonthNumber++;
+            }
+
+            return (int)(Math.Ceiling((decimal)(relativeMonthNumber) / 3));
+        }
+
+        public async Task<TimeSpan> GetSurplusWorkTime(int monthNumber, int yearNumber, int nurseCount, 
+            DepartamentSettings departamentSettings)
+        {
+            var workingTimeInMonthPerNurse = await GetTotalWorkingHoursInMonth(monthNumber, yearNumber, departamentSettings);
+
+            var totalNursesWorkTime = workingTimeInMonthPerNurse * nurseCount;
+            var minimalTotalWorkTimeToAssign =
+                departamentSettings.TargetNumberOfNursesOnShift * 2
+                * GeneralConstants.RegularShiftLenght
+                * DateTime.DaysInMonth(yearNumber, monthNumber);
+
+            return totalNursesWorkTime - minimalTotalWorkTimeToAssign;
+        }
+
+        public TimeSpan GetWorkingTimeFromWorkDays(ICollection<NurseWorkDay> nurserWorkDays)
+        {
+            var workTime = TimeSpan.Zero;
+
+            foreach(var workDay in nurserWorkDays)
+            {
+                if(workDay.MorningShift != null)
+                {
+                    workTime += workDay.MorningShift.ShiftLength;
+                }
+                else if(workDay.ShiftType != ShiftTypes.None)
+                {
+                    workTime += GeneralConstants.RegularShiftLenght;
                 }
             }
-            shortShiftsCapacities = new int[_currentMonth.Days.Length, 2];
 
-            regularDays.OrderBy(i => shiftCapacities[i, (int)ShiftType.day]);
-
-            int[,] shortShifts = new int[regularDays.Count < employees.Count ? employees.Count : regularDays.Count, 2];
-
-            for (int i = 0; i < shortShifts.GetLength(0); i++)
-            {
-                if (i > shortShifts.GetLength(0)) break;
-                shortShifts[i, 0] = regularDays[i];
-            }
-            for (int i = 0; i < employees.Count; i++)
-            {
-                shortShifts[i % shortShifts.Length, 1]++;
-            }
-
-            for (int i = 0; i < shortShifts.GetLength(0); i++)
-            {
-                shortShiftsCapacities[shortShifts[i, 0], (int)ShiftType.day] = shortShifts[i, 1];
-            }
+            return workTime;
         }
 
-        public int GetNumberOfNursesForShift(ShiftType shiftType, int dayNumber)
+        private bool IsWorkingDay(DateOnly date, ICollection<Holiday> holidays)
         {
-            return shiftCapacities[dayNumber - 1, (int)shiftType];
+            return date.DayOfWeek != DayOfWeek.Sunday && date.DayOfWeek != DayOfWeek.Saturday
+                && !holidays.Any(h => DateOnly.FromDateTime(h.Date) == date);
+        }
+        private bool IsWorkingDay(Day day)
+        {
+            return !day.IsHoliday && day.Date.DayOfWeek != DayOfWeek.Sunday && day.Date.DayOfWeek != DayOfWeek.Saturday;
         }
 
-
-
-
-        private int GetTotalNumberOfShiftsToAssign(List<IEmployeeState> employees)
+        public int GetNumberOfWorkingDays(Day[] days)
         {
-            int totalNumberOfShifts = 0;
-            foreach (var employee in employees)
+            var result = 0;
+            foreach(var day in days)
             {
-                totalNumberOfShifts += (int)Math.Floor(employee.WorkTimeToAssign / _workTimeConfiguration.ShiftLenght);
+                if(IsWorkingDay(day))
+                    result++;
             }
-            return totalNumberOfShifts;
+            return result;
         }
 
-        private int GetMinimalNumberOfNursesOnShift(int totalNumberOfShiftsToAssign)
+        private async Task<int> GetNumberOfWorkingDays(DateOnly from, DateOnly to)
         {
-            int calculatedMinimal = totalNumberOfShiftsToAssign / (_currentMonth.Days.Length * _workTimeConfiguration.ShiftDetails.Count);
+            var holidays = await _hoidaysManager.GetHolidays(from.Year);
 
-            return _workTimeConfiguration.TargetNumberOfNursesOnShift < calculatedMinimal ?
-                _workTimeConfiguration.TargetNumberOfNursesOnShift : calculatedMinimal;
-        }
+            var numberOfWorkingDays = 0;
 
-        private int GetNumberOfSurplusShifts(int totalNumberOfShiftsToAssign, int minimalNumberOfNursesOnShift)
-        {
-            return totalNumberOfShiftsToAssign - minimalNumberOfNursesOnShift * _currentMonth.Days.Length * 2;
-        }
-
-        public void InitialiseShortShifts()
-        {
-            List<TimeSpan> result = new List<TimeSpan>();
-            TimeSpan surplusTime = TimeSpan.Zero;
-
-            foreach (var month in _currentQuarter.Months)
+            for (var date = from; date <= to; date = date.AddDays(1))
             {
-                var workTimeInMonth = GetWorkingTimePerNurse(month);
-                var x = GetWorkingTimePerNurse(month);
-                var y = (int)Math.Floor(workTimeInMonth / _workTimeConfiguration.ShiftLenght);
-
-                surplusTime += workTimeInMonth - (int)Math.Floor(workTimeInMonth / _workTimeConfiguration.ShiftLenght)
-                    * _workTimeConfiguration.ShiftLenght;
+                if (IsWorkingDay(date, holidays))
+                    numberOfWorkingDays++;
             }
-
-            while (surplusTime > _workTimeConfiguration.ShiftLenght
-                && surplusTime - _workTimeConfiguration.ShiftLenght > _workTimeConfiguration.TargetMinimalShiftLenght)
-            {
-                surplusTime -= _workTimeConfiguration.ShiftLenght;
-                result.Add(_workTimeConfiguration.ShiftLenght);
-            }
-
-            if (surplusTime > _workTimeConfiguration.ShiftLenght)
-            {
-                result.Add(surplusTime / 2);
-                result.Add(surplusTime / 2);
-            }
-            else result.Add(surplusTime);
-
-            _currentQuarter.SurplusShifts = result;
+            return numberOfWorkingDays;
         }
 
-        public int GetNumberOfShortShifts(ShiftType shiftType, int dayNumber)
+        public async Task<TimeSpan> GetTimeForMorningShifts(int quarterNumber, int yearNumber, 
+            DepartamentSettings departamentSettings)
         {
-            return shortShiftsCapacities[dayNumber - 1, (int)shiftType];
+            var timeForMorningShifts = TimeSpan.Zero;
+            int monthNumber;
+
+            for (int i = 0; i < 3; i++)
+            {
+                monthNumber = departamentSettings.FirstQuarterStart + i + quarterNumber * 3;
+                if(monthNumber > 12)
+                {
+                    monthNumber = 1;
+                    yearNumber++;
+                }
+                
+                var workTimeInMonth = await GetTotalWorkingHoursInMonth(monthNumber, yearNumber, departamentSettings);
+
+                timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth / GeneralConstants.RegularShiftLenght)
+                    * GeneralConstants.RegularShiftLenght;
+            }
+
+            return timeForMorningShifts;
+        }
+
+        public ICollection<MorningShift> CalculateMorningShifts(TimeSpan timeForMorningShifts, 
+            DepartamentSettings departamentSettings)
+        {
+            var lengths = new List<TimeSpan>();
+
+            if(timeForMorningShifts < departamentSettings.TargetMinimalMorningShiftLenght)
+            {
+                timeForMorningShifts += GeneralConstants.RegularShiftLenght;
+            }
+
+            while (timeForMorningShifts > GeneralConstants.RegularShiftLenght
+                && timeForMorningShifts - GeneralConstants.RegularShiftLenght > departamentSettings.TargetMinimalMorningShiftLenght)
+            {
+                timeForMorningShifts -= GeneralConstants.RegularShiftLenght;
+                lengths.Add(GeneralConstants.RegularShiftLenght);
+            }
+
+            if (timeForMorningShifts > GeneralConstants.RegularShiftLenght)
+            {
+                lengths.Add(timeForMorningShifts / 2);
+                lengths.Add(timeForMorningShifts / 2);
+            }
+            else lengths.Add(timeForMorningShifts);
+
+            var morningShifts = new MorningShift[3];
+
+            for(int i = 0; i < 3; i++)
+            {
+                morningShifts[i] = new MorningShift
+                {
+                    Index = (MorningShiftIndex)i,
+                    ShiftLength = TimeSpan.Zero,
+                };
+            }
+
+            int j = 0;
+            foreach(var length in lengths)
+            {
+                morningShifts[j++].ShiftLength = length;
+            }
+
+            return morningShifts;
         }
     }
 }

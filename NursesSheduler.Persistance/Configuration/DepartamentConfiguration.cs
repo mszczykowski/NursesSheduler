@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NursesScheduler.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NursesScheduler.Infrastructure.Configuration
 {
@@ -13,7 +8,11 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Departament> builder)
         {
-            builder.HasKey(d => d.Id);
+            builder.HasKey(d => d.DepartamentId);
+
+            builder.HasMany(d => d.Nurses)
+                .WithOne(n => n.Departament)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(d => d.Name)
                 .IsRequired()

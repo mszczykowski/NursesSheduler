@@ -1,0 +1,115 @@
+﻿
+
+<div class='columns is-mobile is-centered'>
+    <div class='column is-5'>
+        <div class="card">
+            <div class="card-content">
+                <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+                    <DataAnnotationsValidator />
+                    <p class="title is-4">
+                        Konfigruracja czasu pracy
+                    </p>
+                    <TimeSpanInput Label="Dzienny wymiar pracy" @bind-Value="Settings.WorkingTime" ValidationFor="@(() => Settings.WorkingTime)" />
+                    <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximalWeekWorkingTime" ValidationFor="@(() => Settings.MaximalWeekWorkingTime)" />
+                    <TimeSpanInput Label="Minimalna przerwa między dyżurami" @bind-Value="Settings.MinmalShiftBreak" ValidationFor="@(() => Settings.MinmalShiftBreak)" />
+                    <div class="field">
+                        <label class="label">Początek pierwszego kwartału</label>
+                        <div class="select is-fullwidth">
+                            <select value=@Settings.FirstQuarterStart>
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i">@((Months)i)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="help is-danger">
+                            <ValidationMessage For="@(() => Settings.FirstQuarterStart)" />
+                        </div>
+                    </div>
+                    <br />
+                    <p class="title is-4">
+                        Konfigruracja świąt
+                    </p>
+                    <TimeSpanInput Label="Ilość godzin świątecznych należna za zmianę dzienną" @bind-Value="Settings.DayShiftHolidayEligibleHours" ValidationFor="@(() => Settings.DayShiftHolidayEligibleHours)" />
+                    <TimeSpanInput Label="Ilość godzin świątecznych należna za zmianę nocną" @bind-Value="Settings.NightShiftHolidayEligibleHours" ValidationFor="@(() => Settings.NightShiftHolidayEligibleHours)" />
+                    <br />
+                    <p class="title is-4">
+                        Konfigruracja generatora
+                    </p>
+                    <div class="field">
+                        <label class="label">Docelowa liczba pracowników na dyżurze</label>
+                        <div class="control">
+                            <InputNumber class="input" @bind-Value="Settings.TargetNumberOfNursesOnShift" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => Settings.TargetNumberOfNursesOnShift)" />
+                            </div>
+                        </div>
+                    </div>
+                    <TimeSpanInput Label="Docelowa minimalna długość dyżuru (ranki)" @bind-Value="Settings.TargetMinimalMorningShiftLenght" ValidationFor="@(() => Settings.TargetMinimalMorningShiftLenght)" />
+                    <div class="field">
+                        <label class="label">Domyślna liczba prób generatora</label>
+                        <div class="control">
+                            <InputNumber class="input" @bind-Value="Settings.DefaultGeneratorRetryValue" />
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => Settings.DefaultGeneratorRetryValue)" />
+                            </div>
+                        </div>
+                    </div>
+                    <p class="title is-6">
+                        Uwaga! Zmiana ustawień uniemożliwi edycję obecnie zapisanych grafików!
+                    </p>
+                    <div class="buttons is-right">
+                        <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSave)" type="submit">Zapisz</button>
+                        <button class="button @CssHelper.SetIsLoading(_isLoadingCancel)" type="button" @onclick="OnCancel">Anuluj</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public DepratamentSettingsViewModel Settings { get; set; }
+    [Parameter]
+    public EventCallback SaveSettings { get; set; }
+    [Parameter]
+    public EventCallback Cancel { get; set; }
+
+    private bool _isLoadingSave;
+    private bool _isLoadingCancel;
+
+    private EditContext _editContext;
+
+    protected override void OnInitialized()
+    {
+        _isLoadingSave = false;
+        _isLoadingCancel = false;
+
+        _editContext = new(Settings);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+    }
+
+
+    private async Task OnSubmit()
+    {
+        if (_editContext.Validate())
+        {
+            _isLoadingSave = true;
+            await Task.Delay(1);
+            await SaveSettings.InvokeAsync();
+            _isLoadingSave = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnCancel()
+    {
+        _isLoadingCancel = true;
+        await Task.Delay(1);
+        await Cancel.InvokeAsync();
+        _isLoadingCancel = false;
+        StateHasChanged();
+    }
+}

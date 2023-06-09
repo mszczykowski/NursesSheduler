@@ -1,0 +1,23 @@
+﻿<div class="control">
+    <div class="select">
+        <select value="@MonthViewModel.MonthNumber" onchange="@SelectedMonthChanged">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option value="@i">@((Months)i)</option>
+            }
+        </select>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IMonthViewModel MonthViewModel { get; set; }
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private async Task SelectedMonthChanged(ChangeEventArgs e)
+    {
+        MonthViewModel.MonthNumber = Int32.Parse(e.Value.ToString());
+        await OnChange.InvokeAsync();
+    }
+}
