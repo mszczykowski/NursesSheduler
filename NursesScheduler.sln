@@ -17,19 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BlazorShare
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NursesScheduler.BusinessLogic", "NursesSheduler.BusinessLogic\NursesScheduler.BusinessLogic.csproj", "{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolverService", "SolverService", "{729E40D5-8D1D-4BE9-8E35-F774EFB986E8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Interfaces", "..\SheduleSolver\Algorithm.Interfaces\ScheduleSolver.Interfaces.csproj", "{9B443A78-3669-4BEB-8517-ED8C625C40C0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Service", "..\SheduleSolver\Algorithm.ServiceDefinition\ScheduleSolver.Service.csproj", "{4505F68A-43C7-4006-8DFA-DEA27E073E5B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Domain", "..\SheduleSolver\Domain\ScheduleSolver.Domain.csproj", "{0A398641-B98B-489E-9787-EAE6B5027BF7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScheduleSolver.Implementation", "SolverService.Implementation1\ScheduleSolver.Implementation.csproj", "{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9B443A78-3669-4BEB-8517-ED8C625C40C0} = {9B443A78-3669-4BEB-8517-ED8C625C40C0}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,22 +47,6 @@ Global
 		{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B443A78-3669-4BEB-8517-ED8C625C40C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B443A78-3669-4BEB-8517-ED8C625C40C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B443A78-3669-4BEB-8517-ED8C625C40C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B443A78-3669-4BEB-8517-ED8C625C40C0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4505F68A-43C7-4006-8DFA-DEA27E073E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4505F68A-43C7-4006-8DFA-DEA27E073E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4505F68A-43C7-4006-8DFA-DEA27E073E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4505F68A-43C7-4006-8DFA-DEA27E073E5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A398641-B98B-489E-9787-EAE6B5027BF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A398641-B98B-489E-9787-EAE6B5027BF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A398641-B98B-489E-9787-EAE6B5027BF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A398641-B98B-489E-9787-EAE6B5027BF7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,11 +58,6 @@ Global
 		{823F168A-567C-4918-A3D8-F98D9DD89B6C} = {5D91F67A-0526-42B8-8570-28A65BC94777}
 		{4314B214-8751-4964-9C25-9FA7AD201DDF} = {5D91F67A-0526-42B8-8570-28A65BC94777}
 		{9C4AADDB-C6C8-446B-AC9F-7A5E99D289E5} = {5D91F67A-0526-42B8-8570-28A65BC94777}
-		{729E40D5-8D1D-4BE9-8E35-F774EFB986E8} = {5D91F67A-0526-42B8-8570-28A65BC94777}
-		{9B443A78-3669-4BEB-8517-ED8C625C40C0} = {729E40D5-8D1D-4BE9-8E35-F774EFB986E8}
-		{4505F68A-43C7-4006-8DFA-DEA27E073E5B} = {729E40D5-8D1D-4BE9-8E35-F774EFB986E8}
-		{0A398641-B98B-489E-9787-EAE6B5027BF7} = {729E40D5-8D1D-4BE9-8E35-F774EFB986E8}
-		{A7EF509B-9DC5-4592-B8C3-3CA70D9A474F} = {729E40D5-8D1D-4BE9-8E35-F774EFB986E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8DC77EA8-C87D-4748-8B2F-57AB1A06A0A9}
