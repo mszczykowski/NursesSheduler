@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Services
@@ -255,9 +257,43 @@ namespace NursesScheduler.BusinessLogic.Services
             }
         }
 
-        public void ValidateSchedule()
+        public async Task<Schedule> GenerateSchedule(Schedule initialState)
         {
+            var previousSchedule = await GetPreviousSchedule(initialState);
+        }
 
+        private async Task<Schedule?> GetPreviousSchedule(Schedule currentSchedule)
+        {
+            if (currentSchedule == null)
+            {
+                return null;
+            }
+
+            var prevMonth = currentSchedule.MonthNumber - 1;
+            var prevYear = currentSchedule.Year;
+            if(prevMonth <= 0)
+            {
+                prevMonth = 12;
+                prevYear--;
+            }
+
+            return await _context.Schedules
+                .Include(s => s.ScheduleNurses)
+                .ThenInclude(n => n.NurseWorkDays)
+                .FirstOrDefaultAsync(s => s.DepartamentId == currentSchedule.DepartamentId &&
+                    s.Year == prevYear &&
+                    s.MonthNumber == prevMonth);
+        }
+
+        private ICollection<INurseState> InitialiseNurseStates(Schedule initialState)
+        {
+            var nurseStates = new List<INurseState>();
+
+            foreach (var nurse in initialState.ScheduleNurses)
+            {
+                var nurseState = new NurseState();
+                nurseState.NurseId = nurse.NurseId;
+            }
         }
     }
 }

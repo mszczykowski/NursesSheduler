@@ -7,10 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CommandsAndQueries\Schedules\Commands\EditSchedule\**" />
     <Compile Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
     <Compile Remove="CommandsAndQueries\DepartamentsSettings\Queries\GetAllSettings\**" />
+    <EmbeddedResource Remove="CommandsAndQueries\Schedules\Commands\EditSchedule\**" />
     <EmbeddedResource Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
     <EmbeddedResource Remove="CommandsAndQueries\DepartamentsSettings\Queries\GetAllSettings\**" />
+    <None Remove="CommandsAndQueries\Schedules\Commands\EditSchedule\**" />
     <None Remove="CommandsAndQueries\Schedules\Queries\GetAllSchedules\**" />
     <None Remove="CommandsAndQueries\DepartamentsSettings\Queries\GetAllSettings\**" />
   </ItemGroup>
@@ -28,8 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CommandsAndQueries\Schedules\Commands\AddSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Commands\EditSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\CheckSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\PrintSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\SaveSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
   </ItemGroup>
 

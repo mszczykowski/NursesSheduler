@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.GenerateSchedule
@@ -8,6 +9,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
         GenerateScheduleResponse>
     {
         private readonly IMapper _mapper;
+        private readonly ISchedulesService _scheduleService;
 
         public Task<GenerateScheduleResponse> Handle(GenerateScheduleRequest request, CancellationToken cancellationToken)
         {

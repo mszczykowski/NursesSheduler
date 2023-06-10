@@ -139,9 +139,14 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             return _shiftCapacities[dayNumber - 1, (int)shiftIndex];
         }
 
-        public int GetNumberOfNursesForMorningShift(int dayNumber)
+        public int GetNumberOfNursesForMorningShift(ShiftIndex shiftIndex, int dayNumber)
         {
-            return _morningShiftCapacities[dayNumber - 1];
+            if(shiftIndex == ShiftIndex.Day)
+            {
+                return _morningShiftCapacities[dayNumber - 1];
+            }
+
+            return 0;
         }
 
         private int GetTotalNumberOfShiftsToAssign(ICollection<INurseState> nurses)

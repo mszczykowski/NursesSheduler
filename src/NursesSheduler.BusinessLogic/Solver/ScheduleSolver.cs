@@ -1,4 +1,5 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Solver;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Managers;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
@@ -10,7 +11,7 @@ using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Solver
 {
-    internal sealed class ScheduleSolver
+    internal sealed class ScheduleSolver : IScheduleSolver
     {
         private List<INurseState> _nurses;
         private List<IConstraint> _constraints;
@@ -21,13 +22,13 @@ namespace NursesScheduler.BusinessLogic.Solver
         private Quarter _quarter;
         private Day[] _month;
 
-        private int currentEmployeeId;
+        private int currenNurseId;
         private INurseState currentNurse;
 
         private readonly IShiftCapacityManager _shiftCapacityManager;
 
         public ScheduleSolver(List<INurseState> nurses, Quarter quarter, Day[] month, List<IConstraint> constraints,
-            DepartamentSettings departamentSettings, Random random)
+            DepartamentSettings departamentSettings, Random random, ShiftCapacityManager shiftCapacityManager)
         {
             _nurses = nurses;
             _quarter = quarter;
@@ -37,11 +38,11 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             _random = random;
 
-            _shiftCapacityManager = new ShiftCapacityManager(_departamentSettings, _month, _nurses, _random);
+            _shiftCapacityManager = shiftCapacityManager;
             _employeeQueueDirector = new NurseQueueDirector(_random);
         }
 
-        public ISolverState Run(int numberOfRetries)
+        public ISolverState GenerateSchedule(int numberOfRetries)
         {
             _shiftCapacityManager.InitialiseShiftCapacities();
 
@@ -66,13 +67,16 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             Queue<int> currentQueue;
 
-            if (previousState.EmployeesToAssignForCurrentShift == 0 && previousState.ShortShiftsToAssign == 0)
+            if (previousState.NursesToAssignForCurrentShift == 0 && previousState.NursesToAssignForMorningShift == 0)
             {
-                previousState.EmployeesToAssignForCurrentShift = _shiftCapacityManager
+                previousState.NursesToAssignForCurrentShift = _shiftCapacityManager
                     .GetNumberOfNursesForRegularShift(previousState.CurrentShift, previousState.CurrentDay);
 
-                previousState.ShortShiftsToAssign = _shiftCapacityManager
-                    .GetNumberOfNursesForMorningShift(previousState.CurrentDay);
+                previousState.NursesToAssignForMorningShift = _shiftCapacityManager
+                    .GetNumberOfNursesForMorningShift(previousState.CurrentShift, previousState.CurrentDay);
+
+                previousState.NursesToAssignOnTimeOff = previousState.Nurses
+                    .Count(n => n.TimeOff[previousState.CurrentDay - 1]);
                 
                 currentQueue = _employeeQueueDirector
                     .GetSortedEmployeeQueue(previousState.CurrentShift,
@@ -85,11 +89,29 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             var currentState = new SolverState(previousState);
 
-            while (currentQueue.TryDequeue(out currentEmployeeId))
+            while (currentQueue.TryDequeue(out currenNurseId))
             {
-                currentNurse = currentState.Nurses.Single(e => e.NurseId == currentEmployeeId);
+                currentNurse = currentState.Nurses.Single(e => e.NurseId == currenNurseId);
 
-                if (currentState.EmployeesToAssignForCurrentShift > 0)
+                if(currentNurse.TimeOff[currentState.CurrentDay - 1])
+                {
+                    if(currentState.NursesToAssignOnTimeOff <= 0)
+                    {
+                        continue;
+                    }
+
+                    if(currentNurse.NumberOfTimeOffShiftsToAssign > 0 && 
+                        _constraints
+                            .All(c => c.IsSatisfied(currentState, currentNurse, GeneralConstants.RegularShiftLenght)))
+                    {
+                        currentState.AssignNurseOnTimeOff(currentNurse,
+                            !_month[currentState.CurrentDay - 1].IsWorkingDay,
+                            _departamentSettings);
+                    }
+
+                    currentState.AdvanceStateTimeOffShift();
+                }
+                else if (currentState.NursesToAssignForCurrentShift > 0)
                 {
                     if (_constraints.Any(c => !c.IsSatisfied(currentState, currentNurse, 
                         GeneralConstants.RegularShiftLenght)))
@@ -97,14 +119,13 @@ namespace NursesScheduler.BusinessLogic.Solver
                         continue;
                     }
 
-                    if (currentNurse.NumberOfRegularShiftsToAssign <= 0)
-                        continue;
-
                     currentState.AssignNurseToRegularShift(currentNurse,
                         !_month[currentState.CurrentDay - 1].IsWorkingDay,
                         _departamentSettings);
+
+                    currentState.AdvanceStateRegularShift();
                 }
-                else
+                else if(currentState.NursesToAssignForMorningShift > 0)
                 {
                     if (currentNurse.HadMorningShiftAssigned)
                         continue;
@@ -128,9 +149,9 @@ namespace NursesScheduler.BusinessLogic.Solver
                         continue;
 
                     currentState.AssignEmployeeToMorningShift(currentNurse, morningShiftToAssign);
-                }
 
-                currentState.AdvanceState();
+                    currentState.AdvanceStateMorningShift();
+                }
 
                 var result = AssignShift(currentState, currentQueue);
 
@@ -143,27 +164,6 @@ namespace NursesScheduler.BusinessLogic.Solver
             }
 
             return null;
-        }
-
-        private void AssignTimeOffs(ISolverState initialState, INurseState nurse)
-        {
-            for (int i = 0; i < _month.Length; i++)
-            {
-
-            }
-
-
-            int ptoStart;
-            int ptoEnd;
-            for (int i = 0; i < _month.Length; i++)
-            {
-                if (nurse.TimeOff[i] == true)
-                {
-                    ptoStart = i + 1;
-                    while (nurse.TimeOff[i] == true && nurse.TimeOff.Length > i) i++;
-                    ptoEnd = i + 1;
-                }
-            }
         }
     }
 }

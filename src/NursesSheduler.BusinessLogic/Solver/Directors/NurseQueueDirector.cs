@@ -25,50 +25,50 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
             switch (shiftIndex, isWorkingDay)
             {
                 case (ShiftIndex.Day, true):
-                    return GetEmployeesForDayShift(currentDay);
+                    return GetNursesForDayShift(currentDay);
                 case (ShiftIndex.Day, false):
-                    return GetEmployeesForDayHolidayShift(currentDay);
+                    return GetNursesForDayHolidayShift(currentDay);
                 case (ShiftIndex.Night, true):
-                    return GetEmployeesForNightShift(currentDay, previousDayShift);
+                    return GetNursesForNightShift(currentDay, previousDayShift);
                 case (ShiftIndex.Night, false):
-                    return GetEmployeesForNightHolidayShift(currentDay, previousDayShift);
+                    return GetNursesForNightHolidayShift(currentDay, previousDayShift);
                 default:
                     return _nurseQueueBuilder.GetResult();
             }
         }
 
-        private Queue<int> GetEmployeesForDayShift(int currentDay)
+        private Queue<int> GetNursesForDayShift(int currentDay)
         {
             return _nurseQueueBuilder
-                .RemoveEmployeesOnPTO(currentDay)
+                //.RemoveEmployeesOnPTO(currentDay)
                 .OrderByLongestBreak()
                 .GetResult();
         }
 
-        private Queue<int> GetEmployeesForDayHolidayShift(int currentDay)
+        private Queue<int> GetNursesForDayHolidayShift(int currentDay)
         {
             return _nurseQueueBuilder
-                .RemoveEmployeesOnPTO(currentDay)
+                //.RemoveEmployeesOnPTO(currentDay)
                 .OrderByLowestNumberOfHolidayShitfs()
                 .OrderByLongestBreak()
                 .GetResult();
         }
 
-        private Queue<int> GetEmployeesForNightShift(int currentDay, List<int> previousDayShift)
+        private Queue<int> GetNursesForNightShift(int currentDay, List<int> previousDayShift)
         {
             return _nurseQueueBuilder
                 .ProritisePreviousDayShiftWorkers(previousDayShift)
-                .RemoveEmployeesOnPTO(currentDay)
+                //.RemoveEmployeesOnPTO(currentDay)
                 .OrderByLowestNumberOfNightShitfs()
                 .GetResult();
         }
 
 
-        private Queue<int> GetEmployeesForNightHolidayShift(int currentDay, List<int> previousShift)
+        private Queue<int> GetNursesForNightHolidayShift(int currentDay, List<int> previousShift)
         {
             return _nurseQueueBuilder
                 .ProritisePreviousDayShiftWorkers(previousShift)
-                .RemoveEmployeesOnPTO(currentDay)
+                //.RemoveEmployeesOnPTO(currentDay)
                 .OrderByLowestNumberOfNightShitfs()
                 .GetResult();
         }

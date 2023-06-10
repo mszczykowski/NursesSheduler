@@ -11,6 +11,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         TimeSpan HoursToNextShift { get; set; }
         int NumberOfNightShifts { get; set; }
         int NumberOfRegularShiftsToAssign { get; set; }
+        int NumberOfTimeOffShiftsToAssign { get; set; }
         int NurseId { get; set; }
         TimeSpan PTOTimeToAssign { get; set; }
         bool[] TimeOff { get; }
@@ -20,7 +21,11 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         bool HadMorningShiftAssigned { get; }
 
         void AdvanceState(TimeSpan hoursToNextShift);
-        void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter, TimeSpan hoursToNextShift);
-        void UpdateStateOnRegularShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter, DepartamentSettings departamentSettings, TimeSpan hoursToNextShift);
+        void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter, 
+            TimeSpan hoursToNextShift);
+        void UpdateStateOnRegularShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter, 
+            DepartamentSettings departamentSettings, TimeSpan hoursToNextShift);
+        void UpdateStateOnTimeOffShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter, 
+            DepartamentSettings departamentSettings, TimeSpan hoursToNextShift);
     }
 }

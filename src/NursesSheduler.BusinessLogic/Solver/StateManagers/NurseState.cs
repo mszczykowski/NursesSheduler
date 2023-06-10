@@ -19,6 +19,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         public int NumberOfNightShifts { get; set; }
         public int NumberOfRegularShiftsToAssign { get; set; }
+        public int NumberOfTimeOffShiftsToAssign { get; set; }
 
         public TimeSpan HolidayPaidHoursAssigned { get; set; }
 
@@ -42,6 +43,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             WorkTimeAssignedInWeek = new TimeSpan[nurse.WorkTimeAssignedInWeek.Length];
             Array.Copy(nurse.WorkTimeAssignedInWeek, WorkTimeAssignedInWeek, WorkTimeAssignedInWeek.Length);
             HadMorningShiftAssigned = nurse.HadMorningShiftAssigned;
+            NumberOfTimeOffShiftsToAssign = nurse.NumberOfTimeOffShiftsToAssign;
         }
 
         public void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter,
@@ -60,6 +62,13 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             {
                 AdvanceState(hoursToNextShift);
             }
+        }
+
+        public void UpdateStateOnTimeOffShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter,
+            DepartamentSettings departamentSettings, TimeSpan hoursToNextShift)
+        {
+            NumberOfTimeOffShiftsToAssign--;
+            UpdateStateOnRegularShiftAssign(isHoliday, shiftIndex, weekInQuarter, departamentSettings, hoursToNextShift);
         }
 
         public void UpdateStateOnRegularShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter,
@@ -99,6 +108,17 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         {
             HoursFromLastShift += GeneralConstants.RegularShiftLenght;
             HoursToNextShift = hoursToNextShift;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is NurseState state &&
+                   NurseId == state.NurseId;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(NurseId);
         }
     }
 }
