@@ -5,7 +5,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Directors
 {
     internal interface INurseQueueDirector
     {
-        Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isWorkingDay, List<int> previousDayShift, 
-            ICollection<INurseState> nurses, int currentDay);
+        Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isWorkingDay, HashSet<int> previousDayShift,
+            HashSet<INurseState> nurses, Random random);
     }
 }

@@ -19,6 +19,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         TimeSpan WorkTimeToAssign { get; set; }
         TimeSpan WorkTimeToAssignInQuarter { get; set; }
         bool HadMorningShiftAssigned { get; }
+        ShiftIndex PreviousMonthLastShift { get; set; }
 
         void AdvanceState(TimeSpan hoursToNextShift);
         void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter, 
@@ -27,5 +28,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
             DepartamentSettings departamentSettings, TimeSpan hoursToNextShift);
         void UpdateStateOnTimeOffShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter, 
             DepartamentSettings departamentSettings, TimeSpan hoursToNextShift);
+        void ResetHoursFromLastShift();
     }
 }

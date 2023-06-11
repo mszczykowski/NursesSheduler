@@ -9,9 +9,9 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         ShiftIndex CurrentShift { get; set; }
         int DayNumberInQuarter { get; set; }
         int NursesToAssignForCurrentShift { get; set; }
-        ICollection<int>[] MorningShiftsState { get; }
-        ICollection<INurseState> Nurses { get; }
-        ICollection<int>[,] ScheduleState { get; }
+        HashSet<int>[] MorningShiftsState { get; }
+        HashSet<INurseState> Nurses { get; }
+        HashSet<int>[,] ScheduleState { get; }
         int NursesToAssignForMorningShift { get; set; }
         int WeekInQuarter { get; }
         int NursesToAssignOnTimeOff { get; set; }
@@ -24,6 +24,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         void AssignNurseToRegularShift(INurseState nurse, bool isHoliday, DepartamentSettings departamentSettings);
         void AssignNurseOnTimeOff(INurseState nurse, bool isHoliday, DepartamentSettings departamentSettings);
         TimeSpan GetHoursToScheduleEnd();
-        List<int> GetPreviousDayShift();
+        HashSet<int> GetPreviousDayShift();
     }
 }

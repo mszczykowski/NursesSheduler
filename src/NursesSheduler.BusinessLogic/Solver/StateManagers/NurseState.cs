@@ -29,6 +29,8 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         public bool HadMorningShiftAssigned { get; private set; }
 
+        public ShiftIndex PreviousMonthLastShift { get; set; }
+
         public NurseState(INurseState nurse)
         {
             NurseId = nurse.NurseId;
@@ -44,6 +46,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             Array.Copy(nurse.WorkTimeAssignedInWeek, WorkTimeAssignedInWeek, WorkTimeAssignedInWeek.Length);
             HadMorningShiftAssigned = nurse.HadMorningShiftAssigned;
             NumberOfTimeOffShiftsToAssign = nurse.NumberOfTimeOffShiftsToAssign;
+            PreviousMonthLastShift = nurse.PreviousMonthLastShift;
         }
 
         public void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter,
@@ -119,6 +122,11 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         public override int GetHashCode()
         {
             return HashCode.Combine(NurseId);
+        }
+
+        public void ResetHoursFromLastShift()
+        {
+            HoursFromLastShift = TimeSpan.Zero;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         private int _currentDayIndex => CurrentDay - 1;
 
-        public SolverState(Schedule schedule, ICollection<INurseState> nurses, int numberOfDays)
+        public SolverState(Schedule schedule, ICollection<INurseState> nurses)
         {
             CurrentDay = 1;
             CurrentShift = 0;
@@ -40,6 +40,8 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             {
                 Nurses.Add(new NurseState(nurse));
             }
+
+            var numberOfDays = schedule.ScheduleNurses.First().NurseWorkDays.Max(d => d.DayNumber);
 
             ScheduleState = new HashSet<int>[numberOfDays, GeneralConstants.NumberOfShifts];
             MorningShiftsState = new HashSet<int>[numberOfDays];
@@ -62,22 +64,6 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                     }
                 }
             }
-        }
-
-        public SolverState(List<INurseState> nurses, int numberOfDays, int numberOfShifts)
-        {
-            CurrentDay = 1;
-            CurrentShift = 0;
-            NursesToAssignForCurrentShift = 0;
-            NursesToAssignForMorningShift = 0;
-            NursesToAssignOnTimeOff = 0;
-            Nurses = new HashSet<INurseState>();
-            nurses.ForEach(nurse =>
-            {
-                Nurses.Add(new NurseState(nurse));
-            });
-            ScheduleState = new HashSet<int>[numberOfDays, numberOfShifts];
-            MorningShiftsState = new HashSet<int>[numberOfDays];
         }
 
         public SolverState(ISolverState stateToCopy)
@@ -120,7 +106,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             NursesToAssignOnTimeOff = stateToCopy.NursesToAssignOnTimeOff;
         }
 
-        private void AdvanceShift()
+        private void AdvanceShiftAndDay()
         {
             CurrentShift++;
             if ((int)CurrentShift >= GeneralConstants.NumberOfShifts)
@@ -128,12 +114,20 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 CurrentShift = 0;
                 CurrentDay++;
                 DayNumberInQuarter++;
+            }
 
-                if (CurrentDay - 1 < ScheduleState.GetLength(0))
+            if (_currentDayIndex < ScheduleState.GetLength(0))
+            {
+                foreach (var e in Nurses)
                 {
-                    foreach (var e in Nurses)
+                    e.AdvanceState(CalculateNurseHoursToNextShift(e.NurseId));
+                }
+
+                if(ScheduleState[_currentDayIndex, (int)CurrentShift] != null)
+                {
+                    foreach (var nurseId in ScheduleState[_currentDayIndex, (int)CurrentShift])
                     {
-                        e.AdvanceState(CalculateNurseHoursToNextShift(e.NurseId));
+                        Nurses.First(n => n.NurseId == nurseId).ResetHoursFromLastShift();
                     }
                 }
             }
@@ -145,7 +139,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
             if (IsShiftAssined)
             {
-                AdvanceShift();
+                AdvanceShiftAndDay();
             }
         }
 
@@ -155,7 +149,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
             if (IsShiftAssined)
             {
-                AdvanceShift();
+                AdvanceShiftAndDay();
             }
         }
 
@@ -165,7 +159,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
             if (IsShiftAssined)
             {
-                AdvanceShift();
+                AdvanceShiftAndDay();
             }
         }
 
@@ -173,17 +167,17 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         {
             if (CurrentDay == 1)
             {
-                return new List<int>();
+                return Nurses.Where(n => n.PreviousMonthLastShift == ShiftIndex.Day).Select(n => n.NurseId).ToHashSet();
             }
 
-            List<int> result;
+            HashSet<int> result;
 
             if (CurrentShift == ShiftIndex.Day)
             {
                 result = ScheduleState[_currentDayIndex - 1, (int)ShiftIndex.Day];
                 if (MorningShiftsState[_currentDayIndex - 1] != null)
                 {
-                    result.AddRange(MorningShiftsState[_currentDayIndex - 1]);
+                    result.UnionWith(MorningShiftsState[_currentDayIndex - 1]);
                 }
             }
             else
@@ -191,7 +185,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 result = ScheduleState[_currentDayIndex, (int)ShiftIndex.Day];
                 if (MorningShiftsState[_currentDayIndex] != null)
                 {
-                    result.AddRange(MorningShiftsState[_currentDayIndex]);
+                    result.UnionWith(MorningShiftsState[_currentDayIndex]);
                 }
             }
 

@@ -10,27 +10,29 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
     {
         private readonly DepartamentSettings _departamentSettings;
         private readonly Day[] _month;
-        private readonly ICollection<INurseState> _nurses;
+        private readonly int _numberOfNurses;
+        private readonly TimeSpan _timeToAssignInMonth;
         private readonly Random _random;
 
-        private int[,] _shiftCapacities;
-        private int[] _morningShiftCapacities;
+        private readonly int[,] _shiftCapacities;
+        private readonly int[] _morningShiftCapacities;
 
-        public ShiftCapacityManager(DepartamentSettings departamentSettings, Day[] month, ICollection<INurseState> nurses,
-            Random random)
+        public ShiftCapacityManager(DepartamentSettings departamentSettings, Day[] month, int numberOfNurses,
+            TimeSpan timeToAssignInMonth, Random random)
         {
             _departamentSettings = departamentSettings;
             _month = month;
-            _nurses = nurses;
+            _numberOfNurses = numberOfNurses;
+            _timeToAssignInMonth = timeToAssignInMonth;
             _random = random;
 
             _shiftCapacities = new int[_month.Length, GeneralConstants.NumberOfShifts];
             _morningShiftCapacities = new int[_month.Length];
         }
 
-        public void InitialiseShiftCapacities()
+        public void InitialiseShiftCapacities(ISolverState initialState)
         {
-            var totalNumberOfShiftsToAssign = GetTotalNumberOfShiftsToAssign(_nurses);
+            var totalNumberOfShiftsToAssign = GetTotalNumberOfShiftsToAssign();
 
             var minimalNumberOfWorkersOnShift = GetMinimalNumberOfNursesOnShift(totalNumberOfShiftsToAssign);
 
@@ -116,14 +118,14 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             }
             regularDays.OrderBy(i => _shiftCapacities[i, (int)ShiftIndex.Day]);
 
-            int[,] shortShifts = new int[regularDays.Count < _nurses.Count ? _nurses.Count : regularDays.Count, 2];
+            int[,] shortShifts = new int[regularDays.Count < _numberOfNurses ? _numberOfNurses : regularDays.Count, 2];
 
             for (int i = 0; i < shortShifts.GetLength(0); i++)
             {
                 if (i > shortShifts.GetLength(0)) break;
                 shortShifts[i, 0] = regularDays[i];
             }
-            for (int i = 0; i < _nurses.Count; i++)
+            for (int i = 0; i < _numberOfNurses; i++)
             {
                 shortShifts[i % shortShifts.Length, 1]++;
             }
@@ -132,6 +134,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             {
                 _morningShiftCapacities[shortShifts[i, 0]] = shortShifts[i, 1];
             }
+
+            SubtractInitialState(initialState);
         }
 
         public int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber)
@@ -149,14 +153,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             return 0;
         }
 
-        private int GetTotalNumberOfShiftsToAssign(ICollection<INurseState> nurses)
+        private int GetTotalNumberOfShiftsToAssign()
         {
-            int totalNumberOfShifts = 0;
-            foreach (var nurse in nurses)
-            {
-                totalNumberOfShifts += (int)Math.Floor(nurse.WorkTimeToAssign / GeneralConstants.RegularShiftLenght);
-            }
-            return totalNumberOfShifts;
+            return (int)Math.Floor((_numberOfNurses * _timeToAssignInMonth) / GeneralConstants.RegularShiftLenght);
         }
 
         private int GetMinimalNumberOfNursesOnShift(int totalNumberOfShiftsToAssign)
@@ -170,6 +169,80 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         private int GetNumberOfSurplusShifts(int totalNumberOfShiftsToAssign, int minimalNumberOfNursesOnShift)
         {
             return totalNumberOfShiftsToAssign - minimalNumberOfNursesOnShift * _month.Length * 2;
+        }
+
+        private void SubtractInitialState(ISolverState initialState)
+        {
+            for(int i = 0; i < initialState.ScheduleState.GetLength(0); i++)
+            {
+                for(int j = 0; j < initialState.ScheduleState.GetLength(1); j++)
+                {
+                    if(initialState.ScheduleState[i, j] == null)
+                    {
+                        continue;
+                    }
+                    
+                    _shiftCapacities[i, j] -= initialState.ScheduleState[i, j].Count;
+
+                    while (_shiftCapacities[i, j] < 0)
+                    {
+                        _shiftCapacities[i, j]++;
+                        DecreaseMaxCapacity();
+                    }
+                }
+            }
+
+            var assignedNurses = new List<int>();
+
+            for (int i = 0; i < initialState.MorningShiftsState.Length; i++)
+            {
+                if(initialState.MorningShiftsState[i] == null)
+                {
+                    continue;
+                }
+
+                assignedNurses.AddRange(initialState.MorningShiftsState[i]);
+            }
+
+            for (int i = 0; i < assignedNurses.Distinct().Count(); i++)
+            {
+                DecreaseMaxCapacityMorning();
+            }
+        }
+
+        private void DecreaseMaxCapacity()
+        {
+            var maxValue = (from int v in _shiftCapacities select v).Max();
+
+            if (maxValue == 0) return;
+
+            for (int i = 0; i < _shiftCapacities.GetLength(0); i++)
+            {
+                for (int j = 0; j < _shiftCapacities.GetLength(1); j++)
+                {
+                    if(_shiftCapacities[i, j] == maxValue)
+                    {
+                        _shiftCapacities[i, j]--;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void DecreaseMaxCapacityMorning()
+        {
+            var maxValue = (from int v in _morningShiftCapacities select v).Max();
+
+            if (maxValue == 0) return;
+
+            for (int i = 0; i < _morningShiftCapacities.Length; i++)
+            {
+                if (_morningShiftCapacities[i] == maxValue)
+                {
+                    _morningShiftCapacities[i]--;
+                    return;
+                }
+            }
         }
     }
 }

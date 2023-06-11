@@ -6,7 +6,7 @@
         INurseQueueBuilder OrderByLongestBreak();
         INurseQueueBuilder OrderByLowestNumberOfHolidayShitfs();
         INurseQueueBuilder OrderByLowestNumberOfNightShitfs();
-        INurseQueueBuilder ProritisePreviousDayShiftWorkers(List<int> previousShift);
+        INurseQueueBuilder ProritisePreviousDayShiftWorkers(HashSet<int> previousShift);
         INurseQueueBuilder RemoveEmployeesOnPTO(int dayNumber);
     }
 }
