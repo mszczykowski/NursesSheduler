@@ -7,12 +7,9 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 {
     internal sealed class NurseState : INurseState
     {
-        public int NurseId { get; set; }
+        public int NurseId { get; init; }
 
-        public TimeSpan WorkTimeToAssign { get; set; }
-        public TimeSpan WorkTimeToAssignInQuarter { get; set; }
-        public TimeSpan PTOTimeToAssign { get; set; }
-        public TimeSpan[] WorkTimeAssignedInWeek { get; set; }
+        public TimeSpan[] WorkTimeAssignedInWeeks { get; set; }
 
         public TimeSpan HoursFromLastShift { get; set; }
         public TimeSpan HoursToNextShift { get; set; }
@@ -31,10 +28,25 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         public ShiftIndex PreviousMonthLastShift { get; set; }
 
+        public NurseState(NurseQuarterStats nurseQuarterStats, ScheduleNurse previousScheduleNurse,
+            ScheduleNurse currentScheduleNurse)
+        {
+            NurseId = nurseQuarterStats.NurseId;
+            
+            WorkTimeAssignedInWeeks = new TimeSpan[nurseQuarterStats.WorkTimeAssignedInWeek.Count];
+            var i = 0;
+            foreach(var workTimeAssignedInWeek in nurseQuarterStats.WorkTimeAssignedInWeek
+                .OrderBy(t => t.WeekNumber)
+                .Select(t => t.AssignedWorkTime))
+            {
+                WorkTimeAssignedInWeeks[i++] = workTimeAssignedInWeek;
+            }
+
+        }
+
         public NurseState(INurseState nurse)
         {
             NurseId = nurse.NurseId;
-            WorkTimeToAssign = nurse.WorkTimeToAssign;
             HoursFromLastShift = nurse.HoursFromLastShift;
             HoursToNextShift = nurse.HoursToNextShift;
             HolidayPaidHoursAssigned = nurse.HolidayPaidHoursAssigned;
@@ -42,8 +54,8 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             TimeOff = nurse.TimeOff;
             AssignedMorningShiftsIds = new List<int>(nurse.AssignedMorningShiftsIds);
             NumberOfRegularShiftsToAssign = nurse.NumberOfRegularShiftsToAssign;
-            WorkTimeAssignedInWeek = new TimeSpan[nurse.WorkTimeAssignedInWeek.Length];
-            Array.Copy(nurse.WorkTimeAssignedInWeek, WorkTimeAssignedInWeek, WorkTimeAssignedInWeek.Length);
+            WorkTimeAssignedInWeeks = new TimeSpan[nurse.WorkTimeAssignedInWeeks.Length];
+            Array.Copy(nurse.WorkTimeAssignedInWeeks, WorkTimeAssignedInWeeks, WorkTimeAssignedInWeeks.Length);
             HadMorningShiftAssigned = nurse.HadMorningShiftAssigned;
             NumberOfTimeOffShiftsToAssign = nurse.NumberOfTimeOffShiftsToAssign;
             PreviousMonthLastShift = nurse.PreviousMonthLastShift;
@@ -102,8 +114,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         private void UpdateWorkTimes(TimeSpan shiftLenght, int weekInQuarter, TimeSpan hoursToNextShift)
         {
-            WorkTimeToAssign -= shiftLenght;
-            WorkTimeAssignedInWeek[weekInQuarter - 1] += shiftLenght;
+            WorkTimeAssignedInWeeks[weekInQuarter - 1] += shiftLenght;
             HoursToNextShift = hoursToNextShift;
         }
 

@@ -6,7 +6,6 @@ namespace NursesScheduler.Domain.Entities
     {
         public int NurseWorkDayId { get; set; }
         public int DayNumber { get; set; }
-
         public int ScheduleNurseId { get; set; }
         public virtual ScheduleNurse ScheduleNurse { get; set; }
 

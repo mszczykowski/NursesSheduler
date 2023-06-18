@@ -9,10 +9,7 @@
         public virtual Departament Departament { get; set; }
         public int SettingsVersion { get; set; }
         public TimeSpan WorkTimeInQuarterToAssign { get; set; }
-
         public virtual ICollection<NurseQuarterStats> NurseQuarterStats { get; set; }
-
-        public bool MorningShiftsReadOnly { get; set; }
         public virtual ICollection<MorningShift> MorningShifts { get; set; }
     }
 }

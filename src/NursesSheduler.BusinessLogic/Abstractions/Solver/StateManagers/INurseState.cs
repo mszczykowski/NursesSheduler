@@ -12,12 +12,12 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         int NumberOfNightShifts { get; set; }
         int NumberOfRegularShiftsToAssign { get; set; }
         int NumberOfTimeOffShiftsToAssign { get; set; }
-        int NurseId { get; set; }
-        TimeSpan PTOTimeToAssign { get; set; }
+        int NurseId { get; init; }
+        //TimeSpan PTOTimeToAssign { get; set; }
         bool[] TimeOff { get; }
-        TimeSpan[] WorkTimeAssignedInWeek { get; set; }
-        TimeSpan WorkTimeToAssign { get; set; }
-        TimeSpan WorkTimeToAssignInQuarter { get; set; }
+        TimeSpan[] WorkTimeAssignedInWeeks { get; set; }
+        //TimeSpan WorkTimeToAssign { get; set; }
+        //TimeSpan WorkTimeToAssignInQuarter { get; set; }
         bool HadMorningShiftAssigned { get; }
         ShiftIndex PreviousMonthLastShift { get; set; }
 

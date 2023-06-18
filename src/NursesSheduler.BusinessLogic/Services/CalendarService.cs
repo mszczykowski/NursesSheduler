@@ -13,15 +13,21 @@ namespace NursesScheduler.BusinessLogic.Services
             _holidaysManager = holidaysManager;
         }
 
-        public async Task<ICollection<Holiday>> GetHolidaysInMonth(int monthNumber, int yearNumber)
+        public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber, int firstQuarterStart)
         {
-            var holidays = await _holidaysManager.GetHolidays(yearNumber);
+            var quarterNumber = GetQuarterNumber(monthNumber, firstQuarterStart);
+            var quarterMonthDates = GetMonthsInQuarterDates(firstQuarterStart, quarterNumber, yearNumber);
+            var dayInQuarterOffset = 0;
 
-            return holidays.Where(h => h.Date.Month == monthNumber).ToList();
-        }
+            foreach(var monthDate in quarterMonthDates)
+            {
+                if(monthDate.Month < monthNumber)
+                {
+                    dayInQuarterOffset += DateTime.DaysInMonth(monthDate.Year, monthDate.Month);
+                }
+            }
 
-        public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber)
-        {
+
             var holidays = await _holidaysManager.GetHolidays(yearNumber);
 
             holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
@@ -30,7 +36,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             for(int i = 0; i < monthDays.Length; i++)
             {
-                monthDays[i] = new Day(i + 1, monthNumber, yearNumber);
+                monthDays[i] = new Day(i + 1, monthNumber, yearNumber, dayInQuarterOffset + i);
             }
 
             foreach(var holiday in holidays)
@@ -67,6 +73,37 @@ namespace NursesScheduler.BusinessLogic.Services
             }
 
             return daysResult;
+        }
+
+        public ICollection<DateOnly> GetMonthsInQuarterDates(int firstQuarterStart, int quarterNumber, int year)
+        {
+            var result = new List<DateOnly>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var month = firstQuarterStart + i + quarterNumber * 3;
+                if (month > 12)
+                {
+                    month = 1;
+                    year++;
+                }
+
+                result.Add(new DateOnly(year, month, 1));
+            }
+
+            return result;
+        }
+
+        public int GetQuarterNumber(int monthNumber, int firstQuarterStart)
+        {
+            var relativeMonthNumber = 1;
+
+            for (int i = firstQuarterStart; i != monthNumber; i = (i % 12) + 1)
+            {
+                relativeMonthNumber++;
+            }
+
+            return (int)(Math.Ceiling((decimal)(relativeMonthNumber) / 3));
         }
     }
 }

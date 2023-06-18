@@ -12,7 +12,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure
         DbSet<DepartamentSettings> DepartamentSettings { get; set; }
         DbSet<MorningShift> MorningShifts { get; set; }
         DbSet<Nurse> Nurses { get; set; }
-        DbSet<NurseQuarterStats> NursesQuartersStats { get; set; }
         DbSet<NurseWorkDay> NursesWorkDays { get; set; }
         DbSet<Quarter> Quarters { get; set; }
         DbSet<Schedule> Schedules { get; set; }

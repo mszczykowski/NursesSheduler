@@ -13,7 +13,6 @@ namespace NursesScheduler.Infrastructure.Context
         public DbSet<DepartamentSettings> DepartamentSettings { get; set; }
         public DbSet<MorningShift> MorningShifts { get; set; }
         public DbSet<Nurse> Nurses { get; set; }
-        public DbSet<NurseQuarterStats> NursesQuartersStats { get; set; }
         public DbSet<NurseWorkDay> NursesWorkDays { get; set; }
         public DbSet<Quarter> Quarters { get; set; }
         public DbSet<Schedule> Schedules { get; set; }

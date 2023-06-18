@@ -33,7 +33,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
 
             var schedule = await _context.Schedules
                 .Include(s => s.Quarter)
-                .ThenInclude(s => s.NurseQuarterStats)
                 .Include(s => s.ScheduleNurses)
                 .FirstOrDefaultAsync(s => s.DepartamentId == request.DepartamentId &&
                     s.Year == request.Year &&
