@@ -5,6 +5,7 @@ using NursesScheduler.BusinessLogic.Solver;
 using NursesScheduler.BusinessLogic.Solver.Managers;
 using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Services
 {

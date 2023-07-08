@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 {
@@ -101,7 +102,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 }
             }
 
-            AssignedMorningShiftsIds = new(nurseQuarterStats.MorningShiftsAssigned.Select(m => m.MorningShiftId));
+            AssignedMorningShiftsIds = new(nurseQuarterStats.MorningShiftsAssigned.Select(m => m.Id));
             HadMorningShiftAssigned = currentScheduleNurse.NurseWorkDays.Any(d => d.ShiftType == ShiftTypes.Morning);
 
             PreviousMonthLastShift = currentScheduleNurse.PreviousState;
@@ -129,7 +130,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         {
             HadMorningShiftAssigned = true;
 
-            AssignedMorningShiftsIds.Add(morningShift.MorningShiftId);
+            AssignedMorningShiftsIds.Add(morningShift.Id);
 
             if(morningShift.ShiftLength > TimeSpan.Zero)
             {

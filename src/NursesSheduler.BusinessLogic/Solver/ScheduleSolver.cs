@@ -7,6 +7,7 @@ using NursesScheduler.BusinessLogic.Solver.Directors;
 using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver
 {
@@ -120,7 +121,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                         continue;
 
                     var morningShiftsToAssign = _morningShifts
-                        .Where(m => !_currentNurse.AssignedMorningShiftsIds.Contains(m.MorningShiftId))
+                        .Where(m => !_currentNurse.AssignedMorningShiftsIds.Contains(m.Id))
                         .OrderBy(s => _random.Next()).ToList();
 
                     MorningShift morningShiftToAssign = null;

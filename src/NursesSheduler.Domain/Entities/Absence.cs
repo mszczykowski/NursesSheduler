@@ -1,12 +1,12 @@
-﻿using NursesScheduler.Domain.Enums;
+﻿using NursesScheduler.Domain.Abstractions;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.Domain.Entities
 {
-    public class Absence
+    public record Absence : IEntity
     {
-        public int AbsenceId { get; set; }
-        public int Month { get; set; }
-        public ICollection<int> Days { get; set; }
+        public int MonthNumber { get; set; }
+        public virtual ICollection<int> Days { get; set; }
         public TimeSpan WorkTimeToAssign { get; set; }
         public TimeSpan AssignedWorkingHours { get; set; }
         public AbsenceTypes Type { get; set; }
@@ -17,7 +17,7 @@ namespace NursesScheduler.Domain.Entities
 
         public Absence(int month)
         {
-            Month = month;
+            MonthNumber = month;
             Days = new HashSet<int>();
         }
     }

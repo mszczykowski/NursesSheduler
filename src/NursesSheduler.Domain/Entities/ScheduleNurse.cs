@@ -1,11 +1,11 @@
-﻿using NursesScheduler.Domain.Enums;
+﻿using NursesScheduler.Domain.Abstractions;
+using NursesScheduler.Domain.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NursesScheduler.Domain.Entities
 {
-    public class ScheduleNurse
+    public record ScheduleNurse : IEntity
     {
-        public int ScheduleNurseId { get; set; }
         public virtual ICollection<NurseWorkDay> NurseWorkDays { get; set; }
 
         public int NurseId { get; set; }
@@ -15,17 +15,13 @@ namespace NursesScheduler.Domain.Entities
         public virtual Schedule Schedule { get; set; }
 
 
-        [NotMapped]
         public TimeSpan PreviousMonthTime { get; set; }
-        [NotMapped]
         public TimeSpan TimeToAssingInMonth { get; set; }
-        [NotMapped]
         public TimeSpan TimeOffToAssign { get; set; }
-        [NotMapped]
         public TimeSpan TimeToAssingInQuarterLeft { get; set; }
-        [NotMapped]
+        public TimeSpan HolidaysHoursAssigned { get; set; }
+        public int NightShiftsAssigned { get; set; }
         public PreviousNurseStates PreviousState { get; set; }
-        [NotMapped]
         public int DaysFromLastShift { get; set; }
     }
 }

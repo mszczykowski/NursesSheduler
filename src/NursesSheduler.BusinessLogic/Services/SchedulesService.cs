@@ -76,7 +76,7 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 var absences = absenceSummaries
                     .FirstOrDefault(a => a.NurseId == scheduleNurse.NurseId && a.Year == schedule.Year)?
-                    .Absences?.Where(a => a.Month == schedule.MonthNumber)
+                    .Absences?.Where(a => a.MonthNumber == schedule.MonthNumber)
                     .ToList();
 
                 if (absences == null)
@@ -101,7 +101,7 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 var scheduleNurse = new ScheduleNurse
                 {
-                    NurseId = nurse.NurseId,
+                    NurseId = nurse.Id,
                     Nurse = nurse,
                     NurseWorkDays = new List<NurseWorkDay>(),
                     TimeToAssingInMonth = schedule.WorkTimeInMonth,

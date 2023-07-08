@@ -24,7 +24,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var nurses = await _context.Nurses
                 .Include(n => n.AbsencesSummaries)
-                .Where(n => n.DepartamentId == departament.DepartamentId && n.IsDeleted == false)
+                .Where(n => n.DepartamentId == departament.Id && n.IsDeleted == false)
                 .ToListAsync();
 
             foreach (var nurse in nurses)
@@ -53,7 +53,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             for (var date = from; date <= to; date = date.AddDays(1))
             {
-                if (date.Month != currentAbsence.Month)
+                if (date.Month != currentAbsence.MonthNumber)
                 {
                     currentAbsence = new Absence(date.Month);
                     result.Add(currentAbsence);
@@ -73,7 +73,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
         public async Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence)
         {
-            if (absencesSummary.Absences.Any(a => a.Month == absence.Month && a.Days.Intersect(absence.Days).Any()))
+            if (absencesSummary.Absences.Any(a => a.MonthNumber == absence.MonthNumber && a.Days.Intersect(absence.Days).Any()))
             {
                 return AbsenceVeryficationResult.AbsenceAlreadyExists;
             }
@@ -81,7 +81,7 @@ namespace NursesScheduler.BusinessLogic.Services
             if (await _context.Schedules
                 .AnyAsync(s => s.DepartamentId == absencesSummary.Nurse.DepartamentId &&
                     s.Year == absencesSummary.Year &&
-                    s.MonthNumber == absence.Month &&
+                    s.MonthNumber == absence.MonthNumber &&
                     s.IsClosed))
             {
                 return AbsenceVeryficationResult.ClosedMonth;
@@ -121,7 +121,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     nurse.AbsencesSummaries.Add(
                         new AbsencesSummary
                         {
-                            NurseId = nurse.NurseId,
+                            NurseId = nurse.Id,
                             Year = i,
                             PTOTime = nurse.PTOentitlement * TimeSpan.FromDays(1),
                         });

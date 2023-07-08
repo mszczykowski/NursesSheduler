@@ -1,8 +1,9 @@
-﻿namespace NursesScheduler.Domain.Entities
+﻿using NursesScheduler.Domain.Abstractions;
+
+namespace NursesScheduler.Domain.Entities
 {
-    public class DepartamentSettings : IEquatable<DepartamentSettings>
+    public record DepartamentSettings : IEntity
     {
-        public int DepartamentSettingsId { get; set; }
         public TimeSpan WorkingTime { get; set; }
         public TimeSpan MaximalWeekWorkingTime { get; set; }
         public TimeSpan MinmalShiftBreak { get; set; }
@@ -31,7 +32,7 @@
             NightShiftHolidayEligibleHours = TimeSpan.FromHours(4);
         }
 
-        public bool Equals(DepartamentSettings? other)
+        public virtual bool Equals(DepartamentSettings? other)
         {
             if (other == null)
                 return false;

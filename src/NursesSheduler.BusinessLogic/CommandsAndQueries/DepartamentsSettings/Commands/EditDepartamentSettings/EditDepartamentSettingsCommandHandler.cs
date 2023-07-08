@@ -35,7 +35,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
             var oldSettings = await _context.DepartamentSettings
-                .FirstOrDefaultAsync(s => s.DepartamentSettingsId == request.DepartamentSettingsId)
+                .FirstOrDefaultAsync(s => s.Id == request.DepartamentSettingsId)
                 ?? throw new EntityNotFoundException(request.DepartamentSettingsId, nameof(DepartamentSettings));
 
             if (oldSettings.Equals(newSettings))

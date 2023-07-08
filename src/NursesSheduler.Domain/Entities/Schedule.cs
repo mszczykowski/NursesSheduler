@@ -1,8 +1,10 @@
-﻿namespace NursesScheduler.Domain.Entities
+﻿using NursesScheduler.Domain.Abstractions;
+using NursesScheduler.Domain.ValueObjects;
+
+namespace NursesScheduler.Domain.Entities
 {
-    public class Schedule
+    public record Schedule : IEntity
     {
-        public int ScheduleId { get; set; }
         public int MonthNumber { get; set; }
         public int MonthInQuarter { get; set; }
         public int Year { get; set; }

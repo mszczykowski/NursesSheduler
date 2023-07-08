@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
@@ -30,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
                 .ThenInclude(d => d.MorningShift)
-                .Where(s => s.Quarter.QuarterId == currentSchedule.Quarter.QuarterId &&
+                .Where(s => s.Quarter.Id == currentSchedule.Quarter.Id &&
                     s.MonthInQuarter != currentSchedule.MonthInQuarter)
                 .ToListAsync();
 

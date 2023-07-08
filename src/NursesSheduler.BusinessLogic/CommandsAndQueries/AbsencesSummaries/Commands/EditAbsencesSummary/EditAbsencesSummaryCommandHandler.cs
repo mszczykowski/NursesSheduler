@@ -32,7 +32,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Com
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
             var originalSummary = await _context.AbsencesSummaries
-                                            .FirstOrDefaultAsync(s => s.AbsencesSummaryId == request.AbsencesSummaryId)
+                                            .FirstOrDefaultAsync(s => s.Id == request.AbsencesSummaryId)
                                 ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
             _context.Entry(originalSummary).CurrentValues.SetValues(modifiedSummary);

@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
 using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.Managers
 {

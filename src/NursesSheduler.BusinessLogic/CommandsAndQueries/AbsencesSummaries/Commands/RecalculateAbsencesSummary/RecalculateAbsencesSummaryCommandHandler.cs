@@ -25,7 +25,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Com
             var currentSummary = await _context.AbsencesSummaries
                                             .Include(s => s.Absences)
                                             .Include(s => s.Nurse)
-                                            .FirstOrDefaultAsync(s => s.AbsencesSummaryId == request.AbsencesSummaryId);
+                                            .FirstOrDefaultAsync(s => s.Id == request.AbsencesSummaryId);
 
             if (currentSummary == null)
                 throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));

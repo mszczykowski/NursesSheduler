@@ -1,10 +1,9 @@
-﻿using NursesScheduler.Domain.Interfaces;
+﻿using NursesScheduler.Domain.Abstractions;
 
 namespace NursesScheduler.Domain.Entities
 {
-    public class Nurse : ISoftDelete
+    public record Nurse : IEntity, ISoftDelete
     {
-        public int NurseId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public int PTOentitlement { get; set; }

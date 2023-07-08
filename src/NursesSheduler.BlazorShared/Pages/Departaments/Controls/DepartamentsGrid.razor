@@ -68,7 +68,7 @@ else
             };
             var response = await _mediatr.Send(request);
 
-            if (!response.Success)
+            if (response is null)
                 throw new EntityNotDeletedException(departamentId, "Departament");
 
             if (_currentDepartamentStore.CurrentDepartament.DepartamentId == departamentId)

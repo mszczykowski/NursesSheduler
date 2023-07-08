@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNur
         public async Task<GetNurseResponse> Handle(GetNurseRequest request, CancellationToken cancellationToken)
         {
             return _mapper.Map<GetNurseResponse>(await _context.Nurses
-                .FirstOrDefaultAsync(n => n.NurseId == request.NurseId));
+                .FirstOrDefaultAsync(n => n.Id == request.NurseId));
         }
     }
 }

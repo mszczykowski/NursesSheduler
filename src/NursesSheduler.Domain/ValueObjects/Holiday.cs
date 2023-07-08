@@ -1,6 +1,6 @@
-﻿namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.ValueObjects
 {
-    public sealed class Holiday
+    public sealed record Holiday
     {
         public DateTime Date { get; set; }
         public string Name { get; set; }

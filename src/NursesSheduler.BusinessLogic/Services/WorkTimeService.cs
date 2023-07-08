@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Services
 {

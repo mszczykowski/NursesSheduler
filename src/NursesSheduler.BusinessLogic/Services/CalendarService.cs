@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
@@ -11,6 +11,28 @@ namespace NursesScheduler.BusinessLogic.Services
         public CalendarService(IHolidaysProvider holidaysManager)
         {
             _holidaysManager = holidaysManager;
+        }
+
+        public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber)
+        {
+            var holidays = await _holidaysManager.GetHolidays(yearNumber);
+
+            holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
+
+            var monthDays = new Day[DateTime.DaysInMonth(yearNumber, monthNumber)];
+
+            for (int i = 0; i < monthDays.Length; i++)
+            {
+                monthDays[i] = new Day(i + 1, monthNumber, yearNumber);
+            }
+
+            foreach (var holiday in holidays)
+            {
+                monthDays[holiday.Date.Day - 1].IsHoliday = true;
+                monthDays[holiday.Date.Day - 1].HolidayName = holiday.LocalName;
+            }
+
+            return monthDays;
         }
 
         public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber, int firstQuarterStart)
@@ -27,22 +49,11 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
             }
 
+            var monthDays = await GetMonthDays(monthNumber, yearNumber);
 
-            var holidays = await _holidaysManager.GetHolidays(yearNumber);
-
-            holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
-
-            var monthDays = new Day[DateTime.DaysInMonth(yearNumber, monthNumber)];
-
-            for(int i = 0; i < monthDays.Length; i++)
+            for (int i = 0; i < monthDays.Length; i++)
             {
-                monthDays[i] = new Day(i + 1, monthNumber, yearNumber, dayInQuarterOffset + i);
-            }
-
-            foreach(var holiday in holidays)
-            {
-                monthDays[holiday.Date.Day - 1].IsHoliday = true;
-                monthDays[holiday.Date.Day - 1].HolidayName = holiday.LocalName;
+                monthDays[i].DayInQuarter = dayInQuarterOffset + i;
             }
 
             return monthDays;

@@ -8,7 +8,7 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Nurse> builder)
         {
-            builder.HasKey(n => n.NurseId);
+            builder.HasKey(n => n.Id);
 
             builder.Property(n => n.Name)
                 .IsRequired()

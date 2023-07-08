@@ -17,7 +17,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.Delet
 
         public async Task<DeleteNurseResponse> Handle(DeleteNurseRequest request, CancellationToken cancellationToken)
         {
-            var nurse = await _context.Nurses.Include(n => n.Shifts).FirstOrDefaultAsync(n => n.NurseId == request.NurseId)
+            var nurse = await _context.Nurses.Include(n => n.Shifts).FirstOrDefaultAsync(n => n.Id == request.NurseId)
                 ?? throw new EntityNotFoundException(request.NurseId, nameof(Nurse));
 
 

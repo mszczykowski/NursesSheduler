@@ -28,7 +28,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             var validationResult = await _validator.ValidateAsync(modifiedDepartament);
             if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-            var originalDepartament = await _context.Departaments.FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId) 
+            var originalDepartament = await _context.Departaments.FirstOrDefaultAsync(d => d.Id == request.DepartamentId) 
                 ?? throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
 
 

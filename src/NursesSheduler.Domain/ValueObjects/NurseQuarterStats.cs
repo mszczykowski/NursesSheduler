@@ -1,6 +1,8 @@
-﻿namespace NursesScheduler.Domain.Entities
+﻿using NursesScheduler.Domain.Entities;
+
+namespace NursesScheduler.Domain.ValueObjects
 {
-    public class NurseQuarterStats
+    public sealed record NurseQuarterStats
     {
         public int NurseId { get; set; }
         public TimeSpan WorkTimeAssignedInQuarter { get; set; }

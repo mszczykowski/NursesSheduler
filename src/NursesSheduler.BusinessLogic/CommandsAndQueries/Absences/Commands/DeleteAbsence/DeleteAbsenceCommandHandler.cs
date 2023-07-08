@@ -17,7 +17,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Del
 
         public async Task<DeleteAbsenceResponse> Handle(DeleteAbsenceRequest request, CancellationToken cancellationToken)
         {
-            var absence = await _context.Absences.FirstOrDefaultAsync(a => a.AbsenceId == request.AbsenceId)
+            var absence = await _context.Absences.FirstOrDefaultAsync(a => a.Id == request.AbsenceId)
                 ?? throw new EntityNotFoundException(request.AbsenceId, nameof(Absence));
 
             _context.Absences.Remove(absence);

@@ -24,7 +24,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
         public async Task<PickDepartamentResponse> Handle(PickDepartamentRequest request, CancellationToken cancellationToken)
         {
             var departament = await _context.Departaments
-                                            .FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId);
+                                            .FirstOrDefaultAsync(d => d.Id == request.DepartamentId);
 
             if (departament == null)
                 throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));

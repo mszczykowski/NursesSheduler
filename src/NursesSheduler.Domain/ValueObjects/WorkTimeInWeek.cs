@@ -1,14 +1,13 @@
-﻿namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.ValueObjects
 {
-    public sealed class WorkTimeInWeek
+    public sealed record WorkTimeInWeek
     {
         public int WeekNumber { get; set; }
         public TimeSpan AssignedWorkTime { get; set; }
 
-        public override bool Equals(object? obj)
+        public bool Equals(WorkTimeInWeek? other)
         {
-            return obj is WorkTimeInWeek week &&
-                   WeekNumber == week.WeekNumber;
+            return other is not null && WeekNumber == other.WeekNumber;
         }
 
         public override int GetHashCode()

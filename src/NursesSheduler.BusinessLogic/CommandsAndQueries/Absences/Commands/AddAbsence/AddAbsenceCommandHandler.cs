@@ -40,12 +40,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var absences = _absencesService.GetAbsencesFromAddAbsenceRequest(request);
+            var absences = _absencesService.GetAbsencesFromAddAbsenceRequest(request.From, request.To, 
+                request.AbsencesSummaryId, request.Type);
 
             var absencesSummary = await _context.AbsencesSummaries
                 .Include(y => y.Absences)
                 .Include(y => y.Nurse)
-                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
+                .FirstOrDefaultAsync(y => y.Id == request.AbsencesSummaryId)
                 ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
             var veryficationResult = AbsenceVeryficationResult.Valid;
@@ -68,9 +69,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
             foreach (var absence in absences)
             {
-                var days = await _calendarService.GetDaysFromDayNumbers(absence.Month, absencesSummary.Year, 
+                var days = await _calendarService.GetDaysFromDayNumbers(absence.MonthNumber, absencesSummary.Year, 
                     absence.Days);
-                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings);
+                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkingTime);
 
                 absencesSummary.Absences.Add(absence);
             }

@@ -2,7 +2,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
-using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.Infrastructure.HttpClients
 {
