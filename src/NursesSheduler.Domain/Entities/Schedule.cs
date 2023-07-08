@@ -20,5 +20,7 @@
 
         public int DepartamentId { get; set; }
         public virtual Departament Departament { get; set; }
+
+        public virtual ICollection<Day> MonthDays { get; set; }
     }
 }

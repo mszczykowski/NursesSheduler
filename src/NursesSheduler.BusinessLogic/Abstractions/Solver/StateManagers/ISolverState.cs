@@ -25,5 +25,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         void AssignNurseOnTimeOff(INurseState nurse, bool isHoliday, DepartamentSettings departamentSettings);
         TimeSpan GetHoursToScheduleEnd();
         HashSet<int> GetPreviousDayShift();
+        void PopulateScheduleFromState(Schedule schedule);
     }
 }

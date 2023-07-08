@@ -1,19 +1,19 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CacheManagers
+namespace NursesScheduler.Infrastructure.Providers
 {
-    internal class HolidaysManager : IHolidaysManager
+    public sealed class HolidaysProvider : IHolidaysProvider
     {
         private const string HOLIDAYS_CACHE_KEY = "Holidays-";
 
         private readonly IHolidaysApiClient _holidaysApiClient;
         private readonly IMemoryCache _memoryCache;
 
-        public HolidaysManager(IHolidaysApiClient holidaysApiClient, IMemoryCache memoryCache)
+        public HolidaysProvider(IHolidaysApiClient holidaysApiClient, IMemoryCache memoryCache)
         {
             _holidaysApiClient = holidaysApiClient;
             _memoryCache = memoryCache;

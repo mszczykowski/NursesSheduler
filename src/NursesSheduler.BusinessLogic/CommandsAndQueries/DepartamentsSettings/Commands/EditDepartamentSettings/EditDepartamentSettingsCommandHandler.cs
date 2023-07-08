@@ -2,8 +2,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 
@@ -15,10 +15,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
         private readonly IMapper _mapper;
         private readonly IValidator<DepartamentSettings> _validator;
         private readonly IApplicationDbContext _context;
-        private readonly IDepartamentSettingsManager _departamentSettingsManager;
+        private readonly IDepartamentSettingsProvider _departamentSettingsManager;
 
         public EditDepartamentSettingsCommandHandler(IMapper mapper, IValidator<DepartamentSettings> validator,
-                                  IApplicationDbContext context, IDepartamentSettingsManager departamentSettingsManager)
+                                  IApplicationDbContext context, IDepartamentSettingsProvider departamentSettingsManager)
         {
             _mapper = mapper;
             _validator = validator;

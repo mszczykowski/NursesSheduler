@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using MediatR;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
 {
     internal sealed class GetDepartamentSettingsQueryHandler : IRequestHandler<GetDepartamentSettingsRequest, 
                                                                                         GetDepartamentSettingsResponse>
     {
-        private readonly IDepartamentSettingsManager _departamentSettingsManager;
+        private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly IMapper _mapper;
 
-        public GetDepartamentSettingsQueryHandler(IDepartamentSettingsManager departamentSettingsManager, IMapper mapper)
+        public GetDepartamentSettingsQueryHandler(IDepartamentSettingsProvider departamentSettingsManager, IMapper mapper)
         {
             _departamentSettingsManager = departamentSettingsManager;
             _mapper = mapper;

@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries.GetAbsences
 {
     public sealed class GetAbsencesResponse
     {

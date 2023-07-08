@@ -1,20 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CacheManagers
+namespace NursesScheduler.Infrastructure.Providers
 {
-    internal class DepartamentSettingsManager : IDepartamentSettingsManager
+    public sealed class DepartamentSettingsProvider : IDepartamentSettingsProvider
     {
         private const string DEPT_SETTINGS_CACHE_KEY = "DeptSettings-";
 
         private readonly IApplicationDbContext _context;
         private readonly IMemoryCache _memoryCache;
 
-        public DepartamentSettingsManager(IApplicationDbContext context, IMemoryCache memoryCache)
+        public DepartamentSettingsProvider(IApplicationDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
             _memoryCache = memoryCache;

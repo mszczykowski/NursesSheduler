@@ -1,4 +1,4 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 
@@ -6,9 +6,9 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class CalendarService : ICalendarService
     {
-        private readonly IHolidaysManager _holidaysManager;
+        private readonly IHolidaysProvider _holidaysManager;
 
-        public CalendarService(IHolidaysManager holidaysManager)
+        public CalendarService(IHolidaysProvider holidaysManager)
         {
             _holidaysManager = holidaysManager;
         }

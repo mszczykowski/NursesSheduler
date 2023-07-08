@@ -2,10 +2,10 @@
 {
     public enum PreviousNurseStates
     {
-        none,
-        morning,
-        day,
-        night,
-        prioritise,
+        None,
+        Morning,
+        Day,
+        Night,
+        Prioritise,
     }
 }

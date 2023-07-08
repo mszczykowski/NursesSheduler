@@ -9,6 +9,10 @@
             Date.DayOfWeek != DayOfWeek.Sunday;
         public int DayInQuarter { get; set; }
         public int WeekInQuarter { get; set; }
+        public Day(int day, int month, int year)
+        {
+            Date = new DateOnly(year, month, day);
+        }
         public Day(int day, int month, int year, int dayInQuarter)
         {
             Date = new DateOnly(year, month, day);

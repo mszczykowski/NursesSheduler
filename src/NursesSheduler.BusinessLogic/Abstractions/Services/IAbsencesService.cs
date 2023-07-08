@@ -1,5 +1,4 @@
-﻿using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
-using NursesScheduler.Domain.Entities;
+﻿using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
@@ -8,7 +7,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
     {
         Task InitializeDepartamentAbsencesSummaries(Departament departament, CancellationToken cancellationToken);
         void InitializeNewNurseAbsencesSummaries(Nurse nurse, Departament departament);
-        ICollection<Absence> GetAbsencesFromAddAbsenceRequest(AddAbsenceRequest absenceRequest);
+        ICollection<Absence> GetAbsencesFromAddAbsenceRequest(DateOnly from, DateOnly to, int absencesSummaryId,
+            AbsenceTypes type);
         Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence);
     }
 }

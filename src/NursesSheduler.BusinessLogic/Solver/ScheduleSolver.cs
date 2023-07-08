@@ -12,11 +12,11 @@ namespace NursesScheduler.BusinessLogic.Solver
 {
     internal sealed class ScheduleSolver : IScheduleSolver
     {
-        private readonly List<IConstraint> _constraints;
+        private readonly ICollection<IConstraint> _constraints;
         private readonly INurseQueueDirector _employeeQueueDirector;
         private readonly DepartamentSettings _departamentSettings;
 
-        private readonly Quarter _quarter;
+        private readonly ICollection<MorningShift> _morningShifts;
         private readonly Day[] _month;
 
         private Random _random;
@@ -26,10 +26,10 @@ namespace NursesScheduler.BusinessLogic.Solver
 
         private IShiftCapacityManager _shiftCapacityManager;
 
-        public ScheduleSolver(Quarter quarter, Day[] month, List<IConstraint> constraints,
+        public ScheduleSolver(ICollection<MorningShift> morningShifts, Day[] month, ICollection<IConstraint> constraints,
             DepartamentSettings departamentSettings)
         {
-            _quarter = quarter;
+            _morningShifts = morningShifts;
             _month = month;
             _departamentSettings = departamentSettings;
             _constraints = constraints;
@@ -119,7 +119,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                     if (_currentNurse.HadMorningShiftAssigned)
                         continue;
 
-                    var morningShiftsToAssign = _quarter.MorningShifts
+                    var morningShiftsToAssign = _morningShifts
                         .Where(m => !_currentNurse.AssignedMorningShiftsIds.Contains(m.MorningShiftId))
                         .OrderBy(s => _random.Next()).ToList();
 

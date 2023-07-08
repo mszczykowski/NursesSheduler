@@ -1,8 +1,8 @@
 ﻿using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.Abstractions.CacheManagers
+namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers
 {
-    internal interface IDepartamentSettingsManager
+    public interface IDepartamentSettingsProvider
     {
         Task<DepartamentSettings> GetDepartamentSettings(int departamentId);
         void InvalidateCache(int departamentId);

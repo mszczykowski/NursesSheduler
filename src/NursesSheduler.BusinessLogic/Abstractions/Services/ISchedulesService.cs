@@ -8,5 +8,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
             DepartamentSettings departamentSettings);
         Task SetTimeOffs(Schedule schedule, DepartamentSettings departamentSettings);
         Task SetNurseWorkTimes(Schedule schedule);
+        Task<Schedule?> GetPreviousSchedule(Schedule currentSchedule);
     }
 }

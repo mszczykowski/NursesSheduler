@@ -1,4 +1,4 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
@@ -10,7 +10,7 @@ namespace NursesScheduler.BusinessLogic.Services
     {
         private readonly ICalendarService _calendarService;
 
-        public WorkTimeService(IHolidaysManager hoidaysManager, ICalendarService calendarService)
+        public WorkTimeService(IHolidaysProvider hoidaysManager, ICalendarService calendarService)
         {
             _calendarService = calendarService;
         }

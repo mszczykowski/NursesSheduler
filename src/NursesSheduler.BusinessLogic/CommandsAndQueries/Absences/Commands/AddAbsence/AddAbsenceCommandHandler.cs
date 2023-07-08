@@ -2,8 +2,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
@@ -19,11 +19,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
         private readonly IWorkTimeService _workTimeService;
         private readonly IAbsencesService _absencesService;
         private readonly ICalendarService _calendarService;
-        private readonly IDepartamentSettingsManager _settingsManager;
+        private readonly IDepartamentSettingsProvider _settingsManager;
 
         public AddAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, 
             IValidator<AddAbsenceRequest> validator, IWorkTimeService workTimeService, IAbsencesService absencesService,
-            ICalendarService calendarService, IDepartamentSettingsManager settingsManager)
+            ICalendarService calendarService, IDepartamentSettingsProvider settingsManager)
         {
             _context = context;
             _mapper = mapper;

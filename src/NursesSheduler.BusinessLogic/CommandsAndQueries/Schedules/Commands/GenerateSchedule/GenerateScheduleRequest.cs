@@ -20,6 +20,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
         public ICollection<ScheduleNurseResponse> ScheduleNurses { get; set; }
         public TimeSpan TimeForMorningShifts { get; set; }
         public string GeneratorSeed { get; set; }
+        public bool UseSpecifiedSeed { get; set; }
+        public int NumberOfRetries { get; set; }
 
         public sealed class DayResponse
         {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
@@ -11,14 +10,11 @@ namespace NursesScheduler.BusinessLogic.Services
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentDateService _currentDateService;
-        private readonly IWorkTimeService _workTimeService;
 
-        public AbsencesService(IApplicationDbContext context, ICurrentDateService currentDateService,
-            IWorkTimeService workTimeService)
+        public AbsencesService(IApplicationDbContext context, ICurrentDateService currentDateService)
         {
             _context = context;
             _currentDateService = currentDateService;
-            _workTimeService = workTimeService;
         }
 
         public async Task InitializeDepartamentAbsencesSummaries(Departament departament, 
@@ -46,15 +42,16 @@ namespace NursesScheduler.BusinessLogic.Services
             InitializeNurseAbsencesSummary(nurse, departament);
         }
 
-        public ICollection<Absence> GetAbsencesFromAddAbsenceRequest(AddAbsenceRequest absenceRequest)
+        public ICollection<Absence> GetAbsencesFromAddAbsenceRequest(DateOnly from, DateOnly to, int absencesSummaryId,
+            AbsenceTypes type)
         {
             var result = new List<Absence>();
 
-            var currentAbsence = new Absence(absenceRequest.From.Month);
+            var currentAbsence = new Absence(from.Month);
 
             result.Add(currentAbsence);
 
-            for (var date = absenceRequest.From; date <= absenceRequest.To; date = date.AddDays(1))
+            for (var date = from; date <= to; date = date.AddDays(1))
             {
                 if (date.Month != currentAbsence.Month)
                 {
@@ -67,8 +64,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
             foreach(var absence in result)
             {
-                absence.AbsencesSummaryId = absenceRequest.AbsencesSummaryId;
-                absence.Type = absenceRequest.Type;
+                absence.AbsencesSummaryId = absencesSummaryId;
+                absence.Type = type;
             }
             
             return result;

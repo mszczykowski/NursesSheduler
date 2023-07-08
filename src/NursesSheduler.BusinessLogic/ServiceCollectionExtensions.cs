@@ -5,9 +5,6 @@ using FluentValidation;
 using NursesScheduler.BusinessLogic.Validation;
 using NursesScheduler.BusinessLogic.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using Microsoft.Extensions.Caching.Memory;
-using NursesScheduler.BusinessLogic.CacheManagers;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 
@@ -19,7 +16,6 @@ namespace NursesScheduler.BusinessLogic
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddSingleton<IMemoryCache, MemoryCache>();
 
             //validators
             services.AddTransient<IValidator<Nurse>, NurseValidator>();
@@ -28,16 +24,15 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
             services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
 
-            //managers
-            services.AddTransient<IHolidaysManager, HolidaysManager>();
-            services.AddTransient<IDepartamentSettingsManager, DepartamentSettingsManager>();
-
             //services
+            services.AddSingleton<ICurrentDateService, CurrentDateService>();
+            services.AddSingleton<ISeedService, SeedService>();
             services.AddTransient<IWorkTimeService, WorkTimeService>();
             services.AddTransient<IAbsencesService, AbsencesService>();
-            services.AddSingleton<ICurrentDateService, CurrentDateService>();
             services.AddTransient<ISchedulesService, SchedulesService>();
             services.AddTransient<ICalendarService, CalendarService>();
+            services.AddTransient<INurseStatsService, NurseStatsService>();
+            services.AddTransient<ISolverService, SolverService>();
         }
     }
 }

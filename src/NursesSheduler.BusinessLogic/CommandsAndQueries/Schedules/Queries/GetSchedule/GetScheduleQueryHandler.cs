@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NursesScheduler.BusinessLogic.Abstractions.CacheManagers;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
@@ -12,12 +12,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly ISchedulesService _schedulesService;
-        private readonly IDepartamentSettingsManager _departamentSettingsManager;
+        private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly ICalendarService _calendarService;
         private readonly IWorkTimeService _workTimeService;
 
         public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper, ISchedulesService schedulesService,
-            IDepartamentSettingsManager departamentSettingsManager, ICalendarService calendarService,
+            IDepartamentSettingsProvider departamentSettingsManager, ICalendarService calendarService,
             IWorkTimeService workTimeService)
         {
             _context = context;

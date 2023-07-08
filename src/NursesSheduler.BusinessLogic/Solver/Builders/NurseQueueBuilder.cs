@@ -49,7 +49,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseQueueBuilder OrderByLowestNumberOfNightShitfs()
         {
-            _orderByBuilder.Append(nameof(INurseState.NumberOfNightShifts) + ",");
+            _orderByBuilder.Append(nameof(INurseState.NumberOfNightShiftsAssigned) + ",");
 
             return this;
         }

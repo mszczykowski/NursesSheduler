@@ -29,7 +29,8 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         public SolverState(Schedule schedule, ICollection<INurseState> nurses)
         {
             CurrentDay = 1;
-            CurrentShift = 0;
+            CurrentShift = ShiftIndex.Night;
+            DayNumberInQuarter = schedule.MonthDays.First(d => d.Date.Day == 1).DayInQuarter;
 
             NursesToAssignForCurrentShift = 0;
             NursesToAssignForMorningShift = 0;
@@ -41,7 +42,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 Nurses.Add(new NurseState(nurse));
             }
 
-            var numberOfDays = schedule.ScheduleNurses.First().NurseWorkDays.Max(d => d.DayNumber);
+            var numberOfDays = schedule.MonthDays.Count;
 
             ScheduleState = new HashSet<int>[numberOfDays, GeneralConstants.NumberOfShifts];
             MorningShiftsState = new HashSet<int>[numberOfDays];
@@ -167,7 +168,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         {
             if (CurrentDay == 1)
             {
-                return Nurses.Where(n => n.PreviousMonthLastShift == ShiftIndex.Day).Select(n => n.NurseId).ToHashSet();
+                return Nurses.Where(n => n.PreviousMonthLastShift == PreviousNurseStates.Day).Select(n => n.NurseId).ToHashSet();
             }
 
             HashSet<int> result;
@@ -234,6 +235,44 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             }
 
             return result;
+        }
+
+        public void PopulateScheduleFromState(Schedule schedule)
+        {
+            for(int i = 0; i < ScheduleState.GetLength(0); i++)
+            {
+                foreach (var nurseId in ScheduleState[i, (int)ShiftIndex.Night])
+                {
+                    schedule.ScheduleNurses
+                        .First(n => n.NurseId == nurseId)
+                        .NurseWorkDays
+                        .First(d => d.DayNumber == i + 1)
+                        .ShiftType = ShiftTypes.Night;
+                }
+
+                foreach (var nurseId in ScheduleState[i, (int)ShiftIndex.Day])
+                {
+                    schedule.ScheduleNurses
+                        .First(n => n.NurseId == nurseId)
+                        .NurseWorkDays
+                        .First(d => d.DayNumber == i + 1)
+                        .ShiftType = ShiftTypes.Day;
+                }
+
+                foreach (var nurseId in MorningShiftsState[i])
+                {
+                    var nurseWorkDay = schedule.ScheduleNurses
+                        .First(n => n.NurseId == nurseId)
+                        .NurseWorkDays
+                        .First(d => d.DayNumber == i + 1);
+
+                    nurseWorkDay.ShiftType = ShiftTypes.Morning;
+                    nurseWorkDay.MorningShiftId = Nurses
+                        .First(n => n.NurseId == nurseId)
+                        .AssignedMorningShiftsIds
+                        .Last();
+                }
+            }
         }
 
         private TimeSpan CalculateNurseHoursToNextShift(int nurseId)

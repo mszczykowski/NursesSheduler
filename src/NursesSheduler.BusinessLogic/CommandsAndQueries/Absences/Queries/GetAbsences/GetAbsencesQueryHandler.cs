@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries.GetAbsences
 {
     internal sealed class GetAbsencesQueryHandler : IRequestHandler<GetAbsencesRequest, ICollection<GetAbsencesResponse>>
     {
@@ -16,7 +16,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries
             _mapper = mapper;
         }
 
-        public async Task<ICollection<GetAbsencesResponse>> Handle(GetAbsencesRequest request, 
+        public async Task<ICollection<GetAbsencesResponse>> Handle(GetAbsencesRequest request,
             CancellationToken cancellationToken)
         {
             return _mapper.Map<ICollection<GetAbsencesResponse>>(await _context.Absences
