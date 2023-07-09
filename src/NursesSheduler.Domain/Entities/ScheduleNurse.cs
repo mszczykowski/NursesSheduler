@@ -1,11 +1,11 @@
 ﻿using NursesScheduler.Domain.Abstractions;
 using NursesScheduler.Domain.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NursesScheduler.Domain.Entities
 {
-    public record ScheduleNurse : IEntity
+    public record ScheduleNurse
     {
+        public int ScheduleNurseId { get; set; }
         public virtual ICollection<NurseWorkDay> NurseWorkDays { get; set; }
 
         public int NurseId { get; set; }

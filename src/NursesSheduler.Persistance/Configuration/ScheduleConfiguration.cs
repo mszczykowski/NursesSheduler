@@ -16,7 +16,7 @@ namespace NursesScheduler.Infrastructure.Configuration
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => c.ToList());
 
-            builder.HasKey(s => s.Id);
+            builder.HasKey(s => s.ScheduleId);
 
             builder.Property(s => s.Holidays)
                 .HasConversion(new ValueConverter<ICollection<int>, string>(

@@ -46,7 +46,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             var absencesSummary = await _context.AbsencesSummaries
                 .Include(y => y.Absences)
                 .Include(y => y.Nurse)
-                .FirstOrDefaultAsync(y => y.Id == request.AbsencesSummaryId)
+                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
                 ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
             var veryficationResult = AbsenceVeryficationResult.Valid;

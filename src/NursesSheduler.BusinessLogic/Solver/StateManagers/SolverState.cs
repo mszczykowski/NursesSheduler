@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 {
@@ -26,11 +27,11 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         private int _currentDayIndex => CurrentDay - 1;
 
-        public SolverState(Schedule schedule, ICollection<INurseState> nurses)
+        public SolverState(Schedule schedule, Day[] monthDays, ICollection<INurseState> nurses)
         {
             CurrentDay = 1;
             CurrentShift = ShiftIndex.Night;
-            DayNumberInQuarter = schedule.MonthDays.First(d => d.Date.Day == 1).DayInQuarter;
+            DayNumberInQuarter = monthDays[0].DayInQuarter;
 
             NursesToAssignForCurrentShift = 0;
             NursesToAssignForMorningShift = 0;
@@ -42,7 +43,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 Nurses.Add(new NurseState(nurse));
             }
 
-            var numberOfDays = schedule.MonthDays.Count;
+            var numberOfDays = monthDays.Length;
 
             ScheduleState = new HashSet<int>[numberOfDays, GeneralConstants.NumberOfShifts];
             MorningShiftsState = new HashSet<int>[numberOfDays];

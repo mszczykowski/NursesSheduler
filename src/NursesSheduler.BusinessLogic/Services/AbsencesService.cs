@@ -24,7 +24,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var nurses = await _context.Nurses
                 .Include(n => n.AbsencesSummaries)
-                .Where(n => n.DepartamentId == departament.Id && n.IsDeleted == false)
+                .Where(n => n.DepartamentId == departament.DepartamentId && n.IsDeleted == false)
                 .ToListAsync();
 
             foreach (var nurse in nurses)
@@ -81,7 +81,7 @@ namespace NursesScheduler.BusinessLogic.Services
             if (await _context.Schedules
                 .AnyAsync(s => s.DepartamentId == absencesSummary.Nurse.DepartamentId &&
                     s.Year == absencesSummary.Year &&
-                    s.MonthNumber == absence.MonthNumber &&
+                    s.Month == absence.MonthNumber &&
                     s.IsClosed))
             {
                 return AbsenceVeryficationResult.ClosedMonth;
@@ -121,7 +121,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     nurse.AbsencesSummaries.Add(
                         new AbsencesSummary
                         {
-                            NurseId = nurse.Id,
+                            NurseId = nurse.NurseId,
                             Year = i,
                             PTOTime = nurse.PTOentitlement * TimeSpan.FromDays(1),
                         });

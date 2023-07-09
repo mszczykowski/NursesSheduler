@@ -31,8 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CommandsAndQueries\Schedules\Commands\CheckSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Commands\PrintSchedule\" />
+    <Folder Include="CommandsAndQueries\MorningShifts\Queries\" />
+    <Folder Include="CommandsAndQueries\Quarters\Commands\" />
+    <Folder Include="CommandsAndQueries\Quarters\Queries\GetQuarter\" />
+    <Folder Include="CommandsAndQueries\Schedules\Queries\CheckSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Commands\CloseSchedule\" />
+    <Folder Include="CommandsAndQueries\Schedules\Queries\PrintSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\SaveSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
   </ItemGroup>

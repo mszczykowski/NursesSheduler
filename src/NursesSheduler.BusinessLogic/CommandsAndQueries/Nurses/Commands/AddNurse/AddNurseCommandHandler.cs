@@ -28,7 +28,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
         public async Task<AddNurseResponse> Handle(AddNurseRequest request, CancellationToken cancellationToken)
         {
             var nurse = _mapper.Map<Nurse>(request);
-            var departamet = _context.Departaments.Include(d => d.Nurses).FirstOrDefault(d => d.Id == request.DepartamentId);
+            var departamet = _context.Departaments.Include(d => d.Nurses)
+                .FirstOrDefault(d => d.DepartamentId == request.DepartamentId);
 
             if(departamet == null)
             {

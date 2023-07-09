@@ -138,6 +138,10 @@ else
 @code {
     private MorningShiftsSettingsModal _morningShiftsSettingsModal;
     private SolverSettingsModal _solverSettingsModal;
+    private ScheduleViewModel _schedule;
+    private QuarterViewModel _quarter;
+    private IEnumerable<DayViewModel> _days;
+    private IEnumerable<NurseViewModel> _nurses;
 
     private int _numberOfReties;
     private string _generatorSeed;
@@ -148,14 +152,13 @@ else
             MonthNumber = DateTime.Now.Month,
         };
 
-    private ScheduleViewModel _schedule;
-
     private bool _isLoading;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+
             await GetSchedule();
         }
     }
@@ -171,6 +174,18 @@ else
     {
         _dateViewModel.MonthNumber = Int32.Parse(e.Value.ToString());
         await GetSchedule();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+
+        }
+        catch(Exception e)
+        {
+            base.HandleException(e);
+        }
     }
 
     private async Task GetSchedule()

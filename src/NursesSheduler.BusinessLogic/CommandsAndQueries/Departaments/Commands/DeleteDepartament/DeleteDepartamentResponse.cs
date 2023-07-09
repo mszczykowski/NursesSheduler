@@ -2,6 +2,11 @@
 {
     public sealed class DeleteDepartamentResponse
     {
+        public bool Success { get; set; }
 
+        public DeleteDepartamentResponse(bool success)
+        {
+            Success = success;
+        }
     }
 }

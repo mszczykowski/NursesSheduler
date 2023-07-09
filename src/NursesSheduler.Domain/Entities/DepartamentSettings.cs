@@ -1,9 +1,8 @@
-﻿using NursesScheduler.Domain.Abstractions;
-
-namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.Entities
 {
-    public record DepartamentSettings : IEntity
+    public record DepartamentSettings
     {
+        public int DepartamentSettingsId { get; set; }
         public TimeSpan WorkingTime { get; set; }
         public TimeSpan MaximalWeekWorkingTime { get; set; }
         public TimeSpan MinmalShiftBreak { get; set; }

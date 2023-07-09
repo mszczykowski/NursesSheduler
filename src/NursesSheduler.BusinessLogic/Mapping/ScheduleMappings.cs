@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.CreateSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
-using NursesScheduler.BusinessLogic.Mapping.CustomResolvers;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -9,9 +9,8 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public ScheduleMappings()
         {
-            CreateMap<Schedule, GetScheduleResponse>()
-                .ForMember(dest => dest.QuarterNumber, opt => opt.MapFrom<QuarterNumberResolver>())
-                .ForMember(dest => dest.WorkTimeInQuarter, opt => opt.MapFrom<WorkTimeInQuarterResolver>());
+            CreateMap<Schedule, GetScheduleResponse>();
+            CreateMap<Schedule, CreateScheduleResponse>();
         }
     }
 }

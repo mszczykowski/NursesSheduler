@@ -1,9 +1,8 @@
-﻿using NursesScheduler.Domain.Abstractions;
-
-namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.Entities
 {
-    public record AbsencesSummary : IEntity
+    public record AbsencesSummary
     {
+        public int AbsencesSummaryId { get; set; }
         public int Year { get; set; }
         public TimeSpan PTOTime { get; set; }
         public TimeSpan PTOTimeUsed { get; set; }

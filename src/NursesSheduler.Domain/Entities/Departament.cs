@@ -1,9 +1,8 @@
-﻿using NursesScheduler.Domain.Abstractions;
-
-namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.Entities
 {
-    public record Departament : IEntity
+    public record Departament
     {
+        public int DepartamentId { get; set; }
         public string Name { get; set; }
         public int CreationYear { get; set; }
 

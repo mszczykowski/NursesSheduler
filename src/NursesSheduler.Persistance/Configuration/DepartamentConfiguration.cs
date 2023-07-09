@@ -8,7 +8,7 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Departament> builder)
         {
-            builder.HasKey(d => d.Id);
+            builder.HasKey(d => d.DepartamentId);
 
             builder.HasMany(d => d.Nurses)
                 .WithOne(n => n.Departament)

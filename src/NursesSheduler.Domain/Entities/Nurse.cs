@@ -2,8 +2,9 @@
 
 namespace NursesScheduler.Domain.Entities
 {
-    public record Nurse : IEntity, ISoftDelete
+    public record Nurse : ISoftDelete
     {
+        public int NurseId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public int PTOentitlement { get; set; }

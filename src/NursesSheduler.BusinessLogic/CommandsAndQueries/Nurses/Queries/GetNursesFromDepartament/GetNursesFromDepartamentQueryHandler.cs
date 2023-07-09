@@ -21,7 +21,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNur
                                                                                     CancellationToken cancellationToken)
         {
             return _mapper.Map<List<GetNursesFromDepartamentResponse>>(await _context.Nurses
-                .Where(n => n.DepartamentId == request.DepartamentId && !n.IsDeleted)
+                .Where(n => n.DepartamentId == request.DepartamentId && (!n.IsDeleted || request.IncludeDeleted))
                 .ToListAsync());
         }
     }

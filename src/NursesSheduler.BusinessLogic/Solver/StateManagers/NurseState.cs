@@ -102,7 +102,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 }
             }
 
-            AssignedMorningShiftsIds = new(nurseQuarterStats.MorningShiftsAssigned.Select(m => m.Id));
+            AssignedMorningShiftsIds = new(nurseQuarterStats.MorningShiftsAssigned.Select(m => m.MorningShiftId));
             HadMorningShiftAssigned = currentScheduleNurse.NurseWorkDays.Any(d => d.ShiftType == ShiftTypes.Morning);
 
             PreviousMonthLastShift = currentScheduleNurse.PreviousState;
@@ -130,7 +130,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         {
             HadMorningShiftAssigned = true;
 
-            AssignedMorningShiftsIds.Add(morningShift.Id);
+            AssignedMorningShiftsIds.Add(morningShift.MorningShiftId);
 
             if(morningShift.ShiftLength > TimeSpan.Zero)
             {

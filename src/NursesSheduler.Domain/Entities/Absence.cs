@@ -1,10 +1,10 @@
-﻿using NursesScheduler.Domain.Abstractions;
-using NursesScheduler.Domain.Enums;
+﻿using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.Domain.Entities
 {
-    public record Absence : IEntity
+    public record Absence
     {
+        public int AbsenceId { get; set; }
         public int MonthNumber { get; set; }
         public virtual ICollection<int> Days { get; set; }
         public TimeSpan WorkTimeToAssign { get; set; }

@@ -14,17 +14,19 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
         private readonly IMapper _mapper;
         private readonly IAbsencesService _absencesService;
 
-        public PickDepartamentCommandHandler(IApplicationDbContext context, IMapper mapper, IAbsencesService absencesService)
+        public PickDepartamentCommandHandler(IApplicationDbContext context, IMapper mapper,
+            IAbsencesService absencesService)
         {
             _context = context;
             _mapper = mapper;
             _absencesService = absencesService;
         }
 
-        public async Task<PickDepartamentResponse> Handle(PickDepartamentRequest request, CancellationToken cancellationToken)
+        public async Task<PickDepartamentResponse> Handle(PickDepartamentRequest request, 
+            CancellationToken cancellationToken)
         {
             var departament = await _context.Departaments
-                                            .FirstOrDefaultAsync(d => d.Id == request.DepartamentId);
+                .FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId);
 
             if (departament == null)
                 throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));

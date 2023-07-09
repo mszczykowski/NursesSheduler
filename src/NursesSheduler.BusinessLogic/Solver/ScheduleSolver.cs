@@ -121,7 +121,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                         continue;
 
                     var morningShiftsToAssign = _morningShifts
-                        .Where(m => !_currentNurse.AssignedMorningShiftsIds.Contains(m.Id))
+                        .Where(m => !_currentNurse.AssignedMorningShiftsIds.Contains(m.MorningShiftId))
                         .OrderBy(s => _random.Next()).ToList();
 
                     MorningShift morningShiftToAssign = null;

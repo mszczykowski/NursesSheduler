@@ -4,7 +4,7 @@ using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    internal sealed class NursesService
+    internal sealed class NursesService : INursesService
     {
         private readonly IApplicationDbContext _context;
 
@@ -13,7 +13,7 @@ namespace NursesScheduler.BusinessLogic.Services
             _context = context;
         }
 
-        public async Task<ICollection<Nurse>> GetDepartamentNurses(int departamentId)
+        public async Task<IEnumerable<Nurse>> GetActiveDepartamentNurses(int departamentId)
         {
             return await _context.Nurses
                 .Include(n => n.AbsencesSummaries)

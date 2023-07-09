@@ -32,7 +32,6 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<ISchedulesService, SchedulesService>();
             services.AddTransient<ICalendarService, CalendarService>();
             services.AddTransient<INurseStatsService, NurseStatsService>();
-            services.AddTransient<ISolverService, SolverService>();
         }
     }
 }

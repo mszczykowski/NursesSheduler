@@ -1,10 +1,10 @@
-﻿using NursesScheduler.Domain.Abstractions;
-using NursesScheduler.Domain.Enums;
+﻿using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.Domain.Entities
 {
-    public record NurseWorkDay : IEntity
+    public record NurseWorkDay
     {
+        public int NurseWorkDayId { get; set; }
         public int DayNumber { get; set; }
         public int ScheduleNurseId { get; set; }
         public virtual ScheduleNurse ScheduleNurse { get; set; }

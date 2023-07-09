@@ -7,7 +7,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         Task<Schedule> GetNewSchedule(int monthNumber, int yearNumber, int departamentId,
             DepartamentSettings departamentSettings);
         Task SetTimeOffs(Schedule schedule, DepartamentSettings departamentSettings);
-        Task SetNurseWorkTimes(Schedule schedule);
+        Task CalculateNurseWorkTimes(Schedule schedule);
         Task<Schedule?> GetPreviousSchedule(Schedule currentSchedule);
+        Task UpdateScheduleNurses(Schedule schedule);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public DayMappings()
         {
-            CreateMap<Day, GetScheduleResponse.DayResponse>();
+            CreateMap<Day, GetMonthDaysResponse>();
         }
     }
 }

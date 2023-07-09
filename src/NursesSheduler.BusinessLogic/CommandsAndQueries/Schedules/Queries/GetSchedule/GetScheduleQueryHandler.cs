@@ -29,37 +29,34 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         }
         public async Task<GetScheduleResponse> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
         {
-            bool readOnly = false;
-
             var schedule = await _context.Schedules
-                .Include(s => s.Quarter)
                 .Include(s => s.ScheduleNurses)
+                .ThenInclude(n => n.NurseWorkDays)
                 .FirstOrDefaultAsync(s => s.DepartamentId == request.DepartamentId &&
                     s.Year == request.Year &&
-                    s.MonthNumber == request.Month);
+                    s.Month == request.Month);
 
-            var currentSettings = await _departamentSettingsManager.GetDepartamentSettings(request.DepartamentId);
+            if(schedule is not null && schedule.IsClosed)
+            {
+                return _mapper.Map<GetScheduleResponse>(schedule);
+            }
 
-            if (schedule != null && currentSettings.SettingsVersion != schedule.SettingsVersion)
-                readOnly = true;
+            var departamentSettings = await _departamentSettingsManager.GetDepartamentSettings(request.DepartamentId);
 
-            if (schedule == null)
+            if (schedule is null)
+            {
                 schedule = await _schedulesService.GetNewSchedule(request.Month, request.Year, request.DepartamentId,
-                    currentSettings);
+                    departamentSettings);
+            }
+            else
+            {
+                await _schedulesService.UpdateScheduleNurses(schedule);
+            }
 
-            await _schedulesService.SetTimeOffs(schedule, currentSettings);
-            await _schedulesService.SetNurseWorkTimes(schedule);
+            await _schedulesService.SetTimeOffs(schedule, departamentSettings);
+            await _schedulesService.CalculateNurseWorkTimes(schedule);
 
-            var response = _mapper.Map<GetScheduleResponse>(schedule);
-
-            var monthDays = await _calendarService.GetMonthDays(request.Month, request.Year);
-
-            response.MonthDays = _mapper.Map<GetScheduleResponse.DayResponse[]>(monthDays);
-
-            response.TimeForMorningShifts = await _workTimeService.GetTimeForMorningShifts(schedule.Quarter.QuarterNumber, 
-                schedule.Quarter.QuarterYear, currentSettings);
-
-            return response;
+            return _mapper.Map<GetScheduleResponse>(schedule);
         }
     }
 }

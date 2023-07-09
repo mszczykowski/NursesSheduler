@@ -31,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
                 .ThenInclude(d => d.MorningShift)
-                .Where(s => s.Quarter.Id == currentSchedule.Quarter.Id &&
+                .Where(s => s.Quarter.QuarterId == currentSchedule.Quarter.QuarterId &&
                     s.MonthInQuarter != currentSchedule.MonthInQuarter)
                 .ToListAsync();
 
@@ -46,7 +46,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 var daysInMonth = await _calendarService.GetMonthDays(monthDate.Month, monthDate.Year, 
                     departamentSettings.FirstQuarterStart);
 
-                var schedule = quarterSchedules.FirstOrDefault(s => s.MonthNumber == monthDate.Month);
+                var schedule = quarterSchedules.FirstOrDefault(s => s.Month == monthDate.Month);
 
                 PopulateMonthNurseQuarterStats(nurseQuarterStats, schedule, daysInMonth, departamentSettings);
             }
