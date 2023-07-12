@@ -79,7 +79,8 @@ namespace NursesScheduler.BusinessLogic.Services
             }
 
             if (await _context.Schedules
-                .AnyAsync(s => s.DepartamentId == absencesSummary.Nurse.DepartamentId &&
+                .Include(s => s.Quarter)
+                .AnyAsync(s => s.Quarter.DepartamentId == absencesSummary.Nurse.DepartamentId &&
                     s.Year == absencesSummary.Year &&
                     s.Month == absence.MonthNumber &&
                     s.IsClosed))

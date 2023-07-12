@@ -4,7 +4,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
 {
     internal sealed class CalculateMorningShiftsCommandHandler : IRequestHandler<CalculateMorningShiftsRequest,
         ICollection<CalculateMorningShiftsResponse>>
@@ -13,7 +13,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
         private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly IMapper _mapper;
 
-        public CalculateMorningShiftsCommandHandler(IWorkTimeService workTimeService, 
+        public CalculateMorningShiftsCommandHandler(IWorkTimeService workTimeService,
             IDepartamentSettingsProvider departamentSettingsManager,
             IMapper mapper)
         {
@@ -22,7 +22,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
             _mapper = mapper;
         }
 
-        public async Task<ICollection<CalculateMorningShiftsResponse>> Handle(CalculateMorningShiftsRequest request, 
+        public async Task<ICollection<CalculateMorningShiftsResponse>> Handle(CalculateMorningShiftsRequest request,
             CancellationToken cancellationToken)
         {
             var departamentSettings = await _departamentSettingsManager.GetDepartamentSettings(request.DepartamentId);

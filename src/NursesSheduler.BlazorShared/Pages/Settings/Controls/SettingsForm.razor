@@ -12,20 +12,6 @@
                     <TimeSpanInput Label="Dzienny wymiar pracy" @bind-Value="Settings.WorkingTime" ValidationFor="@(() => Settings.WorkingTime)" />
                     <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximalWeekWorkingTime" ValidationFor="@(() => Settings.MaximalWeekWorkingTime)" />
                     <TimeSpanInput Label="Minimalna przerwa między dyżurami" @bind-Value="Settings.MinmalShiftBreak" ValidationFor="@(() => Settings.MinmalShiftBreak)" />
-                    <div class="field">
-                        <label class="label">Początek pierwszego kwartału</label>
-                        <div class="select is-fullwidth">
-                            <select value=@Settings.FirstQuarterStart>
-                                @for (int i = 1; i <= 12; i++)
-                                {
-                                    <option value="@i">@((Months)i)</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="help is-danger">
-                            <ValidationMessage For="@(() => Settings.FirstQuarterStart)" />
-                        </div>
-                    </div>
                     <br />
                     <p class="title is-4">
                         Konfigruracja świąt
@@ -55,9 +41,6 @@
                             </div>
                         </div>
                     </div>
-                    <p class="title is-6">
-                        Uwaga! Zmiana ustawień uniemożliwi edycję obecnie zapisanych grafików!
-                    </p>
                     <div class="buttons is-right">
                         <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSave)" type="submit">Zapisz</button>
                         <button class="button @CssHelper.SetIsLoading(_isLoadingCancel)" type="button" @onclick="OnCancel">Anuluj</button>

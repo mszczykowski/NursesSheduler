@@ -29,6 +29,23 @@
                                     <ValidationMessage For="@(() => Departament.Name)" />
                                 </div>
                             </div>
+                            <label class="label">Kwartały od</label>
+                            @if (IsEdit)
+                            {
+                                <fieldset disabled>
+                                    <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged />
+                                </fieldset>
+                            }
+                            else
+                            {
+                                <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged />
+                            }
+                            <div class="help is-danger">
+                                <ValidationMessage For="@(() => Departament.FirstQuarterStart)" />
+                            </div>
+                            <p class="title is-6">
+                                Miesiąc od którego liczone są kwartały można wybrać tylko przy tworzeniu oddziału!
+                            </p>
                         </div>
                         <div class="buttons is-right">
                             <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
@@ -48,9 +65,12 @@
     public DepartamentViewModel Departament { get; set; }
     [Parameter]
     public EventCallback SaveDepartament { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
 
     private bool _isLoading;
     private EditContext _editContext;
+    private IMonthPickerViewModel _monthPickerViewModel;
 
     private async void OnSubmitClick()
     {
@@ -67,6 +87,12 @@
     {
         _isLoading = false;
         _editContext = new(Departament);
+        _monthPickerViewModel = new MonthPickerViewModel(Departament.FirstQuarterStart);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+    }
+
+    private void OnPickedMonthChanged()
+    {
+        Departament.FirstQuarterStart = _monthPickerViewModel.MonthNumber;
     }
 }

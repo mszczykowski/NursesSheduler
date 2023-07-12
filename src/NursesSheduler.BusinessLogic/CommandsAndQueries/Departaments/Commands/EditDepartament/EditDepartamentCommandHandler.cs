@@ -8,7 +8,7 @@ using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament
 {
-    public class EditDepartamentCommandHandler : IRequestHandler<EditDepartamentRequest, EditDepartamentResponse>
+    internal sealed class EditDepartamentCommandHandler : IRequestHandler<EditDepartamentRequest, EditDepartamentResponse>
     {
         private readonly IMapper _mapper;
         private readonly IValidator<Departament> _validator;

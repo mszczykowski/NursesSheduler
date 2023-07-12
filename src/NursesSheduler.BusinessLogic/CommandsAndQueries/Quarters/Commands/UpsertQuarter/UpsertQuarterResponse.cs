@@ -1,6 +1,6 @@
-﻿namespace NursesScheduler.BlazorShared.ViewModels
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.UpsertQuarter
 {
-    internal sealed class QuarterViewModel
+    public sealed class UpsertQuarterResponse
     {
         public int QuarterId { get; set; }
         public int QuarterNumber { get; set; }

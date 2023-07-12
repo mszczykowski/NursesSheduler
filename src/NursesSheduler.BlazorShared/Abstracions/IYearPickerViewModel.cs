@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.BlazorShared.Abstracions
 {
-    public interface IYearViewModel
+    public interface IYearPickerViewModel
     {
         public int YearNumber { get; set; }
     }

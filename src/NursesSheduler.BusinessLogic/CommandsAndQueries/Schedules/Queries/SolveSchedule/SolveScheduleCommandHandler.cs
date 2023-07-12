@@ -11,7 +11,7 @@ using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.GenerateSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 {
     internal sealed class SolveScheduleCommandHandler : IRequestHandler<SolveScheduleRequest,
         SolveScheduleResponse>
@@ -23,8 +23,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
         private readonly ISeedService _seedService;
         private readonly ICalendarService _calendarService;
 
-        public SolveScheduleCommandHandler(IMapper mapper, ISchedulesService scheduleService, 
-            INurseStatsService nurseStatsService, IDepartamentSettingsProvider departamentSettingsProvider, 
+        public SolveScheduleCommandHandler(IMapper mapper, ISchedulesService scheduleService,
+            INurseStatsService nurseStatsService, IDepartamentSettingsProvider departamentSettingsProvider,
             ISeedService seedService, ICalendarService calendarService)
         {
             _mapper = mapper;
@@ -35,7 +35,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
             _calendarService = calendarService;
         }
 
-        public async Task<SolveScheduleResponse> Handle(SolveScheduleRequest request, 
+        public async Task<SolveScheduleResponse> Handle(SolveScheduleRequest request,
             CancellationToken cancellationToken)
         {
             string generatorSeed;
@@ -50,10 +50,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
 
             var constraints = new ConstraintsDirector().GetAllConstraints(departamentSettings);
 
-            var monthDays = await _calendarService.GetMonthDays(currentSchedule.Month, currentSchedule.Year, 
+            var monthDays = await _calendarService.GetMonthDays(currentSchedule.Month, currentSchedule.Year,
                 departamentSettings.FirstQuarterStart);
 
-            if(request.UseSpecifiedSeed)
+            if (request.UseSpecifiedSeed)
             {
                 generatorSeed = request.GeneratorSeed;
                 request.NumberOfRetries = 1;
@@ -63,12 +63,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
                 generatorSeed = _seedService.GetSeed();
             }
 
-            for(int i = 0; i < request.NumberOfRetries; i++)
+            for (int i = 0; i < request.NumberOfRetries; i++)
             {
-                result = TrySolveSchedule(currentSchedule, previousSchedule, departamentSettings, 
+                result = TrySolveSchedule(currentSchedule, previousSchedule, departamentSettings,
                     constraints, nurseQuarterStats, new Random(generatorSeed.GetHashCode()), monthDays);
 
-                if(result is not null)
+                if (result is not null)
                 {
                     break;
                 }
@@ -76,7 +76,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Ge
                 generatorSeed = _seedService.GetSeed();
             }
 
-            if(result is not null)
+            if (result is not null)
             {
                 result.PopulateScheduleFromState(currentSchedule);
             }

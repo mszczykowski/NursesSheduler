@@ -15,15 +15,15 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
         private readonly IMapper _mapper;
         private readonly IValidator<DepartamentSettings> _validator;
         private readonly IApplicationDbContext _context;
-        private readonly IDepartamentSettingsProvider _departamentSettingsManager;
+        private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
 
         public EditDepartamentSettingsCommandHandler(IMapper mapper, IValidator<DepartamentSettings> validator,
-                                  IApplicationDbContext context, IDepartamentSettingsProvider departamentSettingsManager)
+                                  IApplicationDbContext context, IDepartamentSettingsProvider departamentSettingsProvider)
         {
             _mapper = mapper;
             _validator = validator;
             _context = context;
-            _departamentSettingsManager = departamentSettingsManager;
+            _departamentSettingsProvider = departamentSettingsProvider;
         }
 
         public async Task<EditDepartamentSettingsResponse> Handle(EditDepartamentSettingsRequest request,
@@ -32,14 +32,19 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
             var newSettings = _mapper.Map<DepartamentSettings>(request);
 
             var validationResult = await _validator.ValidateAsync(newSettings);
-            if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
 
             var oldSettings = await _context.DepartamentSettings
                 .FirstOrDefaultAsync(s => s.DepartamentSettingsId == request.DepartamentSettingsId)
                 ?? throw new EntityNotFoundException(request.DepartamentSettingsId, nameof(DepartamentSettings));
 
             if (oldSettings.Equals(newSettings))
+            {
                 return _mapper.Map<EditDepartamentSettingsResponse>(oldSettings);
+            }
 
             oldSettings.SettingsVersion++;
 
@@ -47,7 +52,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            _departamentSettingsManager.InvalidateCache(oldSettings.DepartamentId);
+            _departamentSettingsProvider.InvalidateCache(oldSettings.DepartamentId);
 
             return result > 0 ? _mapper.Map<EditDepartamentSettingsResponse>(oldSettings) : null;
         }

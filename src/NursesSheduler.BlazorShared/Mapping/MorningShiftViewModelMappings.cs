@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.ViewModels;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 
 namespace NursesScheduler.BlazorShared.Mapping
@@ -9,7 +9,6 @@ namespace NursesScheduler.BlazorShared.Mapping
     {
         public MorningShiftViewModelMappings()
         {
-            CreateMap<GetScheduleResponse.MorningShiftsResponse, MorningShiftViewModel>();
             CreateMap<CalculateMorningShiftsResponse, MorningShiftViewModel>();
         }
     }

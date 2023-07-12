@@ -17,7 +17,6 @@ namespace NursesScheduler.BlazorShared.Mapping
             CreateMap<GetNursesFromDepartamentResponse, NurseViewModel>();
             CreateMap<GetNurseResponse, NurseViewModel>();
             CreateMap<NurseViewModel, EditNurseRequest>();
-            CreateMap<GetScheduleResponse.NurseResponse, NurseViewModel>();
         }
     }
 }

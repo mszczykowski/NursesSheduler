@@ -1,8 +1,11 @@
 ﻿@page "/scheduleView"
 
 @using NursesScheduler.BlazorShared.Pages.Schedules.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.UpsertQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 
 @inherits ComponenentUsingDepartament
@@ -10,8 +13,8 @@
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
 
-<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Recalculate="CalculateMorningShifts" Save="SaveMorningShifts"/>
-<SolverSettingsModal @ref="_solverSettingsModal" Save="SaveSolverSettings"/>
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Recalculate="CalculateMorningShifts" Save="SaveMorningShifts" />
+<SolverSettingsModal @ref="_solverSettingsModal" Save="SaveSolverSettings" />
 
 @if (_schedule == null || _isLoading)
 {
@@ -39,13 +42,13 @@ else
                     <label class="label">Miesiąc</label>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthViewModel=_dateViewModel OnChange="ReloadSchedule"/>
+                    <MonthSelect MonthViewModel=_dateViewModel OnChange="ReloadSchedule" />
                 </div>
                 <div class="level-item">
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <YearSelect YearViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="ReloadSchedule"/>
+                    <YearSelect YearViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="ReloadSchedule" />
                 </div>
                 <div class="level-item">
                     <button class="button is-info" @onclick="(async () => await ReloadSchedule())">Bieżący miesiąc</button>
@@ -131,22 +134,24 @@ else
         </div>
     </div>
 
-    <ScheduleTable MonthDays=_schedule.MonthDays ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_schedule.MorningShifts/>
+    <ScheduleTable MonthDays=_schedule.MonthDays ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_schedule.MorningShifts />
 }
 
 
 @code {
+    private IEnumerable<NurseViewModel> _nurses;
+    private IEnumerable<DayViewModel> _days;
+    private QuarterViewModel _quarter;
+    private IEnumerable<MorningShiftViewModel> _morningShifts;
+    private ScheduleViewModel _schedule;
+
     private MorningShiftsSettingsModal _morningShiftsSettingsModal;
     private SolverSettingsModal _solverSettingsModal;
-    private ScheduleViewModel _schedule;
-    private QuarterViewModel _quarter;
-    private IEnumerable<DayViewModel> _days;
-    private IEnumerable<NurseViewModel> _nurses;
 
     private int _numberOfReties;
     private string _generatorSeed;
 
-    private DateViewModel _dateViewModel = new DateViewModel
+    private DatePickerViewModel _dateViewModel = new DatePickerViewModel
         {
             YearNumber = DateTime.Now.Year,
             MonthNumber = DateTime.Now.Month,
@@ -158,8 +163,16 @@ else
     {
         if (firstRender)
         {
-
-            await GetSchedule();
+            try
+            {
+                await GetNurses();
+                await GetUpsertQuarter();
+                await GetSchedule();
+            }
+            catch (Exception e)
+            {
+                base.HandleException(e);
+            }
         }
     }
 
@@ -176,39 +189,7 @@ else
         await GetSchedule();
     }
 
-    private async Task LoadData()
-    {
-        try
-        {
 
-        }
-        catch(Exception e)
-        {
-            base.HandleException(e);
-        }
-    }
-
-    private async Task GetSchedule()
-    {
-        try
-        {
-            var request = new GetScheduleRequest
-                {
-                    Month = _dateViewModel.MonthNumber,
-                    Year = _dateViewModel.YearNumber,
-                    DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
-                };
-            var response = await _mediatr.Send(request);
-
-            _schedule = _mapper.Map<ScheduleViewModel>(response);
-            _isLoading = false;
-            StateHasChanged();
-        }
-        catch (Exception e)
-        {
-            base.HandleException(e);
-        }
-    }
 
     private void InitialiseSchedule()
     {
@@ -248,5 +229,83 @@ else
     {
         _numberOfReties = solverSettingsViewModel.NumberOfRetries;
         _generatorSeed = solverSettingsViewModel.GeneratorSeed;
+    }
+
+    private async Task ChangeSchedule()
+    {
+        await GetMonthDays();
+        await GetSchedule();
+
+        if(_schedule.QuarterId != _quarter.QuarterId)
+        {
+            await ChangeQuarter();
+        }
+    }
+
+    private async Task ChangeQuarter()
+    {
+        await GetUpsertQuarter();
+        await GetMorningShifts();
+    }
+
+    private async Task GetUpsertQuarter()
+    {
+        var request = new UpsertQuarterRequest
+            {
+                Month = _dateViewModel.MonthNumber,
+                Year = _dateViewModel.YearNumber,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+        var response = await _mediatr.Send(request);
+
+        _quarter = _mapper.Map<QuarterViewModel>(response);
+    }
+
+    private async Task GetNurses()
+    {
+        var request = new GetNursesFromDepartamentRequest()
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                IncludeDeleted = true,
+            };
+        var response = await _mediatr.Send(request);
+
+        _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(response);
+    }
+
+    private async Task GetSchedule()
+    {
+        var request = new GetScheduleRequest
+            {
+                Month = _dateViewModel.MonthNumber,
+                Year = _dateViewModel.YearNumber,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+        var response = await _mediatr.Send(request);
+
+        _schedule = _mapper.Map<ScheduleViewModel>(response);
+    }
+
+    private async Task GetMonthDays()
+    {
+        var request = new GetMonthDaysRequest
+            {
+                Month = _dateViewModel.MonthNumber,
+                Year = _dateViewModel.YearNumber,
+            };
+        var response = await _mediatr.Send(request);
+
+        _days = _mapper.Map<IEnumerable<DayViewModel>>(response);
+    }
+
+    private async Task GetMorningShifts()
+    {
+        var request = new GetMorningShiftsRequest
+            {
+                QuarterId = _quarter.QuarterId,
+            };
+        var response = await _mediatr.Send(request);
+
+        _morningShifts = _mapper.Map<IEnumerable<MorningShiftViewModel>>(response);
     }
 }

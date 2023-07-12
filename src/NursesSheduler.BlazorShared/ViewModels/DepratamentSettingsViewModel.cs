@@ -18,10 +18,6 @@ namespace NursesScheduler.BlazorShared.ViewModels
         [Range(typeof(TimeSpan), "00:00:00", "100:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 100h")]
         public TimeSpan MinmalShiftBreak { get; set; }
 
-        [Required(ErrorMessage = "Należy wybrać pierwszy miesiąc pierwszego kwartału")]
-        [Range(1, 12, ErrorMessage = "Wartość musi być miesiącem")]
-        public int FirstQuarterStart { get; set; }
-
         [Required(ErrorMessage = "Należy wpisać ilość godzin świątecznych należną za zmianę dzienną")]
         [Range(typeof(TimeSpan), "00:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 12h")]
         public TimeSpan DayShiftHolidayEligibleHours { get; set; }

@@ -16,8 +16,5 @@
 
         public int QuarterId { get; set; }
         public Quarter Quarter { get; set; }
-
-        public int DepartamentId { get; set; }
-        public virtual Departament Departament { get; set; }
     }
 }

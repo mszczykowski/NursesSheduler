@@ -7,8 +7,7 @@
         public int CreationYear { get; set; }
 
         public virtual ICollection<Nurse> Nurses { get; set; }
-        public virtual ICollection<Schedule> Schedules { get; set; }
-
+        public virtual ICollection<Quarter> Quarters { get; set; }
         public virtual DepartamentSettings DepartamentSettings { get; set; }
     }
 }

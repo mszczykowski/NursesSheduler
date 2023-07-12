@@ -43,7 +43,6 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 Month = monthNumber,
                 Year = yearNumber,
-                DepartamentId = departamentId,
                 TimeOffAssigned = TimeSpan.Zero,
                 MonthInQuarter = monthInQuarter,
             };
@@ -65,7 +64,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var absenceSummaries = await _context.AbsencesSummaries
                 .Where(a => a.Year == schedule.Year &&
-                    a.Nurse.DepartamentId == schedule.DepartamentId)
+                    a.Nurse.DepartamentId == schedule.Quarter.DepartamentId)
                 .Include(a => a.Absences)
                 .ToListAsync();
 
@@ -162,10 +161,9 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task CalculateNurseWorkTimes(Schedule currentSchedule)
         {
             var previousSchedules = await _context.Schedules
-                .Where(s => s.Quarter == currentSchedule.Quarter &&
+                .Where(s => s.QuarterId == currentSchedule.QuarterId &&
                     s.Month != currentSchedule.Month &&
-                    s.Year == currentSchedule.Year &&
-                    s.DepartamentId == currentSchedule.DepartamentId)
+                    s.Year == currentSchedule.Year)
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
                 .OrderBy(s => s.MonthInQuarter)
@@ -248,14 +246,14 @@ namespace NursesScheduler.BusinessLogic.Services
             return await _context.Schedules
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
-                .FirstOrDefaultAsync(s => s.DepartamentId == currentSchedule.DepartamentId &&
+                .FirstOrDefaultAsync(s => s.Quarter.DepartamentId == currentSchedule.Quarter.DepartamentId &&
                     s.Year == prevMonth.Year &&
                     s.Month == prevMonth.Month);
         }
 
         public async Task UpdateScheduleNurses(Schedule schedule)
         {
-            var activeNurses = await _nursesService.GetActiveDepartamentNurses(schedule.DepartamentId);
+            var activeNurses = await _nursesService.GetActiveDepartamentNurses(schedule.Quarter.DepartamentId);
             var numberOfDaysInMonth = DateTime.DaysInMonth(schedule.Year, schedule.Month);
 
             foreach(var nurse in activeNurses)

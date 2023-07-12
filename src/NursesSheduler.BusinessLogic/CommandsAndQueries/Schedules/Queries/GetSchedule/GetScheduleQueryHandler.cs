@@ -30,9 +30,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         public async Task<GetScheduleResponse> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
         {
             var schedule = await _context.Schedules
+                .Include(s => s.Quarter)
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
-                .FirstOrDefaultAsync(s => s.DepartamentId == request.DepartamentId &&
+                .FirstOrDefaultAsync(s => s.Quarter.DepartamentId == request.DepartamentId &&
                     s.Year == request.Year &&
                     s.Month == request.Month);
 

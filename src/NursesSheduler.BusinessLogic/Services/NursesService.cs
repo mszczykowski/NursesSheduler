@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Services

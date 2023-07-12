@@ -20,7 +20,6 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<EditNurseRequest, Nurse>();
             CreateMap<Nurse, EditNurseResponse>();
             CreateMap<Nurse, GetAbsencesSummaryByDepartamentResponse>();
-            CreateMap<Nurse, GetScheduleResponse.NurseResponse>();
         }
     }
 }

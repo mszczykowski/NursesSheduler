@@ -6,7 +6,7 @@
         public int DepartamentId { get; set; }
         public int MonthNumber { get; set; }
         public int Year { get; set; }
-        public int QuarterNumber { get; set; }
+        public int QuarterId { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
         public TimeSpan WorkTimeInQuarter { get; set; }
         public TimeSpan TimeOffAvailableToAssgin { get; set; }

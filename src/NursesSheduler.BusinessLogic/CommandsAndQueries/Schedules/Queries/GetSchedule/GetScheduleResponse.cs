@@ -8,14 +8,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         public int DepartamentId { get; set; }
         public int MonthNumber { get; set; }
         public int Year { get; set; }
-        public int QuarterNumber { get; set; }
+        public int QuarterId { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
         public TimeSpan WorkTimeInQuarter { get; set; }
         public TimeSpan TimeOffAvailableToAssgin { get; set; }
         public TimeSpan TimeOffAssigned { get; set; }
         public bool IsClosed { get; set; }
         public ICollection<ScheduleNurseResponse> ScheduleNurses { get; set; }
-        public TimeSpan TimeForMorningShifts { get; set; }
 
         public sealed class ScheduleNurseResponse
         {
@@ -23,12 +22,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
             public int NurseId { get; init; }
             public PreviousNurseStates PreviousState { get; set; }
             public int DaysFromLastShift { get; set; }
-
             public NurseWorkDayResponse[] NurseWorkDays { get; set; }
             public TimeSpan PreviousMonthTime { get; set; }
             public TimeSpan TimeToAssingInMonth { get; set; }
             public TimeSpan TimeToAssingInQuarterLeft { get; set; }
             public TimeSpan TimeOffToAssign { get; set; }
+            public TimeSpan HolidaysHoursAssigned { get; set; }
+            public int NightShiftsAssigned { get; set; }
         }
 
         public sealed class NurseWorkDayResponse

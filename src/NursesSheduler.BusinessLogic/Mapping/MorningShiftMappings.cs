@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -9,8 +9,9 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public MorningShiftMappings()
         {
-            CreateMap<MorningShift, GetScheduleResponse.MorningShiftsResponse>();
+            CreateMap<MorningShift, GetMorningShiftsResponse>();
             CreateMap<MorningShift, CalculateMorningShiftsResponse>();
+
         }
     }
 }

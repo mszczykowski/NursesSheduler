@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.BlazorShared.Abstracions
 {
-    public interface IMonthViewModel
+    public interface IMonthPickerViewModel
     {
         public int MonthNumber { get; set; }
     }
