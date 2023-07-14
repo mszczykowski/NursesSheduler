@@ -9,7 +9,7 @@
     <SchedulePrevState PreviousStatate=ScheduleNurse.PreviousState/>
     @foreach(var workDay in ScheduleNurse.NurseWorkDays)
     {
-        <ScheduleShift WorkDay=workDay Day=MonthDays[workDay.DayNumber-1] MorningShifts="MorningShifts"/>
+        <ScheduleShift WorkDay=workDay Day=@MonthDays.First(d=>d.Date.Day == workDay.DayNumber) MorningShifts="MorningShifts"/>
     }
     <td class="summary">@ScheduleNurse.PreviousMonthTime.GetTotalHoursAndMinutes()</td>
     <td class="summary">@ScheduleNurse.TimeToAssingInMonth.GetTotalHoursAndMinutes()</td>
@@ -24,7 +24,7 @@
     [Parameter]
     public ScheduleNurseViewModel ScheduleNurse { get; set; }
     [Parameter]
-    public DayViewModel[] MonthDays { get; set; }
+    public IEnumerable<DayViewModel> MonthDays { get; set; }
     [Parameter]
-    public MorningShiftViewModel[] MorningShifts { get; set; }
+    public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
 }

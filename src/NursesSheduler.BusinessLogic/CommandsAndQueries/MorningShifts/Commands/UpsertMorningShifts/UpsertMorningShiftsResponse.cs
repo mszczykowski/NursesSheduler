@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.UpsertMorningShifts
 {
-    internal class UpsertMorningShiftsResponse
+    public sealed class UpsertMorningShiftsResponse
     {
+        public int MorningShiftId { get; set; }
+        public MorningShiftIndex Index { get; set; }
+        public TimeSpan ShiftLength { get; set; }
     }
 }

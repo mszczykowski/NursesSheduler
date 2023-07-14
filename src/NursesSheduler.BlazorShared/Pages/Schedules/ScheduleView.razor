@@ -2,6 +2,7 @@
 
 @using NursesScheduler.BlazorShared.Pages.Schedules.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
@@ -10,13 +11,14 @@
 
 @inherits ComponenentUsingDepartament
 
-@inject IMediator _mediatr;
-@inject IMapper _mapper;
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler
 
-<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Recalculate="CalculateMorningShifts" Save="SaveMorningShifts" />
-<SolverSettingsModal @ref="_solverSettingsModal" Save="SaveSolverSettings" />
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Quarter=_quarter MorningShifts=_morningShifts />
+<SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
 
-@if (_schedule == null || _isLoading)
+@if (_isLoading)
 {
     <LoadingSpinner />
 }
@@ -26,10 +28,10 @@ else
         <div class="level">
             <div class="level-left">
                 <div class="level-item">
-                    <a @onclick="(() => _morningShiftsSettingsModal.SetModal(_schedule.MorningShifts, _schedule.TimeForMorningShifts))">Konfiguracja ranków</a>
+                    <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())">Konfiguracja ranków</a>
                 </div>
                 <div class="level-item">
-                    <a @onclick="(() => _solverSettingsModal.SetModal(_generatorSeed, _numberOfReties))">Konfiguracja generatora</a>
+                    <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
                     <a>Drukuj</a>
@@ -42,19 +44,18 @@ else
                     <label class="label">Miesiąc</label>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthViewModel=_dateViewModel OnChange="ReloadSchedule" />
+                    <MonthSelect MonthViewModel=_dateViewModel OnChange="OnSeletedDateChanged" />
                 </div>
                 <div class="level-item">
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <YearSelect YearViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="ReloadSchedule" />
+                    <YearSelect YearViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChanged" />
                 </div>
                 <div class="level-item">
-                    <button class="button is-info" @onclick="(async () => await ReloadSchedule())">Bieżący miesiąc</button>
+                    <button class="button is-info" @onclick="OnCurrentDateClick">Bieżący miesiąc</button>
                 </div>
             </div>
-
 
             <div class="level-right">
                 <div class="level-item">
@@ -104,7 +105,7 @@ else
             <div class="level-left">
                 <div class="level-item">
                     <p>
-                        <b>Kwartał:</b> @_schedule.QuarterNumber
+                        <b>Kwartał:</b> @_quarter.QuarterNumber
                     </p>
                 </div>
                 <div class="level-item">
@@ -114,7 +115,7 @@ else
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Czas w kwartale:</b> @_schedule.WorkTimeInQuarter.GetTotalHoursAndMinutes()
+                        <b>Czas w kwartale:</b> @_quarter.WorkTimeInQuarterToAssign.GetTotalHoursAndMinutes()
                     </p>
                 </div>
                 <div class="level-item">
@@ -134,7 +135,7 @@ else
         </div>
     </div>
 
-    <ScheduleTable MonthDays=_schedule.MonthDays ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_schedule.MorningShifts />
+    <ScheduleTable MonthDays=_days ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_morningShifts />
 }
 
 
@@ -144,12 +145,10 @@ else
     private QuarterViewModel _quarter;
     private IEnumerable<MorningShiftViewModel> _morningShifts;
     private ScheduleViewModel _schedule;
+    private SolverSettingsViewModel _solverSettings;
 
-    private MorningShiftsSettingsModal _morningShiftsSettingsModal;
-    private SolverSettingsModal _solverSettingsModal;
-
-    private int _numberOfReties;
-    private string _generatorSeed;
+    private ModalBase _morningShiftsSettingsModal;
+    private ModalBase _solverSettingsModal;
 
     private DatePickerViewModel _dateViewModel = new DatePickerViewModel
         {
@@ -163,86 +162,61 @@ else
     {
         if (firstRender)
         {
+            _isLoading = true;
+
             try
             {
                 await GetNurses();
-                await GetUpsertQuarter();
-                await GetSchedule();
+                await InitializeSolverSettings();
+                await SetQuarter();
+                await SetSchedule();
             }
             catch (Exception e)
             {
-                base.HandleException(e);
+                _exceptionHandler.HandleException(e);
             }
+
+            _isLoading = false;
         }
     }
 
-    private async Task ReloadSchedule()
+    private async Task OnSeletedDateChanged()
     {
         _isLoading = true;
         await Task.Delay(1);
-        await GetSchedule();
-    }
 
-    private async Task SelectedMonthChanged(ChangeEventArgs e)
-    {
-        _dateViewModel.MonthNumber = Int32.Parse(e.Value.ToString());
-        await GetSchedule();
-    }
-
-
-
-    private void InitialiseSchedule()
-    {
-
-    }
-
-    private void LoadSchedule(GetScheduleResponse response)
-    {
-
-    }
-
-    private void SaveMorningShifts(MorningShiftsEditViewModel morningShiftsEditViewModel)
-    {
-        _schedule.MorningShifts = morningShiftsEditViewModel.MorningShifts;
-    }
-
-    private async Task CalculateMorningShifts(MorningShiftsEditViewModel morningShiftsEditViewModel)
-    {
         try
         {
-            var request = new CalculateMorningShiftsRequest
-                {
-                    TimeForMorningShifts = _schedule.TimeForMorningShifts,
-                    DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
-                };
-            var response = await _mediatr.Send(request);
-
-            morningShiftsEditViewModel.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
+            await SetSchedule();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(ex);
         }
+
+        _isLoading = false;
     }
 
-    private void SaveSolverSettings(SolverSettingsViewModel solverSettingsViewModel)
+    private async Task OnCurrentDateClick()
     {
-        _numberOfReties = solverSettingsViewModel.NumberOfRetries;
-        _generatorSeed = solverSettingsViewModel.GeneratorSeed;
+        _dateViewModel.MonthNumber = DateTime.Now.Month;
+        _dateViewModel.YearNumber = DateTime.Now.Year;
+
+        await OnSeletedDateChanged();
     }
 
-    private async Task ChangeSchedule()
+    private async Task SetSchedule()
     {
         await GetMonthDays();
         await GetSchedule();
 
-        if(_schedule.QuarterId != _quarter.QuarterId)
+        if (_schedule.QuarterId != _quarter.QuarterId)
         {
-            await ChangeQuarter();
+            await SetQuarter();
         }
     }
 
-    private async Task ChangeQuarter()
+    private async Task SetQuarter()
     {
         await GetUpsertQuarter();
         await GetMorningShifts();
@@ -307,5 +281,18 @@ else
         var response = await _mediatr.Send(request);
 
         _morningShifts = _mapper.Map<IEnumerable<MorningShiftViewModel>>(response);
+    }
+
+    private async Task InitializeSolverSettings()
+    {
+        var request = new GetDepartamentSettingsRequest
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+        var response = await _mediatr.Send(request);
+
+        var settings = _mapper.Map<DepratamentSettingsViewModel>(response);
+
+        _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
     }
 }

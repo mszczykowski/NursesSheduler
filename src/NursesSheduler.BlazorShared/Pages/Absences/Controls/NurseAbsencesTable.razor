@@ -4,6 +4,7 @@
 
 @inject IMediator _mediatr
 @inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler
 
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteAbsence" />
@@ -69,7 +70,7 @@ else
         }
         catch (Exception e)
         {
-            HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 }

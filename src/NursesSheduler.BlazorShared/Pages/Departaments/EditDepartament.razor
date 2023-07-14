@@ -1,13 +1,13 @@
 ﻿@page "/departaments/edit/{Id:int}"
 
-@inherits ExceptionHandlingComponent
-
 @using NursesScheduler.BlazorShared.Pages.Departaments.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament
 
-@inject IMediator _mediatr;
-@inject IMapper _mapper;
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptonHandler
+@inject NavigationManager _navigationManager
 
 @if(_departament == null)
 {
@@ -15,7 +15,7 @@
 }
 else
 {
-    <DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveDepartament="SaveDepartament"/>
+    <DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveDepartament="SaveDepartament" IsEdit=true/>
 }
 
 
@@ -43,13 +43,18 @@ else
                 DepartamentId = Id
             };
             var response = await _mediatr.Send(request);
-            if (response == null) NavigationManager.NavigateTo("/notFound");
+
+            if (response == null)
+            {
+                throw new EntityNotFoundException(Id, nameof(DepartamentViewModel));
+            }
+
             _departament = _mapper.Map<DepartamentViewModel>(response);
             StateHasChanged();
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptonHandler.HandleException(e);
         }
         
     }
@@ -61,11 +66,11 @@ else
             var request = _mapper.Map<EditDepartamentRequest>(_departament);
             var response = await _mediatr.Send(request);
 
-            NavigationManager.NavigateTo("/departaments");
+            _navigationManager.NavigateTo("/departaments");
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptonHandler.HandleException(e);
         }
     }
 }

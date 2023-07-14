@@ -26,22 +26,22 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
         public async Task<CreateDepartamentResponse> Handle(CreateDepartamentRequest request, 
             CancellationToken cancellationToken)
         {
-            var departamnt = _mapper.Map<Departament>(request);
+            var departament = _mapper.Map<Departament>(request);
 
-            var validationResult = await _validator.ValidateAsync(departamnt);
+            var validationResult = await _validator.ValidateAsync(departament);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
             }
 
-            departamnt.CreationYear = _currentDateService.GetCurrentDate().Year;
-            departamnt.DepartamentSettings = new DepartamentSettings(request.FirstQuarterStart);
+            departament.CreationYear = _currentDateService.GetCurrentDate().Year;
+            departament.DepartamentSettings = new DepartamentSettings(request.FirstQuarterStart);
 
-            await _context.Departaments.AddAsync(departamnt);
+            await _context.Departaments.AddAsync(departament);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            return result > 0 ? _mapper.Map<CreateDepartamentResponse>(departamnt) : null;
+            return result > 0 ? _mapper.Map<CreateDepartamentResponse>(departament) : null;
         }
     }
 }

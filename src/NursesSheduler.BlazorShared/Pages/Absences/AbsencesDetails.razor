@@ -13,6 +13,7 @@
 
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
+@inject IExceptionHandler _exceptionHandler;
 
 <EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" Recalculate="RecalculateSummary" Save="EditSummary" />
 
@@ -141,7 +142,7 @@ else
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 
@@ -209,7 +210,7 @@ else
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 
@@ -235,7 +236,7 @@ else
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 
@@ -254,7 +255,7 @@ else
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 }

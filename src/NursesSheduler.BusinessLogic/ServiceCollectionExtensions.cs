@@ -23,6 +23,7 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IValidator<AddAbsenceRequest>, AddAbsenceRequestValidator>();
             services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
             services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
+            services.AddTransient<IValidator<MorningShift>, MorningShiftValidator>();
 
             //services
             services.AddSingleton<ICurrentDateService, CurrentDateService>();
@@ -32,6 +33,7 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<ISchedulesService, SchedulesService>();
             services.AddTransient<ICalendarService, CalendarService>();
             services.AddTransient<INurseStatsService, NurseStatsService>();
+            services.AddTransient<INursesService, NursesService>();
         }
     }
 }

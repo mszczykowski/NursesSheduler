@@ -2,8 +2,9 @@
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
 {
-    internal class GetMorningShiftsResponse
+    public sealed class GetMorningShiftsResponse
     {
+        public int MorningShiftId { get; set; }
         public MorningShiftIndex Index { get; set; }
         public TimeSpan ShiftLength { get; set; }
     }

@@ -5,8 +5,9 @@
 @using NursesScheduler.BlazorShared.Pages.Nurses.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 
-@inject IMediator _mediatr;
-@inject IMapper _mapper;
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler
 
 <div class='container'>
     <div class="level">
@@ -47,7 +48,7 @@
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 }

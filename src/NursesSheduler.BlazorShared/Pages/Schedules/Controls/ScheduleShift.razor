@@ -27,7 +27,7 @@
     [Parameter]
     public DayViewModel Day { get; set; }
     [Parameter]
-    public ICollection<MorningShiftViewModel> MorningShifts { get; set; }
+    public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
     [Parameter]
     public EventCallback RecalculateRow { get; set; }
 

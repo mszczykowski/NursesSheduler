@@ -15,6 +15,11 @@ namespace NursesScheduler.Domain.Entities
         public int AbsencesSummaryId { get; set; }
         public virtual AbsencesSummary AbsencesSummary { get; set; }
 
+
+        public Absence()
+        {
+
+        }
         public Absence(int month)
         {
             MonthNumber = month;

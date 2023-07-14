@@ -3,10 +3,9 @@
 @using NursesScheduler.BlazorShared.Pages.Departaments.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
 
-@inherits ExceptionHandlingComponent
-
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
+@inject IExceptionHandler _exceptonHandler;
 
 
 <div class="container">
@@ -63,7 +62,7 @@
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptonHandler.HandleException(e);
         }
     }
 }

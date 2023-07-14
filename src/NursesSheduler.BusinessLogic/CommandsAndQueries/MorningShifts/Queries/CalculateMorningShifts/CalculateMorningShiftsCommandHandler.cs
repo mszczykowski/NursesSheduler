@@ -2,7 +2,6 @@
 using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.BusinessLogic.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
 {
@@ -26,9 +25,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries
             CancellationToken cancellationToken)
         {
             var departamentSettings = await _departamentSettingsManager.GetDepartamentSettings(request.DepartamentId);
-
-            if (departamentSettings == null)
-                throw new EntityNotFoundException(request.DepartamentId, nameof(DepartamentsSettings));
 
             return _mapper.Map<ICollection<CalculateMorningShiftsResponse>>(_workTimeService
                 .CalculateMorningShifts(request.TimeForMorningShifts, departamentSettings));

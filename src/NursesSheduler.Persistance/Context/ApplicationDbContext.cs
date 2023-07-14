@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.ValueObjects;
 using NursesScheduler.Infrastructure.Configuration;
 
 namespace NursesScheduler.Infrastructure.Context
@@ -18,7 +17,6 @@ namespace NursesScheduler.Infrastructure.Context
         public DbSet<Quarter> Quarters { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<ScheduleNurse> ScheduleNurses { get; set; }
-        public DbSet<WorkTimeInWeek> WorkTimeInWeeks { get; set; }
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

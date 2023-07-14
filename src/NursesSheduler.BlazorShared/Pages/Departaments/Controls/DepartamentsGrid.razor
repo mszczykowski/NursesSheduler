@@ -1,12 +1,11 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.DeleteDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament
 
-@inherits ExceptionHandlingComponent
-
-@inject IMediator _mediatr;
-@inject IMapper _mapper;
-@inject CurrentDepartamentStore _currentDepartamentStore;
-
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject CurrentDepartamentStore _currentDepartamentStore
+@inject IExceptionHandler _exceptionHandler
+@inject NavigationManager _navigationManager;
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteDepratament" />
 
@@ -50,11 +49,11 @@ else
                 throw new EntityNotFoundException(departament.DepartamentId, nameof(DepartamentViewModel));
 
             _currentDepartamentStore.CurrentDepartament = _mapper.Map<DepartamentViewModel>(response);
-            base.NavigationManager.NavigateTo("/scheduleView");
+            _navigationManager.NavigateTo("/scheduleView");
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 
@@ -82,7 +81,7 @@ else
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 }

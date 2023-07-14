@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.BlazorShared.ViewModels
 {
-    internal sealed class QuarterViewModel
+    public sealed class QuarterViewModel
     {
         public int QuarterId { get; set; }
         public int QuarterNumber { get; set; }

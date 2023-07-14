@@ -6,8 +6,9 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
 
-@inject IMediator _mediatr;
-@inject IMapper _mapper;
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler;
 
 <div class='container'>
     <div class="level">
@@ -63,7 +64,7 @@
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 
@@ -78,7 +79,7 @@
         }
         catch (Exception e)
         {
-            base.HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 }

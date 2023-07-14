@@ -2,8 +2,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
-using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
 {
@@ -12,26 +10,19 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries
     {
         private readonly IMapper _mapper;
         private readonly IApplicationDbContext _applicationDbContext;
+
+        public GetMorningShiftsQueryHandler(IMapper mapper, IApplicationDbContext applicationDbContext)
+        {
+            _mapper = mapper;
+            _applicationDbContext = applicationDbContext;
+        }
+
         public async Task<IEnumerable<GetMorningShiftsResponse>> Handle(GetMorningShiftsRequest request, 
             CancellationToken cancellationToken)
         {
-            var morningShifts = await _applicationDbContext.MorningShifts
+            return _mapper.Map<IEnumerable<GetMorningShiftsResponse>>(await _applicationDbContext.MorningShifts
                 .Where(m => m.QuarterId == request.QuarterId)
-                .ToListAsync();
-
-            if(!morningShifts.Any())
-            {
-                for(int i = 0; i <= (int)MorningShiftIndex.R3; i++)
-                {
-                    morningShifts.Add(new MorningShift
-                    {
-                        QuarterId = request.QuarterId,
-                        Index = (MorningShiftIndex)i,
-                        ShiftLength = TimeSpan.Zero,
-                    });
-                }
-            }
-            return _mapper.Map<IEnumerable<GetMorningShiftsResponse>>(morningShifts);
+                .ToListAsync());
         }
     }
 }

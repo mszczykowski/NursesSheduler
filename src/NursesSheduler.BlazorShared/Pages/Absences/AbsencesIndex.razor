@@ -8,6 +8,7 @@
 
 @inject IMediator _mediatr
 @inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler;
 
 
 <div class="container">
@@ -87,7 +88,7 @@
         }
         catch (Exception e)
         {
-            HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 

@@ -32,12 +32,13 @@ namespace NursesScheduler.Infrastructure.Migrations
                     WorkingTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     MaximalWeekWorkingTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     MinmalShiftBreak = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    FirstQuarterStart = table.Column<int>(type: "INTEGER", nullable: false),
-                    FirstShiftStartTime = table.Column<TimeOnly>(type: "TEXT", nullable: false),
                     TargetNumberOfNursesOnShift = table.Column<int>(type: "INTEGER", nullable: false),
                     TargetMinimalMorningShiftLenght = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     DefaultGeneratorRetryValue = table.Column<int>(type: "INTEGER", nullable: false),
                     SettingsVersion = table.Column<int>(type: "INTEGER", nullable: false),
+                    DayShiftHolidayEligibleHours = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    NightShiftHolidayEligibleHours = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    FirstQuarterStart = table.Column<int>(type: "INTEGER", nullable: false),
                     DepartamentId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -81,10 +82,12 @@ namespace NursesScheduler.Infrastructure.Migrations
                     QuarterId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     QuarterNumber = table.Column<int>(type: "INTEGER", nullable: false),
-                    QuarterYear = table.Column<int>(type: "INTEGER", nullable: false),
+                    Year = table.Column<int>(type: "INTEGER", nullable: false),
                     DepartamentId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SettingsVersion = table.Column<int>(type: "INTEGER", nullable: false),
-                    MorningShiftsReadOnly = table.Column<bool>(type: "INTEGER", nullable: false)
+                    WorkTimeInQuarterToAssign = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    TimeForMorningShifts = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SettingsVersion = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -121,31 +124,24 @@ namespace NursesScheduler.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NursesQuartersStats",
+                name: "MorningShifts",
                 columns: table => new
                 {
-                    NurseQuarterStatsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    MorningShiftId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    WorkTimeInQuarterToAssign = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    HolidayPaidHoursAssigned = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    NumberOfNightShifts = table.Column<int>(type: "INTEGER", nullable: false),
-                    NurseId = table.Column<int>(type: "INTEGER", nullable: false),
-                    QuarterId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Index = table.Column<int>(type: "INTEGER", nullable: false),
+                    ShiftLength = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    QuarterId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NursesQuartersStats", x => x.NurseQuarterStatsId);
+                    table.PrimaryKey("PK_MorningShifts", x => x.MorningShiftId);
                     table.ForeignKey(
-                        name: "FK_NursesQuartersStats_Nurses_NurseId",
-                        column: x => x.NurseId,
-                        principalTable: "Nurses",
-                        principalColumn: "NurseId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_NursesQuartersStats_Quarters_QuarterId",
+                        name: "FK_MorningShifts_Quarters_QuarterId",
                         column: x => x.QuarterId,
                         principalTable: "Quarters",
-                        principalColumn: "QuarterId");
+                        principalColumn: "QuarterId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -154,26 +150,19 @@ namespace NursesScheduler.Infrastructure.Migrations
                 {
                     ScheduleId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    MonthNumber = table.Column<int>(type: "INTEGER", nullable: false),
+                    Month = table.Column<int>(type: "INTEGER", nullable: false),
                     MonthInQuarter = table.Column<int>(type: "INTEGER", nullable: false),
                     Year = table.Column<int>(type: "INTEGER", nullable: false),
-                    QuarterId = table.Column<int>(type: "INTEGER", nullable: false),
                     WorkTimeInMonth = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     TimeOffAvailableToAssgin = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     TimeOffAssigned = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    SettingsVersion = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
                     Holidays = table.Column<string>(type: "TEXT", nullable: false),
-                    DepartamentId = table.Column<int>(type: "INTEGER", nullable: false)
+                    QuarterId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Schedules", x => x.ScheduleId);
-                    table.ForeignKey(
-                        name: "FK_Schedules_Departaments_DepartamentId",
-                        column: x => x.DepartamentId,
-                        principalTable: "Departaments",
-                        principalColumn: "DepartamentId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Schedules_Quarters_QuarterId",
                         column: x => x.QuarterId,
@@ -188,11 +177,12 @@ namespace NursesScheduler.Infrastructure.Migrations
                 {
                     AbsenceId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    From = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    To = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    WorkingHoursToAssign = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    MonthNumber = table.Column<int>(type: "INTEGER", nullable: false),
+                    Days = table.Column<string>(type: "TEXT", nullable: false),
+                    WorkTimeToAssign = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     AssignedWorkingHours = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
                     AbsencesSummaryId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -207,58 +197,21 @@ namespace NursesScheduler.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MorningShifts",
-                columns: table => new
-                {
-                    MorningShiftId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Lenght = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    NurseQuarterStatsId = table.Column<int>(type: "INTEGER", nullable: true),
-                    QuarterId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MorningShifts", x => x.MorningShiftId);
-                    table.ForeignKey(
-                        name: "FK_MorningShifts_NursesQuartersStats_NurseQuarterStatsId",
-                        column: x => x.NurseQuarterStatsId,
-                        principalTable: "NursesQuartersStats",
-                        principalColumn: "NurseQuarterStatsId");
-                    table.ForeignKey(
-                        name: "FK_MorningShifts_Quarters_QuarterId",
-                        column: x => x.QuarterId,
-                        principalTable: "Quarters",
-                        principalColumn: "QuarterId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkTimeInWeek",
-                columns: table => new
-                {
-                    WorkTimeInWeekId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    WeekNumber = table.Column<int>(type: "INTEGER", nullable: false),
-                    AssignedWorkTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    NurseQuarterStatsId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkTimeInWeek", x => x.WorkTimeInWeekId);
-                    table.ForeignKey(
-                        name: "FK_WorkTimeInWeek_NursesQuartersStats_NurseQuarterStatsId",
-                        column: x => x.NurseQuarterStatsId,
-                        principalTable: "NursesQuartersStats",
-                        principalColumn: "NurseQuarterStatsId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ScheduleNurses",
                 columns: table => new
                 {
                     ScheduleNurseId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     NurseId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ScheduleId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ScheduleId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PreviousMonthTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    TimeToAssingInMonth = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    TimeOffToAssign = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    TimeToAssingInQuarterLeft = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    HolidaysHoursAssigned = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    NightShiftsAssigned = table.Column<int>(type: "INTEGER", nullable: false),
+                    PreviousState = table.Column<int>(type: "INTEGER", nullable: false),
+                    DaysFromLastShift = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -285,21 +238,14 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     DayNumber = table.Column<int>(type: "INTEGER", nullable: false),
                     ScheduleNurseId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    ShiftStart = table.Column<TimeOnly>(type: "TEXT", nullable: false),
-                    ShiftEnd = table.Column<TimeOnly>(type: "TEXT", nullable: false),
+                    ShiftType = table.Column<int>(type: "INTEGER", nullable: false),
                     MorningShiftId = table.Column<int>(type: "INTEGER", nullable: true),
-                    AbsenceId = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsTimeOff = table.Column<bool>(type: "INTEGER", nullable: false),
                     NurseId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NursesWorkDays", x => x.NurseWorkDayId);
-                    table.ForeignKey(
-                        name: "FK_NursesWorkDays_Absences_AbsenceId",
-                        column: x => x.AbsenceId,
-                        principalTable: "Absences",
-                        principalColumn: "AbsenceId");
                     table.ForeignKey(
                         name: "FK_NursesWorkDays_MorningShifts_MorningShiftId",
                         column: x => x.MorningShiftId,
@@ -335,11 +281,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_MorningShifts_NurseQuarterStatsId",
-                table: "MorningShifts",
-                column: "NurseQuarterStatsId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MorningShifts_QuarterId",
                 table: "MorningShifts",
                 column: "QuarterId");
@@ -348,21 +289,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                 name: "IX_Nurses_DepartamentId",
                 table: "Nurses",
                 column: "DepartamentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_NursesQuartersStats_NurseId",
-                table: "NursesQuartersStats",
-                column: "NurseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_NursesQuartersStats_QuarterId",
-                table: "NursesQuartersStats",
-                column: "QuarterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_NursesWorkDays_AbsenceId",
-                table: "NursesWorkDays",
-                column: "AbsenceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NursesWorkDays_MorningShiftId",
@@ -395,23 +321,16 @@ namespace NursesScheduler.Infrastructure.Migrations
                 column: "ScheduleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Schedules_DepartamentId",
-                table: "Schedules",
-                column: "DepartamentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Schedules_QuarterId",
                 table: "Schedules",
                 column: "QuarterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkTimeInWeek_NurseQuarterStatsId",
-                table: "WorkTimeInWeek",
-                column: "NurseQuarterStatsId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Absences");
+
             migrationBuilder.DropTable(
                 name: "DepartamentSettings");
 
@@ -419,10 +338,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                 name: "NursesWorkDays");
 
             migrationBuilder.DropTable(
-                name: "WorkTimeInWeek");
-
-            migrationBuilder.DropTable(
-                name: "Absences");
+                name: "AbsencesSummaries");
 
             migrationBuilder.DropTable(
                 name: "MorningShifts");
@@ -431,16 +347,10 @@ namespace NursesScheduler.Infrastructure.Migrations
                 name: "ScheduleNurses");
 
             migrationBuilder.DropTable(
-                name: "AbsencesSummaries");
-
-            migrationBuilder.DropTable(
-                name: "NursesQuartersStats");
+                name: "Nurses");
 
             migrationBuilder.DropTable(
                 name: "Schedules");
-
-            migrationBuilder.DropTable(
-                name: "Nurses");
 
             migrationBuilder.DropTable(
                 name: "Quarters");

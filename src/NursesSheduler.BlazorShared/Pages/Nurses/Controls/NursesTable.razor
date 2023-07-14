@@ -1,9 +1,7 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 
-@inherits ExceptionHandlingComponent;
-
 @inject IMediator _mediatr
-
+@inject IExceptionHandler _exceptionHandler;
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteNurse" />
 
@@ -63,7 +61,7 @@ else
         }
         catch (Exception e)
         {
-            HandleException(e);
+            _exceptionHandler.HandleException(e);
         }
     }
 }

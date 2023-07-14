@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure
 {
@@ -17,7 +16,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure
         DbSet<Quarter> Quarters { get; set; }
         DbSet<Schedule> Schedules { get; set; }
         DbSet<ScheduleNurse> ScheduleNurses { get; set; }
-        DbSet<WorkTimeInWeek> WorkTimeInWeeks { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         EntityEntry Entry(object entity);

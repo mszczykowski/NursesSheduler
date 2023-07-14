@@ -19,7 +19,7 @@
         <div class='column is-5'>
             <div class="card">
                 <div class="card-content">
-                    <EditForm EditContext="@_editContext" OnSubmit="@OnSubmitClick">
+                    <EditForm EditContext="@_editContext" OnValidSubmit="@OnSubmitClick">
                         <DataAnnotationsValidator />
                         <div class="field">
                             <label class="label">Nazwa</label>
@@ -29,22 +29,15 @@
                                     <ValidationMessage For="@(() => Departament.Name)" />
                                 </div>
                             </div>
-                            <label class="label">Kwartały od</label>
-                            @if (IsEdit)
-                            {
-                                <fieldset disabled>
-                                    <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged />
-                                </fieldset>
-                            }
-                            else
-                            {
-                                <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged />
-                            }
+                            <label class="label">Miesiąc od którego są naliczane kwartały</label>
+                            <fieldset disabled=@IsEdit>
+                                <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged CssClass="is-fullwidth"/>
+                            </fieldset>
                             <div class="help is-danger">
                                 <ValidationMessage For="@(() => Departament.FirstQuarterStart)" />
                             </div>
                             <p class="title is-6">
-                                Miesiąc od którego liczone są kwartały można wybrać tylko przy tworzeniu oddziału!
+                                Miesiąc od którego są naliczane kwartały można wybrać tylko przy tworzeniu oddziału!
                             </p>
                         </div>
                         <div class="buttons is-right">
@@ -74,13 +67,10 @@
 
     private async void OnSubmitClick()
     {
-        if (_editContext.Validate())
-        {
-            _isLoading = true;
-            await Task.Delay(1);
-            await SaveDepartament.InvokeAsync();
-            StateHasChanged();
-        }
+        _isLoading = true;
+        await Task.Delay(1);
+        await SaveDepartament.InvokeAsync();
+        StateHasChanged();
     }
 
     protected override void OnInitialized()

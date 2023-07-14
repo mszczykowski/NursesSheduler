@@ -11,7 +11,7 @@ namespace NursesScheduler.BusinessLogic.Services
     {
         private readonly ICalendarService _calendarService;
 
-        public WorkTimeService(IHolidaysProvider hoidaysManager, ICalendarService calendarService)
+        public WorkTimeService(ICalendarService calendarService)
         {
             _calendarService = calendarService;
         }
@@ -95,18 +95,13 @@ namespace NursesScheduler.BusinessLogic.Services
             DepartamentSettings departamentSettings)
         {
             var timeForMorningShifts = TimeSpan.Zero;
-            int monthNumber;
 
-            for (int i = 0; i < 3; i++)
+            var monthsInQuarter = _calendarService.GetMonthsInQuarterDates(departamentSettings.FirstQuarterStart,
+                quarterNumber, yearNumber);
+
+            foreach(var monthDate in monthsInQuarter)
             {
-                monthNumber = departamentSettings.FirstQuarterStart + i + quarterNumber * 3;
-                if (monthNumber > 12)
-                {
-                    monthNumber = 1;
-                    yearNumber++;
-                }
-
-                var workTimeInMonth = await GetTotalWorkingHoursInMonth(monthNumber, yearNumber,
+                var workTimeInMonth = await GetTotalWorkingHoursInMonth(monthDate.Month, monthDate.Year,
                     departamentSettings.WorkingTime);
 
                 timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth /

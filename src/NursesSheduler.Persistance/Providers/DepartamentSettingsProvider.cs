@@ -30,7 +30,9 @@ namespace NursesScheduler.Infrastructure.Providers
                 result = await _context.DepartamentSettings.FirstOrDefaultAsync(s => s.DepartamentId == departamentId);
 
                 if (result == null)
+                {
                     throw new EntityNotFoundException(departamentId, nameof(DepartamentSettings));
+                }
 
                 _memoryCache.Set(key, result);
             }

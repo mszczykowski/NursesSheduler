@@ -6,6 +6,11 @@ namespace NursesScheduler.BlazorShared.Abstracions
     {
         protected bool _isVisible;
 
+        public virtual void ShowModal()
+        {
+            ChangeVisibility();
+        }
+
         protected void ChangeVisibility()
         {
             _isVisible = !_isVisible;

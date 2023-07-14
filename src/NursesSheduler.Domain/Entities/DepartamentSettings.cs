@@ -17,6 +17,10 @@
         public int DepartamentId { get; set; }
         public virtual Departament Departament { get; set; }
 
+        public DepartamentSettings()
+        {
+
+        }
         public DepartamentSettings(int firstQuarterStart)
         {
             WorkingTime = new TimeSpan(7, 35, 0);
