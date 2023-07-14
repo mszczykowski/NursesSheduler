@@ -4,5 +4,6 @@
     {
         public int DepartamentId { get; set; }
         public string Name { get; set; }
+        public int FirstQuarterStart { get; set; }
     }
 }

@@ -35,7 +35,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             }
 
             departament.CreationYear = _currentDateService.GetCurrentDate().Year;
-            departament.DepartamentSettings = new DepartamentSettings(request.FirstQuarterStart);
+            departament.DepartamentSettings = new DepartamentSettings();
 
             await _context.Departaments.AddAsync(departament);
 

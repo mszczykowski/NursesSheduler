@@ -72,7 +72,8 @@ else
                 throw new EntityNotDeletedException(departamentId, "Departament");
             }
 
-            if (_currentDepartamentStore.CurrentDepartament.DepartamentId == departamentId)
+            if (_currentDepartamentStore.CurrentDepartament is not null &&
+                _currentDepartamentStore.CurrentDepartament.DepartamentId == departamentId)
             {
                 _currentDepartamentStore.CurrentDepartament = null;
             }

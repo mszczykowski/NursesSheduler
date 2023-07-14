@@ -10,7 +10,6 @@ namespace NursesScheduler.BusinessLogic.Validation
             RuleFor(m => m.Index)
                 .IsInEnum();
             RuleFor(m => m.ShiftLength)
-                .NotEmpty()
                 .GreaterThanOrEqualTo(TimeSpan.Zero)
                 .LessThanOrEqualTo(TimeSpan.FromHours(12));
         }

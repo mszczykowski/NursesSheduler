@@ -27,12 +27,10 @@ namespace NursesScheduler.Infrastructure.Providers
 
             if (!_memoryCache.TryGetValue(key, out result))
             {
-                result = await _context.DepartamentSettings.FirstOrDefaultAsync(s => s.DepartamentId == departamentId);
-
-                if (result == null)
-                {
-                    throw new EntityNotFoundException(departamentId, nameof(DepartamentSettings));
-                }
+                result = await _context.DepartamentSettings
+                    .Include(s => s.Departament)
+                    .FirstOrDefaultAsync(s => s.DepartamentId == departamentId)
+                    ?? throw new EntityNotFoundException(departamentId, nameof(DepartamentSettings));
 
                 _memoryCache.Set(key, result);
             }

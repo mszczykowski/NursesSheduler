@@ -10,6 +10,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonth
         private readonly ICalendarService _calendarService;
         private readonly IMapper _mapper;
 
+        public GetMonthDaysQueryHandler(ICalendarService calendarService, IMapper mapper)
+        {
+            _calendarService = calendarService;
+            _mapper = mapper;
+        }
+
         public async Task<IEnumerable<GetMonthDaysResponse>> Handle(GetMonthDaysRequest request, 
             CancellationToken cancellationToken)
         {

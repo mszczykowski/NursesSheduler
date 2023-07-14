@@ -28,8 +28,10 @@ namespace NursesScheduler.Infrastructure.Providers
             {
                 result = await _holidaysApiClient.GetHolidays(year);
 
-                if (result == null || result.Count == 0)
+                if (result is null || result.Count == 0)
+                {
                     throw new EntityNotFoundException(year, nameof(Holiday));
+                }
 
                 _memoryCache.Set(key, result);
             }

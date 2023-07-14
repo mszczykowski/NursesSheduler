@@ -44,13 +44,13 @@ else
                     <label class="label">Miesiąc</label>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthViewModel=_dateViewModel OnChange="OnSeletedDateChanged" />
+                    <MonthSelect MonthPickerViewModel=_dateViewModel OnChange="OnSeletedDateChanged" />
                 </div>
                 <div class="level-item">
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <YearSelect YearViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChanged" />
+                    <YearSelect YearPickerViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChanged" />
                 </div>
                 <div class="level-item">
                     <button class="button is-info" @onclick="OnCurrentDateClick">Bieżący miesiąc</button>
@@ -156,7 +156,7 @@ else
             MonthNumber = DateTime.Now.Month,
         };
 
-    private bool _isLoading;
+    private bool _isLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -177,6 +177,7 @@ else
             }
 
             _isLoading = false;
+            StateHasChanged();
         }
     }
 

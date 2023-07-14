@@ -1,4 +1,6 @@
-﻿namespace NursesScheduler.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace NursesScheduler.Domain.Entities
 {
     public record DepartamentSettings
     {
@@ -12,16 +14,14 @@
         public int SettingsVersion { get; set; }
         public TimeSpan DayShiftHolidayEligibleHours { get; set; }
         public TimeSpan NightShiftHolidayEligibleHours { get; set; }
-        public int FirstQuarterStart { get; set; }
 
         public int DepartamentId { get; set; }
         public virtual Departament Departament { get; set; }
 
-        public DepartamentSettings()
-        {
+        [NotMapped]
+        public int FirstQuarterStart => Departament.FirstQuarterStart;
 
-        }
-        public DepartamentSettings(int firstQuarterStart)
+        public DepartamentSettings()
         {
             WorkingTime = new TimeSpan(7, 35, 0);
             MaximalWeekWorkingTime = TimeSpan.FromHours(24);
@@ -32,7 +32,6 @@
             SettingsVersion = 1;
             DayShiftHolidayEligibleHours = TimeSpan.FromHours(12);
             NightShiftHolidayEligibleHours = TimeSpan.FromHours(4);
-            FirstQuarterStart = firstQuarterStart;
         }
 
         public virtual bool Equals(DepartamentSettings? other)
@@ -43,13 +42,11 @@
             return WorkingTime == other.WorkingTime &&
                 MaximalWeekWorkingTime == other.MaximalWeekWorkingTime &&
                 MinmalShiftBreak == other.MinmalShiftBreak &&
-                FirstQuarterStart == other.FirstQuarterStart &&
                 DayShiftHolidayEligibleHours == other.DayShiftHolidayEligibleHours &&
                 NightShiftHolidayEligibleHours == other.NightShiftHolidayEligibleHours &&
                 TargetNumberOfNursesOnShift == other.TargetNumberOfNursesOnShift &&
                 TargetMinimalMorningShiftLenght == other.TargetMinimalMorningShiftLenght &&
                 DefaultGeneratorRetryValue == other.DefaultGeneratorRetryValue;
-
         }
     }
 }

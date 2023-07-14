@@ -1,6 +1,6 @@
 ﻿@inherits ModalBase
 
-@if (SolverSettings is not null)
+@if (_solverSettingsForm is not null)
 {
     <div class="modal @CssHelper.SetIsActive(_isVisible)">
         <div class="modal-background"></div>
@@ -37,7 +37,7 @@
                     <div class="field">
                         <div class="control">
                             <label class="checkbox">
-                                <InputCheckbox @bind-Value="SolverSettings.UseOwnSeed" />
+                                <input type="checkbox" @bind="SolverSettings.UseOwnSeed"/>
                                 Użyj własnego ziarna generatora
                             </label>
                         </div>
@@ -45,7 +45,7 @@
                 </section>
                 <footer class="modal-card-foot">
                     <button class="button is-primary" type="submit">Zapisz</button>
-                    <button class="button" @onclick="ChangeVisibility">Anuluj</button>
+                    <button class="button" type="button" @onclick="ChangeVisibility">Anuluj</button>
                 </footer>
             </EditForm>
         </div>

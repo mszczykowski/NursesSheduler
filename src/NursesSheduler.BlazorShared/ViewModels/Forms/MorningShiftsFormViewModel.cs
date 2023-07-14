@@ -10,9 +10,11 @@ namespace NursesScheduler.BlazorShared.ViewModels.Forms
 
         public MorningShiftsFormViewModel(IEnumerable<MorningShiftViewModel> morningShifts)
         {
-            MorningShifts = new MorningShiftViewModel[3];
+            var numberOfMorningShifts = Enum.GetValues<MorningShiftIndexes>().Length;
 
-            for (int i = 0; i < MorningShifts.Length; i++)
+            MorningShifts = new MorningShiftViewModel[numberOfMorningShifts];
+
+            for (int i = 0; i < numberOfMorningShifts; i++)
             {
                 MorningShifts[i] = new MorningShiftViewModel
                 {

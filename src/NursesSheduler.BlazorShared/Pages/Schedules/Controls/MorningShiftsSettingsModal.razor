@@ -7,7 +7,7 @@
 @inject IMediator _mediatr;
 @inject IExceptionHandler _exceptionHandler;
 
-@if (Quarter is not null && _morningShiftsEditModel is not null)
+@if (_morningShiftsForm is not null)
 {
     <div class="modal @CssHelper.SetIsActive(_isVisible)">
         <div class="modal-background"></div>
@@ -21,10 +21,10 @@
                 <section class="modal-card-body">
                     <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@Quarter.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
                     <br />
-                    <fieldset @CssHelper.SetDisabled(Quarter.IsClosed)>
-                        @for(int i = 0; i < MorningShifts.Count(); i++)
+                    <fieldset disabled=@Quarter.IsClosed>
+                        @foreach(var morningShift in _morningShiftsForm.MorningShifts)
                         {
-                            <TimeSpanInput Label=@GetInputLabel(i) @bind-Value="_morningShiftsEditModel.MorningShifts[i].ShiftLength" ValidationFor="@(() => _morningShiftsEditModel.MorningShifts[i].ShiftLength)" />
+                            <TimeSpanInput Label=@GetInputLabel(morningShift.Index) @bind-Value="morningShift.ShiftLength" ValidationFor="@(() => morningShift.ShiftLength)" />
                         }
                     </fieldset>
                     <p>Po zamnięciu któregokolwiek grafiku z kwartału nie będzie można edytować ranków!</p>
@@ -47,18 +47,21 @@
     [Parameter]
     public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
 
-    private MorningShiftsFormViewModel _morningShiftsEditModel;
+    private MorningShiftsFormViewModel _morningShiftsForm;
     private EditContext _editContext;
     private bool _isSaveLoading;
 
+
     public override void ShowModal()
     {
-        _morningShiftsEditModel = new(MorningShifts);
-
-        _editContext = new(_morningShiftsEditModel);
-        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
         _isSaveLoading = false;
-        ChangeVisibility();
+
+        _morningShiftsForm = new(MorningShifts);
+
+        _editContext = new(_morningShiftsForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        
+        base.ChangeVisibility();
     }
 
     private async Task OnSave()
@@ -72,14 +75,9 @@
             {
                 QuarterId = Quarter.QuarterId,
                 MorningShifts = _mapper
-                    .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsEditModel.MorningShifts),
+                    .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm.MorningShifts),
             };
-            var response = await _mediatr.Send(request);
-
-            if(response is null)
-            {
-                throw new EntityNotAddedException(nameof(MorningShiftViewModel));
-            }
+            var response = await _mediatr.Send(request) ?? throw new EntityNotAddedException(nameof(MorningShiftViewModel));;
 
             MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
             base.ChangeVisibility();
@@ -88,11 +86,6 @@
         {
             _exceptionHandler.HandleException(e);
         }
-    }
-
-    private async Task OnCancel()
-    {
-        base.ChangeVisibility();
     }
 
     private async Task OnRecalculate()
@@ -106,7 +99,7 @@
                 };
             var response = await _mediatr.Send(request);
 
-            _morningShiftsEditModel.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
+            _morningShiftsForm.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
         }
         catch (Exception e)
         {
@@ -114,8 +107,8 @@
         }
     }
 
-    private string GetInputLabel(int i)
+    private string GetInputLabel(MorningShiftIndexes index)
     {
-        return "Długość ranka " + (i + 1);
+        return "Długość ranka " + ((int)index + 1);
     }
 }
