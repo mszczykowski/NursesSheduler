@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 {
@@ -7,6 +8,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNu
         public string Name { get; set; }
         public string Surname { get; set; }
         public int PTOentitlement { get; set; }
+        public Teams Team { get; set; }
         public int DepartamentId { get; set; }
 
     }

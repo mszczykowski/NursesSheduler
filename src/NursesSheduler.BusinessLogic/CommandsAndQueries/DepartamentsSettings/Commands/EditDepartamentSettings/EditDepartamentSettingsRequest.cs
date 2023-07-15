@@ -5,8 +5,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
     public sealed class EditDepartamentSettingsRequest : IRequest<EditDepartamentSettingsResponse>
     {
         public int DepartamentSettingsId { get; set; }
-        public TimeSpan WorkingTime { get; set; }
-        public TimeSpan MaximalWeekWorkingTime { get; set; }
+        public TimeSpan WorkDayLength { get; set; }
+        public TimeSpan MaximalWeekWorkDayLength { get; set; }
         public TimeSpan MinmalShiftBreak { get; set; }
         public int TargetNumberOfNursesOnShift { get; set; }
         public TimeSpan TargetMinimalMorningShiftLenght { get; set; }

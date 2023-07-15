@@ -2,9 +2,8 @@
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers
 {
-    public interface IDepartamentSettingsProvider
+    public interface IDepartamentSettingsProvider : ICacheProvider<DepartamentSettings, int>
     {
-        Task<DepartamentSettings> GetDepartamentSettings(int departamentId);
-        void InvalidateCache(int departamentId);
+
     }
 }

@@ -6,16 +6,16 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class CalendarService : ICalendarService
     {
-        private readonly IHolidaysProvider _holidaysManager;
+        private readonly IHolidaysProvider _holidaysProvider;
 
-        public CalendarService(IHolidaysProvider holidaysManager)
+        public CalendarService(IHolidaysProvider holidaysProvider)
         {
-            _holidaysManager = holidaysManager;
+            _holidaysProvider = holidaysProvider;
         }
 
-        public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber)
+        public async Task<Day[]> GetMonthDaysAsync(int monthNumber, int yearNumber)
         {
-            var holidays = await _holidaysManager.GetHolidays(yearNumber);
+            var holidays = await _holidaysProvider.GetCachedDataAsync(yearNumber);
 
             holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
 
@@ -35,10 +35,10 @@ namespace NursesScheduler.BusinessLogic.Services
             return monthDays;
         }
 
-        public async Task<Day[]> GetMonthDays(int monthNumber, int yearNumber, int firstQuarterStart)
+        public async Task<Day[]> GetMonthDaysAsync(int monthNumber, int yearNumber, int firstQuarterStart)
         {
             var quarterNumber = GetQuarterNumber(monthNumber, firstQuarterStart);
-            var quarterMonthDates = GetMonthsInQuarterDates(firstQuarterStart, quarterNumber, yearNumber);
+            var quarterMonthDates = GetMonthsInQuarterDatesAsync(firstQuarterStart, quarterNumber, yearNumber);
             var dayInQuarterOffset = 0;
 
             foreach(var monthDate in quarterMonthDates)
@@ -49,7 +49,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
             }
 
-            var monthDays = await GetMonthDays(monthNumber, yearNumber);
+            var monthDays = await GetMonthDaysAsync(monthNumber, yearNumber);
 
             for (int i = 0; i < monthDays.Length; i++)
             {
@@ -59,10 +59,10 @@ namespace NursesScheduler.BusinessLogic.Services
             return monthDays;
         }
 
-        public async Task<ICollection<Day>> GetDaysFromDayNumbers(int monthNumber, int yearNumber, 
+        public async Task<ICollection<Day>> GetDaysFromDayNumbersAsync(int monthNumber, int yearNumber, 
             ICollection<int> dayNumbers)
         {
-            var holidays = await _holidaysManager.GetHolidays(yearNumber);
+            var holidays = await _holidaysProvider.GetCachedDataAsync(yearNumber);
 
             holidays = holidays.Where(h => h.Date.Month == monthNumber).ToList();
 
@@ -86,7 +86,7 @@ namespace NursesScheduler.BusinessLogic.Services
             return daysResult;
         }
 
-        public ICollection<DateOnly> GetMonthsInQuarterDates(int firstQuarterStart, int quarterNumber, int year)
+        public ICollection<DateOnly> GetMonthsInQuarterDatesAsync(int firstQuarterStart, int quarterNumber, int year)
         {
             var result = new List<DateOnly>();
 
@@ -103,6 +103,26 @@ namespace NursesScheduler.BusinessLogic.Services
             }
 
             return result;
+        }
+
+        public int GetMonthInQuarterNumber(int monthNumber, int firstQuarterStart)
+        {
+            int monthInQuarter = 1;
+            for(int i = firstQuarterStart; i <= monthNumber; i++)
+            {
+                if(i > 12)
+                {
+                    i = 1;
+                }
+
+                monthInQuarter++;
+
+                if(monthInQuarter > 3)
+                {
+                    monthInQuarter = 1;
+                }
+            }
+            return monthInQuarter;
         }
 
         public int GetQuarterNumber(int monthNumber, int firstQuarterStart)

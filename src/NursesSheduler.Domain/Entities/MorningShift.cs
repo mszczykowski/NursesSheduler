@@ -7,7 +7,9 @@ namespace NursesScheduler.Domain.Entities
         public int MorningShiftId { get; set; }
         public MorningShiftIndex Index { get; set; }
         public TimeSpan ShiftLength { get; set; }
+        public bool ReadOnly { get; set; }
+
         public int QuarterId { get; set; }
-        public Quarter Quarter { get; set; }
+        public virtual Quarter Quarter { get; set; }
     }
 }

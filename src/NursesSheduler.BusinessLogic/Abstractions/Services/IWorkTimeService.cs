@@ -14,7 +14,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         Task<TimeSpan> GetTotalWorkingHoursInMonth(int monthNumber, int yearNumber, TimeSpan regularDayWorkTime);
         Task<TimeSpan> GetTotalWorkingHoursInQuarter(int quarterNumber, int yearNumber, 
             DepartamentSettings departamentSettings);
-        TimeSpan GetWorkingTimeFromWorkDays(ICollection<NurseWorkDay> nurserWorkDays);
-        TimeSpan GetWorkTimeFromDays(ICollection<Day> days, TimeSpan regularDayWorkTime);
+        TimeSpan GetWorkDayLengthFromWorkDays(IEnumerable<NurseWorkDay> nurserWorkDays);
+        TimeSpan GetWorkTimeFromDays(IEnumerable<Day> days, TimeSpan regularDayWorkTime);
     }
 }

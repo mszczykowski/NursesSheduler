@@ -2,54 +2,27 @@
 using Microsoft.Extensions.Caching.Memory;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
-using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.Infrastructure.Providers
 {
-    public sealed class DepartamentSettingsProvider : IDepartamentSettingsProvider
+    public sealed class DepartamentSettingsProvider : CacheProvider<DepartamentSettings, int>, 
+        IDepartamentSettingsProvider
     {
-        private const string DEPT_SETTINGS_CACHE_KEY = "DeptSettings-";
-
+        private const string DEPT_SETTINGS_CACHE_KEY = "DeptSettings";
         private readonly IApplicationDbContext _context;
-        private readonly IMemoryCache _memoryCache;
 
-        public DepartamentSettingsProvider(IApplicationDbContext context, IMemoryCache memoryCache)
+        public DepartamentSettingsProvider(IApplicationDbContext context, IMemoryCache memoryCache) 
+            : base(memoryCache, DEPT_SETTINGS_CACHE_KEY)
         {
             _context = context;
-            _memoryCache = memoryCache;
         }
 
-        public async Task<DepartamentSettings> GetDepartamentSettings(int departamentId)
+        protected override async Task<DepartamentSettings?> GetDataFromSource(int id)
         {
-            DepartamentSettings result;
-            var key = GetDeptSettingsCacheKey(departamentId);
-
-            if (!_memoryCache.TryGetValue(key, out result))
-            {
-                result = await _context.DepartamentSettings
+            return await _context.DepartamentSettings
                     .Include(s => s.Departament)
-                    .FirstOrDefaultAsync(s => s.DepartamentId == departamentId)
-                    ?? throw new EntityNotFoundException(departamentId, nameof(DepartamentSettings));
-
-                _memoryCache.Set(key, result);
-            }
-            return result;
-        }
-
-        public void InvalidateCache(int departamentId)
-        {
-            var key = GetDeptSettingsCacheKey(departamentId);
-
-            if (_memoryCache.TryGetValue(key, out var result))
-            {
-                _memoryCache.Remove(key);
-            }
-        }
-
-        private string GetDeptSettingsCacheKey(int departamentId)
-        {
-            return $"{DEPT_SETTINGS_CACHE_KEY}{departamentId}";
+                    .FirstOrDefaultAsync(s => s.DepartamentId == id);
         }
     }
 }

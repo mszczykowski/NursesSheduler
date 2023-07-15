@@ -86,7 +86,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
             NumberOfNightShiftsAssigned = nurseQuarterStats.NumberOfNightShifts;
 
-            NumberOfRegularShiftsToAssign = (int)Math.Floor(currentScheduleNurse.TimeToAssingInMonth / 
+            NumberOfRegularShiftsToAssign = (int)Math.Floor(currentScheduleNurse.AssignedWorkTime / 
                 GeneralConstants.RegularShiftLenght);
             NumberOfTimeOffShiftsToAssign = (int)Math.Round(currentScheduleNurse.TimeOffToAssign /
                 GeneralConstants.RegularShiftLenght);

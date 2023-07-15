@@ -6,7 +6,7 @@ namespace NursesScheduler.Domain.Entities
     {
         public int AbsenceId { get; set; }
         public int MonthNumber { get; set; }
-        public virtual ICollection<int> Days { get; set; }
+        public virtual IEnumerable<int> Days { get; set; }
         public TimeSpan WorkTimeToAssign { get; set; }
         public TimeSpan AssignedWorkingHours { get; set; }
         public AbsenceTypes Type { get; set; }

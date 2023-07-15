@@ -15,22 +15,25 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.Ups
         private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
         private readonly IMapper _mapper;
         private readonly IWorkTimeService _workTimeService;
+        private readonly IQuarterProvider _quarterProvider;
 
         public UpsertQuarterCommandHandler(IApplicationDbContext applicationDbContext, ICalendarService calendarService,
-            IDepartamentSettingsProvider departamentSettingsProvider, IMapper mapper, IWorkTimeService workTimeService)
+            IDepartamentSettingsProvider departamentSettingsProvider, IMapper mapper, IWorkTimeService workTimeService
+            IQuarterProvider quarterProvider)
         {
             _applicationDbContext = applicationDbContext;
             _calendarService = calendarService;
             _departamentSettingsProvider = departamentSettingsProvider;
             _mapper = mapper;
             _workTimeService = workTimeService;
+            _quarterProvider = quarterProvider;
         }
 
         public async Task<UpsertQuarterResponse> Handle(UpsertQuarterRequest request,
             CancellationToken cancellationToken)
         {
             var departamentSettings = await _departamentSettingsProvider
-                    .GetDepartamentSettings(request.DepartamentId);
+                    .GetCachedDataAsync(request.DepartamentId);
             var quarterNumber = _calendarService
                 .GetQuarterNumber(request.Month, departamentSettings.FirstQuarterStart);
 
@@ -64,6 +67,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.Ups
                 quarter.TimeForMorningShifts = await _workTimeService
                         .GetTimeForMorningShifts(quarterNumber, request.Year, departamentSettings);
 
+                _quarterProvider.InvalidateCache(quarter.QuarterId);
                 await _applicationDbContext.SaveChangesAsync(cancellationToken);
             }
 

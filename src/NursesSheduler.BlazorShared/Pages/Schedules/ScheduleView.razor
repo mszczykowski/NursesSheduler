@@ -120,7 +120,7 @@ else
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Nadwyżka czasu pracy:</b> @_schedule.TimeOffAvailableToAssgin.GetTotalHoursAndMinutes()
+                        <b>Bilans czasu pracy:</b> @_schedule.TimeOffAvailableToAssgin.GetTotalHoursAndMinutes()
                     </p>
                 </div>
                 <div class="level-item">
@@ -135,7 +135,7 @@ else
         </div>
     </div>
 
-    <ScheduleTable MonthDays=_days ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_morningShifts />
+    <ScheduleTable MonthDays=_days ScheduleNurses=_schedule.ScheduleNurses MorningShifts=_morningShifts Nurses=_nurses />
 }
 
 

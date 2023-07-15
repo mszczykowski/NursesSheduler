@@ -20,7 +20,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonth
             CancellationToken cancellationToken)
         {
             return _mapper.Map<IEnumerable<GetMonthDaysResponse>>(await _calendarService
-                .GetMonthDays(request.Month, request.Year));
+                .GetMonthDaysAsync(request.Month, request.Year));
         }
     }
 }

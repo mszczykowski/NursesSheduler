@@ -4,9 +4,9 @@
     {
         public int SettingsId { get; set; }
 
-        public TimeSpan WorkingTime { get; set; }
+        public TimeSpan WorkDayLength { get; set; }
 
-        public TimeSpan MaximalWeekWorkingTime { get; set; }
+        public TimeSpan MaximalWeekWorkDayLength { get; set; }
 
         public TimeSpan MinmalShiftBreak { get; set; }
 

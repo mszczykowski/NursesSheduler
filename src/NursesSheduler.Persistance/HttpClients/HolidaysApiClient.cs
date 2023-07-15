@@ -17,7 +17,7 @@ namespace NursesScheduler.Infrastructure.HttpClients
             _memoryCache = memoryCache;
         }
 
-        public async Task<List<Holiday>> GetHolidays(int year)
+        public async Task<IEnumerable<Holiday>> GetHolidays(int year)
         {
             List<Holiday> result;
             var key = $"Holidays-{year}";

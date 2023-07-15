@@ -212,11 +212,11 @@ th {
     background: white;
 }
 
-th:after {
+/*.table-schedule th:after {
     content: '';
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
     border-bottom: 2px solid black;
-}
+}*/

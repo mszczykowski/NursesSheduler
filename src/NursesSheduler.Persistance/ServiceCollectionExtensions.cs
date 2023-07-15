@@ -20,7 +20,7 @@ namespace NursesScheduler.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
             services.AddTransient<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
 
-            //providers
+            //cache providers
             services.AddTransient<IHolidaysProvider, HolidaysProvider>();
             services.AddTransient<IDepartamentSettingsProvider, DepartamentSettingsProvider>();
 

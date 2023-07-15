@@ -9,7 +9,7 @@ namespace NursesScheduler.BlazorShared.Helpers
         {
             var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
 
-            return isValid ? "input" : "input is-danger";
+            return isValid ? String.Empty : "is-danger";
         }
     }
 }

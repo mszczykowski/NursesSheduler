@@ -7,12 +7,12 @@ namespace NursesScheduler.BusinessLogic.Validation
     {
         public DepartamentSettingsValidator()
         {
-            RuleFor(s => s.WorkingTime)
+            RuleFor(s => s.WorkDayLength)
                 .NotEmpty()
                 .GreaterThanOrEqualTo(TimeSpan.FromHours(1))
                 .LessThanOrEqualTo(TimeSpan.FromHours(12));
 
-            RuleFor(s => s.MaximalWeekWorkingTime)
+            RuleFor(s => s.MaximalWeekWorkDayLength)
                 .NotEmpty()
                 .GreaterThanOrEqualTo(TimeSpan.FromHours(7))
                 .LessThanOrEqualTo(TimeSpan.FromHours(84));

@@ -18,13 +18,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
     {
         private readonly IMapper _mapper;
         private readonly ISchedulesService _scheduleService;
-        private readonly INurseStatsService _nurseStatsService;
+        private readonly IStatsService _nurseStatsService;
         private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
         private readonly ISeedService _seedService;
         private readonly ICalendarService _calendarService;
 
         public SolveScheduleCommandHandler(IMapper mapper, ISchedulesService scheduleService,
-            INurseStatsService nurseStatsService, IDepartamentSettingsProvider departamentSettingsProvider,
+            IStatsService nurseStatsService, IDepartamentSettingsProvider departamentSettingsProvider,
             ISeedService seedService, ICalendarService calendarService)
         {
             _mapper = mapper;

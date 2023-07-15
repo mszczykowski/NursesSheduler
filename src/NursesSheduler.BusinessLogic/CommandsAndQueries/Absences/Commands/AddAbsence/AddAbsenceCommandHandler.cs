@@ -71,7 +71,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             {
                 var days = await _calendarService.GetDaysFromDayNumbers(absence.MonthNumber, absencesSummary.Year, 
                     absence.Days);
-                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkingTime);
+                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkDayLength);
 
                 absencesSummary.Absences.Add(absence);
             }

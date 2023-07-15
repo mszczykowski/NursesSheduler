@@ -119,7 +119,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("FirstQuarterStart")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("MaximalWeekWorkingTime")
+                    b.Property<TimeSpan>("MaximalWeekWorkDayLength")
                         .HasColumnType("TEXT");
 
                     b.Property<TimeSpan>("MinmalShiftBreak")
@@ -137,7 +137,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("TargetNumberOfNursesOnShift")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("WorkingTime")
+                    b.Property<TimeSpan>("WorkDayLength")
                         .HasColumnType("TEXT");
 
                     b.HasKey("DepartamentSettingsId");

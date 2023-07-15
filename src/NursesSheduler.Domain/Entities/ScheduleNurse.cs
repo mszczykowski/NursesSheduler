@@ -15,10 +15,10 @@ namespace NursesScheduler.Domain.Entities
         public virtual Schedule Schedule { get; set; }
 
 
-        public TimeSpan PreviousMonthTime { get; set; }
-        public TimeSpan TimeToAssingInMonth { get; set; }
+        public TimeSpan PreviousMonthBalance { get; set; }
+        public TimeSpan AssignedWorkTime { get; set; }
         public TimeSpan TimeOffToAssign { get; set; }
-        public TimeSpan TimeToAssingInQuarterLeft { get; set; }
+        public TimeSpan TimeOffToAssiged { get; set; }
         public TimeSpan HolidaysHoursAssigned { get; set; }
         public int NightShiftsAssigned { get; set; }
         public PreviousNurseStates PreviousState { get; set; }

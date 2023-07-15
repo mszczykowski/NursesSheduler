@@ -3,8 +3,8 @@
 <tr>
     <td class="no">@No</td>
     <td class="name">
-        <p>@ScheduleNurse.Nurse.Name</p>
-        <p>@ScheduleNurse.Nurse.Surname</p>
+        <p>@Nurse.Name</p>
+        <p>@Nurse.Surname</p>
         </td>
     <SchedulePrevState PreviousStatate=ScheduleNurse.PreviousState/>
     @foreach(var workDay in ScheduleNurse.NurseWorkDays)
@@ -23,6 +23,8 @@
     public int No { get; set; }
     [Parameter]
     public ScheduleNurseViewModel ScheduleNurse { get; set; }
+    [Parameter]
+    public NurseViewModel Nurse { get; set; }
     [Parameter]
     public IEnumerable<DayViewModel> MonthDays { get; set; }
     [Parameter]

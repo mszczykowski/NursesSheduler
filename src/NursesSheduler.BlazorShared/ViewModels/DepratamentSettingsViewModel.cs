@@ -8,11 +8,11 @@ namespace NursesScheduler.BlazorShared.ViewModels
 
         [Required(ErrorMessage = "Należy wpisać dzienny wymiar pracy")]
         [Range(typeof(TimeSpan), "01:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 1h, maksymalna 12h")]
-        public TimeSpan WorkingTime { get; set; }
+        public TimeSpan WorkDayLength { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać maksymalny tygodniowy wymiar pracy")]
         [Range(typeof(TimeSpan), "07:00:00", "84:00:00", ErrorMessage = "Minmalna wartość to 7h, maksymalna 84h")]
-        public TimeSpan MaximalWeekWorkingTime { get; set; }
+        public TimeSpan MaximalWeekWorkDayLength { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać maksymalną przerwę między dyżurami")]
         [Range(typeof(TimeSpan), "00:00:00", "100:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 100h")]

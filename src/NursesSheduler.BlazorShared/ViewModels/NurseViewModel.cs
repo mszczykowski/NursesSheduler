@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NursesScheduler.BlazorShared.ViewModels.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace NursesScheduler.BlazorShared.ViewModels
 {
@@ -12,6 +13,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
         [StringLength(30, ErrorMessage = "Nzwisko jest zbyt długie (maksymalnie 30 znaków).")]
         public string Surname { get; set; }
         public int DepartamentId { get; set; }
+        public Teams Team { get; set; }
         [Required(ErrorMessage = "Należy wybrać opcję")]
         [Range(20,26, ErrorMessage = "Należy wybrać prawidłową wartość")]
         public int PTOentitlement { get; set; }

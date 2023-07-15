@@ -16,7 +16,7 @@ namespace NursesScheduler.BusinessLogic.Services
             _calendarService = calendarService;
         }
 
-        public TimeSpan GetWorkTimeFromDays(ICollection<Day> days, TimeSpan regularDayWorkTime)
+        public TimeSpan GetWorkTimeFromDays(IEnumerable<Day> days, TimeSpan regularDayWorkTime)
         {
             var workTime = TimeSpan.Zero;
 
@@ -34,7 +34,7 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task<TimeSpan> GetTotalWorkingHoursInMonth(int monthNumber, int yearNumber,
             TimeSpan regularDayWorkTime)
         {
-            var month = await _calendarService.GetMonthDays(monthNumber, yearNumber);
+            var month = await _calendarService.GetMonthDaysAsync(monthNumber, yearNumber);
 
             return GetWorkTimeFromDays(month, regularDayWorkTime);
 
@@ -45,13 +45,13 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var workTimeInQuarter = TimeSpan.Zero;
 
-            var quarterDates = _calendarService.GetMonthsInQuarterDates(departamentSettings.FirstQuarterStart, quarterNumber,
+            var quarterDates = _calendarService.GetMonthsInQuarterDatesAsync(departamentSettings.FirstQuarterStart, quarterNumber,
                 yearNumber);
 
             foreach (var date in quarterDates)
             {
                 workTimeInQuarter += await GetTotalWorkingHoursInMonth(date.Month, date.Year,
-                    departamentSettings.WorkingTime);
+                    departamentSettings.WorkDayLength);
             }
 
             return workTimeInQuarter;
@@ -60,10 +60,10 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task<TimeSpan> GetSurplusWorkTime(int monthNumber, int yearNumber, int nurseCount,
             DepartamentSettings departamentSettings)
         {
-            var workingTimeInMonthPerNurse = await GetTotalWorkingHoursInMonth(monthNumber, yearNumber,
-                departamentSettings.WorkingTime);
+            var WorkDayLengthInMonthPerNurse = await GetTotalWorkingHoursInMonth(monthNumber, yearNumber,
+                departamentSettings.WorkDayLength);
 
-            var totalNursesWorkTime = workingTimeInMonthPerNurse * nurseCount;
+            var totalNursesWorkTime = WorkDayLengthInMonthPerNurse * nurseCount;
             var minimalTotalWorkTimeToAssign =
                 departamentSettings.TargetNumberOfNursesOnShift * 2
                 * GeneralConstants.RegularShiftLenght
@@ -72,7 +72,7 @@ namespace NursesScheduler.BusinessLogic.Services
             return totalNursesWorkTime - minimalTotalWorkTimeToAssign;
         }
 
-        public TimeSpan GetWorkingTimeFromWorkDays(ICollection<NurseWorkDay> nurserWorkDays)
+        public TimeSpan GetWorkDayLengthFromWorkDays(IEnumerable<NurseWorkDay> nurserWorkDays)
         {
             var workTime = TimeSpan.Zero;
 
@@ -96,13 +96,13 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var timeForMorningShifts = TimeSpan.Zero;
 
-            var monthsInQuarter = _calendarService.GetMonthsInQuarterDates(departamentSettings.FirstQuarterStart,
+            var monthsInQuarter = _calendarService.GetMonthsInQuarterDatesAsync(departamentSettings.FirstQuarterStart,
                 quarterNumber, yearNumber);
 
             foreach(var monthDate in monthsInQuarter)
             {
                 var workTimeInMonth = await GetTotalWorkingHoursInMonth(monthDate.Month, monthDate.Year,
-                    departamentSettings.WorkingTime);
+                    departamentSettings.WorkDayLength);
 
                 timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth /
                     GeneralConstants.RegularShiftLenght) * GeneralConstants.RegularShiftLenght;

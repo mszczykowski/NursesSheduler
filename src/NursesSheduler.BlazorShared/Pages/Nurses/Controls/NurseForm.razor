@@ -25,6 +25,20 @@
                         </div>
                     </div>
                     <div class="field">
+                        <div class="control">
+                            <InputRadioGroup @bind-Value="Nurse.Team">
+                            <label class="radio">
+                                <InputRadio Value="Teams.T1"/>
+                                Zespół 1
+                            </label>
+                            <label class="radio">
+                                <InputRadio Value="Teams.T2"/>
+                                Zespół 2
+                            </label>
+                            </InputRadioGroup>
+                        </div>
+                    </div>
+                    <div class="field">
                         <label class="label">Wymiar urlopu</label>
                         <div class="control">
                             <div class="select is-fullwidth">
@@ -41,12 +55,12 @@
                     <div class="buttons is-right">
                         <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
                     </div>
+                    
                 </EditForm>
             </div>
         </div>
     </div>
 </div>
-
 
 @code {
     [Parameter]

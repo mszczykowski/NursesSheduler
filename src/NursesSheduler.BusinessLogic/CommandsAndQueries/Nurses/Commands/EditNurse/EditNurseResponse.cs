@@ -1,4 +1,6 @@
-﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
+﻿using NursesScheduler.Domain.Enums;
+
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.EditNurse
 {
     public sealed class EditNurseResponse
     {
@@ -6,5 +8,6 @@
         public string Name { get; set; }
         public string Surname { get; set; }
         public int PTOentitlement { get; set; }
+        public Teams Team { get; set; }
     }
 }

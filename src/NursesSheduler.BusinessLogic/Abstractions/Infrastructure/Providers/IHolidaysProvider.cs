@@ -2,8 +2,8 @@
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers
 {
-    public interface IHolidaysProvider
+    public interface IHolidaysProvider : ICacheProvider<IEnumerable<Holiday>, int>
     {
-        Task<ICollection<Holiday>> GetHolidays(int year);
+
     }
 }

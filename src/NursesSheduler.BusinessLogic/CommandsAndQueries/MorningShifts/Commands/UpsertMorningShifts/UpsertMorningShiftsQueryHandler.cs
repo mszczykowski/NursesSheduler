@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
@@ -15,13 +16,15 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
         private readonly IMapper _mapper;
         private readonly IValidator<MorningShift> _validator;
         private readonly IApplicationDbContext _context;
+        private readonly IQuarterProvider _quarterProvider;
 
         public UpsertMorningShiftsQueryHandler(IMapper mapper, IValidator<MorningShift> validator, 
-            IApplicationDbContext context)
+            IApplicationDbContext context, IQuarterProvider quarterProvider)
         {
             _mapper = mapper;
             _validator = validator;
             _context = context;
+            _quarterProvider = quarterProvider;
         }
 
         public async Task<IEnumerable<UpsertMorningShiftsResponse>> Handle(UpsertMorningShiftsRequest request,
@@ -66,6 +69,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
                 }
             }
 
+            _quarterProvider.InvalidateCache(request.QuarterId);
             var result = await _context.SaveChangesAsync(cancellationToken);
 
             return result > 0 ? _mapper.Map<IEnumerable<UpsertMorningShiftsResponse>>(quarter.MorningShifts) : null;

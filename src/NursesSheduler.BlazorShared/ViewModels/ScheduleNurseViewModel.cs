@@ -6,7 +6,6 @@ namespace NursesScheduler.BlazorShared.ViewModels
     {
         public int ScheduleNurseId { get; set; }
         public int NurseId { get; set; }
-        public NurseViewModel Nurse { get; set; }
         public PreviousStatates PreviousState { get; set; }
         public int DaysFromLastShift { get; set; }
 

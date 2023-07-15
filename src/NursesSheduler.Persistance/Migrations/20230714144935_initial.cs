@@ -29,8 +29,8 @@ namespace NursesScheduler.Infrastructure.Migrations
                 {
                     DepartamentSettingsId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    WorkingTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    MaximalWeekWorkingTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    WorkDayLength = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    MaximalWeekWorkDayLength = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     MinmalShiftBreak = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     TargetNumberOfNursesOnShift = table.Column<int>(type: "INTEGER", nullable: false),
                     TargetMinimalMorningShiftLenght = table.Column<TimeSpan>(type: "TEXT", nullable: false),

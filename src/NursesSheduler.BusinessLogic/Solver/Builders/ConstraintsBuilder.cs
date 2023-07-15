@@ -30,7 +30,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint()
         {
-            _result.Add(new MaxTotalHoursInWeekConstraint(_departamentSettings.MaximalWeekWorkingTime));
+            _result.Add(new MaxTotalHoursInWeekConstraint(_departamentSettings.MaximalWeekWorkDayLength));
             return this;
         }
 

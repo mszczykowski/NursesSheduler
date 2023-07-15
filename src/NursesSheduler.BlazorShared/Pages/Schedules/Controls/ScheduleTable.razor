@@ -35,9 +35,10 @@ else
         <tbody>
             @{
                 i = 1;
-                foreach (var nurse in ScheduleNurses)
+                foreach (var scheduleNurse in ScheduleNurses)
                 {
-                    <ScheduleRow No=i++ ScheduleNurse=nurse MonthDays=MonthDays MorningShifts=MorningShifts />
+                    <ScheduleRow No=i++ ScheduleNurse=scheduleNurse MonthDays=MonthDays MorningShifts=MorningShifts 
+                        Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId)/>
                 }
             }
         </tbody>
@@ -48,6 +49,8 @@ else
 @code {
     [Parameter]
     public IEnumerable<DayViewModel> MonthDays { get; set; }
+    [Parameter]
+    public IEnumerable<NurseViewModel> Nurses { get; set; }
     [Parameter]
     public IEnumerable<ScheduleNurseViewModel> ScheduleNurses { get; set; }
     [Parameter]
