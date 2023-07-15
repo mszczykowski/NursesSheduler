@@ -135,7 +135,32 @@ namespace NursesScheduler.BusinessLogic.Services
             return GetScheduleStats(scheduleStatsKey, days, departamentSettings, schedule);
         }
 
+        public async Task<IEnumerable<ScheduleStatsKey>> GetScheduleStatsKeysForQuarterAsync(int quarterNumber, int year,
+            int departamentId)
+        {
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
 
+            var keys = new List<ScheduleStatsKey>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var month = departamentSettings.FirstQuarterStart + i + (quarterNumber - 1) * 3;
+                if (month > 12)
+                {
+                    month = 1;
+                    year++;
+                }
+
+                keys.Add(new ScheduleStatsKey
+                {
+                    Year = year,
+                    Month = month,
+                    DepartamentId = departamentId,
+                });
+            }
+
+            return keys;
+        }
 
         private ScheduleStats GetScheduleStats(ScheduleStatsKey key, IEnumerable<Day> days,
             DepartamentSettings departamentSettings, Schedule? schedule)
@@ -228,8 +253,8 @@ namespace NursesScheduler.BusinessLogic.Services
                 .Sum(d => d.MorningShift.ShiftLength.Ticks));
         }
 
-        private ScheduleStats GetStatsFromClosedSchedule(ScheduleStatsKey key, Schedule schedule, IEnumerable<Day> days,
-            DepartamentSettings departamentSettings)
+        private ScheduleStats GetStatsFromClosedSchedule(ScheduleStatsKey key, Schedule schedule, 
+            IEnumerable<DayNumbered> days, DepartamentSettings departamentSettings)
         {
             var scheduleStats = new ScheduleStats
             {
@@ -288,7 +313,7 @@ namespace NursesScheduler.BusinessLogic.Services
         }
 
         private IDictionary<int, TimeSpan> GetWorkTimeInWeeks(IEnumerable<NurseWorkDay> nurseWorkDays,
-            IEnumerable<Day> days)
+            IEnumerable<DayNumbered> days)
         {
             var workTimeInWeeks = new Dictionary<int, TimeSpan>();
 

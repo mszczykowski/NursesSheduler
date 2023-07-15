@@ -18,11 +18,11 @@ namespace NursesScheduler.Infrastructure.Providers
             _context = context;
         }
 
-        protected override async Task<DepartamentSettings?> GetDataFromSource(int id)
+        protected override async Task<DepartamentSettings?> GetDataFromSource(int key)
         {
             return await _context.DepartamentSettings
                     .Include(s => s.Departament)
-                    .FirstOrDefaultAsync(s => s.DepartamentId == id);
+                    .FirstOrDefaultAsync(s => s.DepartamentId == key);
         }
     }
 }

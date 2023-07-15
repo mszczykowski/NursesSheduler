@@ -45,7 +45,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var workTimeInQuarter = TimeSpan.Zero;
 
-            var quarterDates = _calendarService.GetMonthsInQuarterDatesAsync(departamentSettings.FirstQuarterStart, quarterNumber,
+            var quarterDates = _calendarService.GetQuarterMonths(departamentSettings.FirstQuarterStart, quarterNumber,
                 yearNumber);
 
             foreach (var date in quarterDates)
@@ -96,7 +96,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var timeForMorningShifts = TimeSpan.Zero;
 
-            var monthsInQuarter = _calendarService.GetMonthsInQuarterDatesAsync(departamentSettings.FirstQuarterStart,
+            var monthsInQuarter = _calendarService.GetQuarterMonths(departamentSettings.FirstQuarterStart,
                 quarterNumber, yearNumber);
 
             foreach(var monthDate in monthsInQuarter)

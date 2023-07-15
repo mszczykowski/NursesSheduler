@@ -6,16 +6,16 @@ namespace NursesScheduler.Infrastructure.Providers
 {
     public sealed class ScheduleStatsProvider : CacheProvider<ScheduleStats, ScheduleStatsKey>
     {
-        private readonly IStatsService _scheduleStatsService;
-        public ScheduleStatsProvider(IStatsService scheduleStatsService, IMemoryCache memoryCache, 
+        private readonly IStatsService _statsService;
+        public ScheduleStatsProvider(IStatsService statsService, IMemoryCache memoryCache, 
             string cacheKey) : base(memoryCache, cacheKey)
         {
-            _scheduleStatsService = scheduleStatsService;
+            _statsService = statsService;
         }
 
-        protected override async Task<ScheduleStats?> GetDataFromSource(ScheduleStatsKey id)
+        protected override async Task<ScheduleStats?> GetDataFromSource(ScheduleStatsKey key)
         {
-            return await _scheduleStatsService.GetScheduleStatsAsync(id.Year, id.Month, id.DepartamentId);
+            return await _statsService.GetScheduleStatsAsync(key.Year, key.Month, key.DepartamentId);
         }
     }
 }

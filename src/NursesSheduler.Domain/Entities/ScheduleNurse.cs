@@ -6,7 +6,7 @@ namespace NursesScheduler.Domain.Entities
     public record ScheduleNurse
     {
         public int ScheduleNurseId { get; set; }
-        public virtual ICollection<NurseWorkDay> NurseWorkDays { get; set; }
+        public virtual IEnumerable<NurseWorkDay> NurseWorkDays { get; set; }
 
         public int NurseId { get; set; }
         public virtual Nurse Nurse { get; set; }

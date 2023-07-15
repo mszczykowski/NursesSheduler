@@ -7,47 +7,47 @@ namespace NursesScheduler.Infrastructure.Providers
 
     public abstract class CacheProvider<TObject, TKey> : ICacheProvider<TObject, TKey> where TObject : class
     {
-        private readonly string _cacheKey;
+        private readonly string _cacheName;
 
 
         private readonly IMemoryCache _memoryCache;
 
-        public CacheProvider(IMemoryCache memoryCache, string cacheKey)
+        public CacheProvider(IMemoryCache memoryCache, string cacheName)
         {
             _memoryCache = memoryCache;
-            _cacheKey = cacheKey;
+            _cacheName = cacheName;
         }
 
-        public async Task<TObject> GetCachedDataAsync(TKey id)
+        public async Task<TObject> GetCachedDataAsync(TKey key)
         {
             TObject result;
-            var key = BuildKey(id);
+            var cacheKey = BuildCacheKey(key);
 
-            if (!_memoryCache.TryGetValue(key, out result))
+            if (!_memoryCache.TryGetValue(cacheKey, out result))
             {
-                result = await GetDataFromSource(id)
-                    ?? throw new EntityNotFoundException(id.ToString(), nameof(TObject));
+                result = await GetDataFromSource(key)
+                    ?? throw new EntityNotFoundException(cacheKey.ToString(), nameof(TObject));
 
-                _memoryCache.Set(key, result);
+                _memoryCache.Set(cacheKey, result);
             }
             return result;
         }
 
-        public void InvalidateCache(TKey id)
+        public void InvalidateCache(TKey key)
         {
-            var key = BuildKey(id);
+            var cacheKey = BuildCacheKey(key);
 
-            if (_memoryCache.TryGetValue(key, out var result))
+            if (_memoryCache.TryGetValue(cacheKey, out var result))
             {
-                _memoryCache.Remove(key);
+                _memoryCache.Remove(cacheKey);
             }
         }
 
-        protected abstract Task<TObject?> GetDataFromSource(TKey id);
+        protected abstract Task<TObject?> GetDataFromSource(TKey key);
 
-        private string BuildKey(TKey id)
+        private string BuildCacheKey(TKey key)
         {
-            return $"{_cacheKey}-{id}";
+            return $"{_cacheName}-{key}";
         }
     }
 }

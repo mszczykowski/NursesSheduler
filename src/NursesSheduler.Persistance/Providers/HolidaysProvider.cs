@@ -17,9 +17,9 @@ namespace NursesScheduler.Infrastructure.Providers
             _holidaysApiClient = holidaysApiClient;
         }
 
-        protected override async Task<IEnumerable<Holiday>?> GetDataFromSource(int id)
+        protected override async Task<IEnumerable<Holiday>?> GetDataFromSource(int key)
         {
-            return await _holidaysApiClient.GetHolidays(id);
+            return await _holidaysApiClient.GetHolidays(key);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace NursesScheduler.Domain.Entities
     public record NurseWorkDay
     {
         public int NurseWorkDayId { get; set; }
-        public int DayNumber { get; set; }
+        public int Day { get; set; }
         public bool IsTimeOff { get; set; }
         public ShiftTypes ShiftType { get; set; }
 
