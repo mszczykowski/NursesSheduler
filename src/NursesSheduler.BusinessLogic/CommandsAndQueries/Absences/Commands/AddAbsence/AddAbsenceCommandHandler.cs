@@ -69,7 +69,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
             foreach (var absence in absences)
             {
-                var days = await _calendarService.GetDaysFromDayNumbers(absence.MonthNumber, absencesSummary.Year, 
+                var days = await _calendarService.GetDaysFromDayNumbers(absence.Month, absencesSummary.Year, 
                     absence.Days);
                 absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkDayLength);
 

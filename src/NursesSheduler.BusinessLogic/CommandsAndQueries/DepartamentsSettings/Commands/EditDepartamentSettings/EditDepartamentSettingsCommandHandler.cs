@@ -39,14 +39,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
 
             var oldSettings = await _context.DepartamentSettings
                 .FirstOrDefaultAsync(s => s.DepartamentSettingsId == request.DepartamentSettingsId)
-                ?? throw new EntityNotFoundException(request.DepartamentSettingsId, nameof(DepartamentSettings));
+                ?? throw new EntityNotFoundException(request.DepartamentSettingsId.ToString(), nameof(DepartamentSettings));
 
-            if (oldSettings.Equals(newSettings))
-            {
-                return _mapper.Map<EditDepartamentSettingsResponse>(oldSettings);
-            }
-
-            oldSettings.SettingsVersion++;
 
             _context.Entry(oldSettings).CurrentValues.SetValues(request);
 

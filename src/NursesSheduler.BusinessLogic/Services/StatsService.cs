@@ -61,6 +61,8 @@ namespace NursesScheduler.BusinessLogic.Services
                             AssignedWorkTime = nurseScheduleStats.AssignedWorkTime,
                             HolidayHoursAssigned = nurseScheduleStats.HolidayHoursAssigned,
                             NightShiftsAssigned = nurseScheduleStats.NightShiftsAssigned,
+                            TimeOffToAssign = nurseQuarterStats.TimeOffToAssign,
+                            TimeOffAssigned = nurseQuarterStats.TimeOffAssigned,
                             MorningShiftsAssigned = new List<MorningShiftIndex>(nurseQuarterStats.MorningShiftsAssigned),
                             WorkTimeInWeeks = new Dictionary<int, TimeSpan>(),
                         };
@@ -70,6 +72,8 @@ namespace NursesScheduler.BusinessLogic.Services
                         nurseQuarterStats.AssignedWorkTime += nurseScheduleStats.AssignedWorkTime;
                         nurseQuarterStats.HolidayHoursAssigned += nurseScheduleStats.HolidayHoursAssigned;
                         nurseQuarterStats.NightShiftsAssigned += nurseScheduleStats.NightShiftsAssigned;
+                        nurseQuarterStats.TimeOffToAssign += nurseQuarterStats.TimeOffToAssign;
+                        nurseQuarterStats.TimeOffAssigned += nurseQuarterStats.TimeOffAssigned;
                         nurseQuarterStats.MorningShiftsAssigned.Union(nurseQuarterStats.MorningShiftsAssigned);
                     }
 
@@ -97,7 +101,8 @@ namespace NursesScheduler.BusinessLogic.Services
                 .ThenInclude(s => s.NurseWorkDays)
                 .ThenInclude(d => d.MorningShift)
                 .Include(s => s.Quarter)
-                .FirstOrDefaultAsync(s => s.Quarter.Year == year && s.Month == month && s.Quarter.DepartamentId == departamentId);
+                .FirstOrDefaultAsync(s => s.Quarter.Year == year && s.Month == month
+                    && s.Quarter.DepartamentId == departamentId);
 
             var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
 
@@ -162,15 +167,29 @@ namespace NursesScheduler.BusinessLogic.Services
             return keys;
         }
 
-        private ScheduleStats GetScheduleStats(ScheduleStatsKey key, IEnumerable<Day> days,
+        public async Task<IEnumerable<NurseScheduleStats>> GetNurseScheduleStats(Schedule schedule, int departamentId, 
+            int year)
+        {
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
+            var days = await _calendarService
+                .GetMonthDaysAsync(year, schedule.Month, departamentSettings.FirstQuarterStart);
+
+            return GetNurseScheduleStats(schedule, days, departamentSettings);
+        }
+
+        private ScheduleStats GetScheduleStats(ScheduleStatsKey key, IEnumerable<DayNumbered> days,
             DepartamentSettings departamentSettings, Schedule? schedule)
         {
+            var workTimeInMonth = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkDayLength);
+
             var scheduleStats = new ScheduleStats
             {
                 CacheKey = key,
-                WorkTimeInMonth = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkDayLength),
+                WorkTimeInMonth = workTimeInMonth,
                 MonthInQuarter = _calendarService
                     .GetMonthInQuarterNumber(key.Month, departamentSettings.FirstQuarterStart),
+                WorkTimeBalance = CalculateWorkTimeBalance(workTimeInMonth, schedule?.ScheduleNurses?.Count() ?? 0,
+                    departamentSettings.TargetMinNumberOfNursesOnShift, days.Count())
             };
 
             scheduleStats.NursesScheduleStats = GetNurseScheduleStats(schedule, days, departamentSettings);
@@ -178,7 +197,7 @@ namespace NursesScheduler.BusinessLogic.Services
             return scheduleStats;
         }
 
-        private IEnumerable<NurseScheduleStats> GetNurseScheduleStats(Schedule? schedule, IEnumerable<Day> days,
+        private IEnumerable<NurseScheduleStats> GetNurseScheduleStats(Schedule? schedule, IEnumerable<DayNumbered> days,
             DepartamentSettings departamentSettings)
         {
             var nurseScheduleStats = new List<NurseScheduleStats>();
@@ -200,6 +219,9 @@ namespace NursesScheduler.BusinessLogic.Services
                     DaysFromLastShift = GetDaysFromLastShift(nurseSchedule.NurseWorkDays),
                     MorningShiftsAssigned = GetAssignedMorningShifts(nurseSchedule.NurseWorkDays),
                     WorkTimeInWeeks = GetWorkTimeInWeeks(nurseSchedule.NurseWorkDays, days),
+                    TimeOffToAssign = CalculateTimeOffToAssign(nurseSchedule.NurseWorkDays, days, 
+                        departamentSettings.WorkDayLength),
+                    TimeOffAssigned = CalculateTimeOffAssigned(nurseSchedule.NurseWorkDays),
                 };
 
                 nurseScheduleStats.Add(nurseStats);
@@ -219,7 +241,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var holiadayHoursAssinged = TimeSpan.Zero;
             foreach (var day in days.Where(d => d.IsHoliday))
             {
-                var workDay = nurseWorkDays.First(d => d.DayNumber == day.Date.DayNumber);
+                var workDay = nurseWorkDays.First(d => d.Day == day.Date.DayNumber);
 
                 if (workDay.ShiftType == ShiftTypes.None)
                 {
@@ -243,23 +265,17 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private TimeSpan CalculateAssignedWorkTime(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            return nurseWorkDays
-                .Where(d => d.ShiftType == ShiftTypes.Day || d.ShiftType == ShiftTypes.Night)
-                .Count() * GeneralConstants.RegularShiftLenght
-                +
-                TimeSpan.FromTicks(
-                nurseWorkDays
-                .Where(d => d.ShiftType == ShiftTypes.Morning)
-                .Sum(d => d.MorningShift.ShiftLength.Ticks));
+            return TimeSpan.FromTicks(nurseWorkDays.Sum(d => GetAssignedDayWorkTime(d).Ticks));
         }
 
-        private ScheduleStats GetStatsFromClosedSchedule(ScheduleStatsKey key, Schedule schedule, 
+        private ScheduleStats GetStatsFromClosedSchedule(ScheduleStatsKey key, Schedule schedule,
             IEnumerable<DayNumbered> days, DepartamentSettings departamentSettings)
         {
             var scheduleStats = new ScheduleStats
             {
                 CacheKey = key,
                 WorkTimeInMonth = schedule.WorkTimeInMonth,
+                WorkTimeBalance = schedule.WorkTimeBalance,
                 MonthInQuarter = _calendarService
                     .GetMonthInQuarterNumber(key.Month, departamentSettings.FirstQuarterStart),
             };
@@ -273,6 +289,8 @@ namespace NursesScheduler.BusinessLogic.Services
                     AssignedWorkTime = nurseSchedule.AssignedWorkTime,
                     HolidayHoursAssigned = nurseSchedule.HolidaysHoursAssigned,
                     NightShiftsAssigned = nurseSchedule.NightShiftsAssigned,
+                    TimeOffToAssign = nurseSchedule.TimeOffToAssign,
+                    TimeOffAssigned = nurseSchedule.TimeOffToAssiged,
                     LastState = GetLastState(nurseSchedule.NurseWorkDays),
                     DaysFromLastShift = GetDaysFromLastShift(nurseSchedule.NurseWorkDays),
                     MorningShiftsAssigned = GetAssignedMorningShifts(nurseSchedule.NurseWorkDays),
@@ -296,12 +314,12 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private ShiftTypes GetLastState(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            return nurseWorkDays.First(d => d.DayNumber == nurseWorkDays.Max(d => d.DayNumber)).ShiftType;
+            return nurseWorkDays.First(d => d.Day == nurseWorkDays.Max(d => d.Day)).ShiftType;
         }
         private int GetDaysFromLastShift(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
             var days = 0;
-            foreach (var workDay in nurseWorkDays.OrderByDescending(d => d.DayNumber))
+            foreach (var workDay in nurseWorkDays.OrderByDescending(d => d.Day))
             {
                 if (workDay.ShiftType != ShiftTypes.None)
                 {
@@ -324,7 +342,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     workTimeInWeeks.Add(day.WeekInQuarter, TimeSpan.Zero);
                 }
 
-                var workDay = nurseWorkDays.First(d => d.DayNumber == day.Date.DayNumber);
+                var workDay = nurseWorkDays.First(d => d.Day == day.Date.DayNumber);
 
                 if (workDay.ShiftType == ShiftTypes.None)
                 {
@@ -351,6 +369,40 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             return workTimeInQuarter - ((int)Math.Floor(workTimeInQuarter / GeneralConstants.RegularShiftLenght)
                 * GeneralConstants.RegularShiftLenght);
+        }
+
+        private TimeSpan CalculateTimeOffToAssign(IEnumerable<NurseWorkDay> nurseWorkDays,
+            IEnumerable<Day> days, TimeSpan workDayLength)
+        {
+            return nurseWorkDays.Where(wd => wd.IsTimeOff && days.First(d => d.Date.Day == wd.Day).IsWorkingDay)
+                .Count() * workDayLength;
+        }
+
+        private TimeSpan CalculateTimeOffAssigned(IEnumerable<NurseWorkDay> nurseWorkDays)
+        {
+            return TimeSpan
+                .FromTicks(nurseWorkDays.Where(d => d.IsTimeOff == true).Sum(d => GetAssignedDayWorkTime(d).Ticks));
+        }
+
+        private TimeSpan GetAssignedDayWorkTime(NurseWorkDay nurseWorkDay)
+        {
+            switch (nurseWorkDay.ShiftType)
+            {
+                case ShiftTypes.None:
+                    return TimeSpan.Zero;
+                case ShiftTypes.Morning:
+                    return nurseWorkDay.MorningShift.ShiftLength;
+                default:
+                    return GeneralConstants.RegularShiftLenght;
+            }
+        }
+
+        private TimeSpan CalculateWorkTimeBalance(TimeSpan workTimeInMonth, int numberOfNurses, 
+            int minNumberOfNursesOnShift, int numberOfDaysInMonth)
+        {
+            return (workTimeInMonth * numberOfNurses) 
+                - 
+                (numberOfDaysInMonth * minNumberOfNursesOnShift * GeneralConstants.RegularShiftLenght);
         }
     }
 }

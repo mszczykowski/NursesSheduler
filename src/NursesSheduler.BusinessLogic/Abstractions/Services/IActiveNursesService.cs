@@ -2,7 +2,7 @@
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
-    internal interface INursesService
+    internal interface IActiveNursesService
     {
         Task<IEnumerable<Nurse>> GetActiveDepartamentNurses(int departamentId);
     }

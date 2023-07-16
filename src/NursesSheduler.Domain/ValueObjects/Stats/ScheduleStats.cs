@@ -5,6 +5,7 @@
         public ScheduleStatsKey CacheKey { get; set; }
         public int MonthInQuarter { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
+        public TimeSpan WorkTimeBalance { get; set; }
         public IEnumerable<NurseScheduleStats> NursesScheduleStats { get; set; }
     }
 }

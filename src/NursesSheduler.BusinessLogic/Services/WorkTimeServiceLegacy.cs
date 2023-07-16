@@ -1,5 +1,4 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
-using NursesScheduler.BusinessLogic.Abstractions.Services;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
@@ -7,11 +6,11 @@ using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    internal sealed class WorkTimeService : IWorkTimeService
+    internal sealed class WorkTimeServiceLegacy : IWorkTimeService
     {
         private readonly ICalendarService _calendarService;
 
-        public WorkTimeService(ICalendarService calendarService)
+        public WorkTimeServiceLegacy(ICalendarService calendarService)
         {
             _calendarService = calendarService;
         }
@@ -65,7 +64,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var totalNursesWorkTime = WorkDayLengthInMonthPerNurse * nurseCount;
             var minimalTotalWorkTimeToAssign =
-                departamentSettings.TargetNumberOfNursesOnShift * 2
+                departamentSettings.TargetMinNumberOfNursesOnShift * 2
                 * GeneralConstants.RegularShiftLenght
                 * DateTime.DaysInMonth(yearNumber, monthNumber);
 

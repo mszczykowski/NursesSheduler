@@ -50,7 +50,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             Array.Fill(nightShiftsCapacities, minimalNumberOfWorkersOnShift);
             Array.Fill(holidayDayShiftCapacities, minimalNumberOfWorkersOnShift);
 
-            if (minimalNumberOfWorkersOnShift < _departamentSettings.TargetNumberOfNursesOnShift)
+            if (minimalNumberOfWorkersOnShift < _departamentSettings.TargetMinNumberOfNursesOnShift)
             {
                 if (numberOfSurplusShifts > 0)
                 {
@@ -163,8 +163,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         {
             int calculatedMinimal = totalNumberOfShiftsToAssign / (_month.Length * GeneralConstants.NumberOfShifts);
 
-            return _departamentSettings.TargetNumberOfNursesOnShift < calculatedMinimal ?
-                _departamentSettings.TargetNumberOfNursesOnShift : calculatedMinimal;
+            return _departamentSettings.TargetMinNumberOfNursesOnShift < calculatedMinimal ?
+                _departamentSettings.TargetMinNumberOfNursesOnShift : calculatedMinimal;
         }
 
         private int GetNumberOfSurplusShifts(int totalNumberOfShiftsToAssign, int minimalNumberOfNursesOnShift)

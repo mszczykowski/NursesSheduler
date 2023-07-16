@@ -6,38 +6,35 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries.GetScheduleStatsQuery
 {
-    internal class GetScheduleQueryHandler : IRequestHandler<GetScheduleRequest, GetScheduleResponse>
+    internal sealed class GetScheduleStatsQueryHandler : IRequestHandler<GetScheduleStatsRequest,
+        GetScheduleStatsResponse>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly ISchedulesService _schedulesService;
+        private readonly IStatsService _statsService;
 
-        public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper, ISchedulesService schedulesService)
+        public GetScheduleStatsQueryHandler(IApplicationDbContext context, IMapper mapper, IStatsService statsService)
         {
             _context = context;
             _mapper = mapper;
-            _schedulesService = schedulesService;
+            _statsService = statsService;
         }
 
-        public async Task<GetScheduleResponse> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
+        public async Task<GetScheduleStatsResponse> Handle(GetScheduleStatsRequest request,
+            CancellationToken cancellationToken)
         {
             var schedule = await _context.Schedules
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
                 .FirstOrDefaultAsync(s => s.QuarterId == request.QuarterId && s.Month == request.Month);
 
-            if(schedule is not null)
-            {
-                return _mapper.Map<GetScheduleResponse>(schedule);
-            }
-
             var quarter = await _context.Quarters
                 .FindAsync(request.QuarterId) ?? throw new EntityNotFoundException(request.QuarterId, nameof(Quarter));
 
-            return _mapper.Map<GetScheduleResponse>(await _schedulesService
-                .CreateNewScheduleAsync(request.Month, quarter));
+            return _mapper.Map<GetScheduleStatsResponse>(await _statsService.GetScheduleStatsAsync(schedule,
+                quarter.DepartamentId, quarter.Year));
         }
     }
 }

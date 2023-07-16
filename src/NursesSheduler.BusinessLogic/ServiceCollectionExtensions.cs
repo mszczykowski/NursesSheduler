@@ -28,12 +28,12 @@ namespace NursesScheduler.BusinessLogic
             //services
             services.AddSingleton<ICurrentDateService, CurrentDateService>();
             services.AddSingleton<ISeedService, SeedService>();
-            services.AddTransient<IWorkTimeService, WorkTimeService>();
-            services.AddTransient<IAbsencesService, AbsencesService>();
+            services.AddTransient<IWorkTimeService, WorkTimeServiceLegacy>();
+            services.AddTransient<IAbsencesService, AbsencesServiceLegacy>();
             services.AddTransient<ISchedulesService, SchedulesService>();
             services.AddTransient<ICalendarService, CalendarService>();
             services.AddTransient<IStatsService, StatsService>();
-            services.AddTransient<INursesService, NursesService>();
+            services.AddTransient<IActiveNursesService, ActiveNursesService>();
         }
     }
 }

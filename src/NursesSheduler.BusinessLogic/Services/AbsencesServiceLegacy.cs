@@ -6,15 +6,25 @@ using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    internal sealed class AbsencesService : IAbsencesService
+    internal sealed class AbsencesServiceLegacy : IAbsencesService
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentDateService _currentDateService;
 
-        public AbsencesService(IApplicationDbContext context, ICurrentDateService currentDateService)
+        public AbsencesServiceLegacy(IApplicationDbContext context, ICurrentDateService currentDateService)
         {
             _context = context;
             _currentDateService = currentDateService;
+        }
+
+        public async Task<IEnumerable<Absence>> GetNurseAbsencesInMonthAsync(int year, int month, int nurseId)
+        {
+            return await _context.AbsencesSummaries
+                .Include(s => s.Absences)
+                .Where(s => s.NurseId == nurseId && s.Year == year)
+                .SelectMany(s => s.Absences)
+                .Where(a => a.Month == month)
+                .ToListAsync();
         }
 
         public async Task InitializeDepartamentAbsencesSummaries(Departament departament, 
@@ -53,7 +63,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             for (var date = from; date <= to; date = date.AddDays(1))
             {
-                if (date.Month != currentAbsence.MonthNumber)
+                if (date.Month != currentAbsence.Month)
                 {
                     currentAbsence = new Absence(date.Month);
                     result.Add(currentAbsence);
@@ -73,7 +83,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
         public async Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence)
         {
-            if (absencesSummary.Absences.Any(a => a.MonthNumber == absence.MonthNumber && a.Days.Intersect(absence.Days).Any()))
+            if (absencesSummary.Absences.Any(a => a.Month == absence.Month && a.Days.Intersect(absence.Days).Any()))
             {
                 return AbsenceVeryficationResult.AbsenceAlreadyExists;
             }
@@ -82,7 +92,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 .Include(s => s.Quarter)
                 .AnyAsync(s => s.Quarter.DepartamentId == absencesSummary.Nurse.DepartamentId &&
                     s.Year == absencesSummary.Year &&
-                    s.Month == absence.MonthNumber &&
+                    s.Month == absence.Month &&
                     s.IsClosed))
             {
                 return AbsenceVeryficationResult.ClosedMonth;

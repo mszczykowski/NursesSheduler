@@ -10,7 +10,12 @@
         {
 
         }
-        public EntityNotFoundException(string key, string type) 
+        public EntityNotFoundException(int key, string type)
+            : base($"Entity of type {type} with key {key} cannot be found.")
+        {
+
+        }
+        public EntityNotFoundException(string key, string type)
             : base($"Entity of type {type} with key {key} cannot be found.")
         {
 

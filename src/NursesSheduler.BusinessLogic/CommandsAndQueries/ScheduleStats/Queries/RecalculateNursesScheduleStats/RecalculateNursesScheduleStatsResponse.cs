@@ -1,8 +1,6 @@
-﻿using NursesScheduler.Domain.Enums;
-
-namespace NursesScheduler.Domain.ValueObjects.Stats
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries.RecalculateNursesScheduleStats
 {
-    public record NurseStats
+    public sealed class RecalculateNursesScheduleStatsResponse
     {
         public int NurseId { get; set; }
         public TimeSpan AssignedWorkTime { get; set; }
@@ -10,7 +8,5 @@ namespace NursesScheduler.Domain.ValueObjects.Stats
         public TimeSpan TimeOffToAssign { get; set; }
         public TimeSpan TimeOffAssigned { get; set; }
         public int NightShiftsAssigned { get; set; }
-        public IDictionary<int, TimeSpan> WorkTimeInWeeks { get; set; }
-        public IEnumerable<MorningShiftIndex> MorningShiftsAssigned { get; set; }
     }
 }

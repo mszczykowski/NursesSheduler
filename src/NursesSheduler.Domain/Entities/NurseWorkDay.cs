@@ -14,7 +14,5 @@ namespace NursesScheduler.Domain.Entities
 
         public int ScheduleNurseId { get; set; }
         public virtual ScheduleNurse ScheduleNurse { get; set; }
-
-        
     }
 }

@@ -26,7 +26,7 @@ namespace NursesScheduler.BusinessLogic.Validation
                 .GreaterThanOrEqualTo(1)
                 .LessThanOrEqualTo(12);
 
-            RuleFor(s => s.TargetNumberOfNursesOnShift)
+            RuleFor(s => s.TargetMinNumberOfNursesOnShift)
                 .NotEmpty()
                 .GreaterThanOrEqualTo(1)
                 .LessThanOrEqualTo(100);
