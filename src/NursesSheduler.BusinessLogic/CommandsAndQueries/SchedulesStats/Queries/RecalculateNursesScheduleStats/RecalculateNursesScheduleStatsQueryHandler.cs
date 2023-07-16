@@ -3,14 +3,14 @@ using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries.RecalculateNursesScheduleStats
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNursesScheduleStats
 {
     internal sealed class RecalculateNursesScheduleStatsQueryHandler
         : IRequestHandler<RecalculateNursesScheduleStatsRequest, IEnumerable<RecalculateNursesScheduleStatsResponse>>
     {
         private readonly IStatsService _statsService;
         private readonly IMapper _mapper;
-        public async Task<IEnumerable<RecalculateNursesScheduleStatsResponse>> Handle(RecalculateNursesScheduleStatsRequest request, 
+        public async Task<IEnumerable<RecalculateNursesScheduleStatsResponse>> Handle(RecalculateNursesScheduleStatsRequest request,
             CancellationToken cancellationToken)
         {
             var schedule = _mapper.Map<Schedule>(request.Schedule);

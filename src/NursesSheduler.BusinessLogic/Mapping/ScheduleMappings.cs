@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries.RecalculateNursesScheduleStats;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNursesScheduleStats;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -11,6 +12,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
         {
             CreateMap<Schedule, GetScheduleResponse>();
 
+            CreateMap<GetScheduleStatsRequest.ScheduleRequest, Schedule>();
             CreateMap<RecalculateNursesScheduleStatsRequest.ScheduleRequest, Schedule>();
         }
     }

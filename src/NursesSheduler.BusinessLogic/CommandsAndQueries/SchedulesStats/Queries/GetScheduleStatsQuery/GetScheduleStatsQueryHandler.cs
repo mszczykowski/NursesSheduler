@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries.GetScheduleStatsQuery
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
 {
     internal sealed class GetScheduleStatsQueryHandler : IRequestHandler<GetScheduleStatsRequest,
         GetScheduleStatsResponse>
@@ -25,16 +25,18 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries
         public async Task<GetScheduleStatsResponse> Handle(GetScheduleStatsRequest request,
             CancellationToken cancellationToken)
         {
-            var schedule = await _context.Schedules
-                .Include(s => s.ScheduleNurses)
-                .ThenInclude(n => n.NurseWorkDays)
-                .FirstOrDefaultAsync(s => s.QuarterId == request.QuarterId && s.Month == request.Month);
+            var schedule = _mapper.Map<Schedule>(request.Schedule);
 
-            var quarter = await _context.Quarters
-                .FindAsync(request.QuarterId) ?? throw new EntityNotFoundException(request.QuarterId, nameof(Quarter));
+            if (schedule.IsClosed)
+            {
+                schedule = await _context.Schedules
+                    .Include(s => s.ScheduleNurses)
+                    .ThenInclude(n => n.NurseWorkDays)
+                    .FirstAsync(s => s.ScheduleId == schedule.ScheduleId);
+            }
 
             return _mapper.Map<GetScheduleStatsResponse>(await _statsService.GetScheduleStatsAsync(schedule,
-                quarter.DepartamentId, quarter.Year));
+                request.DepartamentId, request.Year));
         }
     }
 }

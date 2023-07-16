@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
 namespace NursesScheduler.Infrastructure.Providers
 {
-    public sealed class ScheduleStatsProvider : CacheProvider<ScheduleStats, ScheduleStatsKey>
+    public sealed class ScheduleStatsProvider : CacheProvider<ScheduleStats, ScheduleStatsKey>, IScheduleStatsProvider
     {
         private readonly IStatsService _statsService;
         public ScheduleStatsProvider(IStatsService statsService, IMemoryCache memoryCache, 

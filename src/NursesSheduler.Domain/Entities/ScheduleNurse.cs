@@ -21,7 +21,5 @@ namespace NursesScheduler.Domain.Entities
         public TimeSpan TimeOffToAssiged { get; set; }
         public TimeSpan HolidaysHoursAssigned { get; set; }
         public int NightShiftsAssigned { get; set; }
-        public PreviousNurseStates PreviousState { get; set; }
-        public int DaysFromLastShift { get; set; }
     }
 }

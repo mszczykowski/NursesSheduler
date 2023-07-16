@@ -23,6 +23,7 @@ namespace NursesScheduler.Infrastructure
             //cache providers
             services.AddTransient<IHolidaysProvider, HolidaysProvider>();
             services.AddTransient<IDepartamentSettingsProvider, DepartamentSettingsProvider>();
+            services.AddTransient<IScheduleStatsProvider, ScheduleStatsProvider>();
 
             //http clients
             services.AddHttpClient<IHolidaysApiClient, HolidaysApiClient>(client =>

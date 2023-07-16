@@ -1,4 +1,4 @@
-﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleStats.Queries.RecalculateNursesScheduleStats
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNursesScheduleStats
 {
     public sealed class RecalculateNursesScheduleStatsResponse
     {
