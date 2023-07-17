@@ -3,7 +3,7 @@ using NursesScheduler.BlazorShared.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
 
-namespace NursesScheduler.BlazorShared.Mapping
+namespace NursesScheduler.BlazorShared.Mappings
 {
     internal sealed class ScheduleViewModelMappings : Profile
     {

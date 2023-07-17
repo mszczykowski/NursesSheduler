@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNursesScheduleStats
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
 {
     public sealed class RecalculateNurseScheduleStatsRequest : IRequest<RecalculateNursesScheduleStatsResponse>
     {
@@ -12,7 +12,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
 
         public sealed class ScheduleNurseRequest
         {
-            public int ScheduleNurseId { get; set; }
             public int NurseId { get; init; }
             public int ScheduleId { get; init; }
             public IEnumerable<NurseWorkDayRequest> NurseWorkDays { get; set; }
@@ -20,8 +19,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
 
         public sealed class NurseWorkDayRequest
         {
-            public int NurseWorkDayId { get; set; }
-            public int ScheduleNurseId { get; set; }
             public int Day { get; set; }
             public bool IsTimeOff { get; set; }
             public ShiftTypes ShiftType { get; set; }

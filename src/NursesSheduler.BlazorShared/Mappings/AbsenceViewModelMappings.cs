@@ -4,7 +4,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbse
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries.GetAbsences;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
 
-namespace NursesScheduler.BlazorShared.Mapping
+namespace NursesScheduler.BlazorShared.Mappings
 {
     internal sealed class AbsenceViewModelMappings : Profile
     {

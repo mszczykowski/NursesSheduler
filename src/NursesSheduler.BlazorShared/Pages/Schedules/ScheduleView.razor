@@ -128,7 +128,7 @@ else
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Przydzielony urlop:</b> @TimeSpan.FromTicks(_scheduleStats.NursesScheduleStats.Sum(s => s.TimeOffAssigned.Ticks)).GetTotalHoursAndMinutes()
+                        <b>Przydzielony urlop:</b> @_scheduleStats.AssignedTimeOffsTime.GetTotalHoursAndMinutes()
                     </p>
                 </div>
             </div>

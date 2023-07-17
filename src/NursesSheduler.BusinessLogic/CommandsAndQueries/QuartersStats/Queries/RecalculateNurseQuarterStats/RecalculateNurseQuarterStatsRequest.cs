@@ -2,11 +2,11 @@
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.RecalculateNurseQuarterStats
 {
-    internal class RecalculateNurseQuarterStatsRequest : IRequest<RecalculateNurseQuarterStatsResponse>
+    public sealed class RecalculateNurseQuarterStatsRequest : IRequest<RecalculateNurseQuarterStatsResponse>
     {
-        public int CurrentMonth { get; set; }
-        public int CurrentYear { get; set; }
         public int DepartamentId { get; set; }
+        public int Year { get; set; }
+        public int Month { get; set; }
         public NurseStatsRequest CurrentScheduleNurseStats { get; set; }
         public sealed class NurseStatsRequest
         {

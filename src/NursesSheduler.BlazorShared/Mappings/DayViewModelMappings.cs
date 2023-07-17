@@ -2,7 +2,7 @@
 using NursesScheduler.BlazorShared.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays;
 
-namespace NursesScheduler.BlazorShared.Mapping
+namespace NursesScheduler.BlazorShared.Mappings
 {
     internal sealed class DayViewModelMappings : Profile
     {

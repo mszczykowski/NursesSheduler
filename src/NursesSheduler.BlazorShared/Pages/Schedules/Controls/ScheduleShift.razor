@@ -29,7 +29,7 @@
     [Parameter]
     public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
     [Parameter]
-    public EventCallback RecalculateRow { get; set; }
+    public EventCallback OnChange { get; set; }
 
     private string _selectedValue;
 
@@ -79,12 +79,12 @@
                 break;
         }
 
-        await RecalculateRow.InvokeAsync();
+        await OnChange.InvokeAsync();
     }
 
     private async Task SetTimeOff(MouseEventArgs args)
     {
         WorkDay.IsTimeOff = !WorkDay.IsTimeOff;
-        await RecalculateRow.InvokeAsync();
+        await OnChange.InvokeAsync();
     }
 }

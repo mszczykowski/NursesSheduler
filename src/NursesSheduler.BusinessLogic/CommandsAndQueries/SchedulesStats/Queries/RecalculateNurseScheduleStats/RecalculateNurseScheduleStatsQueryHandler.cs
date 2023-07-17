@@ -3,9 +3,9 @@ using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNursesScheduleStats
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
 {
-    internal sealed class RecalculateNurseScheduleStatsQueryHandler 
+    internal sealed class RecalculateNurseScheduleStatsQueryHandler
         : IRequestHandler<RecalculateNurseScheduleStatsRequest, RecalculateNursesScheduleStatsResponse>
     {
         private readonly IMapper _mapper;

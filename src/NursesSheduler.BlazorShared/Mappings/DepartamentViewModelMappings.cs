@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.Pic
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament;
 
-namespace NursesScheduler.BlazorShared.Mapping
+namespace NursesScheduler.BlazorShared.Mappings
 {
     internal class DepartamentViewModelMappings : Profile
     {

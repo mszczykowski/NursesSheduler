@@ -35,10 +35,10 @@ else
         <tbody>
             @{
                 i = 1;
-                foreach (var scheduleNurse in ScheduleNurses)
+                foreach (var scheduleNurse in Schedule.ScheduleNurses)
                 {
-                    <ScheduleRow No=i++ ScheduleNurse=scheduleNurse MonthDays=MonthDays MorningShifts=MorningShifts 
-                        Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId)/>
+                    <ScheduleRow No=i++ ReadOnly=ReadOnly StatsDipslayed=StatsDipslayed Quarter=Quarter Month=Schedule.Month 
+                        ScheduleNurse=scheduleNurse MonthDays=MonthDays MorningShifts=MorningShifts Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId)/>
                 }
             }
         </tbody>
@@ -54,13 +54,17 @@ else
     [Parameter]
     public IEnumerable<NurseViewModel> Nurses { get; set; }
     [Parameter]
-    public IEnumerable<ScheduleNurseViewModel> ScheduleNurses { get; set; }
+    public ScheduleViewModel Schedule { get; set; }
     [Parameter]
     public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
     [Parameter]
     public ScheduleStatsViewModel ScheduleStats { get; set; }
     [Parameter]
     public QuarterStatsViewModel QuarterStats { get; set; }
+    [Parameter]
+    public bool ReadOnly { get; set; }
+    [Parameter]
+    public QuarterViewModel Quarter { get; set; }
 
     private int i;
 }

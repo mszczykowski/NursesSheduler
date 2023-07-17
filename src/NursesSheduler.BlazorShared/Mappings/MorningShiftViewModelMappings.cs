@@ -4,7 +4,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.Up
 using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts;
 
-namespace NursesScheduler.BlazorShared.Mapping
+namespace NursesScheduler.BlazorShared.Mappings
 {
     internal sealed class MorningShiftViewModelMappings : Profile
     {

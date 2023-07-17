@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.RecalculateScheduleHours;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -10,8 +9,6 @@ namespace NursesScheduler.BusinessLogic.Mapping
         public DayMappings()
         {
             CreateMap<Day, GetMonthDaysResponse>();
-
-            CreateMap<RecalculateScheduleHoursRequest.DayRequest, Day>();
         }
     }
 }
