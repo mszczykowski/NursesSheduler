@@ -4,8 +4,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
-using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Commands.EditDepartamentSettings
 {
@@ -39,7 +39,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
 
             var oldSettings = await _context.DepartamentSettings
                 .FirstOrDefaultAsync(s => s.DepartamentSettingsId == request.DepartamentSettingsId)
-                ?? throw new EntityNotFoundException(request.DepartamentSettingsId.ToString(), nameof(DepartamentSettings));
+                ?? throw new EntityNotFoundException(request.DepartamentSettingsId, nameof(DepartamentSettings));
 
 
             _context.Entry(oldSettings).CurrentValues.SetValues(request);

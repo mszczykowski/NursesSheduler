@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
-using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.DeleteNurse
 {
@@ -17,12 +17,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.Delet
 
         public async Task<DeleteNurseResponse> Handle(DeleteNurseRequest request, CancellationToken cancellationToken)
         {
-            var nurse = await _context.Nurses.Include(n => n.Shifts).FirstOrDefaultAsync(n => n.NurseId == request.NurseId)
+            var nurse = await _context.Nurses.Include(n => n.NurseWorkDays).FirstOrDefaultAsync(n => n.NurseId == request.NurseId)
                 ?? throw new EntityNotFoundException(request.NurseId, nameof(Nurse));
 
 
             //soft delete if nurse is assinged to any shift
-            if (nurse.Shifts.Any())
+            if (nurse.NurseWorkDays.Any())
             {
                 nurse.IsDeleted = true;
             }

@@ -71,7 +71,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
                 }
             }
 
-            _quarterProvider.InvalidateCache(request.QuarterId);
             var result = await _context.SaveChangesAsync(cancellationToken);
 
             return result > 0 ? _mapper.Map<IEnumerable<UpsertMorningShiftsResponse>>(quarter.MorningShifts) : null;

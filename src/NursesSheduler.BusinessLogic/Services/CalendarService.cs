@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.Services
             return await GetNumberedDaysAsync(year, month);
         }
 
-        public async Task<IEnumerable<DayNumbered>> GetMonthDaysAsync(int year, int month, int firstQuarterStart)
+        public async Task<IEnumerable<DayNumbered>> GetNumberedMonthDaysAsync(int year, int month, int firstQuarterStart)
         {
             var quarterNumber = GetQuarterNumber(month, firstQuarterStart);
             var quarterMonths = GetQuarterMonths(firstQuarterStart, quarterNumber, year);
@@ -45,7 +45,7 @@ namespace NursesScheduler.BusinessLogic.Services
         }
 
         public async Task<IEnumerable<Day>> GetDaysFromDayNumbersAsync(int year, int month,
-            ICollection<int> days)
+            IEnumerable<int> days)
         {
             var holidays = await _holidaysProvider.GetCachedDataAsync(year);
             holidays = holidays.Where(h => h.Date.Month == month);

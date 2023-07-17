@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
 {
@@ -65,15 +65,16 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
                 return new AddAbsenceResponse(veryficationResult);
             }
 
-            var departamentSettings = await _settingsManager.GetDepartamentSettings(absencesSummary.Nurse.DepartamentId);
+            var departamentSettings = await _settingsManager.GetCachedDataAsync(absencesSummary.Nurse.DepartamentId);
 
             foreach (var absence in absences)
             {
-                var days = await _calendarService.GetDaysFromDayNumbers(absence.Month, absencesSummary.Year, 
+                var days = await _calendarService.GetDaysFromDayNumbersAsync(absencesSummary.Year, absence.Month, 
                     absence.Days);
                 absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkDayLength);
+                absence.AbsencesSummaryId = absencesSummary.AbsencesSummaryId;
 
-                absencesSummary.Absences.Add(absence);
+                await _context.Absences.AddAsync(absence);
             }
 
             var result = await _context.SaveChangesAsync(cancellationToken);

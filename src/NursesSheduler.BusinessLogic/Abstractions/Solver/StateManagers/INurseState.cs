@@ -1,25 +1,28 @@
 ﻿using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
 {
     internal interface INurseState
     {
-        List<int> AssignedMorningShiftsIds { get; set; }
-        TimeSpan HolidayPaidHoursAssigned { get; set; }
+        int NurseId { get; init; }
+
+        public Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; set; }
+
         TimeSpan HoursFromLastShift { get; set; }
         TimeSpan HoursToNextShift { get; set; }
+
+        ICollection<int> AssignedMorningShiftsIds { get; set; }
+        TimeSpan HolidayPaidHoursAssigned { get; set; }
+        
         int NumberOfNightShiftsAssigned { get; set; }
         int NumberOfRegularShiftsToAssign { get; set; }
         int NumberOfTimeOffShiftsToAssign { get; set; }
-        int NurseId { get; init; }
-        //TimeSpan PTOTimeToAssign { get; set; }
+        
         bool[] TimeOff { get; }
-        TimeSpan[] WorkTimeAssignedInWeeks { get; set; }
-        //TimeSpan WorkTimeToAssign { get; set; }
-        //TimeSpan WorkTimeToAssignInQuarter { get; set; }
         bool HadMorningShiftAssigned { get; }
-        PreviousNurseStates PreviousMonthLastShift { get; set; }
+        ShiftTypes PreviousMonthLastShift { get; set; }
 
         void AdvanceState(TimeSpan hoursToNextShift);
         void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter, 

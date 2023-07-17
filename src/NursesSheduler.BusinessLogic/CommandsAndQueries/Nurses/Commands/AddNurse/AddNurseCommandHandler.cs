@@ -4,8 +4,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 {

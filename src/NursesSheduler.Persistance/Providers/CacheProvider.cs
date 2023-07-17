@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
-using NursesScheduler.BusinessLogic.Exceptions;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.Infrastructure.Providers
 {

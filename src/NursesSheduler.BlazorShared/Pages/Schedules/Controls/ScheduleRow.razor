@@ -13,16 +13,16 @@
     <SchedulePrevState PreviousStatate=ScheduleNurse.PreviousState />
     @foreach (var workDay in ScheduleNurse.NurseWorkDays)
     {
-        <ScheduleShift WorkDay=workDay Day=@MonthDays.First(d=>d.Date.Day == workDay.Day) MorningShifts="MorningShifts" OnChange="RecalcuateStatsAsync"/>
+        <ScheduleShift WorkDay=workDay Day=@CommonRowsData.MonthDays.First(d=>d.Date.Day == workDay.Day) MorningShifts="CommonRowsData.MorningShifts" OnChange="RecalcuateStatsAsync"/>
     }
     <th class="summary">Poz. czas pracy</th>
     <th class="summary">Przyp. urlop</th>
     <th class="summary">Urlop do przyp.</th>
     <th class="summary">Godz. świąt.</th>
     <th class="summary">Licz. nocy</th>
-    @if (StatsDipslayed == StatsDisplayed.Schedule)
+    @if (CommonRowsData.StatsDipslayed == StatsDisplayed.Schedule)
     {
-        <td class="summary">@(MonthWorkTime - ScheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes()</td>
+        <td class="summary">@(CommonRowsData.MonthWorkTime - ScheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes()</td>
         <td class="summary">@ScheduleNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
         <td class="summary">@ScheduleNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
         <td class="summary">@ScheduleNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
@@ -30,7 +30,7 @@
     }
     else
     {
-        <td class="summary">@(QuarterWorkTime - QuarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes()</td>
+        <td class="summary">@(CommonRowsData.QuarterWorkTime - QuarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes()</td>
         <td class="summary">@QuarterNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
         <td class="summary">@QuarterNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
         <td class="summary">@QuarterNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
@@ -43,42 +43,24 @@
     [Parameter]
     public int No { get; set; }
     [Parameter]
-    public bool ReadOnly { get; set; }
-    [Parameter]
-    public StatsDisplayed StatsDipslayed { get; set; }
-
-    [Parameter]
-    public QuarterViewModel Quarter { get; set; }
-    [Parameter]
-    public int Month { get; set; }
-
-    [Parameter]
-    public TimeSpan QuarterWorkTime { get; set; }
-    [Parameter]
-    public TimeSpan MonthWorkTime { get; set; }
-    [Parameter]
     public ScheduleNurseViewModel ScheduleNurse { get; set; }
     [Parameter]
     public NurseViewModel Nurse { get; set; }
     [Parameter]
-    public IEnumerable<DayViewModel> MonthDays { get; set; }
-    [Parameter]
-    public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
-    [Parameter]
     public NurseStatsViewModel QuarterNurseStats { get; set; }
     [Parameter]
     public NurseStatsViewModel ScheduleNurseStats { get; set; }
-
-
+    [Parameter]
+    public ScheduleRowCommonDataViewModel CommonRowsData { get; set; }
 
 
     public async Task RecalcuateStatsAsync()
     {
         var scheduleStatsRequest = new RecalculateNurseScheduleStatsRequest
             {
-                DepartamentId = Quarter.DepartamentId,
-                Year = Quarter.Year,
-                Month = Month,
+                DepartamentId = CommonRowsData.DepartamentId,
+                Year = CommonRowsData.Year,
+                Month = CommonRowsData.Month,
                 ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(ScheduleNurse),
             };
 
@@ -89,9 +71,9 @@
     {
         var scheduleStatsRequest = new RecalculateNurseScheduleStatsRequest
             {
-                DepartamentId = Quarter.DepartamentId,
-                Year = Quarter.Year,
-                Month = Month,
+                DepartamentId = CommonRowsData.DepartamentId,
+                Year = CommonRowsData.Year,
+                Month = CommonRowsData.Month,
                 ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(ScheduleNurse),
             };
 
@@ -102,9 +84,9 @@
     {
         var quarterStatsRequest = new RecalculateNurseQuarterStatsRequest
             {
-                DepartamentId = Quarter.DepartamentId,
-                Year = Quarter.Year,
-                Month = Month,
+                DepartamentId = CommonRowsData.DepartamentId,
+                Year = CommonRowsData.Year,
+                Month = CommonRowsData.Month,
                 CurrentScheduleNurseStats = _mapper
                     .Map<RecalculateNurseQuarterStatsRequest.NurseStatsRequest>(ScheduleNurseStats),
             };

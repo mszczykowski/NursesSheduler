@@ -24,7 +24,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries
         public async Task<ICollection<CalculateMorningShiftsResponse>> Handle(CalculateMorningShiftsRequest request,
             CancellationToken cancellationToken)
         {
-            var departamentSettings = await _departamentSettingsManager.GetDepartamentSettings(request.DepartamentId);
+            var departamentSettings = await _departamentSettingsManager.GetCachedDataAsync(request.DepartamentId);
 
             return _mapper.Map<ICollection<CalculateMorningShiftsResponse>>(_workTimeService
                 .CalculateMorningShifts(request.TimeForMorningShifts, departamentSettings));

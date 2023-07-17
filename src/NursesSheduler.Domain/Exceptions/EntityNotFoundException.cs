@@ -14,5 +14,9 @@
         {
 
         }
+        public EntityNotFoundException(string id, string type) : base($"Entity of type {type} with key {id} cannot be found.")
+        {
+
+        }
     }
 }

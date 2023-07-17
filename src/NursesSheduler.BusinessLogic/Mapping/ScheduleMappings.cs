@@ -13,7 +13,6 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<Schedule, GetScheduleResponse>();
 
             CreateMap<GetScheduleStatsRequest.ScheduleRequest, Schedule>();
-            CreateMap<RecalculateNurseScheduleStatsRequest.ScheduleRequest, Schedule>();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@if (ScheduleNurses is null || !ScheduleNurses.Any())
+﻿@if (!ShouldDisplayTable())
 {
     <br/>
     <div class="has-text-centered">
@@ -37,8 +37,10 @@ else
                 i = 1;
                 foreach (var scheduleNurse in Schedule.ScheduleNurses)
                 {
-                    <ScheduleRow No=i++ ReadOnly=ReadOnly StatsDipslayed=StatsDipslayed Quarter=Quarter Month=Schedule.Month 
-                        ScheduleNurse=scheduleNurse MonthDays=MonthDays MorningShifts=MorningShifts Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId)/>
+                    <ScheduleRow No=i++ ScheduleNurse=scheduleNurse Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId) 
+                        QuarterNurseStats=@QuarterStats.NurseStats.First(s=>s.NurseId == scheduleNurse.NurseId) 
+                        ScheduleNurseStats=@ScheduleStats.NursesScheduleStats.First(s=>s.NurseId == scheduleNurse.NurseId) 
+                        CommonRowsData=_commonRowsData/>
                 }
             }
         </tbody>
@@ -67,4 +69,37 @@ else
     public QuarterViewModel Quarter { get; set; }
 
     private int i;
+
+    private ScheduleRowCommonDataViewModel _commonRowsData;
+
+    protected override Task OnParametersSetAsync()
+    {
+        if(ShouldDisplayTable())
+        {
+            BuildCommonRowsData();
+        }
+
+        return base.OnParametersSetAsync();
+    }
+
+    private bool ShouldDisplayTable()
+    {
+        return Schedule is not null && Schedule.ScheduleNurses is not null && Schedule.ScheduleNurses.Any();
+    }
+
+    private void BuildCommonRowsData()
+    {
+        _commonRowsData = new ScheduleRowCommonDataViewModel
+            {
+                ReadOnly = ReadOnly,
+                StatsDipslayed = StatsDipslayed,
+                DepartamentId = Quarter.DepartamentId,
+                Year = Quarter.Year,
+                Month = Schedule.Month,
+                QuarterWorkTime = QuarterStats.WorkTimeInQuarter,
+                MonthWorkTime = ScheduleStats.WorkTimeInMonth,
+                MonthDays = MonthDays,
+                MorningShifts = MorningShifts,
+            };
+    }
 }

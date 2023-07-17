@@ -10,6 +10,7 @@ using NursesScheduler.BusinessLogic.Solver.Managers;
 using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects;
+using NursesScheduler.Domain.ValueObjects.Stats;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 {
@@ -17,63 +18,66 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
         SolveScheduleResponse>
     {
         private readonly IMapper _mapper;
-        private readonly ISchedulesService _scheduleService;
-        private readonly IStatsService _nurseStatsService;
+        private readonly IStatsService _statsService;
         private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
         private readonly ISeedService _seedService;
         private readonly ICalendarService _calendarService;
+        private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
-        public SolveScheduleCommandHandler(IMapper mapper, ISchedulesService scheduleService,
-            IStatsService nurseStatsService, IDepartamentSettingsProvider departamentSettingsProvider,
-            ISeedService seedService, ICalendarService calendarService)
+        public SolveScheduleCommandHandler(IMapper mapper, IStatsService nurseStatsService, 
+            IDepartamentSettingsProvider departamentSettingsProvider, ISeedService seedService, 
+            ICalendarService calendarService, IScheduleStatsProvider scheduleStatsProvider)
         {
             _mapper = mapper;
-            _scheduleService = scheduleService;
-            _nurseStatsService = nurseStatsService;
+            _statsService = nurseStatsService;
             _departamentSettingsProvider = departamentSettingsProvider;
             _seedService = seedService;
             _calendarService = calendarService;
+            _scheduleStatsProvider = scheduleStatsProvider;
         }
 
         public async Task<SolveScheduleResponse> Handle(SolveScheduleRequest request,
             CancellationToken cancellationToken)
         {
-            string generatorSeed;
-            ISolverState? result = null;
+            var currentSchedule = _mapper.Map<Schedule>(request.Schedule);
+            var solverSettings = _mapper.Map<SolverSettings>(request.SolverSettings);
 
-            var currentSchedule = _mapper.Map<Schedule>(request);
-            var previousSchedule = await _scheduleService.GetPreviousSchedule(currentSchedule);
+            if (!solverSettings.UseOwnSeed)
+            {
+                solverSettings.GeneratorSeed = _seedService.GetSeed();
+            }
 
-            var departamentSettings = await _departamentSettingsProvider.GetDepartamentSettings(request.DepartamentId);
-
-            var nurseQuarterStats = await _nurseStatsService.GetNurseQuarterStats(currentSchedule, departamentSettings);
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(request.DepartamentId);
 
             var constraints = new ConstraintsDirector().GetAllConstraints(departamentSettings);
 
-            var monthDays = await _calendarService.GetMonthDays(currentSchedule.Month, currentSchedule.Year,
+            var monthDays = await _calendarService.GetNumberedMonthDaysAsync(currentSchedule.Month, request.Year,
                 departamentSettings.FirstQuarterStart);
 
-            if (request.UseSpecifiedSeed)
-            {
-                generatorSeed = request.GeneratorSeed;
-                request.NumberOfRetries = 1;
-            }
-            else
-            {
-                generatorSeed = _seedService.GetSeed();
-            }
 
-            for (int i = 0; i < request.NumberOfRetries; i++)
+            var currentScheduleStats = await _statsService.GetScheduleStatsAsync(currentSchedule, request.DepartamentId,
+                request.Year);
+            var previousScheduleStats = await _scheduleStatsProvider.GetCachedDataAsync(new ScheduleStatsKey
             {
-                result = TrySolveSchedule(currentSchedule, previousSchedule, departamentSettings,
-                    constraints, nurseQuarterStats, new Random(generatorSeed.GetHashCode()), monthDays);
+                DepartamentId = request.DepartamentId,
+                Year = request.Year,
+                Month = currentSchedule.Month - 1 > 0 ? currentSchedule.Month - 1 : 12,
+            });
+            var quarterStats = await _statsService.GetQuarterStatsAsync(currentScheduleStats, request.Year,
+                currentSchedule.Month, request.DepartamentId);
+
+            ISolverState result = null;
+            for (int i = 0; i < (solverSettings.UseOwnSeed ? 1 : solverSettings.NumberOfRetries); i++)
+            {
+                result = TrySolveSchedule(currentSchedule, currentScheduleStats, previousScheduleStats, quarterStats, 
+                    departamentSettings, constraints, new Random(solverSettings.GeneratorSeed.GetHashCode()), monthDays);
 
                 if (result is not null)
                 {
                     break;
                 }
 
-                generatorSeed = _seedService.GetSeed();
+                solverSettings.GeneratorSeed = _seedService.GetSeed();
             }
 
             if (result is not null)
@@ -84,28 +88,30 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
             return _mapper.Map<SolveScheduleResponse>(currentSchedule);
         }
 
-        private ISolverState? TrySolveSchedule(Schedule currentSchedule, Schedule previousSchedule,
-            DepartamentSettings departamentSettings, ICollection<IConstraint> constraints,
-            ICollection<NurseQuarterStats> nurseQuarterStats, Random random, Day[] monthDays)
+        private ISolverState? TrySolveSchedule(Schedule currentSchedule, ScheduleStats currentScheduleStats, 
+            ScheduleStats previousScheduleStats, QuarterStats quartersStats, DepartamentSettings departamentSettings, 
+            ICollection<IConstraint> constraints, Random random, IEnumerable<DayNumbered> monthDays)
         {
-            var nurseStates = new HashSet<INurseState>();
+            //var nurseStates = new HashSet<INurseState>();
 
-            foreach (var quarterStats in nurseQuarterStats)
-            {
-                nurseStates.Add(new NurseState(quarterStats,
-                    previousSchedule.ScheduleNurses.FirstOrDefault(n => n.NurseId == quarterStats.NurseId),
-                    currentSchedule.ScheduleNurses.First(n => n.NurseId == quarterStats.NurseId)));
-            }
+            //foreach (var quarterStats in nurseQuarterStats)
+            //{
+            //    nurseStates.Add(new NurseState(quarterStats,
+            //        previousSchedule.ScheduleNurses.FirstOrDefault(n => n.NurseId == quarterStats.NurseId),
+            //        currentSchedule.ScheduleNurses.First(n => n.NurseId == quarterStats.NurseId)));
+            //}
 
-            var initialSolverState = new SolverState(currentSchedule, monthDays, nurseStates);
+            //var initialSolverState = new SolverState(currentSchedule, monthDays, nurseStates);
 
-            var solver = new ScheduleSolver(currentSchedule.Quarter.MorningShifts, monthDays, constraints,
-                departamentSettings);
+            //var solver = new ScheduleSolver(currentSchedule.Quarter.MorningShifts, monthDays, constraints,
+            //    departamentSettings);
 
-            var shiftCapacityManager = new ShiftCapacityManager(departamentSettings, monthDays,
-                    nurseQuarterStats.Count, currentSchedule.WorkTimeInMonth, random);
+            //var shiftCapacityManager = new ShiftCapacityManager(departamentSettings, monthDays,
+            //        nurseQuarterStats.Count, currentSchedule.WorkTimeInMonth, random);
 
-            return solver.GenerateSchedule(random, shiftCapacityManager, initialSolverState);
+            //return solver.GenerateSchedule(random, shiftCapacityManager, initialSolverState);
+
+            return null;
         }
     }
 }

@@ -17,15 +17,6 @@ namespace NursesScheduler.Infrastructure.Configuration
                 c => c.ToList());
 
             builder.HasKey(s => s.ScheduleId);
-
-            builder.Property(s => s.Holidays)
-                .HasConversion(new ValueConverter<ICollection<int>, string>(
-                    s => JsonConvert.SerializeObject(s),
-                    s => JsonConvert.DeserializeObject<ICollection<int>>(s)));
-
-            builder.Property(s => s.Holidays)
-                .Metadata
-                .SetValueComparer(valueComparer);
         }
     }
 }

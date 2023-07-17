@@ -27,7 +27,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         private int _currentDayIndex => CurrentDay - 1;
 
-        public SolverState(Schedule schedule, Day[] monthDays, ICollection<INurseState> nurses)
+        public SolverState(Schedule schedule, DayNumbered[] monthDays, ICollection<INurseState> nurses)
         {
             CurrentDay = 1;
             CurrentShift = ShiftIndex.Night;
@@ -54,15 +54,15 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 {
                     if (day.ShiftType == ShiftTypes.Day)
                     {
-                        AddNurseToRegularShift(nurse.NurseId, day.DayNumber, ShiftIndex.Day);
+                        AddNurseToRegularShift(nurse.NurseId, day.Day, ShiftIndex.Day);
                     }
                     else if (day.ShiftType == ShiftTypes.Night)
                     {
-                        AddNurseToRegularShift(nurse.NurseId, day.DayNumber, ShiftIndex.Night);
+                        AddNurseToRegularShift(nurse.NurseId, day.Day, ShiftIndex.Night);
                     }
                     else if (day.ShiftType == ShiftTypes.Morning)
                     {
-                        AddNurseToMorningShift(nurse.NurseId, day.DayNumber);
+                        AddNurseToMorningShift(nurse.NurseId, day.Day);
                     }
                 }
             }
@@ -169,7 +169,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         {
             if (CurrentDay == 1)
             {
-                return Nurses.Where(n => n.PreviousMonthLastShift == PreviousNurseStates.Day).Select(n => n.NurseId).ToHashSet();
+                return Nurses.Where(n => n.PreviousMonthLastShift == ShiftTypes.Day).Select(n => n.NurseId).ToHashSet();
             }
 
             HashSet<int> result;
@@ -247,7 +247,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                     schedule.ScheduleNurses
                         .First(n => n.NurseId == nurseId)
                         .NurseWorkDays
-                        .First(d => d.DayNumber == i + 1)
+                        .First(d => d.Day == i + 1)
                         .ShiftType = ShiftTypes.Night;
                 }
 
@@ -256,7 +256,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                     schedule.ScheduleNurses
                         .First(n => n.NurseId == nurseId)
                         .NurseWorkDays
-                        .First(d => d.DayNumber == i + 1)
+                        .First(d => d.Day == i + 1)
                         .ShiftType = ShiftTypes.Day;
                 }
 
@@ -265,7 +265,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                     var nurseWorkDay = schedule.ScheduleNurses
                         .First(n => n.NurseId == nurseId)
                         .NurseWorkDays
-                        .First(d => d.DayNumber == i + 1);
+                        .First(d => d.Day == i + 1);
 
                     nurseWorkDay.ShiftType = ShiftTypes.Morning;
                     nurseWorkDay.MorningShiftId = Nurses

@@ -16,17 +16,14 @@ namespace NursesScheduler.BusinessLogic.Services
         private readonly ICalendarService _calendarService;
         private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
         private readonly IWorkTimeService _workTimeService;
-        private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
         public StatsService(IApplicationDbContext context, ICalendarService calendarService,
-            IDepartamentSettingsProvider departamentSettingsProvider, IWorkTimeService workTimeService,
-            IScheduleStatsProvider scheduleStatsProvider)
+            IDepartamentSettingsProvider departamentSettingsProvider, IWorkTimeService workTimeService)
         {
             _context = context;
             _calendarService = calendarService;
             _departamentSettingsProvider = departamentSettingsProvider;
             _workTimeService = workTimeService;
-            _scheduleStatsProvider = scheduleStatsProvider;
         }
 
         public async Task<NurseScheduleStats> RecalculateNurseScheduleStats(ScheduleNurse scheduleNurse,
@@ -34,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
             var days = await _calendarService
-                .GetMonthDaysAsync(year, month, departamentSettings.FirstQuarterStart);
+                .GetNumberedMonthDaysAsync(year, month, departamentSettings.FirstQuarterStart);
 
             return GetNurseScheduleStats(scheduleNurse, days, departamentSettings);
         }
@@ -89,7 +86,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
 
-            var days = await _calendarService.GetMonthDaysAsync(year, month, departamentSettings.FirstQuarterStart);
+            var days = await _calendarService.GetNumberedMonthDaysAsync(year, month, departamentSettings.FirstQuarterStart);
 
             var scheduleStatsKey = new ScheduleStatsKey
             {
@@ -110,7 +107,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
 
-            var days = await _calendarService.GetMonthDaysAsync(year, schedule.Month,
+            var days = await _calendarService.GetNumberedMonthDaysAsync(year, schedule.Month,
                 departamentSettings.FirstQuarterStart);
 
             var scheduleStatsKey = new ScheduleStatsKey
@@ -179,7 +176,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 nurseQuarterStats.NightShiftsAssigned += scheduleNurseStats.NightShiftsAssigned;
                 nurseQuarterStats.TimeOffToAssign += scheduleNurseStats.TimeOffToAssign;
                 nurseQuarterStats.TimeOffAssigned += scheduleNurseStats.TimeOffAssigned;
-                nurseQuarterStats.MorningShiftsAssigned.Union(scheduleNurseStats.MorningShiftsAssigned);
+                nurseQuarterStats.MorningShiftsIdsAssigned.Union(scheduleNurseStats.MorningShiftsIdsAssigned);
 
                 foreach (var week in scheduleNurseStats.WorkTimeInWeeks)
                 {
@@ -246,7 +243,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 NightShiftsAssigned = CalculateNightSiftsAssigned(scheduleNurse.NurseWorkDays),
                 LastState = GetLastState(scheduleNurse.NurseWorkDays),
                 HoursFromLastShift = GetHoursFromLastShift(scheduleNurse.NurseWorkDays),
-                MorningShiftsAssigned = GetAssignedMorningShifts(scheduleNurse.NurseWorkDays),
+                MorningShiftsIdsAssigned = GetAssignedMorningShifts(scheduleNurse.NurseWorkDays),
                 WorkTimeInWeeks = GetWorkTimeInWeeks(scheduleNurse.NurseWorkDays, days),
                 TimeOffToAssign = CalculateTimeOffToAssign(scheduleNurse.NurseWorkDays, days,
                         departamentSettings.WorkDayLength),
@@ -322,7 +319,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     TimeOffAssigned = nurseSchedule.TimeOffToAssiged,
                     LastState = GetLastState(nurseSchedule.NurseWorkDays),
                     HoursFromLastShift = GetHoursFromLastShift(nurseSchedule.NurseWorkDays),
-                    MorningShiftsAssigned = GetAssignedMorningShifts(nurseSchedule.NurseWorkDays),
+                    MorningShiftsIdsAssigned = GetAssignedMorningShifts(nurseSchedule.NurseWorkDays),
                     WorkTimeInWeeks = GetWorkTimeInWeeks(nurseSchedule.NurseWorkDays, days),
                 };
 
@@ -334,11 +331,11 @@ namespace NursesScheduler.BusinessLogic.Services
             return scheduleStats;
         }
 
-        private IEnumerable<MorningShiftIndex> GetAssignedMorningShifts(IEnumerable<NurseWorkDay> nurseWorkDays)
+        private IEnumerable<int> GetAssignedMorningShifts(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            return new List<MorningShiftIndex>(nurseWorkDays
+            return new List<int>(nurseWorkDays
                 .Where(d => d.ShiftType == ShiftTypes.Morning)
-                .Select(d => d.MorningShift.Index));
+                .Select(d => d.MorningShift.MorningShiftId));
         }
 
         private ShiftTypes GetLastState(IEnumerable<NurseWorkDay> nurseWorkDays)

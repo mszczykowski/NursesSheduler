@@ -57,7 +57,10 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var result = new List<Absence>();
 
-            var currentAbsence = new Absence(from.Month);
+            var currentAbsence = new Absence
+            {
+                Month = from.Month,
+            };
 
             result.Add(currentAbsence);
 
@@ -65,7 +68,10 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 if (date.Month != currentAbsence.Month)
                 {
-                    currentAbsence = new Absence(date.Month);
+                    currentAbsence = new Absence
+                    {
+                        Month = from.Month,
+                    };
                     result.Add(currentAbsence);
                 }
 
@@ -91,7 +97,7 @@ namespace NursesScheduler.BusinessLogic.Services
             if (await _context.Schedules
                 .Include(s => s.Quarter)
                 .AnyAsync(s => s.Quarter.DepartamentId == absencesSummary.Nurse.DepartamentId &&
-                    s.Year == absencesSummary.Year &&
+                    s.Quarter.Year == absencesSummary.Year &&
                     s.Month == absence.Month &&
                     s.IsClosed))
             {
