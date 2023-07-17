@@ -3,21 +3,12 @@ using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNursesScheduleStats
 {
-    public sealed class RecalculateNursesScheduleStatsRequest
-        : IRequest<IEnumerable<RecalculateNursesScheduleStatsResponse>>
+    public sealed class RecalculateNurseScheduleStatsRequest : IRequest<RecalculateNursesScheduleStatsResponse>
     {
         public int DepartamentId { get; set; }
         public int Year { get; set; }
-        public ScheduleRequest Schedule { get; set; }
-
-        public sealed class ScheduleRequest
-        {
-            public int ScheduleId { get; set; }
-            public int Month { get; set; }
-            public bool IsClosed { get; set; }
-            public int QuarterId { get; set; }
-            public IEnumerable<ScheduleNurseRequest> ScheduleNurses { get; set; }
-        }
+        public int Month { get; set; }
+        public ScheduleNurseRequest ScheduleNurse { get; set; }
 
         public sealed class ScheduleNurseRequest
         {

@@ -22,8 +22,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries
             var currentScheduleStats = _mapper.Map<ScheduleStats>(request.CurrentScheduleStats);
 
             return _mapper.Map<GetQuarterStatsResponse>(await _statsService
-                .GetQuarterNurseStats(currentScheduleStats, request.CurrentYear, request.CurrentMonth, 
-                    request.DepartamentId));
+                .GetQuarterStatsAsync(currentScheduleStats, request.Year, request.Month, request.DepartamentId));
         }
     }
 }

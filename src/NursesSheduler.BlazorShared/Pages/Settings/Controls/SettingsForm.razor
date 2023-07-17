@@ -10,7 +10,7 @@
                         Konfigruracja czasu pracy
                     </p>
                     <TimeSpanInput Label="Dzienny wymiar pracy" @bind-Value="Settings.WorkDayLength" ValidationFor="@(() => Settings.WorkDayLength)" />
-                    <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximalWeekWorkDayLength" ValidationFor="@(() => Settings.MaximalWeekWorkDayLength)" />
+                    <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximalWeekWorkTimeLength" ValidationFor="@(() => Settings.MaximalWeekWorkTimeLength)" />
                     <TimeSpanInput Label="Minimalna przerwa między dyżurami" @bind-Value="Settings.MinmalShiftBreak" ValidationFor="@(() => Settings.MinmalShiftBreak)" />
                     <br />
                     <p class="title is-4">
@@ -25,9 +25,9 @@
                     <div class="field">
                         <label class="label">Docelowa liczba pracowników na dyżurze</label>
                         <div class="control">
-                            <InputNumber class="input" @bind-Value="Settings.TargetNumberOfNursesOnShift" />
+                            <InputNumber class="input" @bind-Value="Settings.TargetMinNumberOfNursesOnShift" />
                             <div class="help is-danger">
-                                <ValidationMessage For="@(() => Settings.TargetNumberOfNursesOnShift)" />
+                                <ValidationMessage For="@(() => Settings.TargetMinNumberOfNursesOnShift)" />
                             </div>
                         </div>
                     </div>

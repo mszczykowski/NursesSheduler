@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BlazorShared.Abstracions;
 
-namespace NursesScheduler.BlazorShared.ViewModels
+namespace NursesScheduler.BlazorShared.ViewModels.Common
 {
     public sealed class DatePickerViewModel : IMonthPickerViewModel, IYearPickerViewModel
     {

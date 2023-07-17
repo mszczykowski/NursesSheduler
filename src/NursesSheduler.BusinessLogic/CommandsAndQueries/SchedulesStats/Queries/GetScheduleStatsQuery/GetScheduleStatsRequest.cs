@@ -3,7 +3,7 @@ using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
 {
-    public sealed class GetScheduleStatsRequest : IRequest<GetScheduleStatsResponse>
+    public sealed class GetScheduleStatsRequest : IRequest<GetScheduleStatsResponse?>
     {
         public int DepartamentId { get; set; }
         public int Year { get; set; }

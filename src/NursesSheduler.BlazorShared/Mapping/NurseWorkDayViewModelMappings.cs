@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
 
 namespace NursesScheduler.BlazorShared.Mapping
 {
@@ -9,6 +10,8 @@ namespace NursesScheduler.BlazorShared.Mapping
         public NurseWorkDayViewModelMappings()
         {
             CreateMap<GetScheduleResponse.NurseWorkDayResponse, NurseWorkDayViewModel>();
+
+            CreateMap<NurseWorkDayViewModel, GetScheduleStatsRequest.NurseWorkDayRequest>();
         }
     }
 }

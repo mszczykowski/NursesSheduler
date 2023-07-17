@@ -12,11 +12,11 @@ namespace NursesScheduler.BlazorShared.ViewModels
 
         [Required(ErrorMessage = "Należy wpisać maksymalny tygodniowy wymiar pracy")]
         [Range(typeof(TimeSpan), "07:00:00", "84:00:00", ErrorMessage = "Minmalna wartość to 7h, maksymalna 84h")]
-        public TimeSpan MaximalWeekWorkDayLength { get; set; }
+        public TimeSpan MaximalWeekWorkTimeLength { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać maksymalną przerwę między dyżurami")]
         [Range(typeof(TimeSpan), "00:00:00", "100:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 100h")]
-        public TimeSpan MinmalShiftBreak { get; set; }
+        public TimeSpan MinimalShiftBreak { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać ilość godzin świątecznych należną za zmianę dzienną")]
         [Range(typeof(TimeSpan), "00:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 0h, maksymalna 12h")]
@@ -28,7 +28,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
 
         [Required(ErrorMessage = "Należy wpisać docelową liczbę pracowników na zmianie")]
         [Range(1, 100, ErrorMessage = "Minmalna wartość to 1 pracownik, maksymalna 100")]
-        public int TargetNumberOfNursesOnShift { get; set; }
+        public int TargetMinNumberOfNursesOnShift { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać docelową minimalną długość zmiany porannej")]
         [Range(typeof(TimeSpan), "01:00:00", "12:00:00", ErrorMessage = "Minmalna wartość to 1h, maksymalna 12h")]

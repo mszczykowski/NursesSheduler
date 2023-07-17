@@ -6,13 +6,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
     {
         public int ScheduleNurseId { get; set; }
         public int NurseId { get; set; }
-        public PreviousStatates PreviousState { get; set; }
-        public int DaysFromLastShift { get; set; }
 
-        public NurseWorkDayViewModel[] NurseWorkDays { get; set; }
-        public TimeSpan PreviousMonthTime { get; set; }
-        public TimeSpan TimeToAssingInMonth { get; set; }
-        public TimeSpan TimeToAssingInQuarterLeft { get; set; }
-        public TimeSpan TimeOffToAssign { get; set; }
+        public IEnumerable<NurseWorkDayViewModel> NurseWorkDays { get; set; }
     }
 }

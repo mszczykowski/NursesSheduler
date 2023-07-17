@@ -19,19 +19,19 @@
             <EditForm EditContext="@_editContext" OnValidSubmit="@OnSave">
                 <ObjectGraphDataAnnotationsValidator />
                 <section class="modal-card-body">
-                    <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@Quarter.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
+                    <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@QuarterStats.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
                     <br />
-                    <fieldset disabled=@Quarter.IsClosed>
-                        @foreach(var morningShift in _morningShiftsForm.MorningShifts)
-                        {
+                    @foreach (var morningShift in _morningShiftsForm.MorningShifts)
+                    {
+                        <fieldset disabled=@morningShift.ReadOnly>
                             <TimeSpanInput Label=@GetInputLabel(morningShift.Index) @bind-Value="morningShift.ShiftLength" ValidationFor="@(() => morningShift.ShiftLength)" />
-                        }
-                    </fieldset>
-                    <p>Po zamnięciu któregokolwiek grafiku z kwartału nie będzie można edytować ranków!</p>
+                        </fieldset>
+                    }
+                    <p>Ranków użytych w zamkniętych kwartałach nie można edytować!</p>
                 </section>
                 <footer class="modal-card-foot">
-                    <button class="button is-success @CssHelper.SetIsLoading(_isSaveLoading)" type="submit">Zapisz</button>
-                    <button class="button is-info" type="button" @onclick="OnRecalculate">Przelicz</button>
+                    <button class="button is-success @CssHelper.SetIsLoading(_isSaveLoading)" type="submit" disabled=@CanEdit()>Zapisz</button>
+                    <button class="button is-info" type="button" @onclick="OnRecalculate" disabled=@CanEdit()>Przelicz</button>
                     <button class="button" type="button" @onclick="ChangeVisibility">Anuluj</button>
                 </footer>
             </EditForm>
@@ -44,6 +44,8 @@
 @code {
     [Parameter]
     public QuarterViewModel Quarter { get; set; }
+    [Parameter]
+    public QuarterStatsViewModel QuarterStats { get; set; }
     [Parameter]
     public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
 
@@ -60,7 +62,7 @@
 
         _editContext = new(_morningShiftsForm);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
-        
+
         base.ChangeVisibility();
     }
 
@@ -68,16 +70,23 @@
     {
         try
         {
+            if(!CanEdit)
+            {
+                return;
+            }
+
             _isSaveLoading = true;
             await Task.Delay(1);
 
             var request = new UpsertMorningShiftsRequest
-            {
-                QuarterId = Quarter.QuarterId,
-                MorningShifts = _mapper
-                    .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm.MorningShifts),
-            };
-            var response = await _mediatr.Send(request) ?? throw new EntityNotAddedException(nameof(MorningShiftViewModel));;
+                {
+                    QuarterId = Quarter.QuarterId,
+                    MorningShifts = _mapper
+                            .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm
+                                .MorningShifts
+                                .Where(m => !m.ReadOnly)),
+                };
+            var response = await _mediatr.Send(request) ?? throw new EntityNotAddedException(nameof(MorningShiftViewModel)); ;
 
             MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
             base.ChangeVisibility();
@@ -94,7 +103,7 @@
         {
             var request = new CalculateMorningShiftsRequest
                 {
-                    TimeForMorningShifts = Quarter.TimeForMorningShifts,
+                    TimeForMorningShifts = QuarterStats.TimeForMorningShifts,
                     DepartamentId = Quarter.DepartamentId,
                 };
             var response = await _mediatr.Send(request);
@@ -105,6 +114,11 @@
         {
             _exceptionHandler.HandleException(e);
         }
+    }
+
+    private bool CanEdit()
+    {
+        return _morningShiftsForm.MorningShifts.Any(s => !s.ReadOnly);
     }
 
     private string GetInputLabel(MorningShiftIndexes index)

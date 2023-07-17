@@ -6,9 +6,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
     {
         public int DepartamentSettingsId { get; set; }
         public TimeSpan WorkDayLength { get; set; }
-        public TimeSpan MaximalWeekWorkDayLength { get; set; }
+        public TimeSpan MaximalWeekWorkTimeLength { get; set; }
         public TimeSpan MinmalShiftBreak { get; set; }
-        public int TargetNumberOfNursesOnShift { get; set; }
+        public int TargetMinNumberOfNursesOnShift { get; set; }
         public TimeSpan TargetMinimalMorningShiftLenght { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
     }

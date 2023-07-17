@@ -5,10 +5,11 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
     public interface IStatsService
     {
-        Task<IEnumerable<NurseScheduleStats>> GetNurseScheduleStats(Schedule schedule, int departamentId, int year);
-        Task<IEnumerable<NurseStats>> GetQuarterNurseStats(ScheduleStats currentScheduleStats, int year, int month,
+        Task<NurseScheduleStats> RecalculateNurseScheduleStats(ScheduleNurse scheduleNurse,
+            int departamentId, int year, int month);
+        Task<NurseStats> RecalculateQuarterNurseStatsAsync(NurseStats currentScheduleNursesStats, int year, int month, 
             int departamentId);
-        Task<QuarterStats> GetQuarterStats(ScheduleStats currentScheduleStats, int year, int month, int departamentId);
+        Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, int year, int month, int departamentId);
         Task<ScheduleStats> GetScheduleStatsAsync(int year, int month, int departamentId);
         Task<ScheduleStats> GetScheduleStatsAsync(Schedule schedule, int departamentId, int year);
     }

@@ -1,6 +1,6 @@
-﻿namespace NursesScheduler.BlazorShared.ViewModels
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
 {
-    public sealed class QuarterViewModel
+    public sealed class GetQuarterResponse
     {
         public int QuarterId { get; set; }
         public int QuarterNumber { get; set; }

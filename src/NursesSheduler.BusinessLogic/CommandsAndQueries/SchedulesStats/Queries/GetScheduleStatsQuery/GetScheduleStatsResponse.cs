@@ -1,6 +1,4 @@
-﻿using NursesScheduler.Domain.Enums;
-
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
 {
     public sealed class GetScheduleStatsResponse
     {
@@ -8,8 +6,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
         public TimeSpan WorkTimeInMonth { get; set; }
         public TimeSpan WorkTimeBalance { get; set; }
         public IEnumerable<NurseStatsResponse> NursesScheduleStats { get; set; }
-        public IEnumerable<PreviousScheduleStateResponse> PreviousStatesResponse { get; set; }
-
         public sealed class NurseStatsResponse
         {
             public int NurseId { get; set; }

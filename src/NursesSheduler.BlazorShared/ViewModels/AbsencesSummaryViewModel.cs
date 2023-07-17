@@ -9,6 +9,6 @@
         public TimeSpan PTOTimeUsed { get; set; }
         public TimeSpan PTOTimeLeftFromPreviousYear { get; set; }
         public TimeSpan PTOLeft => PTOTime + PTOTimeLeftFromPreviousYear - PTOTimeUsed;
-        public List<AbsenceViewModel> Absences { get; set; }
+        public IEnumerable<AbsenceViewModel> Absences { get; set; }
     }
 }

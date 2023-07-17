@@ -3,10 +3,9 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
-using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
-using NursesScheduler.BusinessLogic.Exceptions;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.UpsertMorningShifts
 {
@@ -16,15 +15,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
         private readonly IMapper _mapper;
         private readonly IValidator<MorningShift> _validator;
         private readonly IApplicationDbContext _context;
-        private readonly IQuarterProvider _quarterProvider;
 
         public UpsertMorningShiftsQueryHandler(IMapper mapper, IValidator<MorningShift> validator, 
-            IApplicationDbContext context, IQuarterProvider quarterProvider)
+            IApplicationDbContext context)
         {
             _mapper = mapper;
             _validator = validator;
             _context = context;
-            _quarterProvider = quarterProvider;
         }
 
         public async Task<IEnumerable<UpsertMorningShiftsResponse>> Handle(UpsertMorningShiftsRequest request,
@@ -57,6 +54,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
 
                 if (morningShift is not null)
                 {
+                    if(morningShift.ReadOnly)
+                    {
+                        throw new OperationNotPermittedException("Editing readonly morningShift");
+                    }
+
                     morningShift.ShiftLength = updatedMorningShift.ShiftLength;
                 }
                 else

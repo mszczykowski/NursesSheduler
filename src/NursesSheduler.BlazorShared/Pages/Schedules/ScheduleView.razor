@@ -6,8 +6,11 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.UpsertQuarter
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
 
 @inherits ComponenentUsingDepartament
 
@@ -15,7 +18,7 @@
 @inject IMapper _mapper
 @inject IExceptionHandler _exceptionHandler
 
-<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Quarter=_quarter MorningShifts=_morningShifts />
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Quarter=_quarter QuarterStats=_quarterStats MorningShifts=_morningShifts />
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
 
 @if (_isLoading)
@@ -110,22 +113,22 @@ else
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Norma:</b> @_schedule.WorkTimeInMonth.GetTotalHoursAndMinutes()
+                        <b>Norma:</b> @_scheduleStats.WorkTimeInMonth.GetTotalHoursAndMinutes()
                     </p>
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Czas w kwartale:</b> @_quarter.WorkTimeInQuarterToAssign.GetTotalHoursAndMinutes()
+                        <b>Czas w kwartale:</b> @_quarterStats.WorkTimeInQuarter.GetTotalHoursAndMinutes()
                     </p>
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Bilans czasu pracy:</b> @_schedule.TimeOffAvailableToAssgin.GetTotalHoursAndMinutes()
+                        <b>Bilans czasu pracy:</b> @_scheduleStats.WorkTimeBalance.GetTotalHoursAndMinutes()
                     </p>
                 </div>
                 <div class="level-item">
                     <p>
-                        <b>Przydzielony urlop:</b> @_schedule.TimeOffAssigned.GetTotalHoursAndMinutes()
+                        <b>Przydzielony urlop:</b> @TimeSpan.FromTicks(_scheduleStats.NursesScheduleStats.Sum(s => s.TimeOffAssigned.Ticks)).GetTotalHoursAndMinutes()
                     </p>
                 </div>
             </div>
@@ -140,6 +143,9 @@ else
 
 
 @code {
+    private ScheduleStatsViewModel _scheduleStats;
+    private QuarterStatsViewModel _quarterStats;
+
     private IEnumerable<NurseViewModel> _nurses;
     private IEnumerable<DayViewModel> _days;
     private QuarterViewModel _quarter;
@@ -219,13 +225,19 @@ else
 
     private async Task SetQuarter()
     {
-        await GetUpsertQuarter();
+        _quarter = await GetQuarter();
+        if (_quarter is null)
+        {
+            _quarter = await AddQuarter();
+        }
+
+        await GetQuarter();
         await GetMorningShifts();
     }
 
-    private async Task GetUpsertQuarter()
+    private async Task<QuarterViewModel> AddQuarter()
     {
-        var request = new UpsertQuarterRequest
+        var request = new AddQuarterRequest
             {
                 Month = _dateViewModel.MonthNumber,
                 Year = _dateViewModel.YearNumber,
@@ -233,7 +245,25 @@ else
             };
         var response = await _mediatr.Send(request);
 
-        _quarter = _mapper.Map<QuarterViewModel>(response);
+        if (response is null)
+        {
+            throw new EntityNotAddedException(nameof(QuarterViewModel));
+        }
+
+        return _mapper.Map<QuarterViewModel>(response);
+    }
+
+    private async Task<QuarterViewModel?> GetQuarter()
+    {
+        var request = new GetQuarterRequest
+            {
+                Month = _dateViewModel.MonthNumber,
+                Year = _dateViewModel.YearNumber,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+        var response = await _mediatr.Send(request);
+
+        return response is not null ? _mapper.Map<QuarterViewModel>(response) : null;
     }
 
     private async Task GetNurses()
@@ -253,8 +283,7 @@ else
         var request = new GetScheduleRequest
             {
                 Month = _dateViewModel.MonthNumber,
-                Year = _dateViewModel.YearNumber,
-                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                QuarterId = _quarter.QuarterId,
             };
         var response = await _mediatr.Send(request);
 
@@ -295,5 +324,34 @@ else
         var settings = _mapper.Map<DepratamentSettingsViewModel>(response);
 
         _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
+    }
+
+    private async Task GetScheduleStatsAsync()
+    {
+        var request = new GetScheduleStatsRequest
+            {
+                DepartamentId = _quarter.DepartamentId,
+                Year = _quarter.Year,
+                Schedule = _mapper.Map<GetScheduleStatsRequest.ScheduleRequest>(_schedule),
+            };
+
+        var response = await _mediatr.Send(request);
+
+        _scheduleStats = _mapper.Map<ScheduleStatsViewModel>(response);
+    }
+
+    private async Task GetQuarterStatsAsync()
+    {
+        var request = new GetQuarterStatsRequest
+            {
+                Month = _schedule.Month,
+                Year = _quarter.Year,
+                DepartamentId = _quarter.DepartamentId,
+                CurrentScheduleStats = _mapper.Map<GetQuarterStatsRequest.ScheduleStatsRequest>(_scheduleStats),
+            };
+
+        var response = await _mediatr.Send(request);
+
+        _quarterStats = _mapper.Map<QuarterStatsViewModel>(response);
     }
 }

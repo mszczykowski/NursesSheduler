@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BlazorShared.Abstracions;
 
-namespace NursesScheduler.BlazorShared.ViewModels
+namespace NursesScheduler.BlazorShared.ViewModels.Common
 {
     public sealed class MonthPickerViewModel : IMonthPickerViewModel
     {
@@ -13,7 +13,7 @@ namespace NursesScheduler.BlazorShared.ViewModels
 
         public MonthPickerViewModel(int monthNumber)
         {
-            if(monthNumber >= 1 && monthNumber <= 12)
+            if (monthNumber >= 1 && monthNumber <= 12)
             {
                 MonthNumber = monthNumber;
             }

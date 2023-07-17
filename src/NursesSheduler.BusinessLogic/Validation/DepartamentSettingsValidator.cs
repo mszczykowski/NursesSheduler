@@ -12,7 +12,7 @@ namespace NursesScheduler.BusinessLogic.Validation
                 .GreaterThanOrEqualTo(TimeSpan.FromHours(1))
                 .LessThanOrEqualTo(TimeSpan.FromHours(12));
 
-            RuleFor(s => s.MaximalWeekWorkDayLength)
+            RuleFor(s => s.MaximalWeekWorkTimeLength)
                 .NotEmpty()
                 .GreaterThanOrEqualTo(TimeSpan.FromHours(7))
                 .LessThanOrEqualTo(TimeSpan.FromHours(84));

@@ -20,7 +20,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
                                                                                     CancellationToken cancellationToken)
         {
             return _mapper.Map<GetDepartamentSettingsResponse>(await _departamentSettingsManager
-                .GetDepartamentSettings(request.DepartamentId));
+                .GetCachedDataAsync(request.DepartamentId));
         }
     }
 }

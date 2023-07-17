@@ -12,7 +12,6 @@ else
             <tr>
                 <th class="no">L.p.</th>
                 <th class="name">Pracownik</th>
-                <th class="previous">Poprz.</th>
                 @foreach (var day in MonthDays)
                 {
                     <th class="@ScheduleCssHelper.GetDayClass(day) day">
@@ -26,10 +25,11 @@ else
                         </div>
                     </th>
                 }
-                <th class="summary">Poprz. mies.</th>
-                <th class="summary">Poz. godz. w mies.</th>
-                <th class="summary">Poz. godz. w kwar.</th>
-                <th class="summary">Przyp. wolne</th>
+                <th class="summary">Poz. czas pracy</th>
+                <th class="summary">Przyp. urlop</th>
+                <th class="summary">Urlop do przyp.</th>
+                <th class="summary">Godz. świąt.</th>
+                <th class="summary">Licz. nocy</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +48,8 @@ else
 
 @code {
     [Parameter]
+    public StatsDisplayed StatsDipslayed { get; set; }
+    [Parameter]
     public IEnumerable<DayViewModel> MonthDays { get; set; }
     [Parameter]
     public IEnumerable<NurseViewModel> Nurses { get; set; }
@@ -55,6 +57,10 @@ else
     public IEnumerable<ScheduleNurseViewModel> ScheduleNurses { get; set; }
     [Parameter]
     public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
+    [Parameter]
+    public ScheduleStatsViewModel ScheduleStats { get; set; }
+    [Parameter]
+    public QuarterStatsViewModel QuarterStats { get; set; }
 
     private int i;
 }

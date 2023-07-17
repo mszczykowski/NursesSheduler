@@ -1,6 +1,5 @@
 ﻿using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
 {

@@ -5,8 +5,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries
 {
     public sealed class GetQuarterStatsRequest : IRequest<GetQuarterStatsResponse>
     {
-        public int CurrentMonth { get; set; }
-        public int CurrentYear { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
         public int DepartamentId { get; set; }
 
         public ScheduleStatsRequest CurrentScheduleStats { get; set; }
@@ -15,10 +15,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries
             public int MonthInQuarter { get; set; }
             public TimeSpan WorkTimeInMonth { get; set; }
             public TimeSpan WorkTimeBalance { get; set; }
-            public IEnumerable<NurseScheduleStatsRequest> NursesScheduleStats { get; set; }
+            public IEnumerable<NurseStatsRequest> NursesScheduleStats { get; set; }
         }
 
-        public sealed class NurseScheduleStatsRequest
+        public sealed class NurseStatsRequest
         {
             public int NurseId { get; set; }
             public TimeSpan AssignedWorkTime { get; set; }

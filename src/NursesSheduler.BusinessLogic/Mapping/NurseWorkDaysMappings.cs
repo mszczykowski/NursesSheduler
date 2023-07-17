@@ -12,7 +12,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
         {
             CreateMap<NurseWorkDay, GetScheduleResponse.NurseWorkDayResponse>();
 
-            CreateMap<RecalculateNursesScheduleStatsRequest.NurseWorkDayRequest, NurseWorkDay>();
+            CreateMap<RecalculateNurseScheduleStatsRequest.NurseWorkDayRequest, NurseWorkDay>();
             
             CreateMap<GetScheduleStatsRequest.NurseWorkDayRequest, NurseWorkDay>();
         }

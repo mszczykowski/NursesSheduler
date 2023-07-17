@@ -11,9 +11,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
         public ScheduleNurseMappings()
         {
             CreateMap<ScheduleNurse, GetScheduleResponse.ScheduleNurseResponse>();
-
-            CreateMap<RecalculateNursesScheduleStatsRequest.ScheduleNurseRequest, ScheduleNurse>();
-
+            CreateMap<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest, ScheduleNurse>();
             CreateMap<GetScheduleStatsRequest.ScheduleNurseRequest, ScheduleNurse>();
         }
     }
