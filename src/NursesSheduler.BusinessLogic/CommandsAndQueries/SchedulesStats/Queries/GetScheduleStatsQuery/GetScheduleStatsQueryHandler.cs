@@ -12,13 +12,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IStatsService _statsService;
+        private readonly IScheduleStatsService _scheduleStatsService;
 
-        public GetScheduleStatsQueryHandler(IApplicationDbContext context, IMapper mapper, IStatsService statsService)
+        public GetScheduleStatsQueryHandler(IApplicationDbContext context, IMapper mapper, IScheduleStatsService statsService)
         {
             _context = context;
             _mapper = mapper;
-            _statsService = statsService;
+            _scheduleStatsService = statsService;
         }
 
         public async Task<GetScheduleStatsResponse> Handle(GetScheduleStatsRequest request,
@@ -34,7 +34,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
                     .FirstAsync(s => s.ScheduleId == schedule.ScheduleId);
             }
 
-            return _mapper.Map<GetScheduleStatsResponse>(await _statsService.GetScheduleStatsAsync(schedule,
+            return _mapper.Map<GetScheduleStatsResponse>(await _scheduleStatsService.GetScheduleStatsAsync(schedule,
                 request.DepartamentId, request.Year));
         }
     }

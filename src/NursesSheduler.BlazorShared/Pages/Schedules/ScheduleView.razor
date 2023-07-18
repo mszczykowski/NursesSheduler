@@ -47,16 +47,16 @@ else
                     <label class="label">Miesiąc</label>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthPickerViewModel=_dateViewModel OnChange="OnSeletedDateChanged" />
+                    <MonthSelect MonthPickerViewModel=_dateViewModel OnChange="OnSeletedDateChangedAsync" />
                 </div>
                 <div class="level-item">
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <YearSelect YearPickerViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChanged" />
+                    <YearSelect YearPickerViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChangedAsync" />
                 </div>
                 <div class="level-item">
-                    <button class="button is-info" @onclick="OnCurrentDateClick">Bieżący miesiąc</button>
+                    <button class="button is-info" @onclick="OnCurrentDateClickAsync">Bieżący miesiąc</button>
                 </div>
             </div>
 
@@ -138,8 +138,8 @@ else
         </div>
     </div>
 
-    <ScheduleTable StatsDipslayed=StatsDisplayed.Schedule MonthDays=_days Nurses=_nurses Schedule=_schedule MorningShifts=_morningShifts 
-        ScheduleStats=_scheduleStats QuarterStats=_quarterStats Quarter=_quarter />
+    <ScheduleTable StatsDipslayed=StatsDisplayed.Schedule MonthDays=_days Nurses=_nurses Schedule=_schedule MorningShifts=_morningShifts
+               ScheduleStats=_scheduleStats QuarterStats=_quarterStats Quarter=_quarter />
 }
 
 
@@ -173,29 +173,29 @@ else
 
             try
             {
-                await GetNurses();
-                await InitializeSolverSettings();
-                await SetQuarter();
-                await SetSchedule();
+                await SetNursesAsync();
+                await InitializeSolverSettingsAsync();
+                await SetQuarterAsync();
+                await ChangeScheduleAsync();
+
+                _isLoading = false;
+                StateHasChanged();
             }
             catch (Exception e)
             {
                 _exceptionHandler.HandleException(e);
             }
-
-            _isLoading = false;
-            StateHasChanged();
         }
     }
 
-    private async Task OnSeletedDateChanged()
+    private async Task OnSeletedDateChangedAsync()
     {
         _isLoading = true;
         await Task.Delay(1);
 
         try
         {
-            await SetSchedule();
+            await ChangeScheduleAsync();
         }
         catch (Exception ex)
         {
@@ -205,38 +205,45 @@ else
         _isLoading = false;
     }
 
-    private async Task OnCurrentDateClick()
+    private async Task OnCurrentDateClickAsync()
     {
         _dateViewModel.MonthNumber = DateTime.Now.Month;
         _dateViewModel.YearNumber = DateTime.Now.Year;
 
-        await OnSeletedDateChanged();
+        await OnSeletedDateChangedAsync();
     }
 
-    private async Task SetSchedule()
+    private async Task ChangeScheduleAsync()
     {
-        await GetMonthDays();
-        await GetSchedule();
+        await SetMonthDaysAsync();
+        await SetScheduleAsync();
 
         if (_schedule.QuarterId != _quarter.QuarterId)
         {
-            await SetQuarter();
+            await SetQuarterAsync();
         }
+
+        await SetStatsAsync();
     }
 
-    private async Task SetQuarter()
+    private async Task SetQuarterAsync()
     {
-        _quarter = await GetQuarter();
+        _quarter = await GetQuarterAsync();
         if (_quarter is null)
         {
-            _quarter = await AddQuarter();
+            _quarter = await AddQuarterAsync();
         }
 
-        await GetQuarter();
-        await GetMorningShifts();
+        await SetMorningShiftsAsync();
     }
 
-    private async Task<QuarterViewModel> AddQuarter()
+    private async Task SetStatsAsync()
+    {
+        await SetScheduleStatsAsync();
+        await SetQuarterStatsAsync();
+    }
+
+    private async Task<QuarterViewModel> AddQuarterAsync()
     {
         var request = new AddQuarterRequest
             {
@@ -254,7 +261,7 @@ else
         return _mapper.Map<QuarterViewModel>(response);
     }
 
-    private async Task<QuarterViewModel?> GetQuarter()
+    private async Task<QuarterViewModel?> GetQuarterAsync()
     {
         var request = new GetQuarterRequest
             {
@@ -267,7 +274,7 @@ else
         return response is not null ? _mapper.Map<QuarterViewModel>(response) : null;
     }
 
-    private async Task GetNurses()
+    private async Task SetNursesAsync()
     {
         var request = new GetNursesFromDepartamentRequest()
             {
@@ -279,7 +286,7 @@ else
         _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(response);
     }
 
-    private async Task GetSchedule()
+    private async Task SetScheduleAsync()
     {
         var request = new GetScheduleRequest
             {
@@ -291,7 +298,7 @@ else
         _schedule = _mapper.Map<ScheduleViewModel>(response);
     }
 
-    private async Task GetMonthDays()
+    private async Task SetMonthDaysAsync()
     {
         var request = new GetMonthDaysRequest
             {
@@ -303,7 +310,7 @@ else
         _days = _mapper.Map<IEnumerable<DayViewModel>>(response);
     }
 
-    private async Task GetMorningShifts()
+    private async Task SetMorningShiftsAsync()
     {
         var request = new GetMorningShiftsRequest
             {
@@ -314,7 +321,7 @@ else
         _morningShifts = _mapper.Map<IEnumerable<MorningShiftViewModel>>(response);
     }
 
-    private async Task InitializeSolverSettings()
+    private async Task InitializeSolverSettingsAsync()
     {
         var request = new GetDepartamentSettingsRequest
             {
@@ -327,7 +334,7 @@ else
         _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
     }
 
-    private async Task GetScheduleStatsAsync()
+    private async Task SetScheduleStatsAsync()
     {
         var request = new GetScheduleStatsRequest
             {
@@ -341,7 +348,7 @@ else
         _scheduleStats = _mapper.Map<ScheduleStatsViewModel>(response);
     }
 
-    private async Task GetQuarterStatsAsync()
+    private async Task SetQuarterStatsAsync()
     {
         var request = new GetQuarterStatsRequest
             {

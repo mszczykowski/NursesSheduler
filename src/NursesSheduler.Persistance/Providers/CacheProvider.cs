@@ -9,7 +9,6 @@ namespace NursesScheduler.Infrastructure.Providers
     {
         private readonly string _cacheName;
 
-
         private readonly IMemoryCache _memoryCache;
 
         public CacheProvider(IMemoryCache memoryCache, string cacheName)

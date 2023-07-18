@@ -7,9 +7,12 @@ namespace NursesScheduler.Infrastructure.Providers
 {
     public sealed class ScheduleStatsProvider : CacheProvider<ScheduleStats, ScheduleStatsKey>, IScheduleStatsProvider
     {
-        private readonly IStatsService _statsService;
-        public ScheduleStatsProvider(IStatsService statsService, IMemoryCache memoryCache, 
-            string cacheKey) : base(memoryCache, cacheKey)
+        private const string SCHED_STATS_CACHE_KEY = "ScheduleStats";
+
+        private readonly IScheduleStatsService _statsService;
+
+        public ScheduleStatsProvider(IScheduleStatsService statsService, IMemoryCache memoryCache) 
+            : base(memoryCache, SCHED_STATS_CACHE_KEY)
         {
             _statsService = statsService;
         }

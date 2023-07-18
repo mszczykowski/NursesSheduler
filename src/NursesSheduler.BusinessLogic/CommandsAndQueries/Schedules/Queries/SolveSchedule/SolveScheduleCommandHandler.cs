@@ -4,10 +4,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
-using NursesScheduler.BusinessLogic.Solver;
 using NursesScheduler.BusinessLogic.Solver.Directors;
-using NursesScheduler.BusinessLogic.Solver.Managers;
-using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects;
 using NursesScheduler.Domain.ValueObjects.Stats;
@@ -18,18 +15,20 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
         SolveScheduleResponse>
     {
         private readonly IMapper _mapper;
-        private readonly IStatsService _statsService;
+        private readonly IScheduleStatsService _scheduleStatsService;
+        private readonly IQuarterStatsService _quarterStatsService;
         private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
         private readonly ISeedService _seedService;
         private readonly ICalendarService _calendarService;
         private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
-        public SolveScheduleCommandHandler(IMapper mapper, IStatsService nurseStatsService, 
-            IDepartamentSettingsProvider departamentSettingsProvider, ISeedService seedService, 
-            ICalendarService calendarService, IScheduleStatsProvider scheduleStatsProvider)
+        public SolveScheduleCommandHandler(IMapper mapper, IScheduleStatsService scheduleStatsService, 
+            IQuarterStatsService quarterStatsService, IDepartamentSettingsProvider departamentSettingsProvider, 
+            ISeedService seedService, ICalendarService calendarService, IScheduleStatsProvider scheduleStatsProvider)
         {
             _mapper = mapper;
-            _statsService = nurseStatsService;
+            _scheduleStatsService = scheduleStatsService;
+            _quarterStatsService = quarterStatsService;
             _departamentSettingsProvider = departamentSettingsProvider;
             _seedService = seedService;
             _calendarService = calendarService;
@@ -55,7 +54,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
                 departamentSettings.FirstQuarterStart);
 
 
-            var currentScheduleStats = await _statsService.GetScheduleStatsAsync(currentSchedule, request.DepartamentId,
+            var currentScheduleStats = await _scheduleStatsService.GetScheduleStatsAsync(currentSchedule, request.DepartamentId,
                 request.Year);
             var previousScheduleStats = await _scheduleStatsProvider.GetCachedDataAsync(new ScheduleStatsKey
             {
@@ -63,7 +62,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
                 Year = request.Year,
                 Month = currentSchedule.Month - 1 > 0 ? currentSchedule.Month - 1 : 12,
             });
-            var quarterStats = await _statsService.GetQuarterStatsAsync(currentScheduleStats, request.Year,
+            var quarterStats = await _quarterStatsService.GetQuarterStatsAsync(currentScheduleStats, request.Year,
                 currentSchedule.Month, request.DepartamentId);
 
             ISolverState result = null;

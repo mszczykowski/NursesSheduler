@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.Domain.ValueObjects;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.Infrastructure.HttpClients
 {
@@ -26,8 +27,10 @@ namespace NursesScheduler.Infrastructure.HttpClients
             {
                 result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstants.CountryCode}");
 
-                if (result == null) 
-                    return null;
+                if (result is null)
+                {
+                    throw new EntityNotFoundException("Holidays not loaded");
+                }
 
                 _memoryCache.Set(key, result, DateTime.Now.AddDays(1));
             }

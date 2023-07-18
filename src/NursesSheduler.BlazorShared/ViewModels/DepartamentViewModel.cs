@@ -13,5 +13,10 @@ namespace NursesScheduler.BlazorShared.ViewModels
         [Required(ErrorMessage = "Należy wybrać pierwszy miesiąc pierwszego kwartału")]
         [Range(1, 12, ErrorMessage = "Wartość musi być miesiącem")]
         public int FirstQuarterStart { get; set; }
+
+        public DepartamentViewModel()
+        {
+            FirstQuarterStart = 1;
+        }
     }
 }

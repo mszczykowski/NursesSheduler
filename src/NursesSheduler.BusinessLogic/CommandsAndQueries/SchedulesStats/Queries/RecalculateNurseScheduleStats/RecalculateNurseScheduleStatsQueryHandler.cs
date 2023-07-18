@@ -9,12 +9,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
         : IRequestHandler<RecalculateNurseScheduleStatsRequest, RecalculateNursesScheduleStatsResponse>
     {
         private readonly IMapper _mapper;
-        private readonly IStatsService _statsService;
+        private readonly IScheduleStatsService _scheduleStatsService;
 
-        public RecalculateNurseScheduleStatsQueryHandler(IMapper mapper, IStatsService statsService)
+        public RecalculateNurseScheduleStatsQueryHandler(IMapper mapper, IScheduleStatsService scheduleStatsService)
         {
             _mapper = mapper;
-            _statsService = statsService;
+            _scheduleStatsService = scheduleStatsService;
         }
 
         public async Task<RecalculateNursesScheduleStatsResponse> Handle(RecalculateNurseScheduleStatsRequest request,
@@ -22,7 +22,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
         {
             var scheduleNurse = _mapper.Map<ScheduleNurse>(request.ScheduleNurse);
 
-            return _mapper.Map<RecalculateNursesScheduleStatsResponse>(await _statsService
+            return _mapper.Map<RecalculateNursesScheduleStatsResponse>(await _scheduleStatsService
                 .RecalculateNurseScheduleStats(scheduleNurse, request.DepartamentId, request.Year, request.Month));
         }
     }

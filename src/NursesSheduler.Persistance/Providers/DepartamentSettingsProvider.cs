@@ -10,6 +10,7 @@ namespace NursesScheduler.Infrastructure.Providers
         IDepartamentSettingsProvider
     {
         private const string DEPT_SETTINGS_CACHE_KEY = "DeptSettings";
+
         private readonly IApplicationDbContext _context;
 
         public DepartamentSettingsProvider(IApplicationDbContext context, IMemoryCache memoryCache) 

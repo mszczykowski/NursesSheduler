@@ -32,8 +32,9 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IAbsencesService, AbsencesServiceLegacy>();
             services.AddTransient<ISchedulesService, SchedulesService>();
             services.AddTransient<ICalendarService, CalendarService>();
-            services.AddTransient<IStatsService, StatsService>();
+            services.AddTransient<IScheduleStatsService, ScheuleStatsService>();
             services.AddTransient<IActiveNursesService, ActiveNursesService>();
+            services.AddTransient<IQuarterStatsService, QuarterStatsService>();
         }
     }
 }
