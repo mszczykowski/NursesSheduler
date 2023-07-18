@@ -8,5 +8,6 @@ namespace NursesScheduler.BlazorShared.ViewModels.Common
         public string Title { get; set; }
         public ComponentBase PageContent { get; set; }
         public bool IsSelected { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿@if (!ShouldDisplayTable())
 {
-    <br/>
+    <br />
     <div class="has-text-centered">
         <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
     </div>
 }
 else
 {
+    <ScheduleHeader Quarter=Quarter ScheduleStats=ScheduleStats QuarterStats=QuarterStats CommonTableData=_commonTableData/>
     <table class="table-schedule">
         <thead>
             <tr>
@@ -37,10 +38,10 @@ else
                 i = 1;
                 foreach (var scheduleNurse in Schedule.ScheduleNurses)
                 {
-                    <ScheduleRow No=i++ ScheduleNurse=scheduleNurse Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId) 
-                        QuarterNurseStats=@QuarterStats.NurseStats.First(s=>s.NurseId == scheduleNurse.NurseId) 
-                        ScheduleNurseStats=@ScheduleStats.NursesScheduleStats.First(s=>s.NurseId == scheduleNurse.NurseId) 
-                        CommonRowsData=_commonRowsData/>
+                    <ScheduleRow No=i++ ScheduleNurse=scheduleNurse Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId)
+                        QuarterNursesStats=@QuarterStats.NurseStats
+                        ScheduleNursesStats=@ScheduleStats.NursesScheduleStats
+                        CommonTableData=_commonTableData />
                 }
             }
         </tbody>
@@ -49,8 +50,6 @@ else
 
 
 @code {
-    [Parameter]
-    public StatsDisplayed StatsDipslayed { get; set; }
     [Parameter]
     public IEnumerable<DayViewModel> MonthDays { get; set; }
     [Parameter]
@@ -70,13 +69,13 @@ else
 
     private int i;
 
-    private ScheduleRowCommonDataViewModel _commonRowsData;
+    private CommonTableDataViewModel _commonTableData;
 
     protected override Task OnParametersSetAsync()
     {
-        if(ShouldDisplayTable())
+        if (ShouldDisplayTable())
         {
-            BuildCommonRowsData();
+            BuildCommonTableData();
         }
 
         return base.OnParametersSetAsync();
@@ -87,12 +86,12 @@ else
         return Schedule is not null && Schedule.ScheduleNurses is not null && Schedule.ScheduleNurses.Any();
     }
 
-    private void BuildCommonRowsData()
+    private void BuildCommonTableData()
     {
-        _commonRowsData = new ScheduleRowCommonDataViewModel
+        _commonTableData = new CommonTableDataViewModel
             {
                 ReadOnly = ReadOnly,
-                StatsDipslayed = StatsDipslayed,
+                CurrentStatsDipslayed = StatsDisplayed.Schedule,
                 DepartamentId = Quarter.DepartamentId,
                 Year = Quarter.Year,
                 Month = Schedule.Month,
@@ -101,5 +100,11 @@ else
                 MonthDays = MonthDays,
                 MorningShifts = MorningShifts,
             };
+        _commonTableData.TableNeedsRefresing += RefreshTable;
+    }
+
+    private void RefreshTable()
+    {
+        StateHasChanged();
     }
 }

@@ -151,7 +151,7 @@ namespace NursesScheduler.BusinessLogic.Services
             DepartamentSettings departamentSettings)
         {
             var holiadayHoursAssinged = TimeSpan.Zero;
-            foreach (var day in days.Where(d => d.IsHoliday))
+            foreach (var day in days.Where(d => !d.IsWorkingDay))
             {
                 var workDay = nurseWorkDays.First(d => d.Day == day.Date.Day);
 

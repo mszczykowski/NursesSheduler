@@ -27,9 +27,29 @@
 }
 else
 {
-    <div class="container is-fluid">
+    <div class="schedule-view">
         <div class="level">
             <div class="level-left">
+                <div class="level-item">
+                    <div class="tabs is-toggle is-toggle-rounded">
+                        <ul>
+                            <li>
+                                <a>
+                                    <span class="icon is-small"><i class="fa fa-backward" aria-hidden="true"></i></span>
+                                    <span>Podgląd poprzedniego</span>
+                                </a>
+                            </li>
+                            <li class="is-active">
+                                <a>
+                                    <span>Aktualnie edytowany</span>
+                                    <span class="icon is-small"><i class="fa fa-forward" aria-hidden="true"></i></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="level-right">
                 <div class="level-item">
                     <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())">Konfiguracja ranków</a>
                 </div>
@@ -41,7 +61,7 @@ else
                 </div>
             </div>
         </div>
-        <div class="level">
+        <div class="level is-boxed">
             <div class="level-left">
                 <div class="level-item">
                     <label class="label">Miesiąc</label>
@@ -59,7 +79,6 @@ else
                     <button class="button is-info" @onclick="OnCurrentDateClickAsync">Bieżący miesiąc</button>
                 </div>
             </div>
-
             <div class="level-right">
                 <div class="level-item">
                     <p class="control">
@@ -103,43 +122,10 @@ else
                 </div>
             </div>
         </div>
-
-        <div class="level">
-            <div class="level-left">
-                <div class="level-item">
-                    <p>
-                        <b>Kwartał:</b> @_quarter.QuarterNumber
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p>
-                        <b>Norma:</b> @_scheduleStats.WorkTimeInMonth.GetTotalHoursAndMinutes()
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p>
-                        <b>Czas w kwartale:</b> @_quarterStats.WorkTimeInQuarter.GetTotalHoursAndMinutes()
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p>
-                        <b>Bilans czasu pracy:</b> @_scheduleStats.WorkTimeBalance.GetTotalHoursAndMinutes()
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p>
-                        <b>Przydzielony urlop:</b> @_scheduleStats.AssignedTimeOffsTime.GetTotalHoursAndMinutes()
-                    </p>
-                </div>
-            </div>
-            <div class="level-right">
-                <p><b>Zapisano!</b></p>
-            </div>
-        </div>
     </div>
 
-    <ScheduleTable StatsDipslayed=StatsDisplayed.Schedule MonthDays=_days Nurses=_nurses Schedule=_schedule MorningShifts=_morningShifts
-               ScheduleStats=_scheduleStats QuarterStats=_quarterStats Quarter=_quarter />
+    <ScheduleTable MonthDays=_days Nurses=_nurses Schedule=_schedule MorningShifts=_morningShifts ScheduleStats=_scheduleStats 
+        QuarterStats=_quarterStats Quarter=_quarter ReadOnly=_schedule.IsClosed />
 }
 
 

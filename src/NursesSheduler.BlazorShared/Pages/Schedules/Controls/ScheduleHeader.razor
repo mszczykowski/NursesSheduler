@@ -1,5 +1,74 @@
-﻿<h3>ScheduleHeader</h3>
+﻿<div class="schedule-header schedule-view">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <p>
+                    <b>Kwartał:</b> @Quarter.QuarterNumber
+                </p>
+            </div>
+            <div class="level-item">
+                <p>
+                    <b>Norma:</b> @ScheduleStats.WorkTimeInMonth.GetTotalHoursAndMinutes()
+                </p>
+            </div>
+            <div class="level-item">
+                <p>
+                    <b>Czas w kwartale:</b> @QuarterStats.WorkTimeInQuarter.GetTotalHoursAndMinutes()
+                </p>
+            </div>
+            <div class="level-item">
+                <p>
+                    <b>Bilans czasu pracy:</b> @ScheduleStats.WorkTimeBalance.GetTotalHoursAndMinutes()
+                </p>
+            </div>
+            <div class="level-item">
+                <p>
+                    <b>Przydzielony urlop:</b> @ScheduleStats.AssignedTimeOffsTime.GetTotalHoursAndMinutes()
+                </p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <EditForm Model="CommonTableData">
+                    <p>
+                        <label><b>Wyświetl statystyki: </b></label>
+                        <div class="control">
+                            <InputRadioGroup ValueChanged="@((e) => OnRadiochange(e))" TValue="StatsDisplayed" ValueExpression="() => _selectedValue">
+                                <label class="radio">
+                                    <InputRadio Value="StatsDisplayed.Schedule" 
+                                        checked=@(CommonTableData.CurrentStatsDipslayed == StatsDisplayed.Schedule)/>
+                                    Miesiąca
+                                </label>
+                                <label class="radio">
+                                    <InputRadio Value="StatsDisplayed.Quarter" 
+                                        checked=@(CommonTableData.CurrentStatsDipslayed == StatsDisplayed.Quarter)/>
+                                    Kwartału
+                                </label>
+                            </InputRadioGroup>
+                        </div>
+                    </p>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
 
-@code {
+@code
+{
+    [Parameter]
+    public QuarterViewModel Quarter { get; set; }
+    [Parameter]
+    public ScheduleStatsViewModel ScheduleStats { get; set; }
+    [Parameter]
+    public QuarterStatsViewModel QuarterStats { get; set; }
+    [Parameter]
+    public CommonTableDataViewModel CommonTableData { get; set; }
 
+    private StatsDisplayed _selectedValue;
+
+    private void OnRadiochange(object sender)
+    {
+        CommonTableData.CurrentStatsDipslayed = (StatsDisplayed)sender;
+        CommonTableData.RequestTableRefresh();
+    }
 }

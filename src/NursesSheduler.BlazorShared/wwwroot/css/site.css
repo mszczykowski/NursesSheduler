@@ -105,8 +105,19 @@
 
 /*table*/
 
+.schedule-header {
+    
+}
+
+.schedule-view {
+    width: 100%;
+    margin: 0 auto;
+    padding: 8px 10px;
+    max-width: 1600px;
+}
+
 table.table-schedule {
-    margin: 20px auto;
+    margin: 10px auto;
     table-layout: fixed;
     width: 100%;
     max-width: 1600px;
@@ -212,11 +223,11 @@ th {
     background: white;
 }
 
-/*.table-schedule th:after {
+.table-schedule th:after {
     content: '';
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
-    border-bottom: 2px solid black;
-}*/
+    border-bottom: 1px solid black;
+}
