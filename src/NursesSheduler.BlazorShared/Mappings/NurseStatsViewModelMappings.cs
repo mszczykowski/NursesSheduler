@@ -3,6 +3,7 @@ using NursesScheduler.BlazorShared.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.RecalculateNurseQuarterStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
 
 namespace NursesScheduler.BlazorShared.Mappings
 {
@@ -18,6 +19,9 @@ namespace NursesScheduler.BlazorShared.Mappings
 
             CreateMap<NurseStatsViewModel, RecalculateNurseQuarterStatsRequest.NurseStatsRequest>();
             CreateMap<NurseStatsViewModel, GetQuarterStatsRequest.NurseStatsRequest>();
+
+            CreateMap<RecalculateNursesScheduleStatsResponse, NurseStatsViewModel>();
+            CreateMap<RecalculateNurseQuarterStatsResponse, NurseStatsViewModel>();
         }
     }
 }

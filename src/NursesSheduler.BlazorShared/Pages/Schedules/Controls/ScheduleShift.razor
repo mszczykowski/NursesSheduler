@@ -1,7 +1,7 @@
 ﻿
 
 <td class="day @ScheduleCssHelper.GetDayClass(Day) @ScheduleCssHelper.SetIsTimeOff(WorkDay.IsTimeOff)" @oncontextmenu="SetTimeOff" @oncontextmenu:preventDefault="true">
-    <select @onchange="AssignShift" value="@_selectedValue">
+    <select @onchange="AssignShift" value="@_selectedValue" disabled=@ReadOnly>
         <option value="@nameof(ShiftTypes.None)"> </option>
         <option value="@nameof(ShiftTypes.Day)">D</option>
         <option value="@nameof(ShiftTypes.Night)">N</option>
@@ -10,7 +10,7 @@
             <optgroup label="Ranki">
                 @foreach (var morningShift in MorningShifts)
                 {
-                    @if(morningShift.ShiftLength != TimeSpan.Zero)
+                    @if (morningShift.ShiftLength != TimeSpan.Zero)
                     {
                         <option value="@nameof(morningShift.Index)">@morningShift.ShiftLength.GetTotalHoursAndMinutes()</option>
                     }
@@ -22,6 +22,8 @@
 
 
 @code {
+    [Parameter]
+    public bool ReadOnly { get; set; }
     [Parameter]
     public NurseWorkDayViewModel WorkDay { get; set; }
     [Parameter]

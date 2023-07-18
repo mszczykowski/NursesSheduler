@@ -1,8 +1,9 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.RecalculateNurseQuarterStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
 
-@inject IMapper _mapper;
-@inject IMediator _mediatr;
+@inject IMapper _mapper
+@inject IMediator _mediatr
+@inject IExceptionHandler _exceptionHandler
 
 <tr>
     <td class="no">@No</td>
@@ -12,7 +13,8 @@
     </td>
     @foreach (var workDay in ScheduleNurse.NurseWorkDays)
     {
-        <ScheduleShift WorkDay=workDay Day=@CommonRowsData.MonthDays.First(d=>d.Date.Day == workDay.Day) MorningShifts="CommonRowsData.MorningShifts" OnChange="RecalcuateStatsAsync"/>
+        <ScheduleShift WorkDay=workDay Day=@CommonRowsData.MonthDays.First(d=>d.Date.Day == workDay.Day)
+                   MorningShifts="CommonRowsData.MorningShifts" OnChange="RecalcuateStatsAsync" ReadOnly=CommonRowsData.ReadOnly />
     }
     @if (CommonRowsData.StatsDipslayed == StatsDisplayed.Schedule)
     {
@@ -50,13 +52,20 @@
 
     public async Task RecalcuateStatsAsync()
     {
-        await RecalcuateScheduleStatsAsync();
-        await RecalcuateQuarterStatsAsync();
+        try
+        {
+            await RecalcuateScheduleStatsAsync();
+            await RecalcuateQuarterStatsAsync();
+        }
+        catch(Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
     }
 
     private async Task RecalcuateScheduleStatsAsync()
     {
-        var scheduleStatsRequest = new RecalculateNurseScheduleStatsRequest
+        var request = new RecalculateNurseScheduleStatsRequest
             {
                 DepartamentId = CommonRowsData.DepartamentId,
                 Year = CommonRowsData.Year,
@@ -64,20 +73,22 @@
                 ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(ScheduleNurse),
             };
 
-        ScheduleNurseStats = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(scheduleStatsRequest));
+        ScheduleNurseStats = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
     }
 
     private async Task RecalcuateQuarterStatsAsync()
     {
-        var quarterStatsRequest = new RecalculateNurseQuarterStatsRequest
+        var request = new RecalculateNurseQuarterStatsRequest
             {
                 DepartamentId = CommonRowsData.DepartamentId,
                 Year = CommonRowsData.Year,
                 Month = CommonRowsData.Month,
                 CurrentScheduleNurseStats = _mapper
-                    .Map<RecalculateNurseQuarterStatsRequest.NurseStatsRequest>(ScheduleNurseStats),
+                            .Map<RecalculateNurseQuarterStatsRequest.NurseStatsRequest>(ScheduleNurseStats),
             };
 
-        QuarterNurseStats = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(quarterStatsRequest));
+            var x = await _mediatr.Send(request);
+
+        //QuarterNurseStats = _mapper.Map<NurseStatsViewModel>();
     }
 }
