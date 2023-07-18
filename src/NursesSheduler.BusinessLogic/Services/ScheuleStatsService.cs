@@ -125,6 +125,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var nurseStats = new NurseScheduleStats
             {
+                NurseId = scheduleNurse.NurseId,
                 AssignedWorkTime = CalculateAssignedWorkTime(scheduleNurse.NurseWorkDays),
                 HolidayHoursAssigned = CalculateHolidayHoursAssigned(scheduleNurse.NurseWorkDays, days,
                         departamentSettings),
@@ -152,7 +153,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var holiadayHoursAssinged = TimeSpan.Zero;
             foreach (var day in days.Where(d => d.IsHoliday))
             {
-                var workDay = nurseWorkDays.First(d => d.Day == day.Date.DayNumber);
+                var workDay = nurseWorkDays.First(d => d.Day == day.Date.Day);
 
                 if (workDay.ShiftType == ShiftTypes.None)
                 {
@@ -200,6 +201,7 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 var nurseStats = new NurseScheduleStats
                 {
+                    NurseId = nurseSchedule.NurseId,
                     AssignedWorkTime = nurseSchedule.AssignedWorkTime,
                     HolidayHoursAssigned = nurseSchedule.HolidaysHoursAssigned,
                     NightShiftsAssigned = nurseSchedule.NightShiftsAssigned,
@@ -265,7 +267,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     workTimeInWeeks.Add(day.WeekInQuarter, TimeSpan.Zero);
                 }
 
-                var workDay = nurseWorkDays.First(d => d.Day == day.Date.DayNumber);
+                var workDay = nurseWorkDays.First(d => d.Day == day.Date.Day);
 
                 if (workDay.ShiftType == ShiftTypes.None)
                 {

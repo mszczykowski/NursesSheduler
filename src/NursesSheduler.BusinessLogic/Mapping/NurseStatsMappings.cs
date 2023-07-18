@@ -14,9 +14,8 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<NurseStats, GetScheduleStatsResponse.NurseStatsResponse>();
             CreateMap<NurseStats, RecalculateNursesScheduleStatsResponse>();
 
-            CreateMap<GetQuarterStatsRequest.NurseStatsRequest, NurseStats>();
-
-            CreateMap<GetQuarterStatsResponse.NurseStatsResponse, NurseStats>();
+            CreateMap<GetQuarterStatsRequest.NurseStatsRequest, NurseScheduleStats>();
+            CreateMap<NurseStats, GetQuarterStatsResponse.NurseStatsResponse>();
 
             CreateMap<RecalculateNurseQuarterStatsRequest.NurseStatsRequest, NurseStats>();
         }

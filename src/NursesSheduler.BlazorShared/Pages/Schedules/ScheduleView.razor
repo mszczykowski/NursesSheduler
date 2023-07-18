@@ -179,7 +179,7 @@ else
                 await ChangeScheduleAsync();
 
                 _isLoading = false;
-                StateHasChanged();
+                base.StateHasChanged();
             }
             catch (Exception e)
             {

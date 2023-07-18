@@ -118,7 +118,10 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private NurseStats GetQuarterNurseStats(IEnumerable<NurseStats> quarterSchedulesNurseStats)
         {
-            var nurseQuarterStats = new NurseStats();
+            var nurseQuarterStats = new NurseStats
+            {
+                NurseId = quarterSchedulesNurseStats.First().NurseId,
+            };
 
             foreach (var scheduleNurseStats in quarterSchedulesNurseStats)
             {
@@ -127,17 +130,25 @@ namespace NursesScheduler.BusinessLogic.Services
                 nurseQuarterStats.NightShiftsAssigned += scheduleNurseStats.NightShiftsAssigned;
                 nurseQuarterStats.TimeOffToAssign += scheduleNurseStats.TimeOffToAssign;
                 nurseQuarterStats.TimeOffAssigned += scheduleNurseStats.TimeOffAssigned;
-                nurseQuarterStats.MorningShiftsIdsAssigned.Union(scheduleNurseStats.MorningShiftsIdsAssigned);
 
-                foreach (var week in scheduleNurseStats.WorkTimeInWeeks)
+                if(scheduleNurseStats.MorningShiftsIdsAssigned is not null)
                 {
-                    if (!nurseQuarterStats.WorkTimeInWeeks.ContainsKey(week.Key))
+                    nurseQuarterStats.MorningShiftsIdsAssigned = nurseQuarterStats.MorningShiftsIdsAssigned
+                        .Union(scheduleNurseStats.MorningShiftsIdsAssigned);
+                }
+
+                if(scheduleNurseStats.WorkTimeInWeeks is not null)
+                {
+                    foreach (var week in scheduleNurseStats.WorkTimeInWeeks)
                     {
-                        nurseQuarterStats.WorkTimeInWeeks.Add(week.Key, week.Value);
-                    }
-                    else
-                    {
-                        nurseQuarterStats.WorkTimeInWeeks[week.Key] += week.Value;
+                        if (!nurseQuarterStats.WorkTimeInWeeks.ContainsKey(week.Key))
+                        {
+                            nurseQuarterStats.WorkTimeInWeeks.Add(week.Key, week.Value);
+                        }
+                        else
+                        {
+                            nurseQuarterStats.WorkTimeInWeeks[week.Key] += week.Value;
+                        }
                     }
                 }
             }

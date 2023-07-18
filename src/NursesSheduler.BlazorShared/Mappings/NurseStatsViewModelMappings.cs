@@ -17,6 +17,7 @@ namespace NursesScheduler.BlazorShared.Mappings
             CreateMap<GetQuarterStatsResponse.NurseStatsResponse, NurseStatsViewModel>();
 
             CreateMap<NurseStatsViewModel, RecalculateNurseQuarterStatsRequest.NurseStatsRequest>();
+            CreateMap<NurseStatsViewModel, GetQuarterStatsRequest.NurseStatsRequest>();
         }
     }
 }

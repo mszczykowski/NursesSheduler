@@ -10,19 +10,13 @@
         <p>@Nurse.Name</p>
         <p>@Nurse.Surname</p>
     </td>
-    <SchedulePrevState PreviousStatate=ScheduleNurse.PreviousState />
     @foreach (var workDay in ScheduleNurse.NurseWorkDays)
     {
         <ScheduleShift WorkDay=workDay Day=@CommonRowsData.MonthDays.First(d=>d.Date.Day == workDay.Day) MorningShifts="CommonRowsData.MorningShifts" OnChange="RecalcuateStatsAsync"/>
     }
-    <th class="summary">Poz. czas pracy</th>
-    <th class="summary">Przyp. urlop</th>
-    <th class="summary">Urlop do przyp.</th>
-    <th class="summary">Godz. świąt.</th>
-    <th class="summary">Licz. nocy</th>
     @if (CommonRowsData.StatsDipslayed == StatsDisplayed.Schedule)
     {
-        <td class="summary">@(CommonRowsData.MonthWorkTime - ScheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes()</td>
+        <td class="summary">@((CommonRowsData.MonthWorkTime - ScheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
         <td class="summary">@ScheduleNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
         <td class="summary">@ScheduleNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
         <td class="summary">@ScheduleNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
@@ -30,7 +24,7 @@
     }
     else
     {
-        <td class="summary">@(CommonRowsData.QuarterWorkTime - QuarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes()</td>
+        <td class="summary">@((CommonRowsData.QuarterWorkTime - QuarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
         <td class="summary">@QuarterNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
         <td class="summary">@QuarterNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
         <td class="summary">@QuarterNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
@@ -56,15 +50,8 @@
 
     public async Task RecalcuateStatsAsync()
     {
-        var scheduleStatsRequest = new RecalculateNurseScheduleStatsRequest
-            {
-                DepartamentId = CommonRowsData.DepartamentId,
-                Year = CommonRowsData.Year,
-                Month = CommonRowsData.Month,
-                ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(ScheduleNurse),
-            };
-
-        ScheduleNurseStats = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(scheduleStatsRequest));
+        await RecalcuateScheduleStatsAsync();
+        await RecalcuateQuarterStatsAsync();
     }
 
     private async Task RecalcuateScheduleStatsAsync()

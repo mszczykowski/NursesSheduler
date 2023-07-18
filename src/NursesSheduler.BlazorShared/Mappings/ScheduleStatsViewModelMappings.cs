@@ -5,7 +5,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.Ge
 
 namespace NursesScheduler.BlazorShared.Mappings
 {
-    internal class ScheduleStatsViewModelMappings : Profile
+    internal sealed class ScheduleStatsViewModelMappings : Profile
     {
         public ScheduleStatsViewModelMappings()
         {
