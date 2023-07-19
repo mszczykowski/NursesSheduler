@@ -2,7 +2,7 @@
 {
     internal enum ShiftIndex
     {
-        Night,
         Day,
+        Night,
     }
 }

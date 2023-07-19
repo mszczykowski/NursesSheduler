@@ -81,7 +81,7 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             while (currentQueue.TryDequeue(out _currenNurseId))
             {
-                _currentNurse = currentState.Nurses.Single(e => e.NurseId == _currenNurseId);
+                _currentNurse = currentState.NurseStates.Single(e => e.NurseId == _currenNurseId);
 
                 if(_currentNurse.TimeOff[currentState.CurrentDay - 1])
                 {

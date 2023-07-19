@@ -24,11 +24,12 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         public bool[] TimeOff { get; private set; }
 
-        public ICollection<int> AssignedMorningShiftsIds { get; set; }
+        public IDictionary<int, MorningShiftIndex> AssignedMorningShifts { get; set; }
 
         public bool HadMorningShiftAssigned { get; private set; }
         public ShiftTypes PreviousMonthLastShift { get; set; }
 
+        public NurseTeams NurseTeam { get; set; }
 
         public NurseState(ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, 
             NurseScheduleStats previousScheduleNurseStats)

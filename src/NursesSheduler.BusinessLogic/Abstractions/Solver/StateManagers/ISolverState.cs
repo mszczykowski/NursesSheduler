@@ -1,20 +1,20 @@
 ﻿using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
 {
     internal interface ISolverState
     {
-        int CurrentDay { get; set; }
-        ShiftIndex CurrentShift { get; set; }
-        int DayNumberInQuarter { get; set; }
-        int NursesToAssignForCurrentShift { get; set; }
-        HashSet<int>[] MorningShiftsState { get; }
-        HashSet<INurseState> Nurses { get; }
-        HashSet<int>[,] ScheduleState { get; }
-        int NursesToAssignForMorningShift { get; set; }
-        int WeekInQuarter { get; }
-        int NursesToAssignOnTimeOff { get; set; }
+        public int CurrentDay { get; set; }
+        public ShiftIndex CurrentShift { get; set; }
+
+        public int NursesToAssignForCurrentShift { get; set; }
+        public int NursesToAssignForMorningShift { get; set; }
+        public int NursesToAssignOnTimeOff { get; set; }
+
+        public ICollection<INurseState> NurseStates { get; }
+        public IDictionary<int, ShiftTypes[]> ScheduleState { get; }
         bool IsShiftAssined { get; }
 
         void AdvanceStateRegularShift();
