@@ -3,45 +3,45 @@
         <div class="level-left">
             <div class="level-item">
                 <p>
-                    <b>Kwartał:</b> @Quarter.QuarterNumber
+                    <b>Kwartał:</b> @QuarterData.Quarter.QuarterNumber
                 </p>
             </div>
             <div class="level-item">
                 <p>
-                    <b>Norma:</b> @ScheduleStats.WorkTimeInMonth.GetTotalHoursAndMinutes()
+                    <b>Norma:</b> @ScheduleData.ScheduleStats.WorkTimeInMonth.GetTotalHoursAndMinutes()
                 </p>
             </div>
             <div class="level-item">
                 <p>
-                    <b>Czas w kwartale:</b> @QuarterStats.WorkTimeInQuarter.GetTotalHoursAndMinutes()
+                    <b>Czas w kwartale:</b> @QuarterData.QuarterStats.WorkTimeInQuarter.GetTotalHoursAndMinutes()
                 </p>
             </div>
             <div class="level-item">
                 <p>
-                    <b>Bilans czasu pracy:</b> @ScheduleStats.WorkTimeBalance.GetTotalHoursAndMinutes()
+                    <b>Bilans czasu pracy:</b> @ScheduleData.ScheduleStats.WorkTimeBalance.GetTotalHoursAndMinutes()
                 </p>
             </div>
             <div class="level-item">
                 <p>
-                    <b>Przydzielony urlop:</b> @ScheduleStats.AssignedTimeOffsTime.GetTotalHoursAndMinutes()
+                    <b>Przydzielony urlop:</b> @ScheduleData.ScheduleStats.AssignedTimeOffsTime.GetTotalHoursAndMinutes()
                 </p>
             </div>
         </div>
         <div class="level-right">
             <div class="level-item">
-                <EditForm Model="CommonTableData">
+                <EditForm Model="ScheduleData">
                     <p>
                         <label><b>Wyświetl statystyki: </b></label>
                         <div class="control">
                             <InputRadioGroup ValueChanged="@((e) => OnRadiochange(e))" TValue="StatsDisplayed" ValueExpression="() => _selectedValue">
                                 <label class="radio">
                                     <InputRadio Value="StatsDisplayed.Schedule" 
-                                        checked=@(CommonTableData.CurrentStatsDipslayed == StatsDisplayed.Schedule)/>
+                                        checked=@(ScheduleData.CurrentStatsDipslayed == StatsDisplayed.Schedule)/>
                                     Miesiąca
                                 </label>
                                 <label class="radio">
                                     <InputRadio Value="StatsDisplayed.Quarter" 
-                                        checked=@(CommonTableData.CurrentStatsDipslayed == StatsDisplayed.Quarter)/>
+                                        checked=@(ScheduleData.CurrentStatsDipslayed == StatsDisplayed.Quarter)/>
                                     Kwartału
                                 </label>
                             </InputRadioGroup>
@@ -56,19 +56,15 @@
 @code
 {
     [Parameter]
-    public QuarterViewModel Quarter { get; set; }
+    public QuarterDataWrapper QuarterData { get; set; }
     [Parameter]
-    public ScheduleStatsViewModel ScheduleStats { get; set; }
-    [Parameter]
-    public QuarterStatsViewModel QuarterStats { get; set; }
-    [Parameter]
-    public CommonTableDataViewModel CommonTableData { get; set; }
+    public ScheduleDataWrapper ScheduleData { get; set; }
 
     private StatsDisplayed _selectedValue;
 
     private void OnRadiochange(object sender)
     {
-        CommonTableData.CurrentStatsDipslayed = (StatsDisplayed)sender;
-        CommonTableData.RequestTableRefresh();
+        ScheduleData.CurrentStatsDipslayed = (StatsDisplayed)sender;
+        ScheduleData.RequestScheduleViewRefresh();
     }
 }

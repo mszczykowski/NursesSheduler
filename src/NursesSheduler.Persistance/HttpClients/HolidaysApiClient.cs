@@ -20,20 +20,9 @@ namespace NursesScheduler.Infrastructure.HttpClients
 
         public async Task<IEnumerable<Holiday>> GetHolidays(int year)
         {
-            List<Holiday> result;
-            var key = $"Holidays-{year}";
+            var result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstants.CountryCode}")
+                ?? throw new EntityNotFoundException("Holidays not loaded");
 
-            if(!_memoryCache.TryGetValue(key, out result))
-            {
-                result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstants.CountryCode}");
-
-                if (result is null)
-                {
-                    throw new EntityNotFoundException("Holidays not loaded");
-                }
-
-                _memoryCache.Set(key, result, DateTime.Now.AddDays(1));
-            }
             return result;
         }
     }

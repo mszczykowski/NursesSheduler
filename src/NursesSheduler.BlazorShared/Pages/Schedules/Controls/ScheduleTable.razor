@@ -7,13 +7,13 @@
 }
 else
 {
-    <ScheduleHeader Quarter=Quarter ScheduleStats=ScheduleStats QuarterStats=QuarterStats CommonTableData=_commonTableData/>
+    <ScheduleHeader QuarterData=QuarterData ScheduleData=ScheduleData/>
     <table class="table-schedule">
         <thead>
             <tr>
                 <th class="no">L.p.</th>
                 <th class="name">Pracownik</th>
-                @foreach (var day in MonthDays)
+                @foreach (var day in ScheduleData.Days)
                 {
                     <th class="@ScheduleCssHelper.GetDayClass(day) day">
                         <div class="tooltip">
@@ -36,12 +36,10 @@ else
         <tbody>
             @{
                 i = 1;
-                foreach (var scheduleNurse in Schedule.ScheduleNurses)
+                foreach (var nurseId in ScheduleData.Schedule.ScheduleNurses.Select(s => s.NurseId))
                 {
-                    <ScheduleRow No=i++ ScheduleNurse=scheduleNurse Nurse=@Nurses.First(n=>n.NurseId == scheduleNurse.NurseId)
-                        QuarterNursesStats=@QuarterStats.NurseStats
-                        ScheduleNursesStats=@ScheduleStats.NursesScheduleStats
-                        CommonTableData=_commonTableData />
+                    <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
+                        ScheduleData=ScheduleData />
                 }
             }
         </tbody>
@@ -51,31 +49,19 @@ else
 
 @code {
     [Parameter]
-    public IEnumerable<DayViewModel> MonthDays { get; set; }
-    [Parameter]
     public IEnumerable<NurseViewModel> Nurses { get; set; }
     [Parameter]
-    public ScheduleViewModel Schedule { get; set; }
+    public QuarterDataWrapper QuarterData { get; set; }
     [Parameter]
-    public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
-    [Parameter]
-    public ScheduleStatsViewModel ScheduleStats { get; set; }
-    [Parameter]
-    public QuarterStatsViewModel QuarterStats { get; set; }
-    [Parameter]
-    public bool ReadOnly { get; set; }
-    [Parameter]
-    public QuarterViewModel Quarter { get; set; }
+    public ScheduleDataWrapper ScheduleData { get; set; }
 
     private int i;
 
-    private CommonTableDataViewModel _commonTableData;
-
     protected override Task OnParametersSetAsync()
     {
-        if (ShouldDisplayTable())
+        if(ScheduleData is not null)
         {
-            BuildCommonTableData();
+            ScheduleData.ScheduleNeedsRefreshing += RefreshSchedule;
         }
 
         return base.OnParametersSetAsync();
@@ -83,27 +69,11 @@ else
 
     private bool ShouldDisplayTable()
     {
-        return Schedule is not null && Schedule.ScheduleNurses is not null && Schedule.ScheduleNurses.Any();
+        return ScheduleData.Schedule is not null && ScheduleData.Schedule.ScheduleNurses is not null 
+            && ScheduleData.Schedule.ScheduleNurses.Any();
     }
 
-    private void BuildCommonTableData()
-    {
-        _commonTableData = new CommonTableDataViewModel
-            {
-                ReadOnly = ReadOnly,
-                CurrentStatsDipslayed = StatsDisplayed.Schedule,
-                DepartamentId = Quarter.DepartamentId,
-                Year = Quarter.Year,
-                Month = Schedule.Month,
-                QuarterWorkTime = QuarterStats.WorkTimeInQuarter,
-                MonthWorkTime = ScheduleStats.WorkTimeInMonth,
-                MonthDays = MonthDays,
-                MorningShifts = MorningShifts,
-            };
-        _commonTableData.TableNeedsRefresing += RefreshTable;
-    }
-
-    private void RefreshTable()
+    private void RefreshSchedule()
     {
         StateHasChanged();
     }

@@ -19,7 +19,7 @@
             <EditForm EditContext="@_editContext" OnValidSubmit="@OnSave">
                 <ObjectGraphDataAnnotationsValidator />
                 <section class="modal-card-body">
-                    <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@QuarterStats.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
+                    <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@QuarterData.QuarterStats.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
                     <br />
                     @foreach (var morningShift in _morningShiftsForm.MorningShifts)
                     {
@@ -43,11 +43,7 @@
 
 @code {
     [Parameter]
-    public QuarterViewModel Quarter { get; set; }
-    [Parameter]
-    public QuarterStatsViewModel QuarterStats { get; set; }
-    [Parameter]
-    public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
+    public QuarterDataWrapper QuarterData { get; set; }
 
     private MorningShiftsFormViewModel _morningShiftsForm;
     private EditContext _editContext;
@@ -58,7 +54,7 @@
     {
         _isSaveLoading = false;
 
-        _morningShiftsForm = new(MorningShifts);
+        _morningShiftsForm = new(QuarterData.MorningShifts);
 
         _editContext = new(_morningShiftsForm);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
@@ -80,7 +76,7 @@
 
             var request = new UpsertMorningShiftsRequest
                 {
-                    QuarterId = Quarter.QuarterId,
+                    QuarterId = QuarterData.Quarter.QuarterId,
                     MorningShifts = _mapper
                             .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm
                                 .MorningShifts
@@ -88,7 +84,7 @@
                 };
             var response = await _mediatr.Send(request) ?? throw new EntityNotAddedException(nameof(MorningShiftViewModel)); ;
 
-            MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
+            QuarterData.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
             base.ChangeVisibility();
         }
         catch (Exception e)
@@ -103,8 +99,8 @@
         {
             var request = new CalculateMorningShiftsRequest
                 {
-                    TimeForMorningShifts = QuarterStats.TimeForMorningShifts,
-                    DepartamentId = Quarter.DepartamentId,
+                    TimeForMorningShifts = QuarterData.QuarterStats.TimeForMorningShifts,
+                    DepartamentId = QuarterData.Quarter.DepartamentId,
                 };
             var response = await _mediatr.Send(request);
 

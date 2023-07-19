@@ -23,13 +23,13 @@
             </div>
         </div>
     </div>
-    @if(_nurse == null)
+    @if (_nurse == null)
     {
-        <LoadingSpinner/>
+        <LoadingSpinner />
     }
     else
     {
-        <NurseForm Nurse=@_nurse SaveNurse="SaveNurse"/>
+        <NurseForm Nurse=@_nurse SaveNurse="SaveNurse" />
     }
 </div>
 
@@ -42,7 +42,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) 
+        if (firstRender)
             await LoadNurse();
 
         await base.OnAfterRenderAsync(firstRender);
@@ -53,11 +53,11 @@
         try
         {
             var request = new GetNurseRequest
-            {
-                NurseId = Id
-            };
+                {
+                    NurseId = Id
+                };
             var response = await _mediatr.Send(request);
-            if (response == null) 
+            if (response == null)
                 NavigationManager.NavigateTo("/notFound");
             _nurse = _mapper.Map<NurseViewModel>(response);
             StateHasChanged();

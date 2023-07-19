@@ -10,6 +10,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
 
 @inherits ComponenentUsingDepartament
@@ -18,7 +19,7 @@
 @inject IMapper _mapper
 @inject IExceptionHandler _exceptionHandler
 
-<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" Quarter=_quarter QuarterStats=_quarterStats MorningShifts=_morningShifts />
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" QuarterData=_currentQuarterData />
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
 
 @if (_isLoading)
@@ -33,14 +34,14 @@ else
                 <div class="level-item">
                     <div class="tabs is-toggle is-toggle-rounded">
                         <ul>
-                            <li>
-                                <a>
+                            <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Previous)">
+                                <a @onclick="@(() => _currentDisplayedSchedule = ScheduleDisplayed.Previous)">
                                     <span class="icon is-small"><i class="fa fa-backward" aria-hidden="true"></i></span>
                                     <span>Podgląd poprzedniego</span>
                                 </a>
                             </li>
-                            <li class="is-active">
-                                <a>
+                            <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Current)">
+                                <a @onclick="@(() => _currentDisplayedSchedule = ScheduleDisplayed.Current)">
                                     <span>Aktualnie edytowany</span>
                                     <span class="icon is-small"><i class="fa fa-forward" aria-hidden="true"></i></span>
                                 </a>
@@ -67,89 +68,116 @@ else
                     <label class="label">Miesiąc</label>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthPickerViewModel=_dateViewModel OnChange="OnSeletedDateChangedAsync" />
+                    <MonthSelect MonthPickerViewModel=_pickedDate OnChange="OnSeletedDateChangedAsync" />
                 </div>
                 <div class="level-item">
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <YearSelect YearPickerViewModel=_dateViewModel FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChangedAsync" />
+                    <YearSelect YearPickerViewModel=_pickedDate FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChangedAsync" />
                 </div>
                 <div class="level-item">
                     <button class="button is-info" @onclick="OnCurrentDateClickAsync">Bieżący miesiąc</button>
                 </div>
             </div>
             <div class="level-right">
-                <div class="level-item">
-                    <p class="control">
-                        <a class="button is-info">
-                            <span class="icon">
-                                <i class="fas fa-check" aria-hidden="true"></i>
-                            </span>
-                            <span>Sprawdź</span>
-                        </a>
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p class="control">
-                        <a class="button is-danger">
-                            <span class="icon">
-                                <i class="fas fa-xmark" aria-hidden="true"></i>
-                            </span>
-                            <span>Wyczyść</span>
-                        </a>
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p class="control">
-                        <a class="button is-warning">
-                            <span class="icon">
-                                <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
-                            </span>
-                            <span>Generuj</span>
-                        </a>
-                    </p>
-                </div>
-                <div class="level-item">
-                    <p class="control">
-                        <a class="button is-success">
-                            <span class="icon">
-                                <i class="far fa-floppy-disk" aria-hidden="true"></i>
-                            </span>
-                            <span>Zapisz</span>
-                        </a>
-                    </p>
-                </div>
+                @if (_currentDisplayedSchedule == ScheduleDisplayed.Previous)
+                {
+                    <div class="level-item">
+                        <p class="control">
+                            <b>Podgląd</b>
+                        </p>
+                    </div>
+                }
+                else if (_currentScheduleData.Schedule.IsClosed)
+                {
+                    <div class="level-item">
+                        <p class="control">
+                            <b>Grafik zamknięty</b>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="level-item">
+                        <p class="control">
+                            <a class="button is-info">
+                                <span class="icon">
+                                    <i class="fas fa-check" aria-hidden="true"></i>
+                                </span>
+                                <span>Sprawdź</span>
+                            </a>
+                        </p>
+                    </div>
+                    <div class="level-item">
+                        <p class="control">
+                            <a class="button is-danger">
+                                <span class="icon">
+                                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                                </span>
+                                <span>Wyczyść</span>
+                            </a>
+                        </p>
+                    </div>
+                    <div class="level-item">
+                        <p class="control">
+                            <a class="button is-warning">
+                                <span class="icon">
+                                    <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                                </span>
+                                <span>Generuj</span>
+                            </a>
+                        </p>
+                    </div>
+                    <div class="level-item">
+                        <p class="control">
+                            <a class="button is-success">
+                                <span class="icon">
+                                    <i class="far fa-floppy-disk" aria-hidden="true"></i>
+                                </span>
+                                <span>Zapisz</span>
+                            </a>
+                        </p>
+                    </div>
+                }
             </div>
         </div>
     </div>
 
-    <ScheduleTable MonthDays=_days Nurses=_nurses Schedule=_schedule MorningShifts=_morningShifts ScheduleStats=_scheduleStats 
-        QuarterStats=_quarterStats Quarter=_quarter ReadOnly=_schedule.IsClosed />
+    @if (_currentDisplayedSchedule == ScheduleDisplayed.Current)
+    {
+        <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData />
+    }
+    else
+    {
+        <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData />
+    }
 }
 
 
 @code {
-    private ScheduleStatsViewModel _scheduleStats;
-    private QuarterStatsViewModel _quarterStats;
-
     private IEnumerable<NurseViewModel> _nurses;
-    private IEnumerable<DayViewModel> _days;
-    private QuarterViewModel _quarter;
-    private IEnumerable<MorningShiftViewModel> _morningShifts;
-    private ScheduleViewModel _schedule;
+
+    private ScheduleDataWrapper _currentScheduleData = new();
+    private QuarterDataWrapper _currentQuarterData = new();
+
+    private ScheduleDataWrapper _previousScheduleData = new();
+    private QuarterDataWrapper _previousQuarterData = new();
+
     private SolverSettingsViewModel _solverSettings;
 
     private ModalBase _morningShiftsSettingsModal;
     private ModalBase _solverSettingsModal;
 
-    private DatePickerViewModel _dateViewModel = new DatePickerViewModel
+    private DatePickerViewModel _pickedDate = new DatePickerViewModel
         {
             YearNumber = DateTime.Now.Year,
             MonthNumber = DateTime.Now.Month,
         };
 
     private bool _isLoading = true;
+
+    private ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -161,7 +189,8 @@ else
             {
                 await SetNursesAsync();
                 await InitializeSolverSettingsAsync();
-                await SetQuarterAsync();
+
+
                 await ChangeScheduleAsync();
 
                 _isLoading = false;
@@ -193,48 +222,98 @@ else
 
     private async Task OnCurrentDateClickAsync()
     {
-        _dateViewModel.MonthNumber = DateTime.Now.Month;
-        _dateViewModel.YearNumber = DateTime.Now.Year;
+        _pickedDate.MonthNumber = DateTime.Now.Month;
+        _pickedDate.YearNumber = DateTime.Now.Year;
 
         await OnSeletedDateChangedAsync();
     }
 
     private async Task ChangeScheduleAsync()
     {
-        await SetMonthDaysAsync();
-        await SetScheduleAsync();
+        await SetCurrentQuarter();
+        await SetCurrentSchedule();
+        await SetCurrentStats();
 
-        if (_schedule.QuarterId != _quarter.QuarterId)
+        await SetPreviousQuarter();
+        await SetPreviousSchedule();
+        await SetPreviousStats();
+    }
+
+    private async Task SetCurrentQuarter()
+    {
+        _currentQuarterData.Quarter = await GetOrAddQuarterAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+        _currentQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
+    }
+
+    private async Task SetCurrentSchedule()
+    {
+        _currentScheduleData.Days = await GetMonthDaysAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+        _currentScheduleData.Schedule = await GetScheduleAsync(_pickedDate.MonthNumber, _currentQuarterData.Quarter.QuarterId);
+        _currentScheduleData.ReadOnly = _currentScheduleData.Schedule.IsClosed;
+    }
+
+    private async Task SetCurrentStats()
+    {
+        _currentScheduleData.ScheduleStats = await GetScheduleStatsAsync(_currentQuarterData.Quarter.Year,
+            _currentScheduleData.Schedule);
+        _currentQuarterData.QuarterStats = await GetQuarterStatsAsync(_currentQuarterData.Quarter.Year,
+            _currentScheduleData.Schedule.Month, _currentScheduleData.ScheduleStats);
+    }
+
+    private async Task SetPreviousQuarter()
+    {
+        var prevQuarter = await GetOrAddQuarterAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
+
+        if (prevQuarter.QuarterId == _currentQuarterData.Quarter.QuarterId)
         {
-            await SetQuarterAsync();
+            _previousQuarterData.MorningShifts = _currentQuarterData.MorningShifts;
+            _previousQuarterData.Quarter = _currentQuarterData.Quarter;
+            _previousQuarterData.QuarterStats = _currentQuarterData.QuarterStats;
+        }
+        else
+        {
+            _previousQuarterData.Quarter = prevQuarter;
+            _previousQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
         }
 
-        await SetStatsAsync();
     }
 
-    private async Task SetQuarterAsync()
+    private async Task SetPreviousSchedule()
     {
-        _quarter = await GetQuarterAsync();
-        if (_quarter is null)
+        _previousScheduleData.Schedule = await GetScheduleAsync(_pickedDate.PreviousMonth, _previousQuarterData.Quarter.QuarterId);
+        _previousScheduleData.Days = await GetMonthDaysAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
+        _previousScheduleData.ReadOnly = true;
+    }
+
+    private async Task SetPreviousStats()
+    {
+        _previousScheduleData.ScheduleStats = await GetScheduleStatsAsync(_previousQuarterData.Quarter.Year,
+            _pickedDate.PreviousMonth);
+
+        if (_previousQuarterData.Quarter.QuarterId != _currentQuarterData.Quarter.QuarterId)
         {
-            _quarter = await AddQuarterAsync();
+            _previousQuarterData.QuarterStats = await GetQuarterStatsAsync(_previousQuarterData.Quarter.Year,
+                _previousScheduleData.Schedule.Month, _previousScheduleData.ScheduleStats);
         }
-
-        await SetMorningShiftsAsync();
     }
 
-    private async Task SetStatsAsync()
+
+    private async Task<QuarterViewModel> GetOrAddQuarterAsync(int year, int month)
     {
-        await SetScheduleStatsAsync();
-        await SetQuarterStatsAsync();
+        var quarter = await GetQuarterAsync(year, month);
+        if (quarter is null)
+        {
+            quarter = await AddQuarterAsync(year, month);
+        }
+        return quarter;
     }
 
-    private async Task<QuarterViewModel> AddQuarterAsync()
+    private async Task<QuarterViewModel> AddQuarterAsync(int year, int month)
     {
         var request = new AddQuarterRequest
             {
-                Month = _dateViewModel.MonthNumber,
-                Year = _dateViewModel.YearNumber,
+                Month = month,
+                Year = year,
                 DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
             };
         var response = await _mediatr.Send(request);
@@ -247,12 +326,12 @@ else
         return _mapper.Map<QuarterViewModel>(response);
     }
 
-    private async Task<QuarterViewModel?> GetQuarterAsync()
+    private async Task<QuarterViewModel?> GetQuarterAsync(int year, int month)
     {
         var request = new GetQuarterRequest
             {
-                Month = _dateViewModel.MonthNumber,
-                Year = _dateViewModel.YearNumber,
+                Month = month,
+                Year = year,
                 DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
             };
         var response = await _mediatr.Send(request);
@@ -267,44 +346,80 @@ else
                 DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
                 IncludeDeleted = true,
             };
-        var response = await _mediatr.Send(request);
 
-        _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(response);
+        _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(await _mediatr.Send(request));
     }
 
-    private async Task SetScheduleAsync()
+    private async Task<ScheduleViewModel> GetScheduleAsync(int month, int quarterId)
     {
-        var request = new GetScheduleRequest
+        var request = new BuildScheduleRequest
             {
-                Month = _dateViewModel.MonthNumber,
-                QuarterId = _quarter.QuarterId,
+                Month = month,
+                QuarterId = quarterId,
             };
-        var response = await _mediatr.Send(request);
 
-        _schedule = _mapper.Map<ScheduleViewModel>(response);
+        return _mapper.Map<ScheduleViewModel>(await _mediatr.Send(request));
     }
 
-    private async Task SetMonthDaysAsync()
+    private async Task<IEnumerable<DayViewModel>> GetMonthDaysAsync(int year, int month)
     {
         var request = new GetMonthDaysRequest
             {
-                Month = _dateViewModel.MonthNumber,
-                Year = _dateViewModel.YearNumber,
+                Month = month,
+                Year = year,
             };
-        var response = await _mediatr.Send(request);
 
-        _days = _mapper.Map<IEnumerable<DayViewModel>>(response);
+        return _mapper.Map<IEnumerable<DayViewModel>>(await _mediatr.Send(request));
     }
 
-    private async Task SetMorningShiftsAsync()
+    private async Task<IEnumerable<MorningShiftViewModel>> GetMorningShiftsAsync(int quarterId)
     {
         var request = new GetMorningShiftsRequest
             {
-                QuarterId = _quarter.QuarterId,
+                QuarterId = quarterId,
             };
-        var response = await _mediatr.Send(request);
 
-        _morningShifts = _mapper.Map<IEnumerable<MorningShiftViewModel>>(response);
+        return _mapper.Map<IEnumerable<MorningShiftViewModel>>(await _mediatr.Send(request));
+    }
+
+
+
+    private async Task<ScheduleStatsViewModel> GetScheduleStatsAsync(int year, ScheduleViewModel schedule)
+    {
+        var request = new GetScheduleStatsFromScheduleRequest
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                Year = year,
+                Schedule = _mapper.Map<GetScheduleStatsFromScheduleRequest.ScheduleRequest>(schedule),
+            };
+
+        return _mapper.Map<ScheduleStatsViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<ScheduleStatsViewModel> GetScheduleStatsAsync(int year, int month)
+    {
+        var request = new GetScheduleStatsRequest
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                Year = year,
+                Month = month,
+            };
+
+        return _mapper.Map<ScheduleStatsViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<QuarterStatsViewModel> GetQuarterStatsAsync(int year, int month,
+        ScheduleStatsViewModel scheduleStats)
+    {
+        var request = new GetQuarterStatsRequest
+            {
+                Month = month,
+                Year = year,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                CurrentScheduleStats = _mapper.Map<GetQuarterStatsRequest.ScheduleStatsRequest>(scheduleStats),
+            };
+
+        return _mapper.Map<QuarterStatsViewModel>(await _mediatr.Send(request));
     }
 
     private async Task InitializeSolverSettingsAsync()
@@ -313,39 +428,9 @@ else
             {
                 DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
             };
-        var response = await _mediatr.Send(request);
 
-        var settings = _mapper.Map<DepratamentSettingsViewModel>(response);
+        var settings = _mapper.Map<DepratamentSettingsViewModel>(await _mediatr.Send(request));
 
         _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
-    }
-
-    private async Task SetScheduleStatsAsync()
-    {
-        var request = new GetScheduleStatsRequest
-            {
-                DepartamentId = _quarter.DepartamentId,
-                Year = _quarter.Year,
-                Schedule = _mapper.Map<GetScheduleStatsRequest.ScheduleRequest>(_schedule),
-            };
-
-        var response = await _mediatr.Send(request);
-
-        _scheduleStats = _mapper.Map<ScheduleStatsViewModel>(response);
-    }
-
-    private async Task SetQuarterStatsAsync()
-    {
-        var request = new GetQuarterStatsRequest
-            {
-                Month = _schedule.Month,
-                Year = _quarter.Year,
-                DepartamentId = _quarter.DepartamentId,
-                CurrentScheduleStats = _mapper.Map<GetQuarterStatsRequest.ScheduleStatsRequest>(_scheduleStats),
-            };
-
-        var response = await _mediatr.Send(request);
-
-        _quarterStats = _mapper.Map<QuarterStatsViewModel>(response);
     }
 }

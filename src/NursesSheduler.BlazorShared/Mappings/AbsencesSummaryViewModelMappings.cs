@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NursesScheduler.BlazorShared.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;

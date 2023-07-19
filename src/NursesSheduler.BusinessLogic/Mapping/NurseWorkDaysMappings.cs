@@ -10,11 +10,11 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public NurseWorkDaysMappings()
         {
-            CreateMap<NurseWorkDay, GetScheduleResponse.NurseWorkDayResponse>();
+            CreateMap<NurseWorkDay, BuildScheduleResponse.NurseWorkDayResponse>();
 
             CreateMap<RecalculateNurseScheduleStatsRequest.NurseWorkDayRequest, NurseWorkDay>();
             
-            CreateMap<GetScheduleStatsRequest.NurseWorkDayRequest, NurseWorkDay>();
+            CreateMap<GetScheduleStatsFromScheduleRequest.NurseWorkDayRequest, NurseWorkDay>();
         }
     }
 }

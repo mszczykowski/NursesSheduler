@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NursesScheduler.BlazorShared.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
@@ -10,9 +10,9 @@ namespace NursesScheduler.BlazorShared.Mappings
     {
         public ScheduleNurseViewModelMappings()
         {
-            CreateMap<GetScheduleResponse.ScheduleNurseResponse, ScheduleNurseViewModel>();
+            CreateMap<BuildScheduleResponse.ScheduleNurseResponse, ScheduleNurseViewModel>();
 
-            CreateMap<ScheduleNurseViewModel, GetScheduleStatsRequest.ScheduleNurseRequest>();
+            CreateMap<ScheduleNurseViewModel, GetScheduleStatsFromScheduleRequest.ScheduleNurseRequest>();
 
             CreateMap<ScheduleNurseViewModel, RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>();
         }

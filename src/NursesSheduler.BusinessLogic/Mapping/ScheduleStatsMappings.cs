@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
@@ -9,6 +10,8 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public ScheduleStatsMappings()
         {
+            CreateMap<ScheduleStats, GetScheduleStatsFromScheduleResponse>();
+
             CreateMap<ScheduleStats, GetScheduleStatsResponse>();
 
             CreateMap<GetQuarterStatsRequest.ScheduleStatsRequest, ScheduleStats>();

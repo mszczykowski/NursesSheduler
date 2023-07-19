@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using NursesScheduler.BlazorShared.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.RecalculateNurseQuarterStats;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
 
@@ -16,7 +17,12 @@ namespace NursesScheduler.BlazorShared.Mappings
                 .ConstructUsing((x, mapper) => new KeyValuePair<int, NurseStatsViewModel>(x.NurseId, mapper.Mapper
                     .Map<NurseStatsViewModel>(x)));
 
-            CreateMap<NurseStatsViewModel, GetScheduleStatsResponse.NurseStatsResponse>();
+            CreateMap<GetScheduleStatsFromScheduleResponse.NurseStatsResponse, NurseStatsViewModel>();
+            CreateMap<GetScheduleStatsFromScheduleResponse.NurseStatsResponse, KeyValuePair<int, NurseStatsViewModel>>()
+                .ConstructUsing((x, mapper) => new KeyValuePair<int, NurseStatsViewModel>(x.NurseId, mapper.Mapper
+                    .Map<NurseStatsViewModel>(x)));
+
+            CreateMap<NurseStatsViewModel, GetScheduleStatsFromScheduleResponse.NurseStatsResponse>();
 
             CreateMap<GetQuarterStatsResponse.NurseStatsResponse, NurseStatsViewModel>();
             CreateMap<GetQuarterStatsResponse.NurseStatsResponse, KeyValuePair<int, NurseStatsViewModel>>()

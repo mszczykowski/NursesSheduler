@@ -1,4 +1,4 @@
-﻿using NursesScheduler.BlazorShared.ViewModels;
+﻿using NursesScheduler.BlazorShared.Models.ViewModels;
 
 namespace NursesScheduler.BlazorShared.Helpers
 {

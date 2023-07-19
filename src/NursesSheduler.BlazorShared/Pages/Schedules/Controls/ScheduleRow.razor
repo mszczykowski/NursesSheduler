@@ -11,14 +11,14 @@
         <p>@Nurse.Name</p>
         <p>@Nurse.Surname</p>
     </td>
-    @foreach (var workDay in ScheduleNurse.NurseWorkDays)
+    @foreach (var workDay in _scheduleNurse.NurseWorkDays)
     {
-        <ScheduleShift WorkDay=workDay Day=@CommonTableData.MonthDays.First(d=>d.Date.Day == workDay.Day)
-                   MorningShifts="CommonTableData.MorningShifts" OnChange="RecalcuateStatsAsync" ReadOnly=CommonTableData.ReadOnly />
+        <ScheduleShift WorkDay=workDay Day=@ScheduleData.Days.First(d=>d.Date.Day == workDay.Day)
+                   MorningShifts="QuarterData.MorningShifts" OnChange="RecalcuateStatsAsync" ReadOnly=ScheduleData.ReadOnly />
     }
-    @if (CommonTableData.CurrentStatsDipslayed == StatsDisplayed.Schedule)
+    @if (ScheduleData.CurrentStatsDipslayed == StatsDisplayed.Schedule)
     {
-        <td class="summary">@((CommonTableData.MonthWorkTime - _scheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+        <td class="summary">@((ScheduleData.ScheduleStats.WorkTimeInMonth - _scheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
         <td class="summary">@_scheduleNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
         <td class="summary">@_scheduleNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
         <td class="summary">@_scheduleNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
@@ -26,7 +26,7 @@
     }
     else
     {
-        <td class="summary">@((CommonTableData.QuarterWorkTime - _quarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+        <td class="summary">@((QuarterData.QuarterStats.WorkTimeInQuarter - _quarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
         <td class="summary">@_quarterNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
         <td class="summary">@_quarterNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
         <td class="summary">@_quarterNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
@@ -39,18 +39,27 @@
     [Parameter]
     public int No { get; set; }
     [Parameter]
-    public ScheduleNurseViewModel ScheduleNurse { get; set; }
-    [Parameter]
     public NurseViewModel Nurse { get; set; }
     [Parameter]
-    public IDictionary<int, NurseStatsViewModel> QuarterNursesStats { get; set; }
+    public QuarterDataWrapper QuarterData { get; set; }
     [Parameter]
-    public IDictionary<int, NurseStatsViewModel> ScheduleNursesStats { get; set; }
-    [Parameter]
-    public CommonTableDataViewModel CommonTableData { get; set; }
+    public ScheduleDataWrapper ScheduleData { get; set; }
 
-    private NurseStatsViewModel _scheduleNurseStats => ScheduleNursesStats[Nurse.NurseId];
-    private NurseStatsViewModel _quarterNurseStats => QuarterNursesStats[Nurse.NurseId];
+
+    private NurseStatsViewModel _scheduleNurseStats => ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId];
+    private NurseStatsViewModel _quarterNurseStats => QuarterData.QuarterStats.NurseStats[Nurse.NurseId];
+    private ScheduleNurseViewModel _scheduleNurse => ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == Nurse.NurseId);
+
+    protected override Task OnParametersSetAsync()
+    {
+        if(ScheduleData is not null)
+        {
+            ScheduleData.ScheduleNeedsRecalculation += (async () => await RecalcuateStatsAsync());
+        }
+
+        return base.OnParametersSetAsync();
+    }
+    
 
     public async Task RecalcuateStatsAsync()
     {
@@ -58,7 +67,7 @@
         {
             await RecalcuateScheduleStatsAsync();
             await RecalcuateQuarterStatsAsync();
-            CommonTableData.RequestTableRefresh();
+            ScheduleData.RequestScheduleViewRefresh();
         }
         catch(Exception e)
         {
@@ -70,26 +79,26 @@
     {
         var request = new RecalculateNurseScheduleStatsRequest
             {
-                DepartamentId = CommonTableData.DepartamentId,
-                Year = CommonTableData.Year,
-                Month = CommonTableData.Month,
-                ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(ScheduleNurse),
+                DepartamentId = QuarterData.Quarter.DepartamentId,
+                Year = QuarterData.Quarter.Year,
+                Month = ScheduleData.Schedule.Month,
+                ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(_scheduleNurse),
             };
 
-        ScheduleNursesStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
+        ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
     }
 
     private async Task RecalcuateQuarterStatsAsync()
     {
         var request = new RecalculateNurseQuarterStatsRequest
             {
-                DepartamentId = CommonTableData.DepartamentId,
-                Year = CommonTableData.Year,
-                Month = CommonTableData.Month,
+                DepartamentId = QuarterData.Quarter.DepartamentId,
+                Year = QuarterData.Quarter.Year,
+                Month = ScheduleData.Schedule.Month,
                 CurrentScheduleNurseStats = _mapper
                             .Map<RecalculateNurseQuarterStatsRequest.NurseStatsRequest>(_scheduleNurseStats),
             };
 
-        QuarterNursesStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
+        QuarterData.QuarterStats.NurseStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
     }
 }
