@@ -3,10 +3,10 @@ using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.RecalculateNurseQuarterStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal sealed class NurseStatsViewModelMappings : Profile
     {
@@ -30,7 +30,7 @@ namespace NursesScheduler.BlazorShared.Mappings
                     .Map<NurseStatsViewModel>(x)));
 
             CreateMap<NurseStatsViewModel, RecalculateNurseQuarterStatsRequest.NurseStatsRequest>();
-            
+
             CreateMap<NurseStatsViewModel, GetQuarterStatsRequest.NurseStatsRequest>();
             CreateMap<KeyValuePair<int, NurseStatsViewModel>, GetQuarterStatsRequest.NurseStatsRequest>()
                 .ConstructUsing((x, mapper) => mapper.Mapper.Map<GetQuarterStatsRequest.NurseStatsRequest>(x.Value));

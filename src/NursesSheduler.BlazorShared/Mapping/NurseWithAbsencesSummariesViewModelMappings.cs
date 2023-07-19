@@ -2,7 +2,7 @@
 using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal sealed class NurseWithAbsencesSummariesViewModelMappings : Profile
     {

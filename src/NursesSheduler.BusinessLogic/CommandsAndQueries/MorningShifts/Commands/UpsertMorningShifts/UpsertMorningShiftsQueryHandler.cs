@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.Exceptions;
@@ -15,13 +16,15 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
         private readonly IMapper _mapper;
         private readonly IValidator<MorningShift> _validator;
         private readonly IApplicationDbContext _context;
+        private readonly IQuarterStatsService _quarterStatsService;
 
         public UpsertMorningShiftsQueryHandler(IMapper mapper, IValidator<MorningShift> validator, 
-            IApplicationDbContext context)
+            IApplicationDbContext context, IQuarterStatsService quarterStatsService)
         {
             _mapper = mapper;
             _validator = validator;
             _context = context;
+            _quarterStatsService = quarterStatsService;
         }
 
         public async Task<IEnumerable<UpsertMorningShiftsResponse>> Handle(UpsertMorningShiftsRequest request,
@@ -56,7 +59,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
                 {
                     if(morningShift.ReadOnly)
                     {
-                        throw new OperationNotPermittedException("Editing readonly morningShift");
+                        throw new OperationNotPermittedException("Editing readonly morningShift!");
                     }
 
                     morningShift.ShiftLength = updatedMorningShift.ShiftLength;
@@ -72,6 +75,9 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Command
             }
 
             var result = await _context.SaveChangesAsync(cancellationToken);
+
+            await _quarterStatsService
+                    .InvalidateQuarterCacheAsync(quarter.Year, quarter.QuarterNumber, quarter.DepartamentId);
 
             return result > 0 ? _mapper.Map<IEnumerable<UpsertMorningShiftsResponse>>(quarter.MorningShifts) : null;
         }

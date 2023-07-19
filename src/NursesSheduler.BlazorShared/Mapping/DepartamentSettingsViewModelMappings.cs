@@ -3,7 +3,7 @@ using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Commands.EditDepartamentSettings;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal sealed class DepartamentSettingsViewModelMappings : Profile
     {

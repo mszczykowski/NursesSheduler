@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNur
         public string Name { get; set; }
         public string Surname { get; set; }
         public int DepartamentId { get; set; }
-        public Teams Team { get; set; }
+        public NurseTeams Team { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

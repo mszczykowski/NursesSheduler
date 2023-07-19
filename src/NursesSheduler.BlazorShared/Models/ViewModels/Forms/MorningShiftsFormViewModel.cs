@@ -31,5 +31,10 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
                 }
             }
         }
+
+        public bool IsDirty(IEnumerable<MorningShiftViewModel> unmodifiedShifts)
+        {
+            return MorningShifts.Any(m => unmodifiedShifts.Any(u => u.Index == m.Index && u.ShiftLength != m.ShiftLength));
+        }
     }
 }

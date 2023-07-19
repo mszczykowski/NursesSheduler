@@ -2,16 +2,16 @@
 using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal sealed class ScheduleStatsViewModelMappings : Profile
     {
         public ScheduleStatsViewModelMappings()
         {
             CreateMap<GetScheduleStatsFromScheduleResponse, ScheduleStatsViewModel>();
-            
+
             CreateMap<GetScheduleStatsResponse, ScheduleStatsViewModel>();
 
             CreateMap<ScheduleStatsViewModel, GetQuarterStatsRequest.ScheduleStatsRequest>();

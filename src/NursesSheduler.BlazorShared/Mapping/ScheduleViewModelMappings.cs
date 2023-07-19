@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.Models.ViewModels;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal sealed class ScheduleViewModelMappings : Profile
     {
         public ScheduleViewModelMappings()
         {
+            CreateMap<GetScheduleResponse, ScheduleViewModel>();
+
             CreateMap<BuildScheduleResponse, ScheduleViewModel>();
 
             CreateMap<ScheduleViewModel, GetScheduleStatsFromScheduleRequest.ScheduleRequest>();

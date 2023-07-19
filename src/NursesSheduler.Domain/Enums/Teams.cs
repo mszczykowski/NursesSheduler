@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.Domain.Enums
 {
-    public enum Teams
+    public enum NurseTeams
     {
         T1,
         T2,

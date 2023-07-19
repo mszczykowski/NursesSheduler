@@ -19,5 +19,11 @@
             if (!isVisible) return "display: none";
             return String.Empty;
         }
+
+        public static string SetDisbaled(bool isDisabled)
+        {
+            if (isDisabled) return "has-text-grey-light";
+            return String.Empty;
+        }
     }
 }

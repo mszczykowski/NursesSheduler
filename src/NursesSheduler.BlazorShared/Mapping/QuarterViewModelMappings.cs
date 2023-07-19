@@ -3,7 +3,7 @@ using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal class QuarterViewModelMappings : Profile
     {

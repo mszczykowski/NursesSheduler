@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 
-namespace NursesScheduler.BlazorShared.Mappings
+namespace NursesScheduler.BlazorShared.Mapping
 {
     internal class NurseViewModelMappings : Profile
     {

@@ -9,9 +9,10 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery
 
 @inherits ComponenentUsingDepartament
 
@@ -19,7 +20,8 @@
 @inject IMapper _mapper
 @inject IExceptionHandler _exceptionHandler
 
-<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" QuarterData=_currentQuarterData />
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData 
+    CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData/>
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
 
 @if (_isLoading)
@@ -35,13 +37,13 @@ else
                     <div class="tabs is-toggle is-toggle-rounded">
                         <ul>
                             <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Previous)">
-                                <a @onclick="@(() => _currentDisplayedSchedule = ScheduleDisplayed.Previous)">
-                                    <span class="icon is-small"><i class="fa fa-backward" aria-hidden="true"></i></span>
-                                    <span>Podgląd poprzedniego</span>
+                                <a @onclick="@(() => SetScheduleVisibility(ScheduleDisplayed.Current))">
+                                    <span class="icon is-small @CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)"><i class="fa fa-backward" aria-hidden="true"></i></span>
+                                    <span class="has-text-grey-light @CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)">Podgląd poprzedniego</span>
                                 </a>
                             </li>
                             <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Current)">
-                                <a @onclick="@(() => _currentDisplayedSchedule = ScheduleDisplayed.Current)">
+                                <a @onclick="@(() => SetScheduleVisibility(ScheduleDisplayed.Current))">
                                     <span>Aktualnie edytowany</span>
                                     <span class="icon is-small"><i class="fa fa-forward" aria-hidden="true"></i></span>
                                 </a>
@@ -74,7 +76,8 @@ else
                     <label class="label">Rok</label>
                 </div>
                 <div class="level-item">
-                    <YearSelect YearPickerViewModel=_pickedDate FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear OnChange="OnSeletedDateChangedAsync" />
+                    <YearSelect YearPickerViewModel=_pickedDate FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear
+                            OnChange="OnSeletedDateChangedAsync" />
                 </div>
                 <div class="level-item">
                     <button class="button is-info" @onclick="OnCurrentDateClickAsync">Bieżący miesiąc</button>
@@ -169,6 +172,8 @@ else
     private ModalBase _morningShiftsSettingsModal;
     private ModalBase _solverSettingsModal;
 
+    private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
+
     private DatePickerViewModel _pickedDate = new DatePickerViewModel
         {
             YearNumber = DateTime.Now.Year,
@@ -234,9 +239,14 @@ else
         await SetCurrentSchedule();
         await SetCurrentStats();
 
-        await SetPreviousQuarter();
         await SetPreviousSchedule();
-        await SetPreviousStats();
+        if (_previousScheduleData.Schedule is not null)
+        {
+            await SetPreviousQuarter();
+            await SetPreviousStats();
+        }
+
+        ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
     }
 
     private async Task SetCurrentQuarter()
@@ -248,7 +258,14 @@ else
     private async Task SetCurrentSchedule()
     {
         _currentScheduleData.Days = await GetMonthDaysAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
-        _currentScheduleData.Schedule = await GetScheduleAsync(_pickedDate.MonthNumber, _currentQuarterData.Quarter.QuarterId);
+
+        _currentScheduleData.Schedule = await GetScheduleAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+        if (_currentScheduleData.Schedule is null)
+        {
+            _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
+                _currentQuarterData.Quarter.QuarterId);
+        }
+
         _currentScheduleData.ReadOnly = _currentScheduleData.Schedule.IsClosed;
     }
 
@@ -262,9 +279,7 @@ else
 
     private async Task SetPreviousQuarter()
     {
-        var prevQuarter = await GetOrAddQuarterAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
-
-        if (prevQuarter.QuarterId == _currentQuarterData.Quarter.QuarterId)
+        if (_previousScheduleData.Schedule.QuarterId == _currentQuarterData.Quarter.QuarterId)
         {
             _previousQuarterData.MorningShifts = _currentQuarterData.MorningShifts;
             _previousQuarterData.Quarter = _currentQuarterData.Quarter;
@@ -272,7 +287,7 @@ else
         }
         else
         {
-            _previousQuarterData.Quarter = prevQuarter;
+            _previousQuarterData.Quarter = await GetQuarterAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
             _previousQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
         }
 
@@ -280,7 +295,12 @@ else
 
     private async Task SetPreviousSchedule()
     {
-        _previousScheduleData.Schedule = await GetScheduleAsync(_pickedDate.PreviousMonth, _previousQuarterData.Quarter.QuarterId);
+        _previousScheduleData.Schedule = await GetScheduleAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
+
+        if (_previousScheduleData.Schedule is null)
+        {
+            return;
+        }
         _previousScheduleData.Days = await GetMonthDaysAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
         _previousScheduleData.ReadOnly = true;
     }
@@ -350,7 +370,19 @@ else
         _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(await _mediatr.Send(request));
     }
 
-    private async Task<ScheduleViewModel> GetScheduleAsync(int month, int quarterId)
+    private async Task<ScheduleViewModel?> GetScheduleAsync(int year, int month)
+    {
+        var request = new GetScheduleRequest
+            {
+                Month = month,
+                Year = year,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+
+        return _mapper.Map<ScheduleViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<ScheduleViewModel> BuildScheduleAsync(int month, int quarterId)
     {
         var request = new BuildScheduleRequest
             {
@@ -432,5 +464,13 @@ else
         var settings = _mapper.Map<DepratamentSettingsViewModel>(await _mediatr.Send(request));
 
         _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
+    }
+
+    public void SetScheduleVisibility(ScheduleDisplayed pickedSchedule)
+    {
+        if(pickedSchedule != ScheduleDisplayed.Previous || _isPreviousScheduleAvailable)
+        {
+            _currentDisplayedSchedule = pickedSchedule;
+        }
     }
 }

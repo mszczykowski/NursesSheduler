@@ -1,6 +1,7 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain;
+using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
 namespace NursesScheduler.BusinessLogic.Services
@@ -17,6 +18,18 @@ namespace NursesScheduler.BusinessLogic.Services
             _calendarService = calendarService;
             _departamentSettingsProvider = departamentSettingsProvider;
             _scheduleStatsProvider = scheduleStatsProvider;
+        }
+
+        public async Task InvalidateQuarterCacheAsync(int year, int quarterNumber, int departamentId)
+        {
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
+
+            var keys = await GetStatsKeysQuarterSchedulesAsync(year, quarterNumber, departamentSettings);
+
+            foreach(var key in keys)
+            {
+                _scheduleStatsProvider.InvalidateCache(key);
+            }
         }
 
         public async Task<NurseStats> RecalculateQuarterNurseStatsAsync(NurseStats currentScheduleNursesStats,
@@ -57,13 +70,9 @@ namespace NursesScheduler.BusinessLogic.Services
             return quarterStats;
         }
 
-        private async Task<IEnumerable<ScheduleStatsKey>> GetStatsKeysQuarterSchedulesAsync(int year, int month,
-            int departamentId)
+        private async Task<IEnumerable<ScheduleStatsKey>> GetStatsKeysQuarterSchedulesAsync(int year, int quarterNumber,
+            DepartamentSettings departamentSettings)
         {
-            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
-
-            var quarterNumber = _calendarService.GetQuarterNumber(month, departamentSettings.FirstQuarterStart);
-
             var quarterMonths = _calendarService.GetQuarterMonths(year, quarterNumber,
                 departamentSettings.FirstQuarterStart);
 
@@ -75,11 +84,21 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     Year = monthYear.Year,
                     Month = monthYear.Month,
-                    DepartamentId = departamentId,
+                    DepartamentId = departamentSettings.DepartamentId,
                 });
             }
 
             return keys;
+        }
+
+        private async Task<IEnumerable<ScheduleStatsKey>> GetStatsKeysQuarterSchedulesAsync(int year, int month,
+            int departamentId)
+        {
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
+            
+            var quarterNumber = _calendarService.GetQuarterNumber(month, departamentSettings.FirstQuarterStart);
+
+            return await GetStatsKeysQuarterSchedulesAsync(year, quarterNumber, departamentSettings);
         }
 
         private IEnumerable<NurseStats> GetQuarterNursesStats(IEnumerable<ScheduleStats> quarterSchedulesStats)

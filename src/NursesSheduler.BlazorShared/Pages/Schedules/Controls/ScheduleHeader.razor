@@ -62,6 +62,12 @@
 
     private StatsDisplayed _selectedValue;
 
+    protected override Task OnParametersSetAsync()
+    {
+        _selectedValue = ScheduleData.CurrentStatsDipslayed;
+        return base.OnParametersSetAsync();
+    }
+
     private void OnRadiochange(object sender)
     {
         ScheduleData.CurrentStatsDipslayed = (StatsDisplayed)sender;

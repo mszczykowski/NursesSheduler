@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Exceptions;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
 {
     internal class BuildScheduleQueryHandler : IRequestHandler<BuildScheduleRequest, BuildScheduleResponse>
     {

@@ -12,7 +12,7 @@
                 {
                     @if (morningShift.ShiftLength != TimeSpan.Zero)
                     {
-                        <option value="@nameof(morningShift.Index)">@morningShift.ShiftLength.GetTotalHoursAndMinutes()</option>
+                        <option value="@morningShift.Index.ToString()">@morningShift.ShiftLength.GetTotalHoursAndMinutes()</option>
                     }
                 }
             </optgroup>
@@ -45,6 +45,7 @@
         if (WorkDay.ShiftType == ShiftTypes.Morning)
         {
             _selectedValue = WorkDay.MorningShiftIndex.ToString();
+            WorkDay.RefreshMorningShift(MorningShifts);
         }
         else
         {
@@ -59,25 +60,22 @@
         switch (_selectedValue)
         {
             case nameof(ShiftTypes.None):
-                WorkDay.ShiftType = ShiftTypes.None;
+                WorkDay.SetShift(ShiftTypes.None);
                 break;
             case nameof(ShiftTypes.Day):
-                WorkDay.ShiftType = ShiftTypes.Day;
+                WorkDay.SetShift(ShiftTypes.Day);
                 break;
             case nameof(ShiftTypes.Night):
-                WorkDay.ShiftType = ShiftTypes.Night;
+                WorkDay.SetShift(ShiftTypes.Night);
                 break;
             case nameof(MorningShiftIndexes.R1):
-                WorkDay.ShiftType = ShiftTypes.Morning;
-                WorkDay.MorningShiftIndex = MorningShiftIndexes.R1;
+                WorkDay.SetMorningShift(MorningShiftIndexes.R1, MorningShifts);
                 break;
             case nameof(MorningShiftIndexes.R2):
-                WorkDay.ShiftType = ShiftTypes.Morning;
-                WorkDay.MorningShiftIndex = MorningShiftIndexes.R2;
+                WorkDay.SetMorningShift(MorningShiftIndexes.R2, MorningShifts);
                 break;
             case nameof(MorningShiftIndexes.R3):
-                WorkDay.ShiftType = ShiftTypes.Morning;
-                WorkDay.MorningShiftIndex = MorningShiftIndexes.R3;
+                WorkDay.SetMorningShift(MorningShiftIndexes.R3, MorningShifts);
                 break;
         }
 

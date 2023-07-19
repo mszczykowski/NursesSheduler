@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsQuery
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery
 {
     public sealed class GetScheduleStatsFromScheduleRequest : IRequest<GetScheduleStatsFromScheduleResponse?>
     {

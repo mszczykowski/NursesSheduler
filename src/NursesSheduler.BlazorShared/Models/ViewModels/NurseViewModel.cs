@@ -20,7 +20,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
         public int PTOentitlement { get; set; }
 
         public int DepartamentId { get; set; }
-        public Teams Team { get; set; }
+        public NurseTeams Team { get; set; }
 
         public int NightShiftsBalance { get; set; }
         public TimeSpan HolidayHoursBalance { get; set; }

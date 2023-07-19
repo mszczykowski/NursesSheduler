@@ -9,7 +9,7 @@ namespace NursesScheduler.Domain.Entities
         public string Name { get; set; }
         public string Surname { get; set; }
         public int PTOentitlement { get; set; }
-        public Teams Team { get; set; }
+        public NurseTeams Team { get; set; }
 
         public int NightShiftsBalance { get; set; }
         public TimeSpan HolidayHoursBalance { get; set; }

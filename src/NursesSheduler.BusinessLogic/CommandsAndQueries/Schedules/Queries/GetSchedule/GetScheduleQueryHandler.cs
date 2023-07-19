@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 {
@@ -7,17 +10,23 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public Task<GetScheduleResponse?> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
+        public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<GetScheduleResponse?> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
         {
             var schedule = await _context.Schedules
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
-                .FirstOrDefaultAsync(s => s.QuarterId == request.QuarterId && s.Month == request.Month);
+                .Include(s => s.Quarter)
+                .FirstOrDefaultAsync(s => s.Quarter.Year == request.Year 
+                    && s.Quarter.DepartamentId == request.DepartamentId 
+                    && s.Month == request.Month);
 
-            if (schedule is not null)
-            {
-                return _mapper.Map<BuildScheduleResponse>(schedule);
-            }
+            return schedule is not null ? _mapper.Map<GetScheduleResponse>(schedule) : null;
         }
     }
 }
