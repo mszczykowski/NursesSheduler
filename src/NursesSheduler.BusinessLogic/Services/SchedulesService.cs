@@ -1,4 +1,6 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
+﻿using Microsoft.EntityFrameworkCore;
+using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
@@ -8,6 +10,7 @@ namespace NursesScheduler.BusinessLogic.Services
     {
         private readonly IActiveNursesService _activeNursesService;
         private readonly IAbsencesService _absencesService;
+        private readonly IApplicationDbContext _applicationDbContext;
 
         public SchedulesService(IActiveNursesService activeNursesService, IAbsencesService absencesService)
         {
@@ -35,6 +38,21 @@ namespace NursesScheduler.BusinessLogic.Services
                 foreach (var day in absence.Days)
                 {
                     scheduleNurse.NurseWorkDays.First(d => d.Day == day).IsTimeOff = true;
+                }
+            }
+        }
+
+        public async Task ResolveMorningShifts(Schedule schedule)
+        {
+            var morningShifts = await _applicationDbContext.MorningShifts
+                .Where(m => m.QuarterId == schedule.QuarterId)
+                .ToListAsync();
+
+            foreach(var nurseWorkDay in schedule.ScheduleNurses.SelectMany(s => s.NurseWorkDays))
+            {
+                if(nurseWorkDay.ShiftType == ShiftTypes.Morning)
+                {
+                    nurseWorkDay.MorningShift = morningShifts.First(m => m.MorningShiftId == nurseWorkDay.MorningShiftId);
                 }
             }
         }

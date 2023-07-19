@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.Solver
         private readonly DepartamentSettings _departamentSettings;
 
         private readonly ICollection<MorningShift> _morningShifts;
-        private readonly Day[] _month;
+        private readonly Day[] _days;
 
         private Random _random;
 
@@ -27,11 +27,11 @@ namespace NursesScheduler.BusinessLogic.Solver
 
         private IShiftCapacityManager _shiftCapacityManager;
 
-        public ScheduleSolver(ICollection<MorningShift> morningShifts, Day[] month, ICollection<IConstraint> constraints,
+        public ScheduleSolver(ICollection<MorningShift> morningShifts, Day[] days, ICollection<IConstraint> constraints,
             DepartamentSettings departamentSettings)
         {
             _morningShifts = morningShifts;
-            _month = month;
+            _days = days;
             _departamentSettings = departamentSettings;
             _constraints = constraints;
 
@@ -52,7 +52,7 @@ namespace NursesScheduler.BusinessLogic.Solver
 
         private ISolverState AssignShift(ISolverState previousState, Queue<int> previuousQueue)
         {
-            if (previousState.CurrentDay > _month.Length)
+            if (previousState.CurrentDay > _days.Length)
                 return previousState;
 
             Queue<int> currentQueue;
@@ -70,7 +70,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                 
                 currentQueue = _employeeQueueDirector
                     .GetSortedEmployeeQueue(previousState.CurrentShift,
-                    _month[previousState.CurrentDay - 1].IsWorkingDay,
+                    _days[previousState.CurrentDay - 1].IsWorkingDay,
                     previousState.GetPreviousDayShift(),
                     previousState.Nurses,
                     _random);
@@ -95,7 +95,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                             .All(c => c.IsSatisfied(currentState, _currentNurse, GeneralConstants.RegularShiftLenght)))
                     {
                         currentState.AssignNurseOnTimeOff(_currentNurse,
-                            !_month[currentState.CurrentDay - 1].IsWorkingDay,
+                            !_days[currentState.CurrentDay - 1].IsWorkingDay,
                             _departamentSettings);
                     }
 
@@ -110,7 +110,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                     }
 
                     currentState.AssignNurseToRegularShift(_currentNurse,
-                        !_month[currentState.CurrentDay - 1].IsWorkingDay,
+                        !_days[currentState.CurrentDay - 1].IsWorkingDay,
                         _departamentSettings);
 
                     currentState.AdvanceStateRegularShift();

@@ -44,8 +44,8 @@
 
         if (WorkDay.ShiftType == ShiftTypes.Morning)
         {
-            _selectedValue = WorkDay.MorningShiftIndex.ToString();
             WorkDay.RefreshMorningShift(MorningShifts);
+            _selectedValue = WorkDay.MorningShift.Index.ToString();
         }
         else
         {

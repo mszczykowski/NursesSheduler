@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.ValueObjects.Stats;
 
 namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 {
@@ -29,82 +30,18 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         public ShiftTypes PreviousMonthLastShift { get; set; }
 
 
-        public NurseState(Schedule nurseQuarterStats, ScheduleNurse previousScheduleNurse,
-            ScheduleNurse currentScheduleNurse)
+        public NurseState(ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, 
+            NurseScheduleStats previousScheduleNurseStats)
         {
-            //NurseId = nurseQuarterStats.NurseId;
-            
-            //WorkTimeAssignedInWeeks = new TimeSpan[nurseQuarterStats.WorkTimeAssignedInWeeks.Count];
-            //var i = 0;
-            //foreach(var workTimeAssignedInWeek in nurseQuarterStats.WorkTimeAssignedInWeeks
-            //    .OrderBy(t => t.WeekNumber)
-            //    .Select(t => t.AssignedWorkTime))
-            //{
-            //    WorkTimeAssignedInWeeks[i++] = workTimeAssignedInWeek;
-            //}
+            NurseId = scheduleNurse.NurseId;
 
-            //if(previousScheduleNurse != null)
-            //{
-            //    foreach (var workDay in previousScheduleNurse.NurseWorkDays.OrderByDescending(d => d.DayNumber))
-            //    {
-            //        if (workDay.ShiftType == ShiftTypes.Night)
-            //        {
-            //            HoursFromLastShift += GeneralConstants.RegularShiftLenght;
-            //            break;
-            //        }
-            //        else if (workDay.ShiftType == ShiftTypes.Day)
-            //        {
-            //            break;
-            //        }
-            //        else if (workDay.ShiftType == ShiftTypes.Morning)
-            //        {
-            //            HoursFromLastShift += GeneralConstants.RegularShiftLenght - workDay.MorningShift.ShiftLength;
-            //            break;
-            //        }
-            //        HoursFromLastShift += GeneralConstants.RegularShiftLenght * 2;
-            //    }
-            //}
-            //else
-            //{
-            //    HoursFromLastShift = GeneralConstants.RegularShiftLenght * 10;
-            //}
+            WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(nurseQuarterStats.WorkTimeInWeeks);
 
-            //foreach (var workDay in currentScheduleNurse.NurseWorkDays.OrderBy(d => d.DayNumber))
-            //{
-            //    if (workDay.ShiftType == ShiftTypes.Night)
-            //    {
-            //        break;
-            //    }
-            //    if (workDay.ShiftType == ShiftTypes.Day || workDay.ShiftType == ShiftTypes.Morning)
-            //    {
-            //        HoursFromLastShift += GeneralConstants.RegularShiftLenght;
-            //        break;
-            //    }
-            //    HoursFromLastShift += GeneralConstants.RegularShiftLenght * 2;
-            //}
+            HoursFromLastShift = previousScheduleNurseStats.HoursFromLastShift;
 
-            //NumberOfNightShiftsAssigned = nurseQuarterStats.NumberOfNightShifts;
+            HoursToNextShift = TimeSpan.Zero; // niew eim
 
-            //NumberOfRegularShiftsToAssign = (int)Math.Floor(currentScheduleNurse.AssignedWorkTime / 
-            //    GeneralConstants.RegularShiftLenght);
-            //NumberOfTimeOffShiftsToAssign = (int)Math.Round(currentScheduleNurse.TimeOffToAssign /
-            //    GeneralConstants.RegularShiftLenght);
 
-            //HolidayPaidHoursAssigned = nurseQuarterStats.HolidayPaidHoursAssigned;
-
-            //TimeOff = new bool[currentScheduleNurse.NurseWorkDays.Count];
-            //foreach(var workDay in currentScheduleNurse.NurseWorkDays)
-            //{
-            //    if(workDay.IsTimeOff)
-            //    {
-            //        TimeOff[workDay.DayNumber - 1] = true;
-            //    }
-            //}
-
-            //AssignedMorningShiftsIds = new(nurseQuarterStats.MorningShiftsAssigned.Select(m => m.MorningShiftId));
-            //HadMorningShiftAssigned = currentScheduleNurse.NurseWorkDays.Any(d => d.ShiftType == ShiftTypes.Morning);
-
-            //PreviousMonthLastShift = currentScheduleNurse.PreviousState;
         }
 
         public NurseState(INurseState nurse)

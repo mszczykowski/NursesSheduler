@@ -8,6 +8,7 @@ namespace NursesScheduler.Domain.Entities
         public int Day { get; set; }
         public bool IsTimeOff { get; set; }
         public ShiftTypes ShiftType { get; set; }
+        public MorningShiftIndex morningShiftIndex { get; set; }
 
         public int? MorningShiftId { get; set; }
         public virtual MorningShift? MorningShift { get; set; }

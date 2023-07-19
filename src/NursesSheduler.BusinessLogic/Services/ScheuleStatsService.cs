@@ -94,7 +94,8 @@ namespace NursesScheduler.BusinessLogic.Services
                 MonthInQuarter = _calendarService
                     .GetMonthInQuarterNumber(key.Month, departamentSettings.FirstQuarterStart),
                 WorkTimeBalance = CalculateWorkTimeBalance(workTimeInMonth, schedule?.ScheduleNurses?.Count() ?? 0,
-                    departamentSettings.TargetMinNumberOfNursesOnShift, days.Count())
+                    departamentSettings.TargetMinNumberOfNursesOnShift, days.Count()),
+                IsClosed = GetIsClosed(schedule),
             };
 
             scheduleStats.NursesScheduleStats = GetNursesScheduleStats(schedule, days, departamentSettings);
@@ -193,6 +194,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 WorkTimeBalance = schedule.WorkTimeBalance,
                 MonthInQuarter = _calendarService
                     .GetMonthInQuarterNumber(key.Month, departamentSettings.FirstQuarterStart),
+                IsClosed = GetIsClosed(schedule),
             };
 
             var nurseScheduleStats = new List<NurseScheduleStats>();
@@ -317,6 +319,11 @@ namespace NursesScheduler.BusinessLogic.Services
             return (workTimeInMonth * numberOfNurses)
                 -
                 (numberOfDaysInMonth * minNumberOfNursesOnShift * GeneralConstants.RegularShiftLenght);
+        }
+
+        private bool GetIsClosed(Schedule? schedule)
+        {
+            return schedule is null || schedule.IsClosed;
         }
     }
 }
