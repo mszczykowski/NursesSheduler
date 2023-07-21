@@ -41,6 +41,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="field">
+                        <label class="label">Użyj zespołów przy generacji grafików</label>
+                        <div class="control">
+                            <InputCheckbox class="input" @bind-Value="Settings.UseTeams" />
+                        </div>
+                    </div>
                     <div class="buttons is-right">
                         <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSave)" type="submit">Zapisz</button>
                         <button class="button @CssHelper.SetIsLoading(_isLoadingCancel)" type="button" @onclick="OnCancel">Anuluj</button>

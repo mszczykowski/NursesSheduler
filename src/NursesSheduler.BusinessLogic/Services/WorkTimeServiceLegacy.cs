@@ -15,7 +15,7 @@ namespace NursesScheduler.BusinessLogic.Services
             _calendarService = calendarService;
         }
 
-        public TimeSpan GetWorkTimeFromDays(IEnumerable<Day> days, TimeSpan regularDayWorkTime)
+        public TimeSpan GetWorkTimeFromDays(IEnumerable<DayNumbered> days, TimeSpan regularDayWorkTime)
         {
             var workTime = TimeSpan.Zero;
 

@@ -2,19 +2,22 @@
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Solver.Builders;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.Directors
 {
     internal sealed class ConstraintsDirector : IConstraintsDirector
     {
-        public ICollection<IConstraint> GetAllConstraints(DepartamentSettings departamentSettings)
+        public ICollection<IConstraint> GetAllConstraints(DepartamentSettings departamentSettings,
+            IEnumerable<DayNumbered> monthDays)
         {
-            var constraintsBuilder = new ConstraintsBuilder(departamentSettings);
+            var constraintsBuilder = new ConstraintsBuilder();
 
             return constraintsBuilder
-                .AddMaxTotalHoursInWeekConstraintConstraint()
-                .AddBreakConstraint()
+                .AddMaxTotalHoursInWeekConstraintConstraint(departamentSettings, monthDays)
+                .AddBreakConstraint(departamentSettings)
                 .AddHasShiftsToAssignLeftConstraint()
+                .AddHasEnoughWorkTimeLeftConstraint()
                 .GetResult();
         }
     }

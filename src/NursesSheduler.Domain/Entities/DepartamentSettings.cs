@@ -14,7 +14,8 @@ namespace NursesScheduler.Domain.Entities
         public TimeSpan NightShiftHolidayEligibleHours { get; set; }
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
-        
+        public bool UseTeams { get; set; }
+
         public int DepartamentId { get; set; }
         public virtual Departament Departament { get; set; }
 

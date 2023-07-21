@@ -13,7 +13,7 @@ namespace NursesScheduler.BusinessLogic.Services
             _holidaysProvider = holidaysProvider;
         }
 
-        public async Task<IEnumerable<Day>> GetMonthDaysAsync(int year, int month)
+        public async Task<IEnumerable<DayNumbered>> GetMonthDaysAsync(int year, int month)
         {
             return await GetNumberedDaysAsync(year, month);
         }
@@ -44,17 +44,17 @@ namespace NursesScheduler.BusinessLogic.Services
             return monthDays;
         }
 
-        public async Task<IEnumerable<Day>> GetDaysFromDayNumbersAsync(int year, int month,
+        public async Task<IEnumerable<DayNumbered>> GetDaysFromDayNumbersAsync(int year, int month,
             IEnumerable<int> days)
         {
             var holidays = await _holidaysProvider.GetCachedDataAsync(year);
             holidays = holidays.Where(h => h.Date.Month == month);
 
-            var daysResult = new List<Day>();
+            var daysResult = new List<DayNumbered>();
 
             foreach (var day in days)
             {
-                daysResult.Add(new Day
+                daysResult.Add(new DayNumbered
                 {
                     Date = new DateOnly(year, month, day),
                 });

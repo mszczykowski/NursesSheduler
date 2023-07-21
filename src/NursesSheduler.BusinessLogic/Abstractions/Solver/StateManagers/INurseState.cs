@@ -13,7 +13,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         TimeSpan HoursFromLastShift { get; set; }
         TimeSpan HoursToNextShift { get; set; }
 
-        ICollection<int> AssignedMorningShiftsIds { get; }
         TimeSpan HolidayPaidHoursAssigned { get; set; }
         
         int NumberOfNightShiftsAssigned { get; set; }
@@ -27,6 +26,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         NurseTeams NurseTeam { get; }
 
         IDictionary<int, MorningShiftIndex> AssignedMorningShifts { get; set; }
+
+        TimeSpan WorkTimeInQuarterLeft { get; set; }
 
         void AdvanceState(TimeSpan hoursToNextShift);
         void UpdateStateOnMorningShiftAssign(MorningShift morningShift, int weekInQuarter, 

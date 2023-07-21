@@ -37,5 +37,6 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
         [Required(ErrorMessage = "Należy wpisać domyślną liczbę prób generatora")]
         [Range(1, 10, ErrorMessage = "Liczba prób musi być większa od 1 i nie większa od 10")]
         public int DefaultGeneratorRetryValue { get; set; }
+        public bool UseTeams { get; set; }
     }
 }

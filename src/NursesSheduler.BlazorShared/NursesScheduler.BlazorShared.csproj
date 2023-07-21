@@ -47,8 +47,4 @@
     <Resource Include="wwwroot\css\bootstrap.css" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\ViewModels\Entities\" />
-  </ItemGroup>
-
 </Project>

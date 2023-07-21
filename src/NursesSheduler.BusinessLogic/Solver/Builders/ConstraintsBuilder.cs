@@ -2,23 +2,22 @@
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
 using NursesScheduler.BusinessLogic.Solver.Constraints;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.Builders
 {
     internal sealed class ConstraintsBuilder : IConstraintsBuilder
     {
         private readonly ICollection<IConstraint> _result;
-        private readonly DepartamentSettings _departamentSettings;
 
-        public ConstraintsBuilder(DepartamentSettings departamentSettings)
+        public ConstraintsBuilder()
         {
-            _departamentSettings = departamentSettings;
             _result = new List<IConstraint>();
         }
 
-        public IConstraintsBuilder AddBreakConstraint()
+        public IConstraintsBuilder AddBreakConstraint(DepartamentSettings departamentSettings)
         {
-            _result.Add(new BreakConstraint(_departamentSettings.MinmalShiftBreak));
+            _result.Add(new BreakConstraint(departamentSettings.MinmalShiftBreak));
             return this;
         }
 
@@ -28,9 +27,16 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint()
+        public IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint(DepartamentSettings departamentSettings,
+            IEnumerable<DayNumbered> monthDays)
         {
-            _result.Add(new MaxTotalHoursInWeekConstraint(_departamentSettings.MaximalWeekWorkTimeLength));
+            _result.Add(new MaxTotalHoursInWeekConstraint(departamentSettings.MaximalWeekWorkTimeLength, monthDays));
+            return this;
+        }
+
+        public IConstraintsBuilder AddHasEnoughWorkTimeLeftConstraint()
+        {
+            _result.Add(new HasEnoughWorkTimeLeft());
             return this;
         }
 

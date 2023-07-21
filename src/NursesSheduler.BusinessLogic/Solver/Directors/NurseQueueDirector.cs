@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
 using NursesScheduler.BusinessLogic.Solver.Builders;
 using NursesScheduler.BusinessLogic.Solver.Enums;
+using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Solver.Directors
 {
@@ -11,55 +12,55 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
         private INurseQueueBuilder _nurseQueueBuilder;
 
         public Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isWorkingDay,
-            HashSet<int> previousDayShift, HashSet<INurseState> nurses, Random random)
+            HashSet<int> previousDayShift, IEnumerable<INurseState> nurses, Random random)
         {
             _nurseQueueBuilder = new NurseQueueBuilder(nurses, random);
 
             switch (shiftIndex, isWorkingDay)
             {
                 case (ShiftIndex.Day, true):
-                    return GetNursesForDayShift();
+                    BuildQueueForDayShift();
+                    break;
                 case (ShiftIndex.Day, false):
-                    return GetNursesForDayHolidayShift();
+                    BuildQueueForDayHolidayShift();
+                    break;
                 case (ShiftIndex.Night, true):
-                    return GetNursesForNightShift(previousDayShift);
+                    BuildQueueForNightShift(previousDayShift);
+                    break;
                 case (ShiftIndex.Night, false):
-                    return GetNursesForNightHolidayShift(previousDayShift);
-                default:
-                    return _nurseQueueBuilder.GetResult();
+                    BuildQueueForNightHolidayShift(previousDayShift);
+                    break;
             }
+
+            return _nurseQueueBuilder.GetResult();
         }
 
-        private Queue<int> GetNursesForDayShift()
+        private void BuildQueueForDayShift()
         {
-            return _nurseQueueBuilder
-                .OrderByLongestBreak()
-                .GetResult();
+             _nurseQueueBuilder
+                .OrderByLongestBreak();
         }
 
-        private Queue<int> GetNursesForDayHolidayShift()
+        private void BuildQueueForDayHolidayShift()
         {
-            return _nurseQueueBuilder
+            _nurseQueueBuilder
                 .OrderByLowestNumberOfHolidayShitfs()
-                .OrderByLongestBreak()
-                .GetResult();
+                .OrderByLongestBreak();
         }
 
-        private Queue<int> GetNursesForNightShift(HashSet<int> previousDayShift)
+        private void BuildQueueForNightShift(HashSet<int> previousDayShift)
         {
-            return _nurseQueueBuilder
+            _nurseQueueBuilder
                 .ProritisePreviousDayShiftWorkers(previousDayShift)
-                .OrderByLowestNumberOfNightShitfs()
-                .GetResult();
+                .OrderByLowestNumberOfNightShitfs();
         }
 
 
-        private Queue<int> GetNursesForNightHolidayShift(HashSet<int> previousShift)
+        private void BuildQueueForNightHolidayShift(HashSet<int> previousShift)
         {
-            return _nurseQueueBuilder
+            _nurseQueueBuilder
                 .ProritisePreviousDayShiftWorkers(previousShift)
-                .OrderByLowestNumberOfNightShitfs()
-                .GetResult();
+                .OrderByLowestNumberOfNightShitfs();
         }
     }
 }

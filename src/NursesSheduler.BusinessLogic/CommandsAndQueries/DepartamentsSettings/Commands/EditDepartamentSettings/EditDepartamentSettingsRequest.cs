@@ -11,5 +11,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public TimeSpan TargetMinimalMorningShiftLenght { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
+        public bool UseTeams { get; set; }
     }
 }

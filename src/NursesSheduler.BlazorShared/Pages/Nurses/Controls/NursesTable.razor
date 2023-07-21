@@ -17,20 +17,27 @@ else
         <thead>
             <tr>
                 <th>L.p.</th>
-                <th style="width: 100%">Imie i nazwisko</th>
+                <th class="is-fullwidth">Imie i nazwisko</th>
+                <th>Bilans nocy</th>
+                <th>Bilans godzin świątecznych</th>
                 <th></th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @for(int i = 0; i < Nurses.Count; i++)
-            {
-                <tr>
-                    <td>@(i + 1)</td>
-                    <td class="is-fullwidth">@Nurses[i].ToString()</td>
-                    <td><a href="/nurse/edit/@Nurses[i].NurseId">Edytuj</a></td>
-                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(Nurses[i].ToString(), Nurses[i].NurseId))">Usuń</a></td>
-                </tr>
+            @{
+                nurseIndex = 0;
+                foreach (var nurse in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name))
+                {
+                    <tr>
+                        <td>@nurseIndex++</td>
+                        <td class="is-fullwidth">@nurse.ToString()</td>
+                        <td class="is-fullwidth">@nurse.NightShiftsBalance</td>
+                        <td class="is-fullwidth">@nurse.HolidayHoursBalance.GetTotalHoursAndMinutes()</td>
+                        <td><a href="/nurse/edit/@nurse.NurseId">Edytuj</a></td>
+                        <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(nurse.ToString(), nurse.NurseId))">Usuń</a></td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -39,24 +46,28 @@ else
 
 @code {
     [Parameter]
-    public List<NurseViewModel> Nurses { get; set; }
+    public ICollection<NurseViewModel> Nurses { get; set; }
 
     private DeleteModal _deleteModal;
+
+    private int nurseIndex;
 
     private async Task DeleteNurse(int nurseId)
     {
         try
         {
             var request = new DeleteNurseRequest
-            {
-                NurseId = nurseId,
-            };
+                {
+                    NurseId = nurseId,
+                };
             var response = await _mediatr.Send(request);
 
             if (!response.Success)
+            {
                 throw new EntityNotDeletedException(nurseId, "Nurse");
+            }
 
-            Nurses.RemoveAll(n => n.NurseId == nurseId);
+            Nurses.Remove(Nurses.First(n => n.NurseId == nurseId));
 
         }
         catch (Exception e)

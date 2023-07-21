@@ -53,7 +53,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             HolidayPaidHoursAssigned = nurse.HolidayPaidHoursAssigned;
             NumberOfNightShiftsAssigned = nurse.NumberOfNightShiftsAssigned;
             TimeOff = nurse.TimeOff;
-            AssignedMorningShiftsIds = new List<int>(nurse.AssignedMorningShiftsIds);
+            AssignedMorningShifts = new Dictionary<int, MorningShiftIndex>(nurse.AssignedMorningShifts);
             NumberOfRegularShiftsToAssign = nurse.NumberOfRegularShiftsToAssign;
             WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(nurse.WorkTimeAssignedInWeeks);
             HadMorningShiftAssigned = nurse.HadMorningShiftAssigned;

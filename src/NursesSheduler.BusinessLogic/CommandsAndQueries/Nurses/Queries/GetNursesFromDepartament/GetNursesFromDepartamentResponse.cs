@@ -9,6 +9,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNur
         public string Surname { get; set; }
         public int DepartamentId { get; set; }
         public NurseTeams Team { get; set; }
+        public int NightShiftsBalance { get; set; }
+        public TimeSpan HolidayHoursBalance { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

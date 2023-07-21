@@ -148,7 +148,7 @@ namespace NursesScheduler.BusinessLogic.Services
             return nurseWorkDays.Count(d => d.ShiftType == ShiftTypes.Night);
         }
 
-        private TimeSpan CalculateHolidayHoursAssigned(IEnumerable<NurseWorkDay> nurseWorkDays, IEnumerable<Day> days,
+        private TimeSpan CalculateHolidayHoursAssigned(IEnumerable<NurseWorkDay> nurseWorkDays, IEnumerable<DayNumbered> days,
             DepartamentSettings departamentSettings)
         {
             var holiadayHoursAssinged = TimeSpan.Zero;
@@ -288,7 +288,7 @@ namespace NursesScheduler.BusinessLogic.Services
         }
 
         private TimeSpan CalculateTimeOffToAssign(IEnumerable<NurseWorkDay> nurseWorkDays,
-            IEnumerable<Day> days, TimeSpan workDayLength)
+            IEnumerable<DayNumbered> days, TimeSpan workDayLength)
         {
             return nurseWorkDays.Where(wd => wd.IsTimeOff && days.First(d => d.Date.Day == wd.Day).IsWorkingDay)
                 .Count() * workDayLength;

@@ -10,7 +10,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
     internal sealed class ShiftCapacityManager : IShiftCapacityManager
     {
         private readonly DepartamentSettings _departamentSettings;
-        private readonly Day[] _month;
+        private readonly DayNumbered[] _month;
         private readonly int _numberOfNurses;
         private readonly TimeSpan _timeToAssignInMonth;
         private readonly Random _random;
@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         private readonly int[,] _shiftCapacities;
         private readonly int[] _morningShiftCapacities;
 
-        public ShiftCapacityManager(DepartamentSettings departamentSettings, Day[] month, int numberOfNurses,
+        public ShiftCapacityManager(DepartamentSettings departamentSettings, DayNumbered[] month, int numberOfNurses,
             TimeSpan timeToAssignInMonth, Random random)
         {
             _departamentSettings = departamentSettings;

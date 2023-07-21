@@ -1,5 +1,6 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Builders;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.Domain.Enums;
 using System.Linq.Dynamic.Core;
 using System.Text;
 
@@ -10,25 +11,21 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         private readonly StringBuilder _orderByBuilder;
         private readonly Random _random;
         
-        private HashSet<INurseState> _nurses;
-        private HashSet<INurseState> _nursesPrioritised;
+        private List<INurseState> _nurses;
+        private List<INurseState> _nursesPrioritised;
         
-        public NurseQueueBuilder(HashSet<INurseState> nurses, Random random)
+        public NurseQueueBuilder(IEnumerable<INurseState> nurses, Random random)
         {
-            _nurses = new HashSet<INurseState>(nurses);
+            _nurses = new List<INurseState>(nurses);
+            _nursesPrioritised = new List<INurseState>();
             _orderByBuilder = new StringBuilder();
             _random = random;
         }
 
-        public INurseQueueBuilder RemoveEmployeesOnPTO(int dayNumber)
+        public INurseQueueBuilder FilterTeam(NurseTeams nursesTeam)
         {
-            _nurses = _nurses.Where(e => e.TimeOff[dayNumber - 1] == false).ToHashSet();
-            
-            if (_nursesPrioritised != null)
-            {
-                _nursesPrioritised = _nursesPrioritised
-                    .Where(e => e.TimeOff[dayNumber - 1] == false).ToHashSet();
-            }
+            _nurses = _nurses.Where(n => n.NurseTeam == nursesTeam).ToList();
+            _nursesPrioritised = _nursesPrioritised.Where(n => n.NurseTeam == nursesTeam).ToList();
 
             return this;
         }
@@ -56,20 +53,20 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseQueueBuilder ProritisePreviousDayShiftWorkers(HashSet<int> previousDayShift)
         {
-            _nursesPrioritised = new HashSet<INurseState>(_nurses
-                .Where(n => previousDayShift
-                    .Contains(n.NurseId))
-                    .ToList());
+            _nursesPrioritised = _nurses.Where(n => previousDayShift.Contains(n.NurseId)).ToList();
 
-            _nurses.RemoveWhere(n => previousDayShift.Contains(n.NurseId));
+            _nurses.RemoveAll(n => previousDayShift.Contains(n.NurseId));
 
             return this;
         }
 
         public Queue<int> GetResult()
         {
-            if (_orderByBuilder.Length > 0) 
+            //remove last coma
+            if (_orderByBuilder.Length > 0)
+            {
                 _orderByBuilder.Length--;
+            }
 
             var orderBy = _orderByBuilder.ToString();
 

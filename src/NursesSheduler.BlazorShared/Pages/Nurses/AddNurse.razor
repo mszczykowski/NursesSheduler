@@ -3,6 +3,7 @@
 @inherits ComponenentUsingDepartament
 
 @using NursesScheduler.BlazorShared.Pages.Nurses.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
 
 @inject IMediator _mediatr
@@ -22,22 +23,27 @@
             </div>
         </div>
     </div>
-    <NurseForm Nurse=_nurse SaveNurse="SaveNurse"/>
+    <NurseForm Nurse=_nurse UseTeams=_departamentSettings.UseTeams SaveNurse="SaveNurse" />
 </div>
 
 
 @code {
     private NurseViewModel _nurse;
+    private DepratamentSettingsViewModel _departamentSettings;
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnInitialized();
+        if (firstRender)
+        {
+            await LoadDepartamentSettings();
+            _nurse = new NurseViewModel();
+            _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
+        }
 
-        _nurse = new NurseViewModel();
-        _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
+        await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async void SaveNurse()
+    private async Task SaveNurse()
     {
         try
         {
@@ -45,6 +51,23 @@
             var response = await _mediatr.Send(request);
 
             NavigationManager.NavigateTo("/nurses");
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task LoadDepartamentSettings()
+    {
+        try
+        {
+            var request = new GetDepartamentSettingsRequest
+                {
+                    DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                };
+
+            _departamentSettings = _mapper.Map<DepratamentSettingsViewModel>(await _mediatr.Send(request));
         }
         catch (Exception e)
         {

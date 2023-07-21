@@ -6,6 +6,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Directors
     internal interface INurseQueueDirector
     {
         Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isWorkingDay, HashSet<int> previousDayShift,
-            HashSet<INurseState> nurses, Random random);
+            IEnumerable<INurseState> nurses, Random random);
     }
 }

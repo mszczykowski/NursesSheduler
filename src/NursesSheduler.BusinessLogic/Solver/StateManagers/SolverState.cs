@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
         public ICollection<INurseState> NurseStates { get; }
         public IDictionary<int, ShiftTypes[]> ScheduleState { get; }
 
-        public bool IsShiftAssined => NursesToAssignForCurrentShift <= 0 && NursesToAssignForMorningShift <= 0 && 
+        public bool IsShiftAssined => NursesToAssignForCurrentShift == 0 && NursesToAssignForMorningShift == 0 && 
             NursesToAssignOnTimeOff == 0;
 
         private int _currentDayIndex => CurrentDay - 1;
@@ -66,7 +66,6 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                 NurseStates.Add(new NurseState(nurse));
             }
 
-            ScheduleState = new Dictionary<int, ShiftTypes[]>();
             ScheduleState = stateToCopy.ScheduleState
                 .ToDictionary(entry => entry.Key, entry => (ShiftTypes[])entry.Value.Clone());
         }

@@ -18,23 +18,25 @@ namespace NursesScheduler.BusinessLogic.Solver
         private readonly DepartamentSettings _departamentSettings;
 
         private readonly ICollection<MorningShift> _morningShifts;
-        private readonly Day[] _days;
+        private readonly DayNumbered[] _days;
+
+        private readonly bool _useTeams;
 
         private Random _random;
 
-        private int _currenNurseId;
+        private int _currentNurseId;
         private INurseState _currentNurse;
 
         private IShiftCapacityManager _shiftCapacityManager;
 
-        public ScheduleSolver(ICollection<MorningShift> morningShifts, Day[] days, ICollection<IConstraint> constraints,
-            DepartamentSettings departamentSettings)
+        public ScheduleSolver(ICollection<MorningShift> morningShifts, DayNumbered[] days, ICollection<IConstraint> constraints,
+            DepartamentSettings departamentSettings, bool useTeams)
         {
             _morningShifts = morningShifts;
             _days = days;
             _departamentSettings = departamentSettings;
             _constraints = constraints;
-
+            _useTeams = useTeams;
             _employeeQueueDirector = new NurseQueueDirector();
         }
 
@@ -50,46 +52,46 @@ namespace NursesScheduler.BusinessLogic.Solver
         }
 
 
-        private ISolverState AssignShift(ISolverState previousState, Queue<int> previuousQueue)
+        private ISolverState AssignShift(ISolverState previousState, Queue<int>? previousQueue)
         {
             if (previousState.CurrentDay > _days.Length)
+            {
                 return previousState;
+            }
 
             Queue<int> currentQueue;
+            ISolverState currentState = new SolverState(previousState);
 
-            if (previousState.NursesToAssignForCurrentShift == 0 && previousState.NursesToAssignForMorningShift == 0)
+            if (previousQueue is null)
             {
-                previousState.NursesToAssignForCurrentShift = _shiftCapacityManager
-                    .GetNumberOfNursesForRegularShift(previousState.CurrentShift, previousState.CurrentDay);
-
-                previousState.NursesToAssignForMorningShift = _shiftCapacityManager
-                    .GetNumberOfNursesForMorningShift(previousState.CurrentShift, previousState.CurrentDay);
-
-                previousState.NursesToAssignOnTimeOff = previousState.Nurses
-                    .Count(n => n.TimeOff[previousState.CurrentDay - 1]);
-                
                 currentQueue = _employeeQueueDirector
-                    .GetSortedEmployeeQueue(previousState.CurrentShift,
-                    _days[previousState.CurrentDay - 1].IsWorkingDay,
-                    previousState.GetPreviousDayShift(),
-                    previousState.Nurses,
-                    _random);
+                    .GetSortedEmployeeQueue(previousState.CurrentShift, _days[currentState.CurrentDay - 1].IsWorkingDay,
+                    currentState.GetPreviousDayShift(), previousState.NurseStates, _random);
             }
-            else currentQueue = new Queue<int>(previuousQueue);
+            else currentQueue = new Queue<int>(previousQueue);
 
-            var currentState = new SolverState(previousState);
 
-            while (currentQueue.TryDequeue(out _currenNurseId))
+            //if (previousState.IsShiftAssined)
+            //{
+            //    previousState.NursesToAssignForCurrentShift = _shiftCapacityManager
+            //        .GetNumberOfNursesForRegularShift(previousState.CurrentShift, previousState.CurrentDay);
+
+            //    previousState.NursesToAssignForMorningShift = _shiftCapacityManager
+            //        .GetNumberOfNursesForMorningShift(previousState.CurrentShift, previousState.CurrentDay);
+
+            //    previousState.NursesToAssignOnTimeOff = previousState.Nurses
+            //        .Count(n => n.TimeOff[previousState.CurrentDay - 1]);
+            //}
+
+
+
+
+            while (currentQueue.TryDequeue(out _currentNurseId))
             {
-                _currentNurse = currentState.NurseStates.Single(e => e.NurseId == _currenNurseId);
+                _currentNurse = currentState.NurseStates.First(e => e.NurseId == _currentNurseId);
 
                 if(_currentNurse.TimeOff[currentState.CurrentDay - 1])
                 {
-                    if(currentState.NursesToAssignOnTimeOff <= 0)
-                    {
-                        continue;
-                    }
-
                     if(_currentNurse.NumberOfTimeOffShiftsToAssign > 0 && 
                         _constraints
                             .All(c => c.IsSatisfied(currentState, _currentNurse, GeneralConstants.RegularShiftLenght)))
@@ -145,7 +147,7 @@ namespace NursesScheduler.BusinessLogic.Solver
 
                 var result = AssignShift(currentState, currentQueue);
 
-                if (result == null)
+                if (result is null)
                 {
                     currentState = new SolverState(previousState);
                     continue;

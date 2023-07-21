@@ -1,6 +1,6 @@
 ﻿namespace NursesScheduler.Domain.ValueObjects
 {
-    public record Day
+    public record DayNumbered
     {
         public DateOnly Date { get; set; }
         public bool IsHoliday { get; set; }
