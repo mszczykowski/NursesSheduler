@@ -8,11 +8,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries
     internal sealed class CalculateMorningShiftsCommandHandler : IRequestHandler<CalculateMorningShiftsRequest,
         ICollection<CalculateMorningShiftsResponse>>
     {
-        private readonly IWorkTimeService _workTimeService;
+        private readonly IWorkTimeServiceLegacy _workTimeService;
         private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly IMapper _mapper;
 
-        public CalculateMorningShiftsCommandHandler(IWorkTimeService workTimeService,
+        public CalculateMorningShiftsCommandHandler(IWorkTimeServiceLegacy workTimeService,
             IDepartamentSettingsProvider departamentSettingsManager,
             IMapper mapper)
         {

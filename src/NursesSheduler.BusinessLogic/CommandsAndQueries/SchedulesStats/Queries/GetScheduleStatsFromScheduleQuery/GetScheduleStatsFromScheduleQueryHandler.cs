@@ -10,13 +10,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
     internal sealed class GetScheduleStatsFromScheduleQueryHandler : IRequestHandler<GetScheduleStatsFromScheduleRequest,
         GetScheduleStatsFromScheduleResponse>
     {
-        private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IScheduleStatsService _scheduleStatsService;
 
-        public GetScheduleStatsFromScheduleQueryHandler(IApplicationDbContext context, IMapper mapper, IScheduleStatsService statsService)
+        public GetScheduleStatsFromScheduleQueryHandler(IMapper mapper, IScheduleStatsService statsService)
         {
-            _context = context;
             _mapper = mapper;
             _scheduleStatsService = statsService;
         }
@@ -28,14 +26,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
 
             if (schedule.IsClosed)
             {
-                schedule = await _context.Schedules
-                    .Include(s => s.ScheduleNurses)
-                    .ThenInclude(n => n.NurseWorkDays)
-                    .FirstAsync(s => s.ScheduleId == schedule.ScheduleId);
+                _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year, 
+                    schedule.Month, request.DepartamentId));
             }
 
-            return _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(schedule,
-                request.DepartamentId, request.Year));
+            return _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year, 
+                request.DepartamentId, schedule));
         }
     }
 }

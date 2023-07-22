@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Builders;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
-using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Builders;
 using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain.Enums;
@@ -11,12 +11,12 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
     {
         private INurseQueueBuilder _nurseQueueBuilder;
 
-        public Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool isWorkingDay,
+        public Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool IsWorkDay,
             HashSet<int> previousDayShift, IEnumerable<INurseState> nurses, Random random)
         {
             _nurseQueueBuilder = new NurseQueueBuilder(nurses, random);
 
-            switch (shiftIndex, isWorkingDay)
+            switch (shiftIndex, IsWorkDay)
             {
                 case (ShiftIndex.Day, true):
                     BuildQueueForDayShift();

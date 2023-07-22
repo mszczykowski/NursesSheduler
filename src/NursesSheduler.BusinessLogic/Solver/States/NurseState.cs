@@ -1,44 +1,36 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Enums;
-using NursesScheduler.Domain;
+using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
-namespace NursesScheduler.BusinessLogic.Solver.StateManagers
+namespace NursesScheduler.BusinessLogic.Solver.States
 {
     internal sealed class NurseState : INurseState
     {
         public int NurseId { get; init; }
+        public Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; init; }
+        public TimeSpan HoursFromLastShift { get; init; }
+        public TimeSpan[] HoursToNextShiftMatrix { get; init; }
+        public int NumberOfRegularShiftsToAssign { get; init; }
+        public int NumberOfTimeOffShiftsToAssign { get; init; }
+        public TimeSpan HolidayHoursAssigned { get; init; }
+        public TimeSpan NightHoursAssigned { get; init; }
+        public TimeSpan WorkTimeInQuarterLeft { get; init; }
+        public bool[] TimeOff { get; init; }
+        public HashSet<MorningShiftIndex> PreviouslyAssignedMorningShifts { get; init; }
+        public MorningShiftIndex? AssignedMorningShift { get; init; }
+        public ShiftTypes PreviousMonthLastShift { get; init; }
+        public NurseTeams NurseTeam { get; init; }
 
-        public Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; set; }
-
-        public TimeSpan HoursFromLastShift { get; set; }
-        public TimeSpan HoursToNextShift { get; set; }
-
-        public int NumberOfNightShiftsAssigned { get; set; }
-        public int NumberOfRegularShiftsToAssign { get; set; }
-        public int NumberOfTimeOffShiftsToAssign { get; set; }
-
-        public TimeSpan HolidayPaidHoursAssigned { get; set; }
-
-        public bool[] TimeOff { get; private set; }
-
-        public IDictionary<int, MorningShiftIndex> AssignedMorningShifts { get; set; }
-
-        public bool HadMorningShiftAssigned { get; private set; }
-        public ShiftTypes PreviousMonthLastShift { get; set; }
-
-        public NurseTeams NurseTeam { get; set; }
-
-        public NurseState(ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, 
-            NurseScheduleStats previousScheduleNurseStats)
+        public NurseState()
         {
             NurseId = scheduleNurse.NurseId;
 
-            WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(nurseQuarterStats.WorkTimeInWeeks);
+            WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(nurseQuarterStats.WorkTimeAssignedInWeeks);
 
-            HoursFromLastShift = previousScheduleNurseStats.HoursFromLastShift;
+            HoursFromLastShift = previousScheduleNurseStats.HoursFromLastAssignedShift;
 
             HoursToNextShift = TimeSpan.Zero; // niew eim
 
@@ -53,7 +45,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             HolidayPaidHoursAssigned = nurse.HolidayPaidHoursAssigned;
             NumberOfNightShiftsAssigned = nurse.NumberOfNightShiftsAssigned;
             TimeOff = nurse.TimeOff;
-            AssignedMorningShifts = new Dictionary<int, MorningShiftIndex>(nurse.AssignedMorningShifts);
+            PreviouslyAssignedMorningShifts = new Dictionary<int, MorningShiftIndex>(nurse.AssignedMorningShifts);
             NumberOfRegularShiftsToAssign = nurse.NumberOfRegularShiftsToAssign;
             WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(nurse.WorkTimeAssignedInWeeks);
             HadMorningShiftAssigned = nurse.HadMorningShiftAssigned;
@@ -68,9 +60,9 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
             AssignedMorningShiftsIds.Add(morningShift.MorningShiftId);
 
-            if(morningShift.ShiftLength > TimeSpan.Zero)
+            if (morningShift.ShiftLength > TimeSpan.Zero)
             {
-                HoursFromLastShift = GeneralConstants.RegularShiftLenght - morningShift.ShiftLength;
+                HoursFromLastShift = ScheduleConstatns.RegularShiftLenght - morningShift.ShiftLength;
                 UpdateWorkTimes(morningShift.ShiftLength, weekInQuarter, hoursToNextShift);
             }
             else
@@ -79,29 +71,44 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
             }
         }
 
-        public void UpdateStateOnTimeOffShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter,
+        public void UpdateStateOnTimeOffShiftAssign(bool isHoliday, CurrentShift shiftIndex, int weekInQuarter,
             DepartamentSettings departamentSettings, TimeSpan hoursToNextShift)
         {
             NumberOfTimeOffShiftsToAssign--;
-            UpdateStateOnRegularShiftAssign(isHoliday, shiftIndex, weekInQuarter, departamentSettings, hoursToNextShift);
+            UpdateStateOnShiftAssign(isHoliday, shiftIndex, weekInQuarter, departamentSettings, hoursToNextShift);
         }
 
-        public void UpdateStateOnRegularShiftAssign(bool isHoliday, ShiftIndex shiftIndex, int weekInQuarter,
+        public void UpdateStateOnRegularShiftAssign(bool isHoliday, CurrentShift shiftIndex, int weekInQuarter,
             DepartamentSettings departamentSettings, TimeSpan hoursToNextShift)
         {
-            HoursFromLastShift = TimeSpan.Zero;
             NumberOfRegularShiftsToAssign--;
+            UpdateStateOnShiftAssign(isHoliday, shiftIndex, weekInQuarter,
+                departamentSettings, hoursToNextShift, ScheduleConstatns.RegularShiftLenght);
+        }
 
-            switch (shiftIndex)
+        public void UpdateStateOnShiftAssign(bool isWorkDay, CurrentShift currentShift, int weekInQuarter,
+            DepartamentSettings departamentSettings, TimeSpan shiftLenght)
+        {
+            HoursFromLastShift = ScheduleConstatns.RegularShiftLenght - shiftLenght;
+
+            if (currentShift == CurrentShift.Day)
             {
-                case (ShiftIndex.Day):
-                    if (isHoliday)
+                if (isWorkDay)
+                {
+
+                }
+            }
+
+            switch (currentShift)
+            {
+                case CurrentShift.Day:
+                    if (isWorkDay)
                     {
                         HolidayPaidHoursAssigned += departamentSettings.DayShiftHolidayEligibleHours;
                     }
                     break;
-                case (ShiftIndex.Night):
-                    if (isHoliday)
+                case CurrentShift.Night:
+                    if (isWorkDay)
                     {
                         HolidayPaidHoursAssigned += departamentSettings.NightShiftHolidayEligibleHours;
                     }
@@ -109,7 +116,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
                     break;
             }
 
-            UpdateWorkTimes(GeneralConstants.RegularShiftLenght, weekInQuarter, hoursToNextShift);
+            UpdateWorkTimes(ScheduleConstatns.RegularShiftLenght, weekInQuarter, hoursToNextShift);
         }
 
         private void UpdateWorkTimes(TimeSpan shiftLenght, int weekInQuarter, TimeSpan hoursToNextShift)
@@ -120,7 +127,7 @@ namespace NursesScheduler.BusinessLogic.Solver.StateManagers
 
         public void AdvanceState(TimeSpan hoursToNextShift)
         {
-            HoursFromLastShift += GeneralConstants.RegularShiftLenght;
+            HoursFromLastShift += ScheduleConstatns.RegularShiftLenght;
             HoursToNextShift = hoursToNextShift;
         }
 

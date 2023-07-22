@@ -74,9 +74,9 @@ namespace NursesScheduler.BusinessLogic.Services
             return daysResult;
         }
 
-        public IEnumerable<MonthYear> GetQuarterMonths(int year, int quarterNumber, int firstQuarterStart)
+        public IEnumerable<(int year, int month)> GetQuarterMonths(int year, int quarterNumber, int firstQuarterStart)
         {
-            var result = new List<MonthYear>();
+            var result = new List<(int year, int month)>();
 
             for (int i = 0; i < 3; i++)
             {
@@ -87,11 +87,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     year++;
                 }
 
-                result.Add(new MonthYear
-                {
-                    Year = year,
-                    Month = month
-                });
+                result.Add((year, month));
             }
 
             return result;

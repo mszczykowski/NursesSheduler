@@ -14,13 +14,13 @@ namespace NursesScheduler.BusinessLogic.Validation
 
             RuleFor(s => s.MaximalWeekWorkTimeLength)
                 .NotEmpty()
-                .GreaterThanOrEqualTo(TimeSpan.FromHours(7))
+                .GreaterThanOrEqualTo(TimeSpan.FromHours(12))
                 .LessThanOrEqualTo(TimeSpan.FromHours(84));
 
             RuleFor(s => s.MinmalShiftBreak)
                 .NotEmpty()
-                .GreaterThanOrEqualTo(TimeSpan.Zero)
-                .LessThanOrEqualTo(TimeSpan.FromHours(100));
+                .GreaterThanOrEqualTo(TimeSpan.FromHours(12))
+                .LessThanOrEqualTo(TimeSpan.FromHours(84));
 
             RuleFor(s => s.FirstQuarterStart)
                 .GreaterThanOrEqualTo(1)

@@ -27,6 +27,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
 
         public sealed class MorningShiftRequest
         {
+            public MorningShiftIndex Index { get; set; }
             public TimeSpan ShiftLength { get; set; }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
-using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.Constraints

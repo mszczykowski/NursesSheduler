@@ -2,9 +2,8 @@
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Builders
 {
-    internal interface INurseQueueBuilder
+    internal interface INurseQueueBuilder : IBuilder<Queue<int>>
     {
-        Queue<int> GetResult();
         INurseQueueBuilder FilterTeam(NurseTeams nursesTeam);
         INurseQueueBuilder OrderByLongestBreak();
         INurseQueueBuilder OrderByLowestNumberOfHolidayShitfs();

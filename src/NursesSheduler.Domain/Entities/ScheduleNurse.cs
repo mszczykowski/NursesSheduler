@@ -1,7 +1,4 @@
-﻿using NursesScheduler.Domain.Abstractions;
-using NursesScheduler.Domain.Enums;
-
-namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.Entities
 {
     public record ScheduleNurse
     {
@@ -20,6 +17,6 @@ namespace NursesScheduler.Domain.Entities
         public TimeSpan TimeOffToAssign { get; set; }
         public TimeSpan TimeOffToAssiged { get; set; }
         public TimeSpan HolidaysHoursAssigned { get; set; }
-        public int NightShiftsAssigned { get; set; }
+        public TimeSpan NightHoursAssigned { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
-using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Directors;
 using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.Domain.Entities;

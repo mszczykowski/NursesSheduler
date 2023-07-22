@@ -1,7 +1,7 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Managers;
-using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Enums;
-using NursesScheduler.Domain;
+using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects;
 
@@ -27,7 +27,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             _timeToAssignInMonth = timeToAssignInMonth;
             _random = random;
 
-            _shiftCapacities = new int[_month.Length, GeneralConstants.NumberOfShifts];
+            _shiftCapacities = new int[_month.Length, ScheduleConstatns.NumberOfShifts];
             _morningShiftCapacities = new int[_month.Length];
         }
 
@@ -40,7 +40,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             var numberOfSurplusShifts = GetNumberOfSurplusShifts(totalNumberOfShiftsToAssign,
                 minimalNumberOfWorkersOnShift);
 
-            var numberOfWorkingDays = _month.Count(d => d.IsWorkingDay);
+            var numberOfWorkingDays = _month.Count(d => d.IsWorkDay);
 
             var regularDayShiftCapacities = new int[numberOfWorkingDays];
             var nightShiftsCapacities = new int[_month.Length];
@@ -108,7 +108,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             {
                 _shiftCapacities[i, (int)ShiftIndex.Night] = nightShiftsCapacities[nightShiftIterator++];
 
-                if (!_month[i].IsWorkingDay)
+                if (!_month[i].IsWorkDay)
                     _shiftCapacities[i, (int)ShiftIndex.Day] = holidayDayShiftCapacities[holidayShiftIterator++];
 
                 else
@@ -156,12 +156,12 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
         private int GetTotalNumberOfShiftsToAssign()
         {
-            return (int)Math.Floor((_numberOfNurses * _timeToAssignInMonth) / GeneralConstants.RegularShiftLenght);
+            return (int)Math.Floor((_numberOfNurses * _timeToAssignInMonth) / ScheduleConstatns.RegularShiftLenght);
         }
 
         private int GetMinimalNumberOfNursesOnShift(int totalNumberOfShiftsToAssign)
         {
-            int calculatedMinimal = totalNumberOfShiftsToAssign / (_month.Length * GeneralConstants.NumberOfShifts);
+            int calculatedMinimal = totalNumberOfShiftsToAssign / (_month.Length * ScheduleConstatns.NumberOfShifts);
 
             return _departamentSettings.TargetMinNumberOfNursesOnShift < calculatedMinimal ?
                 _departamentSettings.TargetMinNumberOfNursesOnShift : calculatedMinimal;

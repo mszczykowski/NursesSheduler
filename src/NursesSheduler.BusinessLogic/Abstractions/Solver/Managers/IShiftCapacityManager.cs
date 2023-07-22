@@ -1,4 +1,4 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Enums;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Managers

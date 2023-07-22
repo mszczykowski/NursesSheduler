@@ -1,5 +1,5 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Builders;
-using NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.Domain.Enums;
 using System.Linq.Dynamic.Core;
 using System.Text;

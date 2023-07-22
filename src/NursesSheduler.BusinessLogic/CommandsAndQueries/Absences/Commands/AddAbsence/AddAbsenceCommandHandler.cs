@@ -16,13 +16,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IValidator<AddAbsenceRequest> _validator;
-        private readonly IWorkTimeService _workTimeService;
+        private readonly IWorkTimeServiceLegacy _workTimeService;
         private readonly IAbsencesService _absencesService;
         private readonly ICalendarService _calendarService;
         private readonly IDepartamentSettingsProvider _settingsManager;
 
         public AddAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, 
-            IValidator<AddAbsenceRequest> validator, IWorkTimeService workTimeService, IAbsencesService absencesService,
+            IValidator<AddAbsenceRequest> validator, IWorkTimeServiceLegacy workTimeService, IAbsencesService absencesService,
             ICalendarService calendarService, IDepartamentSettingsProvider settingsManager)
         {
             _context = context;

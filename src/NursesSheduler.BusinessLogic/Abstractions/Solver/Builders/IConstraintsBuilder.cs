@@ -4,13 +4,12 @@ using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Builders
 {
-    internal interface IConstraintsBuilder
+    internal interface IConstraintsBuilder : IBuilder<IEnumerable<IConstraint>>
     {
         IConstraintsBuilder AddBreakConstraint(DepartamentSettings departamentSettings);
         IConstraintsBuilder AddHasEnoughWorkTimeLeftConstraint();
         IConstraintsBuilder AddHasShiftsToAssignLeftConstraint();
         IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint(DepartamentSettings departamentSettings, 
             IEnumerable<DayNumbered> days);
-        ICollection<IConstraint> GetResult();
     }
 }

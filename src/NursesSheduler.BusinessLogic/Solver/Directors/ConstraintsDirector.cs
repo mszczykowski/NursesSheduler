@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
 {
     internal sealed class ConstraintsDirector : IConstraintsDirector
     {
-        public ICollection<IConstraint> GetAllConstraints(DepartamentSettings departamentSettings,
+        public IEnumerable<IConstraint> GetAllConstraints(DepartamentSettings departamentSettings,
             IEnumerable<DayNumbered> monthDays)
         {
             var constraintsBuilder = new ConstraintsBuilder();

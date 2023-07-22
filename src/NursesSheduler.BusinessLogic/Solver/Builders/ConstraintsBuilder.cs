@@ -40,6 +40,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public ICollection<IConstraint> GetResult() => _result;
+        public IEnumerable<IConstraint> GetResult() => _result;
     }
 }

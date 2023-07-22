@@ -1,12 +1,12 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain;
+using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    internal sealed class WorkTimeServiceLegacy : IWorkTimeService
+    internal sealed class WorkTimeServiceLegacy : IWorkTimeServiceLegacy
     {
         private readonly ICalendarService _calendarService;
 
@@ -21,7 +21,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             foreach (var day in days)
             {
-                if (day.IsWorkingDay)
+                if (day.IsWorkDay)
                 {
                     workTime += regularDayWorkTime;
                 }
@@ -65,7 +65,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var totalNursesWorkTime = WorkDayLengthInMonthPerNurse * nurseCount;
             var minimalTotalWorkTimeToAssign =
                 departamentSettings.TargetMinNumberOfNursesOnShift * 2
-                * GeneralConstants.RegularShiftLenght
+                * ScheduleConstatns.RegularShiftLenght
                 * DateTime.DaysInMonth(yearNumber, monthNumber);
 
             return totalNursesWorkTime - minimalTotalWorkTimeToAssign;
@@ -83,7 +83,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
                 else if (workDay.ShiftType != ShiftTypes.None)
                 {
-                    workTime += GeneralConstants.RegularShiftLenght;
+                    workTime += ScheduleConstatns.RegularShiftLenght;
                 }
             }
 
@@ -104,7 +104,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     departamentSettings.WorkDayLength);
 
                 timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth /
-                    GeneralConstants.RegularShiftLenght) * GeneralConstants.RegularShiftLenght;
+                    ScheduleConstatns.RegularShiftLenght) * ScheduleConstatns.RegularShiftLenght;
             }
 
             return timeForMorningShifts;
@@ -117,18 +117,18 @@ namespace NursesScheduler.BusinessLogic.Services
 
             if (timeForMorningShifts < departamentSettings.TargetMinimalMorningShiftLenght)
             {
-                timeForMorningShifts += GeneralConstants.RegularShiftLenght;
+                timeForMorningShifts += ScheduleConstatns.RegularShiftLenght;
             }
 
-            while (timeForMorningShifts > GeneralConstants.RegularShiftLenght
-                && timeForMorningShifts - GeneralConstants.RegularShiftLenght
+            while (timeForMorningShifts > ScheduleConstatns.RegularShiftLenght
+                && timeForMorningShifts - ScheduleConstatns.RegularShiftLenght
                 > departamentSettings.TargetMinimalMorningShiftLenght)
             {
-                timeForMorningShifts -= GeneralConstants.RegularShiftLenght;
-                lengths.Add(GeneralConstants.RegularShiftLenght);
+                timeForMorningShifts -= ScheduleConstatns.RegularShiftLenght;
+                lengths.Add(ScheduleConstatns.RegularShiftLenght);
             }
 
-            if (timeForMorningShifts > GeneralConstants.RegularShiftLenght)
+            if (timeForMorningShifts > ScheduleConstatns.RegularShiftLenght)
             {
                 lengths.Add(timeForMorningShifts / 2);
                 lengths.Add(timeForMorningShifts / 2);

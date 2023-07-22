@@ -2,7 +2,7 @@
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
+namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
 {
     internal interface ISolverState
     {
@@ -20,7 +20,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.StateManagers
         void AdvanceStateRegularShift();
         void AdvanceStateMorningShift();
         void AdvanceStateTimeOffShift();
-        void AssignEmployeeToMorningShift(INurseState nurse, MorningShift morningShift);
+        void AssignNurseToMorningShift(INurseState nurse, MorningShift morningShift);
         void AssignNurseToRegularShift(INurseState nurse, bool isHoliday, DepartamentSettings departamentSettings);
         void AssignNurseOnTimeOff(INurseState nurse, bool isHoliday, DepartamentSettings departamentSettings);
         TimeSpan GetHoursToScheduleEnd();

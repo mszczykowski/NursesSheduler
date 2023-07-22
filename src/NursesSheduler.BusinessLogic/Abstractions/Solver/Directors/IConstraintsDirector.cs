@@ -1,10 +1,12 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Directors
 {
     internal interface IConstraintsDirector
     {
-        ICollection<IConstraint> GetAllConstraints(DepartamentSettings departamentSettings);
+        IEnumerable<IConstraint> GetAllConstraints(DepartamentSettings departamentSettings,
+            IEnumerable<DayNumbered> monthDays);
     }
 }

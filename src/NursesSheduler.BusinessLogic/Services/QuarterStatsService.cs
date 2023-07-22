@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain;
+using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
@@ -145,27 +145,27 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 nurseQuarterStats.AssignedWorkTime += scheduleNurseStats.AssignedWorkTime;
                 nurseQuarterStats.HolidayHoursAssigned += scheduleNurseStats.HolidayHoursAssigned;
-                nurseQuarterStats.NightShiftsAssigned += scheduleNurseStats.NightShiftsAssigned;
+                nurseQuarterStats.NightHoursAssigned += scheduleNurseStats.NightHoursAssigned;
                 nurseQuarterStats.TimeOffToAssign += scheduleNurseStats.TimeOffToAssign;
                 nurseQuarterStats.TimeOffAssigned += scheduleNurseStats.TimeOffAssigned;
 
-                if(scheduleNurseStats.MorningShiftsIdsAssigned is not null)
+                if(scheduleNurseStats.MorningShiftsAssigned is not null)
                 {
-                    nurseQuarterStats.MorningShiftsIdsAssigned = nurseQuarterStats.MorningShiftsIdsAssigned
-                        .Union(scheduleNurseStats.MorningShiftsIdsAssigned);
+                    nurseQuarterStats.MorningShiftsAssigned = nurseQuarterStats.MorningShiftsAssigned
+                        .Union(scheduleNurseStats.MorningShiftsAssigned);
                 }
 
-                if(scheduleNurseStats.WorkTimeInWeeks is not null)
+                if(scheduleNurseStats.WorkTimeAssignedInWeeks is not null)
                 {
-                    foreach (var week in scheduleNurseStats.WorkTimeInWeeks)
+                    foreach (var week in scheduleNurseStats.WorkTimeAssignedInWeeks)
                     {
-                        if (!nurseQuarterStats.WorkTimeInWeeks.ContainsKey(week.Key))
+                        if (!nurseQuarterStats.WorkTimeAssignedInWeeks.ContainsKey(week.Key))
                         {
-                            nurseQuarterStats.WorkTimeInWeeks.Add(week.Key, week.Value);
+                            nurseQuarterStats.WorkTimeAssignedInWeeks.Add(week.Key, week.Value);
                         }
                         else
                         {
-                            nurseQuarterStats.WorkTimeInWeeks[week.Key] += week.Value;
+                            nurseQuarterStats.WorkTimeAssignedInWeeks[week.Key] += week.Value;
                         }
                     }
                 }
@@ -181,8 +181,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private TimeSpan CalculateTimeForMorningShifts(TimeSpan workTimeInQuarter)
         {
-            return workTimeInQuarter - ((int)Math.Floor(workTimeInQuarter / GeneralConstants.RegularShiftLenght)
-                * GeneralConstants.RegularShiftLenght);
+            return workTimeInQuarter - ((int)Math.Floor(workTimeInQuarter / ScheduleConstatns.RegularShiftLenght)
+                * ScheduleConstatns.RegularShiftLenght);
         }
     }
 }

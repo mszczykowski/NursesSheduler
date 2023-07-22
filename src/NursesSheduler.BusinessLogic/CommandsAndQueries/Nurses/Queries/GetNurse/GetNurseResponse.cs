@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNur
         public string Name { get; set; }
         public string Surname { get; set; }
         public int PTOentitlement { get; set; }
-        public NurseTeams Team { get; set; }
+        public NurseTeams NurseTeam { get; set; }
         public int DepartamentId { get; set; }
     }
 }

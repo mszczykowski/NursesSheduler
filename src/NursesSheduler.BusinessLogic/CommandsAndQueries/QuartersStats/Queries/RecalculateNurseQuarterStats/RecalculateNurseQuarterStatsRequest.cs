@@ -15,7 +15,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries
             public TimeSpan HolidayHoursAssigned { get; set; }
             public TimeSpan TimeOffToAssign { get; set; }
             public TimeSpan TimeOffAssigned { get; set; }
-            public int NightShiftsAssigned { get; set; }
+            public TimeSpan NightHoursAssigned { get; set; }
         }
     }
 }
