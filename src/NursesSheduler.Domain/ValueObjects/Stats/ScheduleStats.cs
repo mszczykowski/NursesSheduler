@@ -2,7 +2,7 @@
 {
     public sealed record ScheduleStats
     {
-        public ScheduleStatsKey CacheKey { get; set; }
+        public ScheduleStatsKey Key { get; set; }
         public int MonthInQuarter { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
         public TimeSpan WorkTimeBalance { get; set; }

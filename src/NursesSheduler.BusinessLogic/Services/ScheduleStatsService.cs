@@ -91,7 +91,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var scheduleStats = new ScheduleStats
             {
-                CacheKey = key,
+                Key = key,
                 WorkTimeInMonth = _workTimeService.GetWorkTimeFromDays(monthDays, departamentSettings),
                 MonthInQuarter = _calendarService
                     .GetMonthInQuarterNumber(key.Month, departamentSettings.FirstQuarterStart),
@@ -173,7 +173,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var scheduleStats = new ScheduleStats
             {
-                CacheKey = key,
+                Key = key,
                 WorkTimeInMonth = schedule.WorkTimeInMonth,
                 WorkTimeBalance = schedule.WorkTimeBalance,
                 MonthInQuarter = _calendarService

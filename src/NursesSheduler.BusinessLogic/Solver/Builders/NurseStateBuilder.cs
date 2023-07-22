@@ -71,7 +71,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public INurseStateBuilder SetNumberOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats)
+        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats)
         {
             _numberOfTimeOffShiftsToAssign = (int)Math
                 .Round((nurseScheduleStats.TimeOffToAssign - nurseScheduleStats.TimeOffAssigned)

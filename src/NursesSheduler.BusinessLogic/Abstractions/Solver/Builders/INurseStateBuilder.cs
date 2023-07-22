@@ -11,7 +11,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Builders
         INurseStateBuilder SetHoursFromLastShift(int previousMonthLength, NurseScheduleStats? previousScheduleNurseStats);
         INurseStateBuilder SetHoursToNextShiftMatrix(int nextMonthLength, IEnumerable<NurseWorkDay> nurseWorkDays, 
             NurseScheduleStats? nextScheduleNurseStats, WorkTimeService workTimeService);
-        INurseStateBuilder SetNumberOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats);
+        INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats);
         INurseStateBuilder SetNurseId(ScheduleNurse scheduleNurse);
         INurseStateBuilder SetNurseTeam(Nurse nurse);
         INurseStateBuilder SetPreviouslyAssignedMorningShifts(NurseStats nurseQuarterStats);
