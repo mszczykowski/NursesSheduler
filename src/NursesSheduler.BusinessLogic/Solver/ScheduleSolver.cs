@@ -5,7 +5,6 @@ using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Managers;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Directors;
-using NursesScheduler.BusinessLogic.Solver.StateManagers;
 using NursesScheduler.BusinessLogic.Solver.States;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
@@ -43,7 +42,7 @@ namespace NursesScheduler.BusinessLogic.Solver
             _employeeQueueDirector = new NurseQueueDirector();
         }
 
-        public ISolverState GenerateSchedule(Random random, IShiftCapacityManager shiftCapacityManager, 
+        public ISolverState? GenerateSchedule(Random random, IShiftCapacityManager shiftCapacityManager, 
             ISolverState initialState)
         {
             _random = random;
@@ -52,11 +51,11 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             _shiftCapacityManager.InitialiseShiftCapacities(initialState);
 
-            return AssignShift(initialState, new Queue<int>());
+            return AssignShift(initialState, null);
         }
 
 
-        private ISolverState AssignShift(ISolverState previousState, Queue<int>? previousQueue)
+        private ISolverState? AssignShift(ISolverState previousState, Queue<int>? previousQueue)
         {
             Queue<int> currentQueue;
             ISolverState currentState = new SolverState(previousState);
@@ -139,6 +138,8 @@ namespace NursesScheduler.BusinessLogic.Solver
                         _departamentSettings, _workTimeService);
                 }
 
+                ISolverState result;
+
                 if(currentState.IsShiftAssigned)
                 {
                     currentState.AdvanceUnassignedNursesState();
@@ -150,9 +151,13 @@ namespace NursesScheduler.BusinessLogic.Solver
                     }
 
                     currentState.SetNursesToAssignCounts(_shiftCapacityManager);
-                }
 
-                var result = AssignShift(currentState, currentQueue);
+                    result = AssignShift(currentState, null);
+                }
+                else
+                {
+                    result = AssignShift(currentState, currentQueue);
+                }
 
                 if (result is null)
                 {

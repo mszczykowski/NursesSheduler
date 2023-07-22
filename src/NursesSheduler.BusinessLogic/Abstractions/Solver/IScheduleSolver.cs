@@ -5,7 +5,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver
 {
     internal interface IScheduleSolver
     {
-        ISolverState GenerateSchedule(Random random, IShiftCapacityManager shiftCapacityManager,
+        ISolverState? GenerateSchedule(Random random, IShiftCapacityManager shiftCapacityManager,
             ISolverState initialState);
     }
 }

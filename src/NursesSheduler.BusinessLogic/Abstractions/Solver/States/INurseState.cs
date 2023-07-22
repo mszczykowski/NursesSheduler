@@ -11,16 +11,16 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         MorningShiftIndex? AssignedMorningShift { get; }
         TimeSpan HolidayHoursAssigned { get; }
         TimeSpan HoursFromLastShift { get; }
-        TimeSpan[] HoursToNextShiftMatrix { get; init; }
+        TimeSpan[] HoursToNextShiftMatrix { get; }
         TimeSpan NightHoursAssigned { get; }
         int NumberOfRegularShiftsToAssign { get; }
         int NumberOfTimeOffShiftsToAssign { get; }
-        int NurseId { get; init; }
-        NurseTeams NurseTeam { get; init; }
-        HashSet<MorningShiftIndex> PreviouslyAssignedMorningShifts { get; init; }
-        ShiftTypes PreviousMonthLastShift { get; init; }
-        bool[] TimeOff { get; init; }
-        Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; init; }
+        int NurseId { get; }
+        NurseTeams NurseTeam { get; }
+        HashSet<MorningShiftIndex> PreviouslyAssignedMorningShifts { get; }
+        ShiftTypes PreviousMonthLastShift { get; }
+        bool[] TimeOff { get; }
+        Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; }
         TimeSpan WorkTimeInQuarterLeft { get; }
 
         void AdvanceState();

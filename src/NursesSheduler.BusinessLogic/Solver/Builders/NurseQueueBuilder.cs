@@ -53,7 +53,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseQueueBuilder ProritisePreviousDayShiftWorkers(HashSet<int> previousDayShift)
         {
-            _nursesPrioritised = _nurses.Where(n => previousDayShift.Contains(n.NurseId)).ToList();
+            _nursesPrioritised.AddRange(_nurses.Where(n => previousDayShift.Contains(n.NurseId)));
 
             _nurses.RemoveAll(n => previousDayShift.Contains(n.NurseId));
 

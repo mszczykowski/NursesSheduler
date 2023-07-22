@@ -13,16 +13,18 @@ namespace NursesScheduler.BusinessLogic.Solver.States
     {
         public int NurseId { get; init; }
         public Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; init; }
-        public TimeSpan HoursFromLastShift { get; private set; }
+
+        public TimeSpan _hoursFromLastShift;
+        public TimeSpan HoursFromLastShift { get; set; }
         public TimeSpan[] HoursToNextShiftMatrix { get; init; }
-        public int NumberOfRegularShiftsToAssign { get; private set; }
-        public int NumberOfTimeOffShiftsToAssign { get; private set; }
-        public TimeSpan HolidayHoursAssigned { get; private set; }
-        public TimeSpan NightHoursAssigned { get; private set; }
-        public TimeSpan WorkTimeInQuarterLeft { get; private set; }
+        public int NumberOfRegularShiftsToAssign { get; set; }
+        public int NumberOfTimeOffShiftsToAssign { get; set; }
+        public TimeSpan HolidayHoursAssigned { get; set; }
+        public TimeSpan NightHoursAssigned { get; set; }
+        public TimeSpan WorkTimeInQuarterLeft { get; set; }
         public bool[] TimeOff { get; init; }
         public HashSet<MorningShiftIndex> PreviouslyAssignedMorningShifts { get; init; }
-        public MorningShiftIndex? AssignedMorningShift { get; private set; }
+        public MorningShiftIndex? AssignedMorningShift { get; set; }
         public ShiftTypes PreviousMonthLastShift { get; init; }
         public NurseTeams NurseTeam { get; init; }
 
@@ -52,7 +54,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(stateToCopy.WorkTimeAssignedInWeeks);
         }
 
-        public void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
+        public void UpdateStateOnRegularShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             NumberOfRegularShiftsToAssign--;
