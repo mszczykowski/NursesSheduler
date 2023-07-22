@@ -16,23 +16,47 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
 
             var nurseStateBuilder = new NurseStateBuilder();
 
-            foreach(var scheduleNurse in currentSchedule.ScheduleNurses)
+            var scheduleStatsList = new List<ScheduleStats>()
+                        {
+                            previousScheduleStats,
+                            currentScheduleStats,
+                            nextScheduleStats,
+                        };
+
+            foreach (var scheduleNurse in currentSchedule.ScheduleNurses)
             {
+                var nurse = nurses
+                    .First(n => n.NurseId == scheduleNurse.NurseId);
+
+                var nurseQuarterStats = quarterStats.NurseStats
+                    .First(n => n.NurseId == scheduleNurse.NurseId);
+
+                var previousScheduleNurseStats = previousScheduleStats.NursesScheduleStats
+                    .FirstOrDefault(n => n.NurseId == scheduleNurse.NurseId);
+
                 nurseStates.Add(nurseStateBuilder
                     .SetNurseId(scheduleNurse)
-                    .SetWorkTimeAssignedInWeeks(quarterStats.NurseStats.First(n => n.NurseId == scheduleNurse.NurseId))
+                    .SetWorkTimeAssignedInWeeks(nurseQuarterStats)
                     .SetHoursFromLastShift(DateTime.DaysInMonth(previousScheduleStats.Key.Year, 
-                        previousScheduleStats.Key.Month), 
-                        previousScheduleStats.NursesScheduleStats.First(n => n.NurseId == scheduleNurse.NurseId))
+                        previousScheduleStats.Key.Month),
+                        previousScheduleNurseStats)
                     .SetHoursToNextShiftMatrix(DateTime.DaysInMonth(nextScheduleStats.Key.Year,
                         nextScheduleStats.Key.Month), scheduleNurse.NurseWorkDays, 
                         nextScheduleStats.NursesScheduleStats.FirstOrDefault(n => n.NurseId == scheduleNurse.NurseId),
                         workTimeService)
                     .SetNumbersOfShifts(currentScheduleStats.WorkTimeInMonth, 
                         currentScheduleStats.NursesScheduleStats.First(n => n.NurseId == scheduleNurse.NurseId))
-                    .SetSpecialWorkHours(nurses.First(n => n.NurseId == scheduleNurse.NurseId))
+                    .SetSpecialWorkHours(nurse, scheduleStatsList)
+                    .SetWorkTimeInQuarterLeft(quarterStats.WorkTimeInQuarter, nurseQuarterStats)
+                    .SetTimeOffs(scheduleNurse.NurseWorkDays)
+                    .SetPreviouslyAssignedMorningShifts(nurseQuarterStats)
+                    .SetAssignedMorningShift(scheduleNurse.NurseWorkDays)
+                    .SetPreviousMonthLastShift(previousScheduleNurseStats)
+                    .SetNurseTeam(nurse)
                     .GetResult());
             }
+
+            return nurseStates;
         }
     }
 }

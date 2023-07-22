@@ -139,9 +139,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public INurseStateBuilder SetPreviousMonthLastShift(NurseScheduleStats previousScheduleNurseStats)
+        public INurseStateBuilder SetPreviousMonthLastShift(NurseScheduleStats? previousScheduleNurseStats)
         {
-            _previousMonthLastShift = previousScheduleNurseStats.LastState;
+            _previousMonthLastShift = previousScheduleNurseStats?.LastState ?? ShiftTypes.None;
 
             return this;
         }

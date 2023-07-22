@@ -39,14 +39,14 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseQueueBuilder OrderByLowestNumberOfHolidayShitfs()
         {
-            _orderByBuilder.Append(nameof(INurseState.HolidayPaidHoursAssigned) + ",");
+            _orderByBuilder.Append(nameof(INurseState.HolidayHoursAssigned) + ",");
 
             return this;
         }
 
         public INurseQueueBuilder OrderByLowestNumberOfNightShitfs()
         {
-            _orderByBuilder.Append(nameof(INurseState.NumberOfNightShiftsAssigned) + ",");
+            _orderByBuilder.Append(nameof(INurseState.NightHoursAssigned) + ",");
 
             return this;
         }
