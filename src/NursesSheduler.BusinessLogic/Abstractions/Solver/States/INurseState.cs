@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
 {
     internal interface INurseState
     {
-        MorningShiftIndex? AssignedMorningShift { get; }
+        MorningShiftIndex? AssignedMorningShiftIndex { get; }
         TimeSpan HolidayHoursAssigned { get; }
         TimeSpan HoursFromLastShift { get; }
         TimeSpan[] HoursToNextShiftMatrix { get; }

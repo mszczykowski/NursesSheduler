@@ -24,7 +24,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public TimeSpan WorkTimeInQuarterLeft { get; set; }
         public bool[] TimeOff { get; init; }
         public HashSet<MorningShiftIndex> PreviouslyAssignedMorningShifts { get; init; }
-        public MorningShiftIndex? AssignedMorningShift { get; set; }
+        public MorningShiftIndex? AssignedMorningShiftIndex { get; set; }
         public ShiftTypes PreviousMonthLastShift { get; init; }
         public NurseTeams NurseTeam { get; init; }
 
@@ -46,7 +46,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             WorkTimeInQuarterLeft = stateToCopy.WorkTimeInQuarterLeft;
             TimeOff = stateToCopy.TimeOff;
             PreviouslyAssignedMorningShifts = stateToCopy.PreviouslyAssignedMorningShifts;
-            AssignedMorningShift = stateToCopy.AssignedMorningShift;
+            AssignedMorningShiftIndex = stateToCopy.AssignedMorningShiftIndex;
             PreviousMonthLastShift = stateToCopy.PreviousMonthLastShift;
             NurseTeam = stateToCopy.NurseTeam;
 
@@ -65,12 +65,12 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
-            if (AssignedMorningShift is not null)
+            if (AssignedMorningShiftIndex is not null)
             {
                 throw new InvalidOperationException("UpdateStateOnMorningShiftAssign: assigned morning shift is not null");
             }
 
-            AssignedMorningShift = morningShift.Index;
+            AssignedMorningShiftIndex = morningShift.Index;
 
             if(morningShift.ShiftLength == TimeSpan.Zero)
             {

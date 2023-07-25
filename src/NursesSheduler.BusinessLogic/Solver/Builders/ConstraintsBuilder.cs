@@ -17,7 +17,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public IConstraintsBuilder AddBreakConstraint(DepartamentSettings departamentSettings)
         {
-            _result.Add(new BreakConstraint(departamentSettings.MinmalShiftBreak));
+            _result.Add(new ShiftBreakConstraint(departamentSettings.MinmalShiftBreak));
             return this;
         }
 

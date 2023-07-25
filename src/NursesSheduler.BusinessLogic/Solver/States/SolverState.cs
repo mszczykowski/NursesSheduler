@@ -140,7 +140,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
                     if (workDay.ShiftType == ShiftTypes.Morning)
                     {
                         workDay.MorningShiftIndex = NurseStates
-                            .First(n => n.NurseId == scheduleNurse.NurseId).AssignedMorningShift;
+                            .First(n => n.NurseId == scheduleNurse.NurseId).AssignedMorningShiftIndex;
                     }
                 }
             }

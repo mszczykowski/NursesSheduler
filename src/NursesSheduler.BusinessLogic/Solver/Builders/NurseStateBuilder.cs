@@ -49,9 +49,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         public INurseStateBuilder SetHoursToNextShiftMatrix(int nextMonthLength, IEnumerable<NurseWorkDay> nurseWorkDays,
             NurseScheduleStats? nextScheduleNurseStats, WorkTimeService workTimeService)
         {
-            _hoursToNextShiftMatrix = new TimeSpan[nurseWorkDays.Count()];
+            _hoursToNextShiftMatrix = new TimeSpan[nurseWorkDays.Count() + 1];
 
-            for (int i = 0; i < _hoursToNextShiftMatrix.GetLength(0); i++)
+            for (int i = 0; i < nurseWorkDays.Count(); i++)
             {
                 if (i > 0 && _hoursToNextShiftMatrix[i - 1] - TimeSpan.FromDays(1) >= TimeSpan.Zero)
                 {
@@ -63,19 +63,33 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
                     if (!nurseWorkDays.Any(wd => wd.Day >= i - 1 && wd.ShiftType != ShiftTypes.None))
                     {
-                        _hoursToNextShiftMatrix[i] += nextScheduleNurseStats?.HoursToFirstAssignedShift
-                            ?? TimeSpan.FromDays(nextMonthLength);
+                        _hoursToNextShiftMatrix[i] += GetNextScheudleTimeToFirstShift(nextMonthLength,
+                            nextScheduleNurseStats);
                     }
                 }
             }
+
+            _hoursToNextShiftMatrix[_hoursToNextShiftMatrix.Length - 1] = GetNextScheudleTimeToFirstShift(nextMonthLength,
+                nextScheduleNurseStats);
+
             return this;
         }
 
-        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats)
+        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, IEnumerable<NurseWorkDay> nurseWorkDays,
+            NurseScheduleStats nurseScheduleStats)
         {
-            _numberOfTimeOffShiftsToAssign = (int)Math
-                .Round((nurseScheduleStats.TimeOffToAssign - nurseScheduleStats.TimeOffAssigned)
-                    / ScheduleConstatns.RegularShiftLenght);
+            if(nurseScheduleStats.TimeOffAssigned > nurseScheduleStats.TimeOffToAssign)
+            {
+                _numberOfTimeOffShiftsToAssign = (int)Math
+                    .Round(nurseScheduleStats.TimeOffAssigned
+                        / ScheduleConstatns.RegularShiftLenght);
+            }
+            else
+            {
+                _numberOfTimeOffShiftsToAssign = (int)Math
+                    .Round((nurseScheduleStats.TimeOffToAssign - nurseScheduleStats.TimeOffAssigned)
+                        / ScheduleConstatns.RegularShiftLenght);
+            }
 
             _numberOfRegularShiftsToAssign = (int)Math
                 .Floor((workTimeInMonth - nurseScheduleStats.AssignedWorkTime)
@@ -168,10 +182,16 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
                 WorkTimeInQuarterLeft = _workTimeInQuarterLeft,
                 TimeOff = _timeOff,
                 PreviouslyAssignedMorningShifts = _previouslyAssignedMorningShifts,
-                AssignedMorningShift = _assignedMorningShift,
+                AssignedMorningShiftIndex = _assignedMorningShift,
                 PreviousMonthLastShift = _previousMonthLastShift,
                 NurseTeam = _nurseTeam,
             };
+        }
+
+
+        private TimeSpan GetNextScheudleTimeToFirstShift(int nextMonthLength, NurseScheduleStats? nextScheduleNurseStats)
+        {
+            return nextScheduleNurseStats?.HoursToFirstAssignedShift ?? TimeSpan.FromDays(nextMonthLength);
         }
     }
 }

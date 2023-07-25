@@ -8,6 +8,8 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class WorkTimeService : IWorkTimeService
     {
+        public int 
+
         public TimeSpan GetHoursFromLastAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
             TimeSpan hoursFromLastAssignedShift = TimeSpan.Zero;

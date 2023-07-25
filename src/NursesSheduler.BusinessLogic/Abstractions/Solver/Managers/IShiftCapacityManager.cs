@@ -5,8 +5,9 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Managers
 {
     internal interface IShiftCapacityManager
     {
-        int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber);
+        void GenerateCapacities(Random random);
         int GetNumberOfNursesForMorningShift(ShiftIndex shiftIndex, int dayNumber);
-        void InitialiseShiftCapacities(ISolverState initialState);
+        int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber);
+        void InitialiseCapacityManager();
     }
 }

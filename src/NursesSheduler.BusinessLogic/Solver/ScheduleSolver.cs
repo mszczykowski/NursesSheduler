@@ -104,7 +104,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                 }
                 else if(currentState.NursesToAssignForMorningShift > 0)
                 {
-                    if (_currentNurse.AssignedMorningShift is not null)
+                    if (_currentNurse.AssignedMorningShiftIndex is not null)
                     {
                         continue;
                     }
