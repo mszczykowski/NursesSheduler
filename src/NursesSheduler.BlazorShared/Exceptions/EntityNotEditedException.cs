@@ -10,7 +10,7 @@
         {
 
         }
-        public EntityNotEditedException(int id, string type) : base($"Entity of type {type} with key {id} cannot be edited.")
+        public EntityNotEditedException(int id, string type) : base($"Entity of type {type} with key {id} was not edited.")
         {
 
         }

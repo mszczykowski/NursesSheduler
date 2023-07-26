@@ -30,7 +30,7 @@
     }
     else
     {
-        <NurseForm Nurse=@_nurse UseTeams=_departametSettings.UseTeams SaveNurse="SaveNurse" />
+        <NurseForm Nurse=@_nurse UseTeams=CurrentDepartamentStore.CurrentDepartament.UseTeamsSetting SaveNurse="SaveNurse" />
     }
 </div>
 
@@ -40,34 +40,15 @@
     public int Id { get; set; }
 
     private NurseViewModel _nurse;
-    private DepratamentSettingsViewModel _departametSettings;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await LoadDepartamentSettings();
             await LoadNurse();
         }
 
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private async Task LoadDepartamentSettings()
-    {
-        try
-        {
-            var request = new GetDepartamentSettingsRequest
-                {
-                    DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId,
-                };
-
-            _departametSettings = _mapper.Map<DepratamentSettingsViewModel>(await _mediatr.Send(request));
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
     }
 
     private async Task LoadNurse()

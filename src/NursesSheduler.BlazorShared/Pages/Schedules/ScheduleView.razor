@@ -62,9 +62,6 @@ else
                 <div class="level-item">
                     <a>Drukuj</a>
                 </div>
-                <div class="level-item">
-                    <a class"is-danger">Usuń</a>
-                </div>
             </div>
         </div>
         <div class="level is-boxed">
@@ -107,6 +104,11 @@ else
                 {
                     <div class="level-item">
                         <p class="control">
+                            <a class="button is-danger is-inverted" disabled=@_deleteDisabled>Usuń</a>
+                        </p>
+                    </div>
+                    <div class="level-item">
+                        <p class="control">
                             <a class="button is-info">
                                 <span class="icon">
                                     <i class="fas fa-check" aria-hidden="true"></i>
@@ -117,7 +119,7 @@ else
                     </div>
                     <div class="level-item">
                         <p class="control">
-                            <a class="button is-danger">
+                            <a class="button is-danger" @onclick="ClearSchedule">
                                 <span class="icon">
                                     <i class="fas fa-xmark" aria-hidden="true"></i>
                                 </span>
@@ -162,6 +164,9 @@ else
 
 
 @code {
+    private bool _deleteDisabled;
+
+
     private IEnumerable<NurseViewModel> _nurses;
 
     private ScheduleDataWrapper _currentScheduleData = new();
@@ -263,8 +268,10 @@ else
         _currentScheduleData.Days = await GetMonthDaysAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
 
         _currentScheduleData.Schedule = await GetScheduleAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+        _deleteDisabled = false;
         if (_currentScheduleData.Schedule is null)
         {
+            _deleteDisabled = true;
             _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
                 _currentQuarterData.Quarter.QuarterId);
         }
@@ -469,11 +476,20 @@ else
         _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
     }
 
-    public void SetScheduleVisibility(ScheduleDisplayed pickedSchedule)
+    private void SetScheduleVisibility(ScheduleDisplayed pickedSchedule)
     {
         if(pickedSchedule != ScheduleDisplayed.Previous || _isPreviousScheduleAvailable)
         {
             _currentDisplayedSchedule = pickedSchedule;
         }
+    }
+
+    private void ClearSchedule()
+    {
+        foreach(var workDay in _currentScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays))
+        {
+            workDay.ShiftType = ShiftTypes.None;
+        }
+        _currentScheduleData.RequestScheduleViewRefresh();
     }
 }

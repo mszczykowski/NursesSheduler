@@ -26,6 +26,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             CancellationToken cancellationToken)
         {
             var departament = await _context.Departaments
+                .Include(d => d.DepartamentSettings)
                 .FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId);
 
             if (departament == null)

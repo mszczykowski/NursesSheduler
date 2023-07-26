@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery;
@@ -18,6 +19,8 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<RecalculateNurseScheduleStatsRequest.NurseWorkDayRequest, NurseWorkDay>();
             
             CreateMap<GetScheduleStatsFromScheduleRequest.NurseWorkDayRequest, NurseWorkDay>();
+
+            CreateMap<UpsertScheduleRequest.NurseWorkDayRequest, NurseWorkDay>();
         }
     }
 }

@@ -14,6 +14,8 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
         [Range(1, 12, ErrorMessage = "Wartość musi być miesiącem")]
         public int FirstQuarterStart { get; set; }
 
+        public bool UseTeamsSetting { get; set; }
+
         public DepartamentViewModel()
         {
             FirstQuarterStart = 1;

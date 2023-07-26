@@ -66,11 +66,8 @@
     {
         try
         {
-            var request = _mapper.Map<EditDepartamentSettingsRequest>(_settings);
-            var response = await _mediatr.Send(request);
-
-            if (response == null)
-                throw new EntityNotEditedException(_settings.DepartamentSettingsId, nameof(DepartamentViewModel));
+            var response = await _mediatr.Send(_mapper.Map<EditDepartamentSettingsRequest>(_settings));
+            CurrentDepartamentStore.CurrentDepartament.UseTeamsSetting = response.UseTeams;
         }
         catch (Exception e)
         {

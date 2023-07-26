@@ -17,8 +17,8 @@ else
         <thead>
             <tr>
                 <th>L.p.</th>
-                <th class="is-fullwidth">Imie i nazwisko</th>
-                <th>Bilans godizn nocnych</th>
+                <th class="is-maincolumn">Imie i nazwisko</th>
+                <th>Bilans godzin nocnych</th>
                 <th>Bilans godzin świątecznych</th>
                 <th></th>
                 <th></th>
@@ -30,10 +30,10 @@ else
                 foreach (var nurse in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name))
                 {
                     <tr>
-                        <td>@nurseIndex++</td>
-                        <td class="is-fullwidth">@nurse.ToString()</td>
-                        <td class="is-fullwidth">@nurse.NightHoursBalance.GetTotalHoursAndMinutes()</td>
-                        <td class="is-fullwidth">@nurse.HolidayHoursBalance.GetTotalHoursAndMinutes()</td>
+                        <td>@(++nurseIndex)</td>
+                        <td>@nurse.ToString()</td>
+                        <td>@nurse.NightHoursBalance.GetTotalHoursAndMinutes()</td>
+                        <td>@nurse.HolidayHoursBalance.GetTotalHoursAndMinutes()</td>
                         <td><a href="/nurse/edit/@nurse.NurseId">Edytuj</a></td>
                         <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(nurse.ToString(), nurse.NurseId))">Usuń</a></td>
                     </tr>

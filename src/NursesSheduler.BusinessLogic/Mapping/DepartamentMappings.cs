@@ -18,7 +18,9 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<Departament, CreateDepartamentResponse>();
             CreateMap<EditDepartamentRequest, Departament>();
             CreateMap<Departament, EditDepartamentResponse>();
-            CreateMap<Departament, PickDepartamentResponse>();
+            CreateMap<Departament, PickDepartamentResponse>()
+                .ForMember(dest => dest.UseTeamsSetting,
+                            opt => opt.MapFrom(src => src.DepartamentSettings.UseTeams));
         }
     }
 }

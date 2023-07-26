@@ -17,7 +17,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public IConstraintsBuilder AddBreakConstraint(DepartamentSettings departamentSettings)
         {
-            _result.Add(new ShiftBreakConstraint(departamentSettings.MinmalShiftBreak));
+            _result.Add(new ShiftBreakConstraint(departamentSettings.MinimalShiftBreak));
             return this;
         }
 
@@ -30,7 +30,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         public IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint(DepartamentSettings departamentSettings,
             IEnumerable<DayNumbered> monthDays)
         {
-            _result.Add(new MaxTotalHoursInWeekConstraint(departamentSettings.MaximalWeekWorkTimeLength, monthDays));
+            _result.Add(new MaxTotalHoursInWeekConstraint(departamentSettings.MaximumWeekWorkTimeLength, monthDays));
             return this;
         }
 

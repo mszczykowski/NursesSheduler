@@ -32,10 +32,7 @@
 
   <ItemGroup>
     <Folder Include="CommandsAndQueries\Schedules\Queries\CheckSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Commands\CloseSchedule\" />
     <Folder Include="CommandsAndQueries\Schedules\Queries\PrintSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Commands\SaveSchedule\" />
-    <Folder Include="CommandsAndQueries\Schedules\Commands\DeleteSchedule\" />
   </ItemGroup>
 
   <ItemGroup>

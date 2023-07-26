@@ -10,7 +10,7 @@
                         Konfigruracja czasu pracy
                     </p>
                     <TimeSpanInput Label="Dzienny wymiar pracy" @bind-Value="Settings.WorkDayLength" ValidationFor="@(() => Settings.WorkDayLength)" />
-                    <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximalWeekWorkTimeLength" ValidationFor="@(() => Settings.MaximalWeekWorkTimeLength)" />
+                    <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximumWeekWorkTimeLength" ValidationFor="@(() => Settings.MaximumWeekWorkTimeLength)" />
                     <TimeSpanInput Label="Minimalna przerwa między dyżurami" @bind-Value="Settings.MinimalShiftBreak" ValidationFor="@(() => Settings.MinimalShiftBreak)" />
                     <br />
                     <p class="title is-4">
@@ -42,10 +42,8 @@
                         </div>
                     </div>
                     <div class="field">
-                        <label class="label">Użyj zespołów przy generacji grafików</label>
-                        <div class="control">
-                            <InputCheckbox class="input" @bind-Value="Settings.UseTeams" />
-                        </div>
+                        <label class="checkbox">Użyj zespołów przy generacji grafików</label>
+                        <InputCheckbox @bind-Value="Settings.UseTeams" />
                     </div>
                     <div class="buttons is-right">
                         <button class="button is-primary @CssHelper.SetIsLoading(_isLoadingSave)" type="submit">Zapisz</button>

@@ -7,8 +7,8 @@ namespace NursesScheduler.Domain.Entities
         public int DepartamentSettingsId { get; set; }
 
         public TimeSpan WorkDayLength { get; set; }
-        public TimeSpan MaximalWeekWorkTimeLength { get; set; }
-        public TimeSpan MinmalShiftBreak { get; set; }
+        public TimeSpan MaximumWeekWorkTimeLength { get; set; }
+        public TimeSpan MinimalShiftBreak { get; set; }
         public TimeSpan TargetMinimalMorningShiftLenght { get; set; }
         public TimeSpan DayShiftHolidayEligibleHours { get; set; }
         public TimeSpan NightShiftHolidayEligibleHours { get; set; }
@@ -25,8 +25,8 @@ namespace NursesScheduler.Domain.Entities
         public DepartamentSettings()
         {
             WorkDayLength = new TimeSpan(7, 35, 0);
-            MaximalWeekWorkTimeLength = TimeSpan.FromHours(24);
-            MinmalShiftBreak = TimeSpan.FromHours(12);
+            MaximumWeekWorkTimeLength = TimeSpan.FromHours(24);
+            MinimalShiftBreak = TimeSpan.FromHours(12);
             TargetMinNumberOfNursesOnShift = 4;
             TargetMinimalMorningShiftLenght = TimeSpan.FromHours(6);
             DefaultGeneratorRetryValue = 4;

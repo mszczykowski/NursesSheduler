@@ -6,5 +6,6 @@
         public string Name { get; set; }
         public int CreationYear { get; set; }
         public int FirstQuarterStart { get; set; }
+        public bool UseTeamsSetting { get; set; }
     }
 }

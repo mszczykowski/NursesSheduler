@@ -23,24 +23,19 @@
             </div>
         </div>
     </div>
-    <NurseForm Nurse=_nurse UseTeams=_departamentSettings.UseTeams SaveNurse="SaveNurse" />
+    <NurseForm Nurse=_nurse UseTeams=CurrentDepartamentStore.CurrentDepartament.UseTeamsSetting SaveNurse="SaveNurse" />
 </div>
 
 
 @code {
     private NurseViewModel _nurse;
-    private DepratamentSettingsViewModel _departamentSettings;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {
-            await LoadDepartamentSettings();
-            _nurse = new NurseViewModel();
-            _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
-        }
+        base.OnInitialized();
 
-        await base.OnAfterRenderAsync(firstRender);
+        _nurse = new NurseViewModel();
+        _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
     }
 
     private async Task SaveNurse()
@@ -51,23 +46,6 @@
             var response = await _mediatr.Send(request);
 
             NavigationManager.NavigateTo("/nurses");
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
-    }
-
-    private async Task LoadDepartamentSettings()
-    {
-        try
-        {
-            var request = new GetDepartamentSettingsRequest
-                {
-                    DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId,
-                };
-
-            _departamentSettings = _mapper.Map<DepratamentSettingsViewModel>(await _mediatr.Send(request));
         }
         catch (Exception e)
         {
