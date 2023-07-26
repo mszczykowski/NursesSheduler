@@ -208,11 +208,11 @@ namespace NursesScheduler.BusinessLogic.Services
             return scheduleStats;
         }
 
-        private IEnumerable<int> GetAssignedMorningShifts(IEnumerable<NurseWorkDay> nurseWorkDays)
+        private IEnumerable<MorningShiftIndex> GetAssignedMorningShifts(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            return new List<int>(nurseWorkDays
+            return nurseWorkDays
                 .Where(d => d.ShiftType == ShiftTypes.Morning)
-                .Select(d => d.MorningShift.MorningShiftId));
+                .Select(d => d.MorningShift.Index);
         }
 
         private ShiftTypes GetLastState(IEnumerable<NurseWorkDay> nurseWorkDays)

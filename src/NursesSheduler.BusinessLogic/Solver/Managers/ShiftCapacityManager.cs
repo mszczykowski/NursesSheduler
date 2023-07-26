@@ -53,6 +53,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             _regularDayShiftCapacities = new int[_monthDays.Where(d => d.IsWorkDay).Count()];
             _nightShiftsCapacities = new int[_monthDays.Length];
             _holidayDayShiftCapacities = new int[_monthDays.Length - _regularDayShiftCapacities.Length];
+
+            InitialiseCapacitiesComponents();
         }
 
         private int GetMorningShiftsToAssignInMonth(IEnumerable<INurseState> initialNurseStates,
@@ -73,11 +75,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
                 .Count();
 
             return (totalNumberOfMorningShifts - numberOfAssignedMorningShifts) / 3 - (scheduleStats.MonthInQuarter - 1);
-        }
-
-        public void InitialiseCapacityManager()
-        {
-            InitialiseCapacitiesComponents();
         }
 
         public void GenerateCapacities(Random random)

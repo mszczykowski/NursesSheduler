@@ -1,10 +1,10 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Solver;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
-using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.Managers;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.Queue;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
-using NursesScheduler.BusinessLogic.Solver.Directors;
+using NursesScheduler.BusinessLogic.Solver.Queue;
 using NursesScheduler.BusinessLogic.Solver.States;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
@@ -15,14 +15,11 @@ namespace NursesScheduler.BusinessLogic.Solver
     internal sealed class ScheduleSolver : IScheduleSolver
     {
         private readonly IEnumerable<IConstraint> _constraints;
-        private readonly INurseQueueDirector _employeeQueueDirector;
         private readonly DepartamentSettings _departamentSettings;
         private readonly IWorkTimeService _workTimeService;
 
         private readonly IEnumerable<MorningShift> _morningShifts;
         private readonly DayNumbered[] _monthDays;
-
-        private readonly bool _useTeams;
 
         private Random _random;
 
@@ -31,48 +28,48 @@ namespace NursesScheduler.BusinessLogic.Solver
 
         private IShiftCapacityManager _shiftCapacityManager;
 
+        private ISolverState _initialState;
+
         public ScheduleSolver(IEnumerable<MorningShift> morningShifts, DayNumbered[] monthDays, 
-            IEnumerable<IConstraint> constraints, DepartamentSettings departamentSettings, bool useTeams)
+            IEnumerable<IConstraint> constraints, DepartamentSettings departamentSettings,
+            IShiftCapacityManager shiftCapacityManager, ISolverState initialState)
         {
             _morningShifts = morningShifts;
             _monthDays = monthDays;
             _departamentSettings = departamentSettings;
             _constraints = constraints;
-            _useTeams = useTeams;
-            _employeeQueueDirector = new NurseQueueDirector();
+            _shiftCapacityManager = shiftCapacityManager;
+            _initialState = initialState;
         }
 
-        public ISolverState? GenerateSchedule(Random random, IShiftCapacityManager shiftCapacityManager, 
-            ISolverState initialState)
+        public ISolverState? TrySolveSchedule(Random random)
         {
             _random = random;
+            _shiftCapacityManager.GenerateCapacities(random);
 
-            _shiftCapacityManager = shiftCapacityManager;
+            var stateCopy = new SolverState(_initialState);
 
-            _shiftCapacityManager.InitialiseShiftCapacities(initialState);
+            stateCopy.SetNursesToAssignCounts(_shiftCapacityManager);
 
-            return AssignShift(initialState, null);
+            return AssignShift(stateCopy, GetQueue());
         }
 
 
-        private ISolverState? AssignShift(ISolverState previousState, Queue<int>? previousQueue)
+        private ISolverState? AssignShift(ISolverState previousState, INursesQueue currentQueue)
         {
-            Queue<int> currentQueue;
             ISolverState currentState = new SolverState(previousState);
 
-            if (previousQueue is null)
+            if (currentQueue.IsEmpty())
             {
-                currentQueue = _employeeQueueDirector
-                    .GetSortedEmployeeQueue(previousState.CurrentShift, _monthDays[currentState.CurrentDay - 1].IsWorkDay,
-                    currentState.GetPreviousDayDayShift(), previousState.NurseStates, _random);
+                currentQueue.PopulateQueue(currentState, _monthDays[currentState.CurrentDay - 1]);
             }
-            else currentQueue = new Queue<int>(previousQueue);
 
             var currentDay = _monthDays[currentState.CurrentDay - 1];
+            var isFirstTry = true;
 
-
-            while (currentQueue.TryDequeue(out _currentNurseId))
+            while (currentQueue.TryDequeue(out _currentNurseId, isFirstTry))
             {
+                isFirstTry = false;
                 _currentNurse = currentState.NurseStates.First(e => e.NurseId == _currentNurseId);
 
                 if(_currentNurse.TimeOff[currentState.CurrentDay - 1])
@@ -152,11 +149,11 @@ namespace NursesScheduler.BusinessLogic.Solver
 
                     currentState.SetNursesToAssignCounts(_shiftCapacityManager);
 
-                    result = AssignShift(currentState, null);
+                    result = AssignShift(currentState, CopyQueue(currentQueue, false));
                 }
                 else
                 {
-                    result = AssignShift(currentState, currentQueue);
+                    result = AssignShift(currentState, CopyQueue(currentQueue, true));
                 }
 
                 if (result is null)
@@ -171,6 +168,26 @@ namespace NursesScheduler.BusinessLogic.Solver
             }
 
             return null;
+        }
+
+        private INursesQueue GetQueue()
+        {
+            if (_departamentSettings.UseTeams)
+            {
+                return new NursesQueueTeams(_random);
+            }
+
+            return new NursesQueue(_random);
+        }
+
+        private INursesQueue CopyQueue(INursesQueue currentQueue, bool shouldCopyInternalQueues)
+        {
+            if(_departamentSettings.UseTeams)
+            {
+                return new NursesQueueTeams((NursesQueueTeams)currentQueue, shouldCopyInternalQueues);
+            }
+
+            return new NursesQueue((NursesQueue)currentQueue, shouldCopyInternalQueues);
         }
     }
 }

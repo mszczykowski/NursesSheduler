@@ -1,6 +1,6 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Builders;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
+using NursesScheduler.BusinessLogic.Abstractions.Solver.Builders;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
-using NursesScheduler.BusinessLogic.Services;
 using NursesScheduler.BusinessLogic.Solver.States;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
@@ -47,7 +47,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         }
 
         public INurseStateBuilder SetHoursToNextShiftMatrix(int nextMonthLength, IEnumerable<NurseWorkDay> nurseWorkDays,
-            NurseScheduleStats? nextScheduleNurseStats, WorkTimeService workTimeService)
+            NurseScheduleStats? nextScheduleNurseStats, IWorkTimeService workTimeService)
         {
             _hoursToNextShiftMatrix = new TimeSpan[nurseWorkDays.Count() + 1];
 
@@ -75,8 +75,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, IEnumerable<NurseWorkDay> nurseWorkDays,
-            NurseScheduleStats nurseScheduleStats)
+        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats)
         {
             if(nurseScheduleStats.TimeOffAssigned > nurseScheduleStats.TimeOffToAssign)
             {

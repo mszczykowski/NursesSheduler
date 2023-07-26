@@ -1,5 +1,4 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
-using NursesScheduler.BusinessLogic.Solver.Enums;
+﻿using NursesScheduler.BusinessLogic.Solver.Enums;
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Managers
 {
@@ -8,6 +7,5 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Managers
         void GenerateCapacities(Random random);
         int GetNumberOfNursesForMorningShift(ShiftIndex shiftIndex, int dayNumber);
         int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber);
-        void InitialiseCapacityManager();
     }
 }

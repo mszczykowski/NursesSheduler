@@ -19,13 +19,10 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public IDictionary<int, ShiftTypes[]> ScheduleState { get; }
         public bool IsShiftAssigned => NursesToAssignForCurrentShift == 0 && NursesToAssignForMorningShift == 0;
 
-        public SolverState(Schedule schedule, int monthLength, IEnumerable<INurseState> nurses,
-            IShiftCapacityManager shiftCapacityManager)
+        public SolverState(Schedule schedule, int monthLength, IEnumerable<INurseState> nurses)
         {
             CurrentDay = 1;
             CurrentShift = ShiftIndex.Day;
-
-            SetNursesToAssignCounts(shiftCapacityManager);
 
             NurseStates = new List<INurseState>();
             foreach (var nurse in nurses)

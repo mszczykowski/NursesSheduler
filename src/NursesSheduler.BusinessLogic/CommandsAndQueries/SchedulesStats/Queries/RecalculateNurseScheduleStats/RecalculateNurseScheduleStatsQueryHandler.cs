@@ -23,7 +23,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
             var scheduleNurse = _mapper.Map<ScheduleNurse>(request.ScheduleNurse);
 
             return _mapper.Map<RecalculateNursesScheduleStatsResponse>(await _scheduleStatsService
-                .RecalculateNurseScheduleStats(scheduleNurse, request.DepartamentId, request.Year, request.Month));
+                .RecalculateNurseScheduleStats(request.Year, request.Month, request.DepartamentId, scheduleNurse));
         }
     }
 }

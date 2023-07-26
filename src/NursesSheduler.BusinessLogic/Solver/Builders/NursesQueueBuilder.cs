@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NursesScheduler.BusinessLogic.Solver.Builders
 {
-    internal sealed class NurseQueueBuilder : INurseQueueBuilder
+    internal sealed class NursesQueueBuilder : INurseQueueBuilder
     {
         private readonly StringBuilder _orderByBuilder;
         private readonly Random _random;
@@ -14,7 +14,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         private List<INurseState> _nurses;
         private List<INurseState> _nursesPrioritised;
         
-        public NurseQueueBuilder(IEnumerable<INurseState> nurses, Random random)
+        public NursesQueueBuilder(IEnumerable<INurseState> nurses, Random random)
         {
             _nurses = new List<INurseState>(nurses);
             _nursesPrioritised = new List<INurseState>();

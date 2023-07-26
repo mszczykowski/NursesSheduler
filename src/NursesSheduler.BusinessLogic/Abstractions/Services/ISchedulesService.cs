@@ -4,7 +4,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
     internal interface ISchedulesService
     {
-        Task ResolveMorningShifts(Schedule schedule);
+        void ResolveMorningShifts(Schedule schedule, IEnumerable<MorningShift> morningShifts);
         Task<Schedule> CreateNewScheduleAsync(int month, Quarter quarter);
         Task SetTimeOffsAsync(int year, int month, ScheduleNurse scheduleNurse);
     }

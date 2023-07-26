@@ -3,18 +3,24 @@ using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Builders;
 using NursesScheduler.BusinessLogic.Solver.Enums;
-using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.Solver.Directors
 {
-    internal sealed class NurseQueueDirector : INurseQueueDirector
+    internal sealed class NursesQueueDirector : INursesQueueDirector
     {
         private INurseQueueBuilder _nurseQueueBuilder;
+        
+        private readonly Random _random;
 
-        public Queue<int> GetSortedEmployeeQueue(ShiftIndex shiftIndex, bool IsWorkDay,
-            HashSet<int> previousDayShift, IEnumerable<INurseState> nurses, Random random)
+        public NursesQueueDirector(Random random)
         {
-            _nurseQueueBuilder = new NurseQueueBuilder(nurses, random);
+            _random = random;
+        }
+
+        public Queue<int> BuildSortedNursesQueue(ShiftIndex shiftIndex, bool IsWorkDay,
+            HashSet<int> previousDayShift, IEnumerable<INurseState> nurses)
+        {
+            _nurseQueueBuilder = new NursesQueueBuilder(nurses, _random);
 
             switch (shiftIndex, IsWorkDay)
             {

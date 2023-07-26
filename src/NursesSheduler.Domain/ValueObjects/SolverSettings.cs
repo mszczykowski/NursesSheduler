@@ -4,6 +4,6 @@
     {
         public int NumberOfRetries { get; set; }
         public bool UseOwnSeed { get; set; }
-        public string? GeneratorSeed { get; set; }
+        public string GeneratorSeed { get; set; }
     }
 }

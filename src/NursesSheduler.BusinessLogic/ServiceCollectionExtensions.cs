@@ -28,6 +28,7 @@ namespace NursesScheduler.BusinessLogic
             //services
             services.AddSingleton<ICurrentDateService, CurrentDateService>();
             services.AddSingleton<ISeedService, SeedService>();
+            services.AddTransient<IWorkTimeService, WorkTimeService>();
             services.AddTransient<IWorkTimeServiceLegacy, WorkTimeServiceLegacy>();
             services.AddTransient<IAbsencesService, AbsencesServiceLegacy>();
             services.AddTransient<ISchedulesService, SchedulesService>();
@@ -35,6 +36,7 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IScheduleStatsService, ScheduleStatsService>();
             services.AddTransient<IActiveNursesService, ActiveNursesService>();
             services.AddTransient<IQuarterStatsService, QuarterStatsService>();
+            services.AddTransient<IScheduleSolverService, ScheduleSolverService>();
         }
     }
 }

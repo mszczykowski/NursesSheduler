@@ -2,7 +2,7 @@
 {
     public enum NurseTeams
     {
-        T1,
-        T2,
+        A,
+        B,
     }
 }
