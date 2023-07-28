@@ -5,7 +5,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
 {
     internal sealed class GetScheduleStatsFromScheduleQueryHandler : IRequestHandler<GetScheduleStatsFromScheduleRequest,
         GetScheduleStatsFromScheduleResponse>
@@ -26,11 +26,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
 
             if (schedule.IsClosed)
             {
-                _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year, 
+                _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year,
                     schedule.Month, request.DepartamentId));
             }
 
-            return _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year, 
+            return _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year,
                 request.DepartamentId, schedule));
         }
     }

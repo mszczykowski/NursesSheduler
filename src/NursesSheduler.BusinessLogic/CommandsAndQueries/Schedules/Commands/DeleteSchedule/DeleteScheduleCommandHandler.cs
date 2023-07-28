@@ -19,6 +19,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.De
             var schedule = await _applicationDbContext.Schedules.FindAsync(request.ScheduleId)
                 ?? throw new EntityNotFoundException(request.ScheduleId, nameof(Schedule));
 
+            if(schedule.IsClosed)
+            {
+                throw new OperationNotPermittedException("Deleting closed schedule");
+            }
+
             _applicationDbContext.Schedules.Remove(schedule);
 
             var result = await _applicationDbContext.SaveChangesAsync(cancellationToken);

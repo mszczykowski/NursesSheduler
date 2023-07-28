@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.PickDepartament
 {
     public sealed class PickDepartamentRequest : IRequest<PickDepartamentResponse>
     {

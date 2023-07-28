@@ -235,3 +235,9 @@ th {
     width: 100%;
     border-bottom: 1px solid black;
 }
+
+.schedule-shift {
+    text-align: center;
+    width: 100%;
+    font-size: 14px;
+}

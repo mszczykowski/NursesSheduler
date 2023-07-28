@@ -3,11 +3,12 @@ using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule
 {
-    public sealed class UpsertScheduleRequest : IRequest<UpsertScheduleResponse>
+    public sealed class UpsertScheduleRequest : IRequest<UpsertScheduleResponse?>
     {
         public int ScheduleId { get; set; }
         public int Month { get; set; }
         public bool IsClosed { get; set; }
+        public int QuarterId { get; set; }
         public IEnumerable<ScheduleNurseRequest> ScheduleNurses { get; set; }
 
         public sealed class ScheduleNurseRequest

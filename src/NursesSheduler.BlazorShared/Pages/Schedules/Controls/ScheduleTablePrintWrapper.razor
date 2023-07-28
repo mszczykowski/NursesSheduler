@@ -1,0 +1,85 @@
+﻿<head>
+    <meta charset="utf-8" />
+    <base href="https://localhost:7270/" />
+    <link href="_content/NursesScheduler.BlazorShared/css/bulma.min.css" rel="stylesheet" />
+    <link href="_content/NursesScheduler.BlazorShared/css/all.min.css" rel="stylesheet" />
+    <link href="_content/NursesScheduler.BlazorShared/css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <p>
+        <b>Miesiąc:</b> @((Months)(ScheduleData.Schedule.Month))
+        <b>Rok:</b> @QuarterData.Quarter.Year
+        <b>Kwartał:</b> @QuarterData.Quarter.QuarterNumber
+        <b>Norma:</b> @ScheduleData.ScheduleStats.WorkTimeInMonth.GetTotalHoursAndMinutes()
+        <b>Czas w kwartale:</b> @QuarterData.QuarterStats.WorkTimeInQuarter.GetTotalHoursAndMinutes()
+        <b>Bilans czasu pracy:</b> @ScheduleData.ScheduleStats.WorkTimeBalance.GetTotalHoursAndMinutes()
+        <b>Przydzielony urlop:</b> @ScheduleData.ScheduleStats.AssignedTimeOffsTime.GetTotalHoursAndMinutes()
+    </p>
+    <table class="table-schedule">
+        <thead>
+            <tr>
+                <th class="no">L.p.</th>
+                <th class="name">Pracownik</th>
+                @foreach (var day in ScheduleData.Days)
+                {
+                    <th class="@ScheduleCssHelper.GetDayClass(day) day">
+                        <p>@day.ToString()</p>
+                        <p>@day.GetDayOfWeekAbreviation()</p>
+                    </th>
+                }
+                <th class="summary">Poz. czas mies.</th>
+                <th class="summary">Poz. czas qwart.</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+                foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
+                {
+                    var nurse = Nurses.First(n => n.NurseId == nurseId);
+                    var schdeuleNurse = ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == nurseId);
+                    var scheduleNurseStats = ScheduleData.ScheduleStats.NursesScheduleStats[nurseId];
+                    var quarterNurseStats = QuarterData.QuarterStats.NurseStats[nurseId];
+                    <tr>
+                        <td class="no">@(i++)</td>
+                        <td class="name">
+                            <p>@nurse.Surname</p>
+                            <p>@nurse.Name</p>
+                        </td>
+                        @foreach (var workDay in schdeuleNurse.NurseWorkDays)
+                        {
+                            var day = ScheduleData.Days.First(d => d.Date.Day == workDay.Day);
+
+                            <td class="day @ScheduleCssHelper.GetDayClass(day) @ScheduleCssHelper.SetIsTimeOff(workDay.IsTimeOff)">
+                                @if (workDay.ShiftType == ShiftTypes.Day)
+                                {
+                                    <div class="schedule-shift">D</div>
+                                }
+                                @if (workDay.ShiftType == ShiftTypes.Night)
+                                {
+                                    <div class="schedule-shift">N</div>
+                                }
+                                @if (workDay.ShiftType == ShiftTypes.Morning)
+                                {
+                                    <div class="schedule-shift">@workDay.MorningShift.ShiftLength.GetTotalHoursAndMinutes()</div>
+                                }
+                            </td>
+                        }
+                        <td class="summary">@((ScheduleData.ScheduleStats.WorkTimeInMonth - scheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+                        <td class="summary">@((QuarterData.QuarterStats.WorkTimeInQuarter - quarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</body>
+
+
+@code {
+    [Parameter]
+    public IEnumerable<NurseViewModel> Nurses { get; set; }
+    [Parameter]
+    public QuarterDataWrapper QuarterData { get; set; }
+    [Parameter]
+    public ScheduleDataWrapper ScheduleData { get; set; }
+}

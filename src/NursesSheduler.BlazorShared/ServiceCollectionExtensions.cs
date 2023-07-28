@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Append.Blazor.Printing;
+using Microsoft.Extensions.DependencyInjection;
 using NursesScheduler.BlazorShared.Abstracions;
 using NursesScheduler.BlazorShared.Helpers;
 using NursesScheduler.BlazorShared.Stores;
@@ -14,6 +15,8 @@ namespace NursesScheduler.BlazorShared
             services.AddTransient<IExceptionHandler, ExceptionHandler>();
             services.AddSingleton<CurrentDepartamentStore>();
             services.AddSingleton<ExceptionStore>();
+
+            services.AddScoped<IPrintingService, PrintingService>();
         }
     }
 }

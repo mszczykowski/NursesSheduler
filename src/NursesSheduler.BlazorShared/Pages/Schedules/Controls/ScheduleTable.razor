@@ -35,7 +35,7 @@ else
         </thead>
         <tbody>
             @{
-                i = 1;
+                int i = 1;
                 foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
                 {
                     <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
@@ -55,7 +55,6 @@ else
     [Parameter]
     public ScheduleDataWrapper ScheduleData { get; set; }
 
-    private int i;
 
     protected override Task OnParametersSetAsync()
     {

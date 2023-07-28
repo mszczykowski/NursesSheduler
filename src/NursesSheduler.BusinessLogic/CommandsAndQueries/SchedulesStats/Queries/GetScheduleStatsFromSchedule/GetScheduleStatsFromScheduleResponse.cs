@@ -1,4 +1,4 @@
-﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery
+﻿namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
 {
     public sealed class GetScheduleStatsFromScheduleResponse
     {

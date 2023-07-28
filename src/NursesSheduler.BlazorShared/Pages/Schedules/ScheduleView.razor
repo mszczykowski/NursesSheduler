@@ -1,8 +1,11 @@
 ﻿@page "/scheduleView"
 
+@using Append.Blazor.Printing
+@using BlazorTemplater
 @using NursesScheduler.BlazorShared.Pages.Schedules.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Documents.Commands.GeneratePdfDocument
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
@@ -12,16 +15,17 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
 
 @inherits ComponenentUsingDepartament
 
 @inject IMediator _mediatr
 @inject IMapper _mapper
 @inject IExceptionHandler _exceptionHandler
+@inject IPrintingService _printingService
 
-<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData 
-    CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData/>
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
+                            CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData />
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
 
 @if (_isLoading)
@@ -60,7 +64,7 @@ else
                     <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
-                    <a>Drukuj</a>
+                    <a @onclick="(async () => await PrintScheule())">Drukuj</a>
                 </div>
             </div>
         </div>
@@ -478,7 +482,7 @@ else
 
     private void SetScheduleVisibility(ScheduleDisplayed pickedSchedule)
     {
-        if(pickedSchedule != ScheduleDisplayed.Previous || _isPreviousScheduleAvailable)
+        if (pickedSchedule != ScheduleDisplayed.Previous || _isPreviousScheduleAvailable)
         {
             _currentDisplayedSchedule = pickedSchedule;
         }
@@ -486,10 +490,36 @@ else
 
     private void ClearSchedule()
     {
-        foreach(var workDay in _currentScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays))
+        foreach (var workDay in _currentScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays))
         {
             workDay.ShiftType = ShiftTypes.None;
         }
         _currentScheduleData.RequestScheduleViewRefresh();
+    }
+
+    private async Task PrintScheule()
+    {
+        try
+        {
+            var documentHtmlContent = new ComponentRenderer<ScheduleTablePrintWrapper>()
+                .AddService<IMapper>(_mapper)
+                .AddService<IMediator>(_mediatr)
+                .AddService<IExceptionHandler>(_exceptionHandler)
+                .Set(t => t.Nurses, _nurses)
+                .Set(t => t.QuarterData, _currentQuarterData)
+                .Set(t => t.ScheduleData, _currentScheduleData)
+                .Render();
+
+            var response = await _mediatr.Send(new GeneratePdfDocumentRequest
+                {
+                    DocumentHtmlContent = documentHtmlContent,
+                });
+
+            _printingService.Print(response.GeneratedFilePath);
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
     }
 }

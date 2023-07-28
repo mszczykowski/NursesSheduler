@@ -2,7 +2,7 @@
 using NursesScheduler.BlazorShared.Models.ViewModels;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromScheduleQuery;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule;
 
 namespace NursesScheduler.BlazorShared.Mapping
 {

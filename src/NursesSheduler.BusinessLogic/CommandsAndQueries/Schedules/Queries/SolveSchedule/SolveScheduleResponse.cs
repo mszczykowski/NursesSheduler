@@ -4,19 +4,16 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
 {
     public sealed class SolveScheduleResponse
     {
-        public int ScheduleId { get; set; }
-        public int Month { get; set; }
-        public bool IsClosed { get; set; }
-        public IEnumerable<ScheduleNurseRequest> ScheduleNurses { get; set; }
+        public IEnumerable<ScheduleNurseResponse> ScheduleNurses { get; set; }
         public SolverSettingsResponse SolverSettings { get; set; }
 
-        public sealed class ScheduleNurseRequest
+        public sealed class ScheduleNurseResponse
         {
             public int NurseId { get; init; }
-            public IEnumerable<NurseWorkDayRequest> NurseWorkDays { get; set; }
+            public IEnumerable<NurseWorkDayRepsonse> NurseWorkDays { get; set; }
         }
 
-        public sealed class NurseWorkDayRequest
+        public sealed class NurseWorkDayRepsonse
         {
             public int Day { get; set; }
             public bool IsTimeOff { get; set; }

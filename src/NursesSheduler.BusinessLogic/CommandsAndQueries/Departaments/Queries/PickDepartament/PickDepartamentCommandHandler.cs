@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Exceptions;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.PickDepartament
 {
     internal class PickDepartamentCommandHandler : IRequestHandler<PickDepartamentRequest, PickDepartamentResponse>
     {
@@ -22,7 +22,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
             _absencesService = absencesService;
         }
 
-        public async Task<PickDepartamentResponse> Handle(PickDepartamentRequest request, 
+        public async Task<PickDepartamentResponse> Handle(PickDepartamentRequest request,
             CancellationToken cancellationToken)
         {
             var departament = await _context.Departaments
