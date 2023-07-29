@@ -55,7 +55,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
 
-            var scheduleMonthDays = (await _calendarService.GetNumberedMonthDaysAsync(currentSchedule.Month, year,
+            var scheduleMonthDays = (await _calendarService.GetNumberedMonthDaysAsync(year, currentSchedule.Month,
                 departamentSettings.FirstQuarterStart)).ToArray();
 
             var constraints = new ConstraintsDirector().GetAllConstraints(departamentSettings, scheduleMonthDays);

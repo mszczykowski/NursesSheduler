@@ -11,7 +11,7 @@ using NursesScheduler.Infrastructure.Context;
 namespace NursesScheduler.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230726184104_initial-schema")]
+    [Migration("20230729080131_initial-schema")]
     partial class initialschema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,9 +91,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("CreationYear")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FirstQuarterStart")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(40)
@@ -119,10 +116,13 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("DepartamentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("MaximalWeekWorkTimeLength")
+                    b.Property<int>("FirstQuarterStart")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("MaximumWeekWorkTimeLength")
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("MinmalShiftBreak")
+                    b.Property<TimeSpan>("MinimalShiftBreak")
                         .HasColumnType("TEXT");
 
                     b.Property<TimeSpan>("NightShiftHolidayEligibleHours")

@@ -21,9 +21,7 @@ namespace NursesScheduler.Infrastructure.Providers
 
         protected override async Task<DepartamentSettings?> GetDataFromSource(int key)
         {
-            return await _context.DepartamentSettings
-                    .Include(s => s.Departament)
-                    .FirstOrDefaultAsync(s => s.DepartamentId == key);
+            return await _context.DepartamentSettings.FindAsync(key);
         }
     }
 }

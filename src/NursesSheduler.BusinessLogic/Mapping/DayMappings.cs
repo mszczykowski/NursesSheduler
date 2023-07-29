@@ -8,7 +8,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
     {
         public DayMappings()
         {
-            CreateMap<DayNumbered, GetMonthDaysResponse>();
+            CreateMap<DayNumbered, GetMonthDaysResponse.DayResponse>();
         }
     }
 }

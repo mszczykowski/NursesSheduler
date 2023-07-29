@@ -13,7 +13,11 @@ namespace NursesScheduler.BusinessLogic.Mapping
         public DepartamentMappings()
         {
             CreateMap<Departament, GetAllDepartamentsResponse>();
-            CreateMap<Departament, GetDepartamentResponse>();
+            CreateMap<Departament, GetDepartamentResponse>()
+                .ForMember(dest => dest.FirstQuarterStart,
+                            opt => opt.MapFrom(src => src.DepartamentSettings.FirstQuarterStart))
+                .ForMember(dest => dest.DefaultGeneratorRetryValue,
+                                opt => opt.MapFrom(src => src.DepartamentSettings.DefaultGeneratorRetryValue));
             CreateMap<CreateDepartamentRequest, Departament>();
             CreateMap<Departament, CreateDepartamentResponse>();
             CreateMap<EditDepartamentRequest, Departament>();

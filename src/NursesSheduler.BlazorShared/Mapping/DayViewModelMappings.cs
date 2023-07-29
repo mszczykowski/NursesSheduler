@@ -8,7 +8,7 @@ namespace NursesScheduler.BlazorShared.Mapping
     {
         public DayViewModelMappings()
         {
-            CreateMap<GetMonthDaysResponse, DayViewModel>();
+            CreateMap<GetMonthDaysResponse.DayResponse, DayViewModel>();
         }
     }
 }

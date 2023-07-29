@@ -8,7 +8,7 @@ using NursesScheduler.Domain.ValueObjects;
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 {
     internal sealed class SolveScheduleCommandHandler : IRequestHandler<SolveScheduleRequest,
-        SolveScheduleResponse>
+        SolveScheduleResponse?>
     {
         private readonly IMapper _mapper;
         private readonly IScheduleSolverService _scheduleSolverService;
@@ -22,7 +22,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
             _seedService = seedService;
         }
 
-        public async Task<SolveScheduleResponse> Handle(SolveScheduleRequest request,
+        public async Task<SolveScheduleResponse?> Handle(SolveScheduleRequest request,
             CancellationToken cancellationToken)
         {
             var currentSchedule = _mapper.Map<Schedule>(request.Schedule);
@@ -55,7 +55,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
                 result.PopulateScheduleFromState(currentSchedule);
             }
 
-            return _mapper.Map<SolveScheduleResponse>(currentSchedule);
+            return result is not null ? _mapper.Map<SolveScheduleResponse>(currentSchedule) : null;
         }
     }
 }

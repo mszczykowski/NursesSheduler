@@ -2,8 +2,13 @@
 {
     public sealed class GetMonthDaysResponse
     {
-        public DateOnly Date { get; set; }
-        public bool IsHoliday { get; set; }
-        public string HolidayName { get; set; }
+        public bool HolidaysLoaded { get; set; }
+        public IEnumerable<DayResponse> MonthDays { get; set; }
+        public sealed class DayResponse
+        {
+            public DateOnly Date { get; set; }
+            public bool IsHoliday { get; set; }
+            public string HolidayName { get; set; }
+        }
     }
 }

@@ -14,6 +14,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
 
@@ -24,6 +25,7 @@
 @inject IExceptionHandler _exceptionHandler
 @inject IPrintingService _printingService
 
+<ErrorModal @ref="_errorModal" />
 <MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
                             CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData />
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
@@ -64,7 +66,7 @@ else
                     <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
-                    <a @onclick="(async () => await PrintScheule())">Drukuj</a>
+                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" />
                 </div>
             </div>
         </div>
@@ -132,14 +134,7 @@ else
                         </p>
                     </div>
                     <div class="level-item">
-                        <p class="control">
-                            <a class="button is-warning">
-                                <span class="icon">
-                                    <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
-                                </span>
-                                <span>Generuj</span>
-                            </a>
-                        </p>
+                        <LoadingButton Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj" Action=SolveSchedule />
                     </div>
                     <div class="level-item">
                         <p class="control">
@@ -170,7 +165,6 @@ else
 @code {
     private bool _deleteDisabled;
 
-
     private IEnumerable<NurseViewModel> _nurses;
 
     private ScheduleDataWrapper _currentScheduleData = new();
@@ -183,8 +177,10 @@ else
 
     private ModalBase _morningShiftsSettingsModal;
     private ModalBase _solverSettingsModal;
+    private ErrorModal _errorModal;
 
     private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
+    private bool _holidaysLoaded;
 
     private DatePickerViewModel _pickedDate = new DatePickerViewModel
         {
@@ -205,13 +201,18 @@ else
             try
             {
                 await SetNursesAsync();
-                await InitializeSolverSettingsAsync();
-
+                InitializeSolverSettings();
 
                 await ChangeScheduleAsync();
 
                 _isLoading = false;
                 base.StateHasChanged();
+
+                if (!_holidaysLoaded)
+                {
+                    _errorModal
+                        .ShowError("Nie wczytano świąt!\nUpewnij się że masz połączenie z internetem i uruchom ponownie program");
+                }
             }
             catch (Exception e)
             {
@@ -415,7 +416,10 @@ else
                 Year = year,
             };
 
-        return _mapper.Map<IEnumerable<DayViewModel>>(await _mediatr.Send(request));
+        var response = await _mediatr.Send(request);
+
+        _holidaysLoaded = response.HolidaysLoaded;
+        return _mapper.Map<IEnumerable<DayViewModel>>(response.MonthDays);
     }
 
     private async Task<IEnumerable<MorningShiftViewModel>> GetMorningShiftsAsync(int quarterId)
@@ -468,16 +472,10 @@ else
         return _mapper.Map<QuarterStatsViewModel>(await _mediatr.Send(request));
     }
 
-    private async Task InitializeSolverSettingsAsync()
+    private void InitializeSolverSettings()
     {
-        var request = new GetDepartamentSettingsRequest
-            {
-                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
-            };
-
-        var settings = _mapper.Map<DepratamentSettingsViewModel>(await _mediatr.Send(request));
-
-        _solverSettings = new SolverSettingsViewModel(settings.DefaultGeneratorRetryValue);
+        _solverSettings =
+            new SolverSettingsViewModel(base.CurrentDepartamentStore.CurrentDepartament.DefaultGeneratorRetryValue);
     }
 
     private void SetScheduleVisibility(ScheduleDisplayed pickedSchedule)
@@ -501,10 +499,7 @@ else
     {
         try
         {
-            var documentHtmlContent = new ComponentRenderer<ScheduleTablePrintWrapper>()
-                .AddService<IMapper>(_mapper)
-                .AddService<IMediator>(_mediatr)
-                .AddService<IExceptionHandler>(_exceptionHandler)
+            var documentHtmlContent = new ComponentRenderer<ScheduleTablePrintView>()
                 .Set(t => t.Nurses, _nurses)
                 .Set(t => t.QuarterData, _currentQuarterData)
                 .Set(t => t.ScheduleData, _currentScheduleData)
@@ -515,11 +510,46 @@ else
                     DocumentHtmlContent = documentHtmlContent,
                 });
 
-            _printingService.Print(response.GeneratedFilePath);
+            await _printingService.Print(response.GeneratedFilePath);
         }
         catch (Exception e)
         {
             _exceptionHandler.HandleException(e);
         }
+    }
+
+    private async Task SolveSchedule()
+    {
+        try
+        {
+            var request = new SolveScheduleRequest
+            {
+                DepartamentId = _currentQuarterData.Quarter.DepartamentId,
+                Year = _currentQuarterData.Quarter.Year,
+                Schedule = _mapper.Map<SolveScheduleRequest.ScheduleRequest>(_currentScheduleData.Schedule),
+                SolverSettings = _mapper.Map<SolveScheduleRequest.SolverSettingsRequest>(_solverSettings),
+            };
+
+            var response = await _mediatr.Send(request);
+
+            if(response is null)
+            {
+                _errorModal.ShowError("Nie udało się znaleźć rozwiązania!");
+                return;
+            }
+
+            _currentScheduleData.Schedule.ScheduleNurses = _mapper.Map<ICollection<ScheduleNurseViewModel>>(response.ScheduleNurses);
+            _solverSettings = _mapper.Map<SolverSettingsViewModel>(response.SolverSettings);
+            _currentScheduleData.RequestScheduleRecalculation();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task UpsertSchedule()
+    {
+        
     }
 }

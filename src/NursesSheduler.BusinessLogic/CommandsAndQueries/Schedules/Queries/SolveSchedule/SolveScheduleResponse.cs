@@ -10,10 +10,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
         public sealed class ScheduleNurseResponse
         {
             public int NurseId { get; init; }
-            public IEnumerable<NurseWorkDayRepsonse> NurseWorkDays { get; set; }
+            public IEnumerable<NurseWorkDayResponse> NurseWorkDays { get; set; }
         }
 
-        public sealed class NurseWorkDayRepsonse
+        public sealed class NurseWorkDayResponse
         {
             public int Day { get; set; }
             public bool IsTimeOff { get; set; }

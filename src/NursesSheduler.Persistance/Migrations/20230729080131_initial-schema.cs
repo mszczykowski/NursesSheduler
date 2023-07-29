@@ -16,8 +16,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                     DepartamentId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 40, nullable: false),
-                    CreationYear = table.Column<int>(type: "INTEGER", nullable: false),
-                    FirstQuarterStart = table.Column<int>(type: "INTEGER", nullable: false)
+                    CreationYear = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -31,14 +30,15 @@ namespace NursesScheduler.Infrastructure.Migrations
                     DepartamentSettingsId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     WorkDayLength = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    MaximalWeekWorkTimeLength = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    MinmalShiftBreak = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    MaximumWeekWorkTimeLength = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    MinimalShiftBreak = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     TargetMinimalMorningShiftLenght = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     DayShiftHolidayEligibleHours = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     NightShiftHolidayEligibleHours = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     TargetMinNumberOfNursesOnShift = table.Column<int>(type: "INTEGER", nullable: false),
                     DefaultGeneratorRetryValue = table.Column<int>(type: "INTEGER", nullable: false),
                     UseTeams = table.Column<bool>(type: "INTEGER", nullable: false),
+                    FirstQuarterStart = table.Column<int>(type: "INTEGER", nullable: false),
                     DepartamentId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>

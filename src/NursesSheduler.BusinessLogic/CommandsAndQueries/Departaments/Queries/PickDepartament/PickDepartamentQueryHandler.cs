@@ -8,13 +8,13 @@ using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.PickDepartament
 {
-    internal class PickDepartamentCommandHandler : IRequestHandler<PickDepartamentRequest, PickDepartamentResponse>
+    internal class PickDepartamentQueryHandler : IRequestHandler<PickDepartamentRequest, PickDepartamentResponse>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IAbsencesService _absencesService;
 
-        public PickDepartamentCommandHandler(IApplicationDbContext context, IMapper mapper,
+        public PickDepartamentQueryHandler(IApplicationDbContext context, IMapper mapper,
             IAbsencesService absencesService)
         {
             _context = context;
@@ -27,10 +27,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.
         {
             var departament = await _context.Departaments
                 .Include(d => d.DepartamentSettings)
-                .FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId);
-
-            if (departament == null)
-                throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
+                .FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId)
+                ?? throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
 
             await _absencesService.InitializeDepartamentAbsencesSummaries(departament, cancellationToken);
 

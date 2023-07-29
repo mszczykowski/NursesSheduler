@@ -15,14 +15,17 @@ namespace NursesScheduler.Domain.Entities
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
         public bool UseTeams { get; set; }
+        public int FirstQuarterStart { get; set; }
 
         public int DepartamentId { get; set; }
         public virtual Departament Departament { get; set; }
 
-        [NotMapped]
-        public int FirstQuarterStart => Departament.FirstQuarterStart;
-
         public DepartamentSettings()
+        {
+
+        }
+
+        public DepartamentSettings(int firstQuarerStart)
         {
             WorkDayLength = new TimeSpan(7, 35, 0);
             MaximumWeekWorkTimeLength = TimeSpan.FromHours(24);
@@ -32,6 +35,7 @@ namespace NursesScheduler.Domain.Entities
             DefaultGeneratorRetryValue = 4;
             DayShiftHolidayEligibleHours = TimeSpan.FromHours(12);
             NightShiftHolidayEligibleHours = TimeSpan.FromHours(4);
+            FirstQuarterStart = firstQuarerStart;
         }
     }
 }

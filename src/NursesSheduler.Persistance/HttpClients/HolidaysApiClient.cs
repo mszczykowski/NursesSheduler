@@ -10,20 +10,22 @@ namespace NursesScheduler.Infrastructure.HttpClients
     public sealed class HolidaysApiClient : IHolidaysApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly IMemoryCache _memoryCache;
 
-        public HolidaysApiClient(HttpClient httpClient, IMemoryCache memoryCache)
+        public HolidaysApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _memoryCache = memoryCache;
         }
 
         public async Task<IEnumerable<Holiday>> GetHolidays(int year)
         {
-            var result = await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstatns.CountryCode}")
-                ?? throw new EntityNotFoundException("Holidays not loaded");
-
-            return result;
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<List<Holiday>>($"{year}/{GeneralConstatns.CountryCode}");
+            }
+            catch(Exception e)
+            {
+                return Enumerable.Empty<Holiday>();
+            }
         }
     }
 }

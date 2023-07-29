@@ -26,6 +26,11 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
         public TimeSpan HolidayHoursBalance { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public NurseViewModel()
+        {
+            PTOentitlement = 26;
+        }
         public override string ToString()
         {
             return $"{Name} {Surname}";

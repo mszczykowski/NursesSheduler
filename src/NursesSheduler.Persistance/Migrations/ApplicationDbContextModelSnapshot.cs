@@ -89,9 +89,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("CreationYear")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FirstQuarterStart")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(40)
@@ -115,6 +112,9 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("DepartamentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FirstQuarterStart")
                         .HasColumnType("INTEGER");
 
                     b.Property<TimeSpan>("MaximumWeekWorkTimeLength")
