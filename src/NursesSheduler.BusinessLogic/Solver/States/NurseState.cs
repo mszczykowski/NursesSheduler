@@ -58,7 +58,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             NumberOfRegularShiftsToAssign--;
-            UpdateStateOnShiftAssign(GetShiftType(shiftIndex), ScheduleConstatns.RegularShiftLenght, day,
+            UpdateStateOnShiftAssign(GetShiftType(shiftIndex), ScheduleConstatns.RegularShiftLength, day,
                 departamentSettings, workTimeService);
         }
 
@@ -85,7 +85,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             NumberOfTimeOffShiftsToAssign--;
-            UpdateStateOnShiftAssign(GetShiftType(shiftIndex), ScheduleConstatns.RegularShiftLenght, day,
+            UpdateStateOnShiftAssign(GetShiftType(shiftIndex), ScheduleConstatns.RegularShiftLength, day,
                 departamentSettings, workTimeService);
         }
 
@@ -93,7 +93,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             WorkTimeAssignedInWeeks[day.WeekInQuarter] += shiftLenght;
-            HoursFromLastShift = ScheduleConstatns.RegularShiftLenght - shiftLenght;
+            HoursFromLastShift = ScheduleConstatns.RegularShiftLength - shiftLenght;
             HolidayHoursAssigned += workTimeService.GetShiftHolidayHours(shiftType, shiftLenght, day, departamentSettings);
             NightHoursAssigned += workTimeService.GetShiftNightHours(shiftType, day, departamentSettings);
             WorkTimeInQuarterLeft -= shiftLenght;
@@ -101,7 +101,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
         public void AdvanceState()
         {
-            HoursFromLastShift += ScheduleConstatns.RegularShiftLenght;
+            HoursFromLastShift += ScheduleConstatns.RegularShiftLength;
         }
 
         private ShiftTypes GetShiftType(ShiftIndex shiftIndex)

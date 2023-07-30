@@ -4,23 +4,21 @@
     <div class='column is-5'>
         <div class="card">
             <div class="card-content">
-                <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+                <EditForm EditContext="@_editContext">
                     <DataAnnotationsValidator />
+                    <TextInput Label="Imie" @bind-Value="Nurse.Name" ValidationFor="@(() => Nurse.Name)" />
+                    <TextInput Label="Nazwisko" @bind-Value="Nurse.Surname" ValidationFor="@(() => Nurse.Surname)" />
                     <div class="field">
-                        <label class="label">Imie</label>
+                        <label class="label">Wymiar urlopu</label>
                         <div class="control">
-                            <InputText class="input" @bind-Value="Nurse.Name" />
-                            <div class="help is-danger">
-                                <ValidationMessage For="@(() => Nurse.Name)" />
+                            <div class="select is-fullwidth">
+                                <InputSelect @bind-Value="Nurse.PTOentitlement">
+                                    <option value="26">26 dni</option>
+                                    <option value="20">20 dni</option>
+                                </InputSelect>
                             </div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Nazwisko</label>
-                        <div class="control">
-                            <InputText class="input" @bind-Value="Nurse.Surname" />
                             <div class="help is-danger">
-                                <ValidationMessage For="@(() => Nurse.Surname)" />
+                                <ValidationMessage For="@(() => Nurse.PTOentitlement)" />
                             </div>
                         </div>
                     </div>
@@ -41,23 +39,9 @@
                             </div>
                         </div>
                     }
-                    <div class="field">
-                        <label class="label">Wymiar urlopu</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <InputSelect @bind-Value="Nurse.PTOentitlement">
-                                    <option value="26">26 dni</option>
-                                    <option value="20">20 dni</option>
-                                </InputSelect>
-                            </div>
-                            <div class="help is-danger">
-                                <ValidationMessage For="@(() => Nurse.PTOentitlement)" />
-                            </div>
-                        </div>
-                    </div>
                     <div class="buttons is-right">
-                        <a class="button" href="/nurses">Powrót</a>
-                        <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
+                        <a class="button" href="/nurses">Anuluj</a>
+                        <LoadingButton Style="button is-primary" Text="Zapisz" Action="OnSubmit" />
                     </div>
                 </EditForm>
             </div>
@@ -78,12 +62,11 @@
 
     private async Task OnSubmit()
     {
-        if (_editContext.Validate())
+        if (!_editContext.Validate())
         {
-            _isLoading = true;
-            await Task.Delay(1);
-            await SaveNurse.InvokeAsync();
+            return;
         }
+        await SaveNurse.InvokeAsync();
     }
 
     protected override void OnInitialized()

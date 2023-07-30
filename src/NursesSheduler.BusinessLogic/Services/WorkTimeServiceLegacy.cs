@@ -65,7 +65,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var totalNursesWorkTime = WorkDayLengthInMonthPerNurse * nurseCount;
             var minimalTotalWorkTimeToAssign =
                 departamentSettings.TargetMinNumberOfNursesOnShift * 2
-                * ScheduleConstatns.RegularShiftLenght
+                * ScheduleConstatns.RegularShiftLength
                 * DateTime.DaysInMonth(yearNumber, monthNumber);
 
             return totalNursesWorkTime - minimalTotalWorkTimeToAssign;
@@ -83,7 +83,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
                 else if (workDay.ShiftType != ShiftTypes.None)
                 {
-                    workTime += ScheduleConstatns.RegularShiftLenght;
+                    workTime += ScheduleConstatns.RegularShiftLength;
                 }
             }
 
@@ -104,7 +104,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     departamentSettings.WorkDayLength);
 
                 timeForMorningShifts = workTimeInMonth - (int)Math.Floor(workTimeInMonth /
-                    ScheduleConstatns.RegularShiftLenght) * ScheduleConstatns.RegularShiftLenght;
+                    ScheduleConstatns.RegularShiftLength) * ScheduleConstatns.RegularShiftLength;
             }
 
             return timeForMorningShifts;
@@ -117,18 +117,18 @@ namespace NursesScheduler.BusinessLogic.Services
 
             if (timeForMorningShifts < departamentSettings.TargetMinimalMorningShiftLenght)
             {
-                timeForMorningShifts += ScheduleConstatns.RegularShiftLenght;
+                timeForMorningShifts += ScheduleConstatns.RegularShiftLength;
             }
 
-            while (timeForMorningShifts > ScheduleConstatns.RegularShiftLenght
-                && timeForMorningShifts - ScheduleConstatns.RegularShiftLenght
+            while (timeForMorningShifts > ScheduleConstatns.RegularShiftLength
+                && timeForMorningShifts - ScheduleConstatns.RegularShiftLength
                 > departamentSettings.TargetMinimalMorningShiftLenght)
             {
-                timeForMorningShifts -= ScheduleConstatns.RegularShiftLenght;
-                lengths.Add(ScheduleConstatns.RegularShiftLenght);
+                timeForMorningShifts -= ScheduleConstatns.RegularShiftLength;
+                lengths.Add(ScheduleConstatns.RegularShiftLength);
             }
 
-            if (timeForMorningShifts > ScheduleConstatns.RegularShiftLenght)
+            if (timeForMorningShifts > ScheduleConstatns.RegularShiftLength)
             {
                 lengths.Add(timeForMorningShifts / 2);
                 lengths.Add(timeForMorningShifts / 2);

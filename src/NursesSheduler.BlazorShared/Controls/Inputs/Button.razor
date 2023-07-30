@@ -1,4 +1,4 @@
-﻿<button class="button @Style @CssHelper.SetIsLoading(_isLoading)" @onclick="OnClick" disabled=@Disalbed>
+﻿<button class="button @Style @CssHelper.SetIsLoading(_isLoading)" type="button" @onclick="OnClick" disabled=@Disabled>
     @if (Icon is not null)
     {
         <span class="icon">
@@ -8,6 +8,7 @@
     <span>@Text</span>
 </button>
 
+
 @code {
     [Parameter]
     public string Style { get; set; }
@@ -16,7 +17,7 @@
     [Parameter]
     public string Text { get; set; }
     [Parameter]
-    public bool Disalbed { get; set; }
+    public bool Disabled { get; set; }
     [Parameter]
     public EventCallback Action { get; set; }
 

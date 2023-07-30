@@ -9,20 +9,15 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
     {
         private readonly TimeSpan _minimalShiftBreak;
 
-        private int _calculatedForDay;
-        private ShiftIndex _calculatedForShift;
-        private TimeSpan _timeToScheduleEnd;
-
         public ShiftBreakConstraint(TimeSpan minimalBreak)
         {
             _minimalShiftBreak = minimalBreak;
-            _calculatedForDay = -1;
         }
 
         public bool IsSatisfied(ISolverState currentSolverState, INurseState currentNurseState, 
             TimeSpan shiftLengthToAssing)
         {
-            if(currentNurseState.HoursFromLastShift >= _minimalShiftBreak)
+            if (currentNurseState.HoursFromLastShift < _minimalShiftBreak)
             {
                 return false;
             }
@@ -32,7 +27,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
                 return currentNurseState
                     .HoursToNextShiftMatrix[currentSolverState.CurrentDay - 1] 
                     - 
-                    ScheduleConstatns.RegularShiftLenght
+                    ScheduleConstatns.RegularShiftLength
                     >=
                     _minimalShiftBreak;
             }
@@ -41,7 +36,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
                 return currentNurseState
                    .HoursToNextShiftMatrix[currentSolverState.CurrentDay]
                    -
-                   ScheduleConstatns.RegularShiftLenght
+                   ScheduleConstatns.RegularShiftLength
                    >=
                    _minimalShiftBreak;
             }

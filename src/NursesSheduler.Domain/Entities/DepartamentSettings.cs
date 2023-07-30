@@ -28,7 +28,7 @@ namespace NursesScheduler.Domain.Entities
         public DepartamentSettings(int firstQuarerStart)
         {
             WorkDayLength = new TimeSpan(7, 35, 0);
-            MaximumWeekWorkTimeLength = TimeSpan.FromHours(24);
+            MaximumWeekWorkTimeLength = TimeSpan.FromHours(48);
             MinimalShiftBreak = TimeSpan.FromHours(12);
             TargetMinNumberOfNursesOnShift = 4;
             TargetMinimalMorningShiftLenght = TimeSpan.FromHours(6);

@@ -9,17 +9,17 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
 
         public NursesQueue(Random random) : base(random)
         {
-
+            _nursesQueue = new Queue<int>();
         }
 
         public NursesQueue(NursesQueue queueToCopy, bool shouldCopyInternalQueues) : base(queueToCopy)
         {
-            if (!shouldCopyInternalQueues)
-            {
-                return;
-            }
-
             _nursesQueue = new Queue<int>(queueToCopy._nursesQueue);
+        }
+
+        public override int GetQueueLenght()
+        {
+            return _nursesQueue.Count;
         }
 
         public override bool IsEmpty()

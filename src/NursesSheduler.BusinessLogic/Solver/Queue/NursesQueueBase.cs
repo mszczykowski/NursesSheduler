@@ -26,5 +26,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
         public abstract bool IsEmpty();
         public abstract void PopulateQueue(ISolverState solverState, Day day);
         public abstract bool TryDequeue(out int result, bool isFirstTry);
+        public abstract int GetQueueLenght();
     }
 }

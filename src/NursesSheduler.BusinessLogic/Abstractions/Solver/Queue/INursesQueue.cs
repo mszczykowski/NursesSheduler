@@ -8,5 +8,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Queue
         bool IsEmpty();
         void PopulateQueue(ISolverState solverState, Day day);
         bool TryDequeue(out int result, bool isFirstTry);
+        int GetQueueLenght();
     }
 }

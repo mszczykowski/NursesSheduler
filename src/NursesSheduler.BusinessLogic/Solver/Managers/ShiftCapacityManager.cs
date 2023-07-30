@@ -104,7 +104,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
             var totalNumberOfShifts =
                 (int)Math.Floor(scheduleStats.WorkTimeInMonth * schedule.ScheduleNurses.Count()
-                    / ScheduleConstatns.RegularShiftLenght);
+                    / ScheduleConstatns.RegularShiftLength);
 
             return totalNumberOfShifts - totalTimeOffShifts;
         }

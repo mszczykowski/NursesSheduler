@@ -32,7 +32,8 @@ namespace NursesScheduler.BusinessLogic.Solver
 
         public ScheduleSolver(IEnumerable<MorningShift> morningShifts, DayNumbered[] monthDays, 
             IEnumerable<IConstraint> constraints, DepartamentSettings departamentSettings,
-            IShiftCapacityManager shiftCapacityManager, ISolverState initialState)
+            IShiftCapacityManager shiftCapacityManager, ISolverState initialState,
+            IWorkTimeService workTimeService)
         {
             _morningShifts = morningShifts;
             _monthDays = monthDays;
@@ -40,6 +41,7 @@ namespace NursesScheduler.BusinessLogic.Solver
             _constraints = constraints;
             _shiftCapacityManager = shiftCapacityManager;
             _initialState = initialState;
+            _workTimeService = workTimeService;
         }
 
         public ISolverState? TrySolveSchedule(Random random)
@@ -51,16 +53,20 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             stateCopy.SetNursesToAssignCounts(_shiftCapacityManager);
 
-            return AssignShift(stateCopy, GetQueue());
+            return AssignShift(stateCopy, GetQueue(), true);
         }
 
 
-        private ISolverState? AssignShift(ISolverState previousState, INursesQueue currentQueue)
+        private ISolverState? AssignShift(ISolverState previousState, INursesQueue previousQueue, bool shouldRebuildQueue)
         {
             ISolverState currentState = new SolverState(previousState);
+            INursesQueue currentQueue = CopyQueue(previousQueue, true);
 
-            if (currentQueue.IsEmpty())
+            Console.WriteLine($"NEW STATE: |{currentState.CurrentDay}|{currentState.CurrentShift}|{currentState.NursesToAssignForCurrentShift}");
+
+            if (shouldRebuildQueue)
             {
+                Console.WriteLine("BUILDING QUEUE");
                 currentQueue.PopulateQueue(currentState, _monthDays[currentState.CurrentDay - 1]);
             }
 
@@ -76,7 +82,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                 {
                     if(_currentNurse.NumberOfTimeOffShiftsToAssign == 0 || 
                         _constraints.Any(c => !c.IsSatisfied(currentState, _currentNurse, 
-                            ScheduleConstatns.RegularShiftLenght)))
+                            ScheduleConstatns.RegularShiftLength)))
                     {
                         continue;
                     }
@@ -88,15 +94,18 @@ namespace NursesScheduler.BusinessLogic.Solver
                 }
                 else if (currentState.NursesToAssignForCurrentShift > 0)
                 {
-                    if (_constraints.Any(c => !c.IsSatisfied(currentState, _currentNurse, 
-                        ScheduleConstatns.RegularShiftLenght)))
+                    if (_currentNurse.NumberOfRegularShiftsToAssign == 0 || 
+                        _constraints.Any(c => !c.IsSatisfied(currentState, _currentNurse, ScheduleConstatns.RegularShiftLength)))
                     {
+                        Console.WriteLine($"NO MATCH, LEFT IN QUEUE: {currentQueue.GetQueueLenght()}");
                         continue;
                     }
 
                     currentState.AssignNurseToRegularShift(_currentNurse);
 
-                    _currentNurse.UpdateStateOnTimeOffShiftAssign(currentState.CurrentShift, currentDay,
+                    Console.WriteLine($"ASSIGNED: {_currentNurseId}, LEFT IN QUEUE: {currentQueue.GetQueueLenght()}");
+
+                    _currentNurse.UpdateStateOnRegularShiftAssign(currentState.CurrentShift, currentDay,
                         _departamentSettings, _workTimeService);
                 }
                 else if(currentState.NursesToAssignForMorningShift > 0)
@@ -149,16 +158,17 @@ namespace NursesScheduler.BusinessLogic.Solver
 
                     currentState.SetNursesToAssignCounts(_shiftCapacityManager);
 
-                    result = AssignShift(currentState, CopyQueue(currentQueue, false));
+                    result = AssignShift(currentState, currentQueue, true);
                 }
                 else
                 {
-                    result = AssignShift(currentState, CopyQueue(currentQueue, true));
+                    result = AssignShift(currentState, currentQueue, false);
                 }
 
                 if (result is null)
                 {
                     currentState = new SolverState(previousState);
+                    Console.WriteLine($"BACK TO STATE: |{previousState.CurrentDay}|{previousState.CurrentShift}|{previousState.NursesToAssignForCurrentShift}");
                     continue;
                 }
                 else
@@ -166,7 +176,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                     return result;
                 }
             }
-
+            Console.WriteLine($"FAILED STATE: |{currentState.CurrentDay}|{currentState.CurrentShift}|{currentState.NursesToAssignForCurrentShift}");
             return null;
         }
 

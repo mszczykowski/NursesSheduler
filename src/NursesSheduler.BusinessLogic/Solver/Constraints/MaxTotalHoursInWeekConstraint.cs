@@ -20,7 +20,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
             return (currentNurseState
                 .WorkTimeAssignedInWeeks[_monthDays[currentSolverState.CurrentDay - 1].WeekInQuarter] 
                 + shiftLengthToAssing) 
-                < _maxWorkTimeInMonth;
+                <= _maxWorkTimeInMonth;
         }
     }
 }

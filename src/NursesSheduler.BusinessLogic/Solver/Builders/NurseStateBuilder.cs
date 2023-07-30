@@ -81,18 +81,18 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             {
                 _numberOfTimeOffShiftsToAssign = (int)Math
                     .Round(nurseScheduleStats.TimeOffAssigned
-                        / ScheduleConstatns.RegularShiftLenght);
+                        / ScheduleConstatns.RegularShiftLength);
             }
             else
             {
                 _numberOfTimeOffShiftsToAssign = (int)Math
                     .Round((nurseScheduleStats.TimeOffToAssign - nurseScheduleStats.TimeOffAssigned)
-                        / ScheduleConstatns.RegularShiftLenght);
+                        / ScheduleConstatns.RegularShiftLength);
             }
 
             _numberOfRegularShiftsToAssign = (int)Math
                 .Floor((workTimeInMonth - nurseScheduleStats.AssignedWorkTime)
-                    / ScheduleConstatns.RegularShiftLenght) - _numberOfTimeOffShiftsToAssign;
+                    / ScheduleConstatns.RegularShiftLength) - _numberOfTimeOffShiftsToAssign;
 
             return this;
         }

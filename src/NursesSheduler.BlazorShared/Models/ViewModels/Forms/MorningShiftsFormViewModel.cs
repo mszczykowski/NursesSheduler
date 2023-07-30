@@ -8,7 +8,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
         [ValidateComplexType]
         public MorningShiftViewModel[] MorningShifts { get; set; }
 
-        public MorningShiftsFormViewModel(IEnumerable<MorningShiftViewModel> morningShifts)
+        public MorningShiftsFormViewModel()
         {
             var numberOfMorningShifts = Enum.GetValues<MorningShiftIndexes>().Length;
 
@@ -23,6 +23,11 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
                 };
             }
 
+            
+        }
+
+        public void SetMorningShifts(IEnumerable<MorningShiftViewModel> morningShifts)
+        {
             if (morningShifts is not null && morningShifts.Any())
             {
                 foreach (var morningShift in morningShifts)
@@ -34,7 +39,8 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
 
         public bool IsDirty(IEnumerable<MorningShiftViewModel> unmodifiedShifts)
         {
-            return MorningShifts.Any(m => unmodifiedShifts.Any(u => u.Index == m.Index && u.ShiftLength != m.ShiftLength));
+            return MorningShifts.Any(m => unmodifiedShifts.Any(u => u.Index == m.Index && u.ShiftLength != m.ShiftLength))
+                || (!unmodifiedShifts.Any() && MorningShifts.Any(m => m.ShiftLength != TimeSpan.Zero));
         }
     }
 }

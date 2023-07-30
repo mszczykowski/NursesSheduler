@@ -12,6 +12,8 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.DeleteSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
@@ -60,10 +62,10 @@ else
             </div>
             <div class="level-right">
                 <div class="level-item">
-                    <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())">Konfiguracja ranków</a>
+                    <Button Style="is-ghost" Text="Konfiguracja ranków" Action="(() => _morningShiftsSettingsModal.ShowModal())" />
                 </div>
                 <div class="level-item">
-                    <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
+                    <Button Style="is-ghost" Text="Konfiguracja generatora" Action="(() => _solverSettingsModal.ShowModal())" />
                 </div>
                 <div class="level-item">
                     <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" />
@@ -523,16 +525,16 @@ else
         try
         {
             var request = new SolveScheduleRequest
-            {
-                DepartamentId = _currentQuarterData.Quarter.DepartamentId,
-                Year = _currentQuarterData.Quarter.Year,
-                Schedule = _mapper.Map<SolveScheduleRequest.ScheduleRequest>(_currentScheduleData.Schedule),
-                SolverSettings = _mapper.Map<SolveScheduleRequest.SolverSettingsRequest>(_solverSettings),
-            };
+                {
+                    DepartamentId = _currentQuarterData.Quarter.DepartamentId,
+                    Year = _currentQuarterData.Quarter.Year,
+                    Schedule = _mapper.Map<SolveScheduleRequest.ScheduleRequest>(_currentScheduleData.Schedule),
+                    SolverSettings = _mapper.Map<SolveScheduleRequest.SolverSettingsRequest>(_solverSettings),
+                };
 
             var response = await _mediatr.Send(request);
 
-            if(response is null)
+            if (response is null)
             {
                 _errorModal.ShowError("Nie udało się znaleźć rozwiązania!");
                 return;
@@ -550,6 +552,42 @@ else
 
     private async Task UpsertSchedule()
     {
-        
+        try
+        {
+            var request = _mapper.Map<UpsertScheduleRequest>(_currentScheduleData.Schedule);
+            var response = _mediatr.Send(request);
+
+            if (response == null)
+            {
+                _errorModal.ShowError("Nie znaleziono zmian!");
+                return;
+            }
+
+            _currentScheduleData.Schedule = _mapper.Map<ScheduleViewModel>(response);
+            _currentScheduleData.RequestScheduleRecalculation();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task DeleteSchedule()
+    {
+        try
+        {
+            await _mediatr.Send(new DeleteScheduleRequest
+                {
+                    ScheduleId = _currentScheduleData.Schedule.ScheduleId,
+                });
+
+            _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
+                _currentQuarterData.Quarter.QuarterId);
+            _currentScheduleData.RequestScheduleRecalculation();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
     }
 }

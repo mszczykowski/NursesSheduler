@@ -52,7 +52,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             NursesToAssignForMorningShift = stateToCopy.NursesToAssignForMorningShift;
 
             //deep copies
-            NurseStates = new List<INurseState>(stateToCopy.NurseStates.Select(s => new NurseState(s)));
+            NurseStates = new List<INurseState>(stateToCopy.NurseStates.Select(s => new NurseState(s)).ToList());
 
             ScheduleState = stateToCopy.ScheduleState
                 .ToDictionary(entry => entry.Key, entry => (ShiftTypes[])entry.Value.Clone());

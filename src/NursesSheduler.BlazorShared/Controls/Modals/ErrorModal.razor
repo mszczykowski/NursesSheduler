@@ -6,13 +6,15 @@
     <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Błąd</p>
-            <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
         </header>
         <section class="modal-card-body">
             <section>@_message</section>
         </section>
         <footer class="modal-card-foot">
-            <button class="button is-danger" @onclick="ChangeVisibility">Zamknij</button>
+            <div class="footer-buttons">
+                <Button Style="button is-danger" Text="Zamknij" Action=base.ChangeVisibility/>
+            </div>
         </footer>
     </div>
 </div>

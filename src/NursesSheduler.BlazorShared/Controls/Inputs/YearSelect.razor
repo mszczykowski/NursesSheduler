@@ -1,6 +1,6 @@
 ﻿<div class="control">
     <div class="select">
-        <select value="@YearPickerViewModel.YearNumber" onchange="@SelectedYearChanged">
+        <select value="@YearPickerViewModel.YearNumber" onchange="SelectedYearChanged">
             @for(int i = FirstYear; i <= DateTime.Now.Year + 1; i++)
             {
                 <option value="@i">@i</option>

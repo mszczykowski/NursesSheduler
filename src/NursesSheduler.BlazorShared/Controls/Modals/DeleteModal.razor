@@ -6,15 +6,17 @@
     <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Usuń</p>
-            <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
         </header>
         <section class="modal-card-body">
             <section>Czy na pewno chcesz usunąć <b>@_name</b>?</section>
             <section>Tej operecji nie da się cofnąć.</section>
         </section>
         <footer class="modal-card-foot">
-            <button class="button is-danger @CssHelper.SetIsLoading(_isLoading)" @onclick="Delete">Usuń</button>
-            <button class="button" @onclick="ChangeVisibility">Anuluj</button>
+            <div class="footer-buttons">
+                <Button Style="button" Text="Anuluj" Action=base.ChangeVisibility/>
+                <LoadingButton Style="button is-danger" Text="Usuń" Action="Delete"/>
+            </div>
         </footer>
     </div>
 </div>
@@ -24,25 +26,20 @@
     [Parameter]
     public EventCallback<int> DeleteAction { get; set; }
 
-    private bool _isLoading;
     private string _name;
     private int _id;
 
-    public void SetModal(string name, int id)
+    public void ShowModal(string name, int id)
     {
         _name = name;
         _id = id;
-        _isLoading = false;
         ChangeVisibility();
     }
 
     private async Task Delete()
     {
-        _isLoading = true;
-        await Task.Delay(1);
         await DeleteAction.InvokeAsync(_id);
         ChangeVisibility();
-        StateHasChanged();
     }
 }
 

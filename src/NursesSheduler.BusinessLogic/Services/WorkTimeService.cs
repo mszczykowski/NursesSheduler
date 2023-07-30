@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.Services
                         hoursFromLastAssignedShift += TimeSpan.FromDays(1);
                         break;
                     case ShiftTypes.Day:
-                        hoursFromLastAssignedShift += ScheduleConstatns.RegularShiftLenght;
+                        hoursFromLastAssignedShift += ScheduleConstatns.RegularShiftLength;
                         return hoursFromLastAssignedShift;
                     case ShiftTypes.Night:
                         return hoursFromLastAssignedShift;
@@ -27,7 +27,7 @@ namespace NursesScheduler.BusinessLogic.Services
                         var morningShiftLenght = workDay.MorningShift?.ShiftLength
                             ?? throw new InvalidOperationException("GetHoursFromLastShift: Morning shift length cannot be null");
 
-                        hoursFromLastAssignedShift += 2 * ScheduleConstatns.RegularShiftLenght - morningShiftLenght;
+                        hoursFromLastAssignedShift += 2 * ScheduleConstatns.RegularShiftLength - morningShiftLenght;
                         return hoursFromLastAssignedShift;
                 }
             }
@@ -46,7 +46,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     case ShiftTypes.Day:
                         return hoursToFirstAssignedShift;
                     case ShiftTypes.Night:
-                        hoursToFirstAssignedShift += ScheduleConstatns.RegularShiftLenght;
+                        hoursToFirstAssignedShift += ScheduleConstatns.RegularShiftLength;
                         return hoursToFirstAssignedShift;
                     case ShiftTypes.Morning:
                         return hoursToFirstAssignedShift;
@@ -77,7 +77,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     return morningShiftLenght ?? 
                         throw new InvalidOperationException("GetAssignedDayWorkTime: Morning shift length cannot be null");
                 default:
-                    return ScheduleConstatns.RegularShiftLenght;
+                    return ScheduleConstatns.RegularShiftLength;
             }
         }
 
@@ -86,7 +86,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             return (GetWorkTimeFromDays(monthDays, departamentSettings) * numberOfNurses)
                 -
-                (monthDays.Count() * departamentSettings.TargetMinNumberOfNursesOnShift * ScheduleConstatns.RegularShiftLenght);
+                (monthDays.Count() * departamentSettings.TargetMinNumberOfNursesOnShift * ScheduleConstatns.RegularShiftLength);
         }
 
         public TimeSpan GetWorkTimeFromDays(IEnumerable<Day> days, DepartamentSettings departamentSettings)
@@ -103,10 +103,10 @@ namespace NursesScheduler.BusinessLogic.Services
 
             if(day.IsWorkDay)
             {
-                return ScheduleConstatns.RegularShiftLenght;
+                return ScheduleConstatns.RegularShiftLength;
             }
 
-            return ScheduleConstatns.RegularShiftLenght - departamentSettings.NightShiftHolidayEligibleHours;
+            return ScheduleConstatns.RegularShiftLength - departamentSettings.NightShiftHolidayEligibleHours;
         }
 
         public TimeSpan GetShiftHolidayHours(ShiftTypes shiftType, TimeSpan? optionalMorningShiftLenght, Day day, 

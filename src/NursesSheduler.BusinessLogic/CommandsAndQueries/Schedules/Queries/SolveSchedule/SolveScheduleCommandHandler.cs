@@ -50,12 +50,19 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
                 solverSettings.GeneratorSeed = _seedService.GetSeed();
             }
 
-            if (result is not null)
+            if (result is null)
             {
-                result.PopulateScheduleFromState(currentSchedule);
+                return null;
             }
 
-            return result is not null ? _mapper.Map<SolveScheduleResponse>(currentSchedule) : null;
+            result.PopulateScheduleFromState(currentSchedule);
+
+            return new SolveScheduleResponse
+            {
+                ScheduleNurses = _mapper
+                    .Map<IEnumerable<SolveScheduleResponse.ScheduleNurseResponse>>(currentSchedule.ScheduleNurses),
+                SolverSettings = _mapper.Map<SolveScheduleResponse.SolverSettingsResponse>(solverSettings),
+            };
         }
     }
 }

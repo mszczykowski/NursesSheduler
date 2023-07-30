@@ -14,19 +14,22 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
         public NursesQueueTeams(Random random) : base(random)
         {
             _teamToDequeue = (NurseTeams)_random.Next(ScheduleConstatns.NumberOfTeams);
+
+            _nursesQueueTeamA = new Queue<int>();
+            _nursesQueueTeamB = new Queue<int>();
         }
 
         public NursesQueueTeams(NursesQueueTeams queueToCopy, bool shouldCopyInternalQueues) : base(queueToCopy)
         {
             _teamToDequeue = queueToCopy._teamToDequeue;
 
-            if (!shouldCopyInternalQueues)
-            {
-                return;
-            }
-
             _nursesQueueTeamA = new Queue<int>(queueToCopy._nursesQueueTeamA);
             _nursesQueueTeamB = new Queue<int>(queueToCopy._nursesQueueTeamB);
+        }
+
+        public override int GetQueueLenght()
+        {
+            return _nursesQueueTeamA.Count + _nursesQueueTeamB.Count;
         }
 
         public override bool IsEmpty()
@@ -58,7 +61,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
                 _teamToDequeue = _teamToDequeue == NurseTeams.A ? NurseTeams.B : NurseTeams.A;
             }
 
-            if (_teamToDequeue == NurseTeams.A || _nursesQueueTeamB.Count == 0)
+            if ((_teamToDequeue == NurseTeams.A && _nursesQueueTeamA.Count != 0) || _nursesQueueTeamB.Count == 0)
             {
                 return _nursesQueueTeamA.TryDequeue(out result) ? true : false;
             }

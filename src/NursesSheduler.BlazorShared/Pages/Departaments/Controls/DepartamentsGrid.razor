@@ -22,7 +22,7 @@ else
     {
         <div class="column is-one-quarter">
             <DepartamentCard Departament=departament 
-                OnDepartamentPick="OnDepartamentPick" OnDeleteClick="(() => _deleteModal.SetModal(departament.Name, departament.DepartamentId))"/>
+                OnDepartamentPick="OnDepartamentPick" OnDeleteClick="(() => _deleteModal.ShowModal(departament.Name, departament.DepartamentId))"/>
         </div>
     }
     </div>
@@ -43,10 +43,8 @@ else
             {
                 DepartamentId = departament.DepartamentId,
             };
-            var response = await _mediatr.Send(request);
-
-            if (response == null)
-                throw new EntityNotFoundException(departament.DepartamentId, nameof(DepartamentViewModel));
+            var response = await _mediatr.Send(request)
+                ?? throw new EntityNotFoundException(departament.DepartamentId, nameof(DepartamentViewModel));;
 
             _currentDepartamentStore.CurrentDepartament = _mapper.Map<DepartamentViewModel>(response);
             _navigationManager.NavigateTo("/scheduleView");

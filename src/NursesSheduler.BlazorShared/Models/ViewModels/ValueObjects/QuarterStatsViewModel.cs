@@ -1,4 +1,4 @@
-﻿namespace NursesScheduler.BlazorShared.Models.ViewModels
+﻿namespace NursesScheduler.BlazorShared.Models.ViewModels.ValueObjects
 {
     public sealed class QuarterStatsViewModel
     {

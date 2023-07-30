@@ -2,6 +2,7 @@
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
 namespace NursesScheduler.BusinessLogic.Services
@@ -139,6 +140,8 @@ namespace NursesScheduler.BusinessLogic.Services
             var nurseQuarterStats = new NurseStats
             {
                 NurseId = quarterSchedulesNurseStats.First().NurseId,
+                MorningShiftsAssigned = new List<MorningShiftIndex>(),
+                WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(),
             };
 
             foreach (var scheduleNurseStats in quarterSchedulesNurseStats)
@@ -181,8 +184,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private TimeSpan CalculateTimeForMorningShifts(TimeSpan workTimeInQuarter)
         {
-            return workTimeInQuarter - ((int)Math.Floor(workTimeInQuarter / ScheduleConstatns.RegularShiftLenght)
-                * ScheduleConstatns.RegularShiftLenght);
+            return workTimeInQuarter - ((int)Math.Floor(workTimeInQuarter / ScheduleConstatns.RegularShiftLength)
+                * ScheduleConstatns.RegularShiftLength);
         }
     }
 }

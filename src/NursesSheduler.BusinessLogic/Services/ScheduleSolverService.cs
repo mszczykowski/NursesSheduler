@@ -89,7 +89,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 scheduleMonthDays, currentSchedule, currentScheduleStats, morningShifts);
 
             return new ScheduleSolver(morningShifts, scheduleMonthDays, constraints, departamentSettings,
-                shiftCapacityManager, initialSolverState);
+                shiftCapacityManager, initialSolverState, _workTimeService);
         }
     }
 }

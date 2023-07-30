@@ -9,7 +9,7 @@
                 <p class="modal-card-title">Ustawienia generatora</p>
                 <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
             </header>
-            <EditForm EditContext="@_editContext" OnValidSubmit="@OnSave">
+            <EditForm EditContext="@_editContext">
                 <section class="modal-card-body">
                     <fieldset disabled=@SolverSettings.UseOwnSeed>
                         <DataAnnotationsValidator />
@@ -37,15 +37,17 @@
                     <div class="field">
                         <div class="control">
                             <label class="checkbox">
-                                <InputCheckbox @bind-Value="SolverSettings.UseOwnSeed"/>
+                                <InputCheckbox @bind-Value="SolverSettings.UseOwnSeed" />
                                 Użyj własnego ziarna generatora
                             </label>
                         </div>
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button class="button is-primary" type="submit">Zapisz</button>
-                    <button class="button" type="button" @onclick="ChangeVisibility">Anuluj</button>
+                    <div class="footer-buttons">
+                        <Button Text="Anuluj" Action="base.ChangeVisibility" />
+                        <LoadingButton Style="is-success" Text="Zapisz" Action="OnSubmit" />
+                    </div>
                 </footer>
             </EditForm>
         </div>
@@ -69,8 +71,13 @@
         ChangeVisibility();
     }
 
-    private async Task OnSave()
+    private void OnSubmit()
     {
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
         SolverSettings = _solverSettingsForm.SolverSettings;
         ChangeVisibility();
     }

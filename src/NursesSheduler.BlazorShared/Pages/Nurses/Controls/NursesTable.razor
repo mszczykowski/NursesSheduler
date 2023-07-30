@@ -35,7 +35,7 @@ else
                         <td>@nurse.NightHoursBalance.GetTotalHoursAndMinutes()</td>
                         <td>@nurse.HolidayHoursBalance.GetTotalHoursAndMinutes()</td>
                         <td><a href="/nurse/edit/@nurse.NurseId">Edytuj</a></td>
-                        <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(nurse.ToString(), nurse.NurseId))">Usuń</a></td>
+                        <td><a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(nurse.ToString(), nurse.NurseId))">Usuń</a></td>
                     </tr>
                 }
             }

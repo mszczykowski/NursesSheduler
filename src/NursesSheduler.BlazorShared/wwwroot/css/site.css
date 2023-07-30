@@ -241,3 +241,9 @@ th {
     width: 100%;
     font-size: 14px;
 }
+
+.footer-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}

@@ -5,7 +5,8 @@
         <p class="title is-4">@Departament.Name</p>
     </div>
     <footer class="card-footer">
-        <a class="card-footer-item button is-ghost @CssHelper.SetIsLoading(_isPickButtonLoading)" @onclick="PickDepartamentClick">Wybierz</a>
+        <LoadingButton Style="card-footer-item button is-ghost" Text="Wybierz" 
+            Action="(async () => await OnDepartamentPick.InvokeAsync(Departament))"/>
     </footer>
     <footer class="card-footer">
         <a class="card-footer-item button is-link is-inverted" href="/departaments/edit/@Departament.DepartamentId">Edytuj</a>
@@ -21,13 +22,4 @@
     public EventCallback<DepartamentViewModel> OnDepartamentPick { get; set; }
     [Parameter]
     public DepartamentViewModel Departament { get; set; }
-
-    private bool _isPickButtonLoading;
-
-    private async Task PickDepartamentClick()
-    {
-        _isPickButtonLoading = true;
-        await Task.Delay(1);
-        await OnDepartamentPick.InvokeAsync(Departament);
-    }
 }

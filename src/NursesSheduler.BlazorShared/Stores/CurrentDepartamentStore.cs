@@ -1,4 +1,4 @@
-﻿using NursesScheduler.BlazorShared.Models.ViewModels;
+﻿using NursesScheduler.BlazorShared.Models.ViewModels.Entities;
 
 namespace NursesScheduler.BlazorShared.Stores
 {

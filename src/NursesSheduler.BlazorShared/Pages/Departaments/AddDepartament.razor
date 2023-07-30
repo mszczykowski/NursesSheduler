@@ -8,11 +8,25 @@
 @inject IExceptionHandler _exceptonHandler
 @inject NavigationManager _navigationManager
 
-<DepartamentForm Title="Dodaj nowy oddział" Departament=@_departament SaveDepartament="SaveDepartament" IsEdit=false/>
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Dodaj nowy oddział</p>
+            </div>
+        </div>
+    </div>
+
+    <DepartamentForm Departament=_departament SaveDepartament="SaveDepartament" IsEdit=false/>
+
+</div>
+
+
 
 
 @code {
     protected DepartamentViewModel _departament = new DepartamentViewModel();
+    
     protected async void SaveDepartament()
     {
         try

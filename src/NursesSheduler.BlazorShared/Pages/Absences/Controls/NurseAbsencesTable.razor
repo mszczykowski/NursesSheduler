@@ -37,7 +37,7 @@ else
                     <td>@absence.WorkingHoursToAssign.GetTotalHoursAndMinutes()</td>
                     <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
                     <td class="is-fullwidth">@absence.Type.GetEnumDisplayName()</td>
-                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.SetModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
+                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
                 </tr>
             }
         </tbody>

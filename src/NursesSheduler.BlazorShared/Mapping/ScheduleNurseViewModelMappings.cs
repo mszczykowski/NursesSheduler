@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.Models.ViewModels;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule;
@@ -22,6 +23,9 @@ namespace NursesScheduler.BlazorShared.Mapping
 
             CreateMap<ScheduleNurseViewModel, SolveScheduleRequest.ScheduleNurseRequest>();
             CreateMap<SolveScheduleResponse.ScheduleNurseResponse, ScheduleNurseViewModel>();
+
+            CreateMap<ScheduleNurseViewModel, UpsertScheduleRequest.ScheduleNurseRequest>();
+            CreateMap<UpsertScheduleResponse.ScheduleNurseResponse, ScheduleNurseViewModel>();
         }
     }
 }

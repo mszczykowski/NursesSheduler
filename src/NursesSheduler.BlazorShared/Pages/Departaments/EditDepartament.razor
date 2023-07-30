@@ -9,27 +9,39 @@
 @inject IExceptionHandler _exceptonHandler
 @inject NavigationManager _navigationManager
 
-@if(_departament == null)
-{
-    <LoadingSpinner/>
-}
-else
-{
-    <DepartamentForm Title="Edytuj oddział" Departament=@_departament SaveDepartament="SaveDepartament" IsEdit=true/>
-}
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Edytuj oddział</p>
+            </div>
+        </div>
+    </div>
 
+    @if (_departament == null)
+    {
+        <LoadingSpinner />
+    }
+    else
+    {
+        <DepartamentForm Departament=@_departament SaveDepartament="SaveDepartament" IsEdit=true />
+    }
+
+</div>
 
 
 @code {
-    protected DepartamentViewModel _departament;
-
     [Parameter]
     public int Id { get; set; }
 
+    protected DepartamentViewModel _departament;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) 
+        if (firstRender)
+        {
             await LoadDepartament();
+        }
 
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -39,15 +51,11 @@ else
         try
         {
             var request = new GetDepartamentRequest
-            {
-                DepartamentId = Id
-            };
-            var response = await _mediatr.Send(request);
-
-            if (response == null)
-            {
-                throw new EntityNotFoundException(Id, nameof(DepartamentViewModel));
-            }
+                {
+                    DepartamentId = Id
+                };
+            var response = await _mediatr.Send(request)
+                ?? throw new EntityNotFoundException(Id, nameof(DepartamentViewModel));
 
             _departament = _mapper.Map<DepartamentViewModel>(response);
             StateHasChanged();
@@ -56,7 +64,7 @@ else
         {
             _exceptonHandler.HandleException(e);
         }
-        
+
     }
 
     protected async void SaveDepartament()

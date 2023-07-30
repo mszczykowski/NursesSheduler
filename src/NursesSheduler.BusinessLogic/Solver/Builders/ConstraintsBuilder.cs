@@ -21,12 +21,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public IConstraintsBuilder AddHasShiftsToAssignLeftConstraint()
-        {
-            _result.Add(new HasShiftsToAssignLeft());
-            return this;
-        }
-
         public IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint(DepartamentSettings departamentSettings,
             IEnumerable<DayNumbered> monthDays)
         {

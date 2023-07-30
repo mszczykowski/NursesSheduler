@@ -1,46 +1,31 @@
 ﻿
 
-<div class='container'>
-    <div class="level">
-        <div class="level-left">
-            <div class="level-item has-text-centered">
-                <p class="title">@Title</p>
-            </div>
-        </div>
-    </div>
-
-
-    <div class='columns is-mobile is-centered'>
-        <div class='column is-5'>
-            <div class="card">
-                <div class="card-content">
-                    <EditForm EditContext="@_editContext" OnValidSubmit="@OnSubmitClick">
-                        <DataAnnotationsValidator />
-                        <div class="field">
-                            <label class="label">Nazwa</label>
-                            <div class="control">
-                                <InputText class="input" @bind-Value="Departament.Name" />
-                                <div class="help is-danger">
-                                    <ValidationMessage For="@(() => Departament.Name)" />
-                                </div>
-                            </div>
-                            <label class="label">Miesiąc od którego są naliczane kwartały</label>
+<div class='columns is-mobile is-centered'>
+    <div class='column is-5'>
+        <div class="card">
+            <div class="card-content">
+                <EditForm EditContext="@_editContext">
+                    <DataAnnotationsValidator />
+                    <TextInput Label="Nazwa" @bind-Value="Departament.Name" ValidationFor="@(() => Departament.Name)" />
+                    <div class="field">
+                        <label class="label">Miesiąc od którego są naliczane kwartały</label>
+                        <div class="control">
                             <fieldset disabled=@IsEdit>
-                                <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged CssClass="is-fullwidth"/>
+                                <MonthSelect MonthPickerViewModel=_monthPickerViewModel OnChange=@OnPickedMonthChanged CssClass="is-fullwidth" />
                             </fieldset>
                             <div class="help is-danger">
                                 <ValidationMessage For="@(() => Departament.FirstQuarterStart)" />
                             </div>
-                            <p class="title is-6">
-                                Miesiąc od którego są naliczane kwartały można wybrać tylko przy tworzeniu oddziału!
-                            </p>
                         </div>
-                        <div class="buttons is-right">
-                            <button class="button is-primary @CssHelper.SetIsLoading(_isLoading)" type="submit">Zapisz</button>
-                            <a class="button" href="/departaments">Anuluj</a>
-                        </div>
-                    </EditForm>
-                </div>
+                        <p class="title is-6 mt-4">
+                            Miesiąc od którego są naliczane kwartały można wybrać tylko przy tworzeniu oddziału!
+                        </p>
+                    </div>
+                    <div class="buttons is-right">
+                        <a class="button" href="/departaments">Anuluj</a>
+                        <LoadingButton Style="button is-primary" Text="Zapisz" Action="OnSubmit" />
+                    </div>
+                </EditForm>
             </div>
         </div>
     </div>
@@ -49,29 +34,28 @@
 
 @code {
     [Parameter]
-    public string Title { get; set; }
-    [Parameter]
     public DepartamentViewModel Departament { get; set; }
     [Parameter]
     public EventCallback SaveDepartament { get; set; }
     [Parameter]
     public bool IsEdit { get; set; }
 
-    private bool _isLoading;
     private EditContext _editContext;
     private IMonthPickerViewModel _monthPickerViewModel;
 
-    private async void OnSubmitClick()
+    private async void OnSubmit()
     {
-        _isLoading = true;
-        await Task.Delay(1);
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
         await SaveDepartament.InvokeAsync();
         StateHasChanged();
     }
 
     protected override void OnInitialized()
     {
-        _isLoading = false;
         _editContext = new(Departament);
         _monthPickerViewModel = new MonthPickerViewModel(Departament.FirstQuarterStart);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());

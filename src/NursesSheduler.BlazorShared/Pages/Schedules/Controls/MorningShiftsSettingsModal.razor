@@ -7,7 +7,7 @@
 @inject IMediator _mediatr;
 @inject IExceptionHandler _exceptionHandler;
 
-@if (_morningShiftsForm is not null)
+@if (_morningShiftsForm is not null && CurrentQuarterData.QuarterStats is not null)
 {
     <div class="modal @CssHelper.SetIsActive(_isVisible)">
         <div class="modal-background"></div>
@@ -16,23 +16,26 @@
                 <p class="modal-card-title">Ustawienia ranków</p>
                 <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
             </header>
-            <EditForm EditContext="@_editContext" OnValidSubmit="@OnSave">
+            <EditForm EditContext="@_editContext">
                 <ObjectGraphDataAnnotationsValidator />
                 <section class="modal-card-body">
                     <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@CurrentQuarterData.QuarterStats.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
                     <br />
-                    @foreach (var morningShift in _morningShiftsForm.MorningShifts)
+                    @for(int i = 0; i < _morningShiftsForm.MorningShifts.Length; i++)
                     {
-                        <fieldset disabled=@morningShift.ReadOnly>
-                            <TimeSpanInput Label=@GetInputLabel(morningShift.Index) @bind-Value="morningShift.ShiftLength" ValidationFor="@(() => morningShift.ShiftLength)" />
+                        int copy = i;
+                        <fieldset disabled=@_morningShiftsForm.MorningShifts[copy].ReadOnly>
+                            <TimeSpanInput Label=@GetInputLabel(_morningShiftsForm.MorningShifts[copy].Index) @bind-Value="_morningShiftsForm.MorningShifts[copy].ShiftLength" ValidationFor="@(() => _morningShiftsForm.MorningShifts[copy].ShiftLength)" />
                         </fieldset>
                     }
                     <p>Ranków użytych w <b>zamkniętych grafikach</b> nie można edytować!</p>
                 </section>
                 <footer class="modal-card-foot">
-                    <button class="button is-success @CssHelper.SetIsLoading(_isSaveLoading)" type="submit" disabled=@(!CanSave())>Zapisz</button>
-                    <button class="button is-info" type="button" @onclick="OnRecalculate" disabled=@(!CanEdit())>Przelicz</button>
-                    <button class="button" type="button" @onclick="ChangeVisibility">Anuluj</button>
+                    <div class="footer-buttons">
+                        <Button Text="Anuluj" Action="base.ChangeVisibility"/>
+                        <Button Style="is-info" Text="Przelicz" Action="OnRecalculate" Disabled=(!CanEdit())/>
+                        <LoadingButton Style="is-success" Text="Zapisz" Action="OnSubmit" Disabled=(!CanSave())/>
+                    </div>
                 </footer>
             </EditForm>
         </div>
@@ -51,47 +54,46 @@
 
     private MorningShiftsFormViewModel _morningShiftsForm;
     private EditContext _editContext;
-    private bool _isSaveLoading;
 
+    protected override Task OnInitializedAsync()
+    {
+        _morningShiftsForm = new MorningShiftsFormViewModel();
+        _editContext = new(_morningShiftsForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+
+        return base.OnInitializedAsync();
+    }
 
     public override void ShowModal()
     {
-        _isSaveLoading = false;
-
-        _morningShiftsForm = new(CurrentQuarterData.MorningShifts);
-
-        _editContext = new(_morningShiftsForm);
-        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        _morningShiftsForm.SetMorningShifts(CurrentQuarterData.MorningShifts);
 
         base.ChangeVisibility();
     }
 
-    private async Task OnSave()
+    private async Task OnSubmit()
     {
         try
         {
-            if(!CanEdit() || !_morningShiftsForm.IsDirty(CurrentQuarterData.MorningShifts))
+            if (!CanEdit() || !_morningShiftsForm.IsDirty(CurrentQuarterData.MorningShifts) || !_editContext.Validate())
             {
                 return;
             }
-
-            _isSaveLoading = true;
-            await Task.Delay(1);
 
             var request = new UpsertMorningShiftsRequest
                 {
                     QuarterId = CurrentQuarterData.Quarter.QuarterId,
                     MorningShifts = _mapper
-                            .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm
-                                .MorningShifts
-                                .Where(m => !m.ReadOnly)),
+                                .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm
+                                    .MorningShifts
+                                    .Where(m => !m.ReadOnly)),
                 };
             var response = await _mediatr.Send(request);
 
             CurrentQuarterData.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
 
             CurrentScheduleData.RequestScheduleRecalculation();
-            if(PreviousScheduleData.Schedule is not null 
+            if (PreviousScheduleData.Schedule is not null
                 && PreviousScheduleData.Schedule.QuarterId == CurrentQuarterData.Quarter.QuarterId)
             {
                 PreviousScheduleData.RequestScheduleRecalculation();
@@ -109,7 +111,7 @@
     {
         try
         {
-            if(!CanEdit())
+            if (!CanEdit())
             {
                 return;
             }

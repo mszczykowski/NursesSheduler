@@ -1,6 +1,5 @@
-﻿
-<div class="control">
-    <div class="@GetSelectClass()">
+﻿<div class="control">
+    <div class="select @CssClass">
         <select value="@MonthPickerViewModel.MonthNumber" onchange="@SelectedMonthChanged">
             @for (int i = 1; i <= 12; i++)
             {
@@ -22,10 +21,5 @@
     {
         MonthPickerViewModel.MonthNumber = Int32.Parse(e.Value.ToString());
         await OnChange.InvokeAsync();
-    }
-
-    private string GetSelectClass()
-    {
-        return "select " + CssClass; 
     }
 }
