@@ -34,7 +34,11 @@ namespace NursesScheduler.BusinessLogic.Validation
 
             RuleFor(s => s.DefaultGeneratorRetryValue)
                 .GreaterThanOrEqualTo(1)
-                .LessThanOrEqualTo(10);
+                .LessThanOrEqualTo(60);
+
+            RuleFor(s => s.DefaultGeneratorRetryValue)
+                .GreaterThanOrEqualTo(1)
+                .LessThanOrEqualTo(60);
         }
     }
 }

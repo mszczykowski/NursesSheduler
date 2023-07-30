@@ -4,7 +4,7 @@
     <div class='column is-5'>
         <div class="card">
             <div class="card-content">
-                <EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+                <EditForm EditContext="@_editContext">
                     <DataAnnotationsValidator />
                     <p class="title is-4">
                         Konfigruracja czasu pracy
@@ -26,8 +26,8 @@
                     <NumberInput Label="Domyślna liczba prób generatora" @bind-Value="Settings.DefaultGeneratorRetryValue" ValidationFor="@(() => Settings.DefaultGeneratorRetryValue)"/>
                     <NumberInput Label="Maksymanly czas próby generatora (w sekundach)" @bind-Value="Settings.DefaultGeneratorTimeOut" ValidationFor="@(() => Settings.DefaultGeneratorTimeOut)"/>
                     <div class="field">
-                        <label class="checkbox">Użyj zespołów przy generacji grafików</label>
                         <InputCheckbox @bind-Value="Settings.UseTeams" />
+                        <label class="checkbox">Użyj zespołów przy generacji grafików (eksperymentalne)</label>
                     </div>
                     <div class="buttons is-right">
                         <LoadingButton Text="Anuluj" Action="Cancel"/>

@@ -30,6 +30,10 @@
                 }
                 <th class="summary">Poz. czas mies.</th>
                 <th class="summary">Poz. czas qwart.</th>
+                <th class="summary">Przyp. urlop</th>
+                <th class="summary">Urlop do przyp.</th>
+                <th class="summary">Godz. świąt.</th>
+                <th class="summary">Godz. noc.</th>
             </tr>
         </thead>
         <tbody>
@@ -68,6 +72,10 @@
                         }
                         <td class="summary">@((ScheduleData.ScheduleStats.WorkTimeInMonth - scheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
                         <td class="summary">@((QuarterData.QuarterStats.WorkTimeInQuarter - quarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+                        <td class="summary">@scheduleNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
+                        <td class="summary">@scheduleNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
+                        <td class="summary">@scheduleNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
+                        <td class="summary">@scheduleNurseStats.NightHoursAssigned.GetTotalHoursAndMinutes()</td>
                     </tr>
                 }
             }

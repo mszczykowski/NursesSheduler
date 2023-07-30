@@ -35,7 +35,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
         public TimeSpan TargetMinimalMorningShiftLenght { get; set; }
 
         [Required(ErrorMessage = "Należy wpisać domyślną liczbę prób generatora")]
-        [Range(1, 10, ErrorMessage = "Liczba prób musi być większa od 1 i nie większa od 10")]
+        [Range(1, 60, ErrorMessage = "Liczba prób musi być większa od 1 i nie większa od 60")]
         public int DefaultGeneratorRetryValue { get; set; }
         [Required(ErrorMessage = "Należy wpisać domyślny maksymalny czas generowania")]
         [Range(1, 60, ErrorMessage = "Maksymalny czas musi być większy niż 1 sekunda i mniejszy niż 60 sekund")]

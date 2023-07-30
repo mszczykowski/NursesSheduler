@@ -8,7 +8,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
         [ValidateComplexType]
         public MorningShiftViewModel[] MorningShifts { get; set; }
 
-        public MorningShiftsFormViewModel()
+        public MorningShiftsFormViewModel(IEnumerable<MorningShiftViewModel> morningShifts)
         {
             var numberOfMorningShifts = Enum.GetValues<MorningShiftIndexes>().Length;
 
@@ -23,10 +23,10 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
                 };
             }
 
-            
+            SetMorningShifts(morningShifts);
         }
 
-        public void SetMorningShifts(IEnumerable<MorningShiftViewModel> morningShifts)
+        private void SetMorningShifts(IEnumerable<MorningShiftViewModel> morningShifts)
         {
             if (morningShifts is not null && morningShifts.Any())
             {

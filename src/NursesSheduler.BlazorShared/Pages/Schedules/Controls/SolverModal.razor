@@ -3,6 +3,7 @@
 
 @inject IMediator _mediatr
 @inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler;
 
 @inherits ModalBase
 
@@ -76,26 +77,33 @@
         }
         catch (Exception e)
         {
-
+            _exceptionHandler.HandleException(e);
         }
     }
 
     private async Task OnSolverUpdate()
     {
-        _solverLogs = _mapper.Map<IEnumerable<SolverLogViewModel>>(await _mediatr.Send(new GetSolverLogsRequest()));
-
-        if (_solveScheduleResponse.SolverResult is not null)
+        try
         {
-            SetResult();
-        }
+            _solverLogs = _mapper.Map<IEnumerable<SolverLogViewModel>>(await _mediatr.Send(new GetSolverLogsRequest()));
 
-        StateHasChanged();
+            if (_solveScheduleResponse.SolverResult is not null)
+            {
+                SetResult();
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
     }
 
     private void SetResult()
     {
         CurrentScheduleData.Schedule.ScheduleNurses = _mapper.Map<ICollection<ScheduleNurseViewModel>>(_solveScheduleResponse.SolverResult.ScheduleNurses);
-        SolverSettings = _mapper.Map<SolverSettingsViewModel>(_solveScheduleResponse.SolverResult.SolverSettings);
+        SolverSettings.GeneratorSeed = _solveScheduleResponse.SolverResult.SolverSettings.GeneratorSeed;
         CurrentScheduleData.RequestScheduleRecalculation();
     }
 
