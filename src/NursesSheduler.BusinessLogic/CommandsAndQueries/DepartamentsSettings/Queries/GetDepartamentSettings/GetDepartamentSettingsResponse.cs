@@ -12,6 +12,7 @@
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
         public bool UseTeams { get; set; }
+        public int DefaultGeneratorTimeOut { get; set; }
         public int DepartamentId { get; set; }
     }
 }

@@ -3,8 +3,9 @@ using NursesScheduler.Domain.Enums;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 {
-    public sealed class SolveScheduleRequest : IRequest<SolveScheduleResponse?>
+    public sealed class SolveScheduleRequest : IRequest<SolveScheduleResponse>
     {
+        public Action SolverEventsListner;
         public int DepartamentId { get; set; }
         public int Year { get; set; }
         public ScheduleRequest Schedule { get; set; }

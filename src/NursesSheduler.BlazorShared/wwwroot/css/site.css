@@ -247,3 +247,10 @@ th {
     display: flex;
     justify-content: right;
 }
+
+.footer-progress {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}

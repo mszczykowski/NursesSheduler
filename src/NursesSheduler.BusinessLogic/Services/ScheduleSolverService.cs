@@ -23,12 +23,15 @@ namespace NursesScheduler.BusinessLogic.Services
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly ISchedulesService _schedulesService;
         private readonly IWorkTimeService _workTimeService;
+        private readonly ICurrentDateService _currentDateService;
+        private readonly IScheduleSolver _scheduleSolver;
 
         public ScheduleSolverService(IScheduleStatsService scheduleStatsService, IQuarterStatsService quarterStatsService,
             IDepartamentSettingsProvider departamentSettingsProvider, ISeedService seedService,
             ICalendarService calendarService, IScheduleStatsProvider scheduleStatsProvider,
             IApplicationDbContext applicationDbContext, ISchedulesService schedulesService,
-            IWorkTimeService workTimeService)
+            IWorkTimeService workTimeService, ICurrentDateService currentDateService,
+            IScheduleSolver scheduleSolver)
         {
             _scheduleStatsService = scheduleStatsService;
             _quarterStatsService = quarterStatsService;
@@ -39,9 +42,12 @@ namespace NursesScheduler.BusinessLogic.Services
             _applicationDbContext = applicationDbContext;
             _schedulesService = schedulesService;
             _workTimeService = workTimeService;
+            _currentDateService = currentDateService;
+            _scheduleSolver = scheduleSolver;
         }
 
-        public async Task<IScheduleSolver> GetScheduleSolver(int year, int departamentId, Schedule currentSchedule)
+        public async Task<IScheduleSolver> GetScheduleSolver(int year, int departamentId, Schedule currentSchedule,
+            CancellationToken cancellationToken)
         {
             var morningShifts = await _applicationDbContext.MorningShifts
                 .Where(m => m.QuarterId == currentSchedule.QuarterId)
@@ -88,8 +94,10 @@ namespace NursesScheduler.BusinessLogic.Services
             var shiftCapacityManager = new ShiftCapacityManager(initialNurseStates, initialSolverState, departamentSettings,
                 scheduleMonthDays, currentSchedule, currentScheduleStats, morningShifts);
 
-            return new ScheduleSolver(morningShifts, scheduleMonthDays, constraints, departamentSettings,
-                shiftCapacityManager, initialSolverState, _workTimeService);
+            _scheduleSolver.InitialiseSolver(morningShifts, scheduleMonthDays, constraints, departamentSettings,
+                shiftCapacityManager, initialSolverState, cancellationToken);
+
+            return _scheduleSolver;
         }
     }
 }

@@ -7,6 +7,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
     {
         public bool IsSatisfied(ISolverState currentSolverState, INurseState currentNurseState, TimeSpan shiftLengthToAssing)
         {
+            //if(currentSolverState.CurrentDay >= 2) return false;
             return currentNurseState.WorkTimeInQuarterLeft - shiftLengthToAssing >= TimeSpan.Zero;
         }
     }

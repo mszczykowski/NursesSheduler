@@ -5,6 +5,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
     internal interface IScheduleSolverService
     {
-        Task<IScheduleSolver> GetScheduleSolver(int year, int departamentId, Schedule currentSchedule);
+        Task<IScheduleSolver> GetScheduleSolver(int year, int departamentId, Schedule currentSchedule, 
+            CancellationToken cancellationToken);
     }
 }

@@ -14,5 +14,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.
         public bool UseTeams { get; set; }
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
+        public int DefaultGeneratorTimeOut { get; set; }
     }
 }

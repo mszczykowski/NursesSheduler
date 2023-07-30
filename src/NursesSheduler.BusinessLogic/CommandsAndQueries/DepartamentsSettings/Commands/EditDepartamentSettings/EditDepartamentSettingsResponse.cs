@@ -11,6 +11,7 @@
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public TimeSpan TargetMinimalMorningShiftLenght { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
+        public int DefaultGeneratorTimeOut { get; set; }
         public bool UseTeams { get; set; }
     }
 }

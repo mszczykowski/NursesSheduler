@@ -8,18 +8,22 @@ using NursesScheduler.BusinessLogic.Solver.Queue;
 using NursesScheduler.BusinessLogic.Solver.States;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
+using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver
 {
     internal sealed class ScheduleSolver : IScheduleSolver
     {
-        private readonly IEnumerable<IConstraint> _constraints;
-        private readonly DepartamentSettings _departamentSettings;
         private readonly IWorkTimeService _workTimeService;
+        private readonly ICurrentDateService _currentDateService;
+        private readonly ISolverLoggerService _solverLoggerService;
 
-        private readonly IEnumerable<MorningShift> _morningShifts;
-        private readonly DayNumbered[] _monthDays;
+        private IEnumerable<IConstraint> _constraints;
+        private DepartamentSettings _departamentSettings;
+
+        private IEnumerable<MorningShift> _morningShifts;
+        private DayNumbered[] _monthDays;
 
         private Random _random;
 
@@ -30,10 +34,23 @@ namespace NursesScheduler.BusinessLogic.Solver
 
         private ISolverState _initialState;
 
-        public ScheduleSolver(IEnumerable<MorningShift> morningShifts, DayNumbered[] monthDays, 
+        private CancellationToken _cancellationToken;
+        private DateTime _startTime;
+
+        private bool _solvingCanceled;
+
+        public ScheduleSolver(IWorkTimeService workTimeService, ICurrentDateService currentDateService, 
+            ISolverLoggerService solverLoggerService)
+        {
+            _workTimeService = workTimeService;
+            _currentDateService = currentDateService;
+            _solverLoggerService = solverLoggerService;
+        }
+
+        public void InitialiseSolver(IEnumerable<MorningShift> morningShifts, DayNumbered[] monthDays,
             IEnumerable<IConstraint> constraints, DepartamentSettings departamentSettings,
             IShiftCapacityManager shiftCapacityManager, ISolverState initialState,
-            IWorkTimeService workTimeService)
+            CancellationToken cancellationToken)
         {
             _morningShifts = morningShifts;
             _monthDays = monthDays;
@@ -41,17 +58,20 @@ namespace NursesScheduler.BusinessLogic.Solver
             _constraints = constraints;
             _shiftCapacityManager = shiftCapacityManager;
             _initialState = initialState;
-            _workTimeService = workTimeService;
+            _cancellationToken = cancellationToken;
         }
 
         public ISolverState? TrySolveSchedule(Random random)
         {
+            _solvingCanceled = false;
             _random = random;
             _shiftCapacityManager.GenerateCapacities(random);
 
             var stateCopy = new SolverState(_initialState);
 
             stateCopy.SetNursesToAssignCounts(_shiftCapacityManager);
+
+            _startTime = _currentDateService.GetCurrentDateTime();
 
             return AssignShift(stateCopy, GetQueue(), true);
         }
@@ -62,18 +82,15 @@ namespace NursesScheduler.BusinessLogic.Solver
             ISolverState currentState = new SolverState(previousState);
             INursesQueue currentQueue = CopyQueue(previousQueue, true);
 
-            Console.WriteLine($"NEW STATE: |{currentState.CurrentDay}|{currentState.CurrentShift}|{currentState.NursesToAssignForCurrentShift}");
-
             if (shouldRebuildQueue)
             {
-                Console.WriteLine("BUILDING QUEUE");
                 currentQueue.PopulateQueue(currentState, _monthDays[currentState.CurrentDay - 1]);
             }
 
             var currentDay = _monthDays[currentState.CurrentDay - 1];
             var isFirstTry = true;
 
-            while (currentQueue.TryDequeue(out _currentNurseId, isFirstTry))
+            while (currentQueue.TryDequeue(out _currentNurseId, isFirstTry) && !ShouldCancel())
             {
                 isFirstTry = false;
                 _currentNurse = currentState.NurseStates.First(e => e.NurseId == _currentNurseId);
@@ -97,13 +114,10 @@ namespace NursesScheduler.BusinessLogic.Solver
                     if (_currentNurse.NumberOfRegularShiftsToAssign == 0 || 
                         _constraints.Any(c => !c.IsSatisfied(currentState, _currentNurse, ScheduleConstatns.RegularShiftLength)))
                     {
-                        Console.WriteLine($"NO MATCH, LEFT IN QUEUE: {currentQueue.GetQueueLenght()}");
                         continue;
                     }
 
                     currentState.AssignNurseToRegularShift(_currentNurse);
-
-                    Console.WriteLine($"ASSIGNED: {_currentNurseId}, LEFT IN QUEUE: {currentQueue.GetQueueLenght()}");
 
                     _currentNurse.UpdateStateOnRegularShiftAssign(currentState.CurrentShift, currentDay,
                         _departamentSettings, _workTimeService);
@@ -144,7 +158,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                         _departamentSettings, _workTimeService);
                 }
 
-                ISolverState result;
+                ISolverState? result;
 
                 if(currentState.IsShiftAssigned)
                 {
@@ -168,7 +182,6 @@ namespace NursesScheduler.BusinessLogic.Solver
                 if (result is null)
                 {
                     currentState = new SolverState(previousState);
-                    Console.WriteLine($"BACK TO STATE: |{previousState.CurrentDay}|{previousState.CurrentShift}|{previousState.NursesToAssignForCurrentShift}");
                     continue;
                 }
                 else
@@ -176,9 +189,34 @@ namespace NursesScheduler.BusinessLogic.Solver
                     return result;
                 }
             }
-            Console.WriteLine($"FAILED STATE: |{currentState.CurrentDay}|{currentState.CurrentShift}|{currentState.NursesToAssignForCurrentShift}");
             return null;
         }
+
+        private bool ShouldCancel()
+        {
+            if(_solvingCanceled)
+            {
+                return true;
+            }
+
+            if(_cancellationToken.IsCancellationRequested)
+            {
+                _solverLoggerService.LogEvent(SolverEvents.CanceledByUser);
+                _solvingCanceled = true;
+                return true;
+            }
+
+            if((_currentDateService.GetCurrentDateTime() - _startTime).TotalSeconds > 
+                _departamentSettings.DefaultGeneratorTimeOut)
+            {
+                _solverLoggerService.LogEvent(SolverEvents.TimedOut);
+                _solvingCanceled = true;
+                return true;
+            }
+
+            return false;
+        }
+
 
         private INursesQueue GetQueue()
         {

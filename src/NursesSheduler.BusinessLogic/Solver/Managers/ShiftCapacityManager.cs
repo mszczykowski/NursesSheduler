@@ -103,8 +103,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
                     .Count();
 
             var totalNumberOfShifts =
-                (int)Math.Floor(scheduleStats.WorkTimeInMonth * schedule.ScheduleNurses.Count()
-                    / ScheduleConstatns.RegularShiftLength);
+                (int)Math.Floor(scheduleStats.WorkTimeInMonth / ScheduleConstatns.RegularShiftLength) 
+                    * schedule.ScheduleNurses.Count();
 
             return totalNumberOfShifts - totalTimeOffShifts;
         }
@@ -196,9 +196,11 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
         private int GetNumberOfSurplusShifts(int minimalNumberOfNursesOnShift)
         {
-            return _totalNumberOfShiftsToAssign
+            var result = _totalNumberOfShiftsToAssign
                 -
                 minimalNumberOfNursesOnShift * _monthDays.Length * ScheduleConstatns.NumberOfShifts;
+
+            return result > 0 ? result : 0;
         }
 
         private void SubtractInitialState()

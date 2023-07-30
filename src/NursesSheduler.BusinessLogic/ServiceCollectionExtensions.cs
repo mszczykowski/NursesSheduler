@@ -7,6 +7,8 @@ using NursesScheduler.BusinessLogic.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
+using NursesScheduler.BusinessLogic.Abstractions.Solver;
+using NursesScheduler.BusinessLogic.Solver;
 
 namespace NursesScheduler.BusinessLogic
 {
@@ -28,6 +30,8 @@ namespace NursesScheduler.BusinessLogic
             //services
             services.AddSingleton<ICurrentDateService, CurrentDateService>();
             services.AddSingleton<ISeedService, SeedService>();
+            services.AddSingleton<ISolverLoggerService, SolverLoggerService>();
+
             services.AddTransient<IWorkTimeService, WorkTimeService>();
             services.AddTransient<IWorkTimeServiceLegacy, WorkTimeServiceLegacy>();
             services.AddTransient<IAbsencesService, AbsencesServiceLegacy>();
@@ -37,6 +41,9 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IActiveNursesService, ActiveNursesService>();
             services.AddTransient<IQuarterStatsService, QuarterStatsService>();
             services.AddTransient<IScheduleSolverService, ScheduleSolverService>();
+
+            //solver
+            services.AddTransient<IScheduleSolver, ScheduleSolver>();
         }
     }
 }

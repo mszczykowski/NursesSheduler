@@ -14,6 +14,7 @@ namespace NursesScheduler.Domain.Entities
         public TimeSpan NightShiftHolidayEligibleHours { get; set; }
         public int TargetMinNumberOfNursesOnShift { get; set; }
         public int DefaultGeneratorRetryValue { get; set; }
+        public int DefaultGeneratorTimeOut { get; set; }
         public bool UseTeams { get; set; }
         public int FirstQuarterStart { get; set; }
 
@@ -36,6 +37,7 @@ namespace NursesScheduler.Domain.Entities
             DayShiftHolidayEligibleHours = TimeSpan.FromHours(12);
             NightShiftHolidayEligibleHours = TimeSpan.FromHours(4);
             FirstQuarterStart = firstQuarerStart;
+            DefaultGeneratorTimeOut = 5;
         }
     }
 }

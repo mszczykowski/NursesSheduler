@@ -28,9 +28,14 @@
 @inject IPrintingService _printingService
 
 <ErrorModal @ref="_errorModal" />
+
 <MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
                             CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData />
+
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
+
+<SolverModal @ref="_solverModal" CurrentQuarterData=_currentQuarterData
+                            CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings/>
 
 @if (_isLoading)
 {
@@ -62,10 +67,10 @@ else
             </div>
             <div class="level-right">
                 <div class="level-item">
-                    <Button Style="is-ghost" Text="Konfiguracja ranków" Action="(() => _morningShiftsSettingsModal.ShowModal())" />
+                    <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())" >Konfiguracja ranków</a>
                 </div>
                 <div class="level-item">
-                    <Button Style="is-ghost" Text="Konfiguracja generatora" Action="(() => _solverSettingsModal.ShowModal())" />
+                    <a @onclick="(() => _solverSettingsModal.ShowModal())" >Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
                     <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" />
@@ -136,7 +141,8 @@ else
                         </p>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj" Action=SolveSchedule />
+                        <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj" 
+                            Action="(() => _solverModal.StartSolving())" />
                     </div>
                     <div class="level-item">
                         <p class="control">
@@ -180,6 +186,7 @@ else
     private ModalBase _morningShiftsSettingsModal;
     private ModalBase _solverSettingsModal;
     private ErrorModal _errorModal;
+    private SolverModal _solverModal;
 
     private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
     private bool _holidaysLoaded;
@@ -494,7 +501,7 @@ else
         {
             workDay.ShiftType = ShiftTypes.None;
         }
-        _currentScheduleData.RequestScheduleViewRefresh();
+        _currentScheduleData.RequestScheduleRecalculation();
     }
 
     private async Task PrintScheule()
@@ -513,36 +520,6 @@ else
                 });
 
             await _printingService.Print(response.GeneratedFilePath);
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
-    }
-
-    private async Task SolveSchedule()
-    {
-        try
-        {
-            var request = new SolveScheduleRequest
-                {
-                    DepartamentId = _currentQuarterData.Quarter.DepartamentId,
-                    Year = _currentQuarterData.Quarter.Year,
-                    Schedule = _mapper.Map<SolveScheduleRequest.ScheduleRequest>(_currentScheduleData.Schedule),
-                    SolverSettings = _mapper.Map<SolveScheduleRequest.SolverSettingsRequest>(_solverSettings),
-                };
-
-            var response = await _mediatr.Send(request);
-
-            if (response is null)
-            {
-                _errorModal.ShowError("Nie udało się znaleźć rozwiązania!");
-                return;
-            }
-
-            _currentScheduleData.Schedule.ScheduleNurses = _mapper.Map<ICollection<ScheduleNurseViewModel>>(response.ScheduleNurses);
-            _solverSettings = _mapper.Map<SolverSettingsViewModel>(response.SolverSettings);
-            _currentScheduleData.RequestScheduleRecalculation();
         }
         catch (Exception e)
         {

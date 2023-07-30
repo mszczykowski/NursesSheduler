@@ -4,8 +4,14 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
 {
     public sealed class SolveScheduleResponse
     {
-        public IEnumerable<ScheduleNurseResponse> ScheduleNurses { get; set; }
-        public SolverSettingsResponse SolverSettings { get; set; }
+        public bool IsSolverRunning { get; set; }
+        public SolverResultResponse? SolverResult { get; set; }
+
+        public sealed class SolverResultResponse
+        {
+            public IEnumerable<ScheduleNurseResponse> ScheduleNurses { get; set; }
+            public SolverSettingsResponse SolverSettings { get; set; }
+        }
 
         public sealed class ScheduleNurseResponse
         {

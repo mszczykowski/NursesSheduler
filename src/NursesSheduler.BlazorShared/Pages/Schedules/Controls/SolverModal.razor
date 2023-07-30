@@ -1,0 +1,114 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+
+@inherits ModalBase
+
+<div class="modal @CssHelper.SetIsActive(_isVisible)">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Generowanie grafiku</p>
+        </header>
+        <section class="modal-card-body">
+            <div class="content">
+                <h3>Stan generatora:</h3>
+                @if (_solverLogs is not null)
+                {
+                    <dl>
+                        @foreach (var log in _solverLogs)
+                        {
+                            <dt>@log.ToString()</dt>
+                        }
+                    </dl>
+                }
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <div class="footer-progress">
+                <progress class="progress is-small is-primary" max="100" value="@GetProgressBarValue()">15%</progress>
+            </div>
+            <div class="footer-buttons">
+                <Button Text="Zamknij" Action="base.ChangeVisibility" Disabled=@(_solveScheduleResponse?.IsSolverRunning ?? false) />
+                <Button Style="is-danger" Text="Przerwij generowanie" Action="(() => _cancellationTokenSource.Cancel())"
+                        Disabled=@(!_solveScheduleResponse?.IsSolverRunning ?? true) />
+            </div>
+        </footer>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public SolverSettingsViewModel SolverSettings { get; set; }
+    [Parameter]
+    public ScheduleDataWrapper CurrentScheduleData { get; set; }
+    [Parameter]
+    public QuarterDataWrapper CurrentQuarterData { get; set; }
+
+    private CancellationTokenSource _cancellationTokenSource;
+
+    private SolveScheduleResponse _solveScheduleResponse;
+
+    private IEnumerable<SolverLogViewModel> _solverLogs;
+
+
+    public async Task StartSolving()
+    {
+        base.ChangeVisibility();
+
+        try
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            var request = new SolveScheduleRequest
+                {
+                    DepartamentId = CurrentQuarterData.Quarter.DepartamentId,
+                    Year = CurrentQuarterData.Quarter.Year,
+                    Schedule = _mapper.Map<SolveScheduleRequest.ScheduleRequest>(CurrentScheduleData.Schedule),
+                    SolverSettings = _mapper.Map<SolveScheduleRequest.SolverSettingsRequest>(SolverSettings),
+                };
+            request.SolverEventsListner += (async () => await InvokeAsync(OnSolverUpdate));
+
+            _solveScheduleResponse = await _mediatr.Send(request, _cancellationTokenSource.Token);
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+    private async Task OnSolverUpdate()
+    {
+        _solverLogs = _mapper.Map<IEnumerable<SolverLogViewModel>>(await _mediatr.Send(new GetSolverLogsRequest()));
+
+        if (_solveScheduleResponse.SolverResult is not null)
+        {
+            SetResult();
+        }
+
+        StateHasChanged();
+    }
+
+    private void SetResult()
+    {
+        CurrentScheduleData.Schedule.ScheduleNurses = _mapper.Map<ICollection<ScheduleNurseViewModel>>(_solveScheduleResponse.SolverResult.ScheduleNurses);
+        SolverSettings = _mapper.Map<SolverSettingsViewModel>(_solveScheduleResponse.SolverResult.SolverSettings);
+        CurrentScheduleData.RequestScheduleRecalculation();
+    }
+
+    private int? GetProgressBarValue()
+    {
+        if (_solveScheduleResponse is null)
+        {
+            return 0;
+        }
+        if (_solveScheduleResponse.IsSolverRunning)
+        {
+            return null;
+        }
+        return 100;
+    }
+}
