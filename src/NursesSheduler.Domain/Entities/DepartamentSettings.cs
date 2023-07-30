@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace NursesScheduler.Domain.Entities
+﻿namespace NursesScheduler.Domain.Entities
 {
     public record DepartamentSettings
     {
@@ -33,11 +31,11 @@ namespace NursesScheduler.Domain.Entities
             MinimalShiftBreak = TimeSpan.FromHours(12);
             TargetMinNumberOfNursesOnShift = 4;
             TargetMinimalMorningShiftLenght = TimeSpan.FromHours(6);
-            DefaultGeneratorRetryValue = 4;
+            DefaultGeneratorRetryValue = 20;
             DayShiftHolidayEligibleHours = TimeSpan.FromHours(12);
             NightShiftHolidayEligibleHours = TimeSpan.FromHours(4);
             FirstQuarterStart = firstQuarerStart;
-            DefaultGeneratorTimeOut = 5;
+            DefaultGeneratorTimeOut = 3;
         }
     }
 }

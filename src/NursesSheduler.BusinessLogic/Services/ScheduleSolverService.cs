@@ -3,7 +3,6 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Solver;
-using NursesScheduler.BusinessLogic.Solver;
 using NursesScheduler.BusinessLogic.Solver.Directors;
 using NursesScheduler.BusinessLogic.Solver.Managers;
 using NursesScheduler.BusinessLogic.Solver.States;
@@ -17,32 +16,26 @@ namespace NursesScheduler.BusinessLogic.Services
         private readonly IScheduleStatsService _scheduleStatsService;
         private readonly IQuarterStatsService _quarterStatsService;
         private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
-        private readonly ISeedService _seedService;
         private readonly ICalendarService _calendarService;
         private readonly IScheduleStatsProvider _scheduleStatsProvider;
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly ISchedulesService _schedulesService;
         private readonly IWorkTimeService _workTimeService;
-        private readonly ICurrentDateService _currentDateService;
         private readonly IScheduleSolver _scheduleSolver;
 
         public ScheduleSolverService(IScheduleStatsService scheduleStatsService, IQuarterStatsService quarterStatsService,
-            IDepartamentSettingsProvider departamentSettingsProvider, ISeedService seedService,
-            ICalendarService calendarService, IScheduleStatsProvider scheduleStatsProvider,
-            IApplicationDbContext applicationDbContext, ISchedulesService schedulesService,
-            IWorkTimeService workTimeService, ICurrentDateService currentDateService,
-            IScheduleSolver scheduleSolver)
+            IDepartamentSettingsProvider departamentSettingsProvider, ICalendarService calendarService, 
+            IScheduleStatsProvider scheduleStatsProvider, IApplicationDbContext applicationDbContext, 
+            ISchedulesService schedulesService, IWorkTimeService workTimeService, IScheduleSolver scheduleSolver)
         {
             _scheduleStatsService = scheduleStatsService;
             _quarterStatsService = quarterStatsService;
             _departamentSettingsProvider = departamentSettingsProvider;
-            _seedService = seedService;
             _calendarService = calendarService;
             _scheduleStatsProvider = scheduleStatsProvider;
             _applicationDbContext = applicationDbContext;
             _schedulesService = schedulesService;
             _workTimeService = workTimeService;
-            _currentDateService = currentDateService;
             _scheduleSolver = scheduleSolver;
         }
 

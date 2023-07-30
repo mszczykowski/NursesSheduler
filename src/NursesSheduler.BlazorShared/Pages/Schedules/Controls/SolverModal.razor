@@ -12,6 +12,7 @@
     <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Generowanie grafiku</p>
+            <button class="delete" aria-label="close" @onclick="ChangeVisibility" Disabled=@(_solveScheduleResponse?.IsSolverRunning ?? false)></button>
         </header>
         <section class="modal-card-body">
             <div class="content">
