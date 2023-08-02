@@ -8,7 +8,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
 {
     internal interface INurseState
     {
-        MorningShiftIndex? AssignedMorningShiftIndex { get; }
         TimeSpan HolidayHoursAssigned { get; }
         TimeSpan HoursFromLastShift { get; }
         TimeSpan[] HoursToNextShiftMatrix { get; }
@@ -17,7 +16,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         int NumberOfTimeOffShiftsToAssign { get; }
         int NurseId { get; }
         NurseTeams NurseTeam { get; }
-        HashSet<MorningShiftIndex> PreviouslyAssignedMorningShifts { get; }
+        public HashSet<int> PreviouslyAssignedMorningShifts { get; init; }
+        public int? AssignedMorningShiftId { get; set; }
         ShiftTypes PreviousMonthLastShift { get; }
         bool[] TimeOff { get; }
         Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; }

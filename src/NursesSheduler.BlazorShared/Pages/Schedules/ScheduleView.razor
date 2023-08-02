@@ -28,6 +28,7 @@
 @inject IPrintingService _printingService
 
 <ErrorModal @ref="_errorModal" />
+<InfoModal @ref="_infoModal" />
 
 <MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
                             CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData />
@@ -50,9 +51,9 @@ else
                     <div class="tabs is-toggle is-toggle-rounded">
                         <ul>
                             <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Previous)">
-                                <a @onclick="@(() => SetScheduleVisibility(ScheduleDisplayed.Current))">
+                                <a @onclick="@(() => SetScheduleVisibility(ScheduleDisplayed.Previous))">
                                     <span class="icon is-small @CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)"><i class="fa fa-backward" aria-hidden="true"></i></span>
-                                    <span class="has-text-grey-light @CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)">Podgląd poprzedniego</span>
+                                    <span class="@CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)">Podgląd poprzedniego</span>
                                 </a>
                             </li>
                             <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Current)">
@@ -131,28 +132,14 @@ else
                         </p>
                     </div>
                     <div class="level-item">
-                        <p class="control">
-                            <a class="button is-danger" @onclick="ClearSchedule">
-                                <span class="icon">
-                                    <i class="fas fa-xmark" aria-hidden="true"></i>
-                                </span>
-                                <span>Wyczyść</span>
-                            </a>
-                        </p>
+                        <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule"/>
                     </div>
                     <div class="level-item">
                         <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj" 
                             Action="(() => _solverModal.StartSolving())" />
                     </div>
                     <div class="level-item">
-                        <p class="control">
-                            <a class="button is-success">
-                                <span class="icon">
-                                    <i class="far fa-floppy-disk" aria-hidden="true"></i>
-                                </span>
-                                <span>Zapisz</span>
-                            </a>
-                        </p>
+                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule"/>
                     </div>
                 }
             </div>
@@ -185,7 +172,8 @@ else
 
     private ModalBase _morningShiftsSettingsModal;
     private ModalBase _solverSettingsModal;
-    private ErrorModal _errorModal;
+    private OkModal _errorModal;
+    private OkModal _infoModal;
     private SolverModal _solverModal;
 
     private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
@@ -214,13 +202,17 @@ else
 
                 await ChangeScheduleAsync();
 
+                _currentScheduleData.RecalculateScheduleStats += (async () => await SetCurrentStats());
+                _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
+                _previousScheduleData.RecalculateScheduleStats += (() => StateHasChanged());
+
                 _isLoading = false;
                 base.StateHasChanged();
 
                 if (!_holidaysLoaded)
                 {
                     _errorModal
-                        .ShowError("Nie wczytano świąt!\nUpewnij się że masz połączenie z internetem i uruchom ponownie program");
+                        .ShowModal("Nie wczytano świąt!\nUpewnij się że masz połączenie z internetem i uruchom ponownie program");
                 }
             }
             catch (Exception e)
@@ -285,7 +277,6 @@ else
         _deleteDisabled = false;
         if (_currentScheduleData.Schedule is null)
         {
-            _deleteDisabled = true;
             _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
                 _currentQuarterData.Quarter.QuarterId);
         }
@@ -408,6 +399,8 @@ else
 
     private async Task<ScheduleViewModel> BuildScheduleAsync(int month, int quarterId)
     {
+        _deleteDisabled = true;
+
         var request = new BuildScheduleRequest
             {
                 Month = month,
@@ -532,16 +525,16 @@ else
         try
         {
             var request = _mapper.Map<UpsertScheduleRequest>(_currentScheduleData.Schedule);
-            var response = _mediatr.Send(request);
+            var response = await _mediatr.Send(request);
 
-            if (response == null)
+            if (response is null)
             {
-                _errorModal.ShowError("Nie znaleziono zmian!");
+                _errorModal.ShowModal("Nie znaleziono zmian!");
                 return;
             }
 
-            _currentScheduleData.Schedule = _mapper.Map<ScheduleViewModel>(response);
-            _currentScheduleData.RequestScheduleRecalculation();
+            _infoModal.ShowModal("Pomyślnie zapisano");
+            _deleteDisabled = false;
         }
         catch (Exception e)
         {

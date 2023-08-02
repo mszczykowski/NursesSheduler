@@ -13,17 +13,17 @@ namespace NursesScheduler.BlazorShared.Models.Wrappers
         public StatsDisplayed CurrentStatsDipslayed { get; set; }
 
 
-        public event Action ScheduleNeedsRefreshing;
-        public event Action ScheduleNeedsRecalculation;
+        public event Action RefreshScheduleView;
+        public event Action RecalculateScheduleStats;
 
         public void RequestScheduleViewRefresh()
         {
-            ScheduleNeedsRefreshing.Invoke();
+            RefreshScheduleView.Invoke();
         }
 
         public void RequestScheduleRecalculation()
         {
-            ScheduleNeedsRecalculation.Invoke();
+            RecalculateScheduleStats.Invoke();
         }
     }
 }

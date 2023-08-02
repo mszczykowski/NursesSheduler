@@ -15,10 +15,18 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Up
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
+        public UpsertScheduleCommandHandler(IMapper mapper, IApplicationDbContext applicationDbContext, 
+            IScheduleStatsProvider scheduleStatsProvider)
+        {
+            _mapper = mapper;
+            _applicationDbContext = applicationDbContext;
+            _scheduleStatsProvider = scheduleStatsProvider;
+        }
+
         public async Task<UpsertScheduleResponse?> Handle(UpsertScheduleRequest request, 
             CancellationToken cancellationToken)
         {
-            var schedule = _mapper.Map<Schedule>(request);
+            var udpatedSchedule = _mapper.Map<Schedule>(request);
 
             var quarter = await _applicationDbContext.Quarters.FindAsync(request.QuarterId)
                 ?? throw new EntityNotFoundException(request.QuarterId, nameof(Quarter));
@@ -26,34 +34,47 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Up
             _scheduleStatsProvider.InvalidateCache(new ScheduleStatsKey
             {
                 DepartamentId = quarter.DepartamentId,
-                Month = schedule.Month,
+                Month = udpatedSchedule.Month,
                 Year = quarter.Year,
             });
 
             var oldSchedule = await _applicationDbContext.Schedules
                 .Include(s => s.ScheduleNurses)
                 .ThenInclude(n => n.NurseWorkDays)
-                .FirstOrDefaultAsync(s => s.ScheduleId == request.ScheduleId);
+                .FirstOrDefaultAsync(s => s.QuarterId == request.QuarterId &&
+                    s.Month == request.Month);
+
+            var x = await _applicationDbContext.Schedules.ToListAsync();
 
             if(oldSchedule is null)
             {
-                _applicationDbContext.Schedules.Add(schedule);
+                _applicationDbContext.Schedules.Add(udpatedSchedule);
 
                 return await _applicationDbContext.SaveChangesAsync(cancellationToken) > 0 
-                    ? _mapper.Map<UpsertScheduleResponse>(schedule) : null;
+                    ? _mapper.Map<UpsertScheduleResponse>(udpatedSchedule) : null;
             }
 
-            foreach (var updatedWorkDay in schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays))
+            foreach (var oldScheduleNurse in oldSchedule.ScheduleNurses)
             {
-                var oldWorkDay = oldSchedule.ScheduleNurses
-                    .SelectMany(n => n.NurseWorkDays)
-                    .First(wd => wd.NurseWorkDayId == updatedWorkDay.NurseWorkDayId);
+                var updatedWorkDays = udpatedSchedule
+                    .ScheduleNurses
+                    .First(n => n.NurseId == oldScheduleNurse.NurseId)
+                    .NurseWorkDays;
 
-                oldWorkDay.ShiftType = updatedWorkDay.ShiftType;
-                
-                if(updatedWorkDay.ShiftType == Domain.Enums.ShiftTypes.Morning)
+                foreach(var oldWorkDay in oldScheduleNurse.NurseWorkDays)
                 {
-                    oldWorkDay.MorningShiftId = updatedWorkDay.MorningShiftId;
+                    var updatedWorkDay = updatedWorkDays.First(wd => wd.Day == oldWorkDay.Day);
+
+                    oldWorkDay.ShiftType = updatedWorkDay.ShiftType;
+
+                    if (updatedWorkDay.ShiftType == Domain.Enums.ShiftTypes.Morning)
+                    {
+                        oldWorkDay.MorningShiftId = updatedWorkDay.MorningShiftId;
+                        continue;
+                    }
+
+                    oldWorkDay.MorningShift = null;
+                    oldWorkDay.MorningShiftId = null;
                 }
             }
 

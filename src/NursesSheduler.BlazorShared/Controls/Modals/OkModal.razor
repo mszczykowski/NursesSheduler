@@ -1,0 +1,37 @@
+﻿@inherits ModalBase
+
+
+<div class="modal @CssHelper.SetIsActive(base._isVisible)">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">@Title</p>
+            <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
+        </header>
+        <section class="modal-card-body">
+            <section>@_message</section>
+        </section>
+        <footer class="modal-card-foot">
+            <div class="footer-buttons">
+                <Button Style=@ButtonStyle Text="Ok" Action=base.ChangeVisibility/>
+            </div>
+        </footer>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string ButtonStyle { get; set; }
+
+    private string _message { get; set; }
+
+    public void ShowModal(string message)
+    {
+        _message = message;
+        base.ChangeVisibility();
+    }
+}
+

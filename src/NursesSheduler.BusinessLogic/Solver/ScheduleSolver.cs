@@ -124,13 +124,14 @@ namespace NursesScheduler.BusinessLogic.Solver
                 }
                 else if(currentState.NursesToAssignForMorningShift > 0)
                 {
-                    if (_currentNurse.AssignedMorningShiftIndex is not null)
+                    if (_currentNurse.AssignedMorningShiftId is not null)
                     {
                         continue;
                     }
 
                     var possibleMorningShifts = _morningShifts
-                        .Where(m => !_currentNurse.PreviouslyAssignedMorningShifts.Contains(m.Index))
+                        .Where(m => !_currentNurse.PreviouslyAssignedMorningShifts.Contains(m.MorningShiftId) 
+                            && m.ShiftLength != TimeSpan.Zero)
                         .OrderBy(s => _random.Next());
 
                     MorningShift? morningShiftToAssign = null;
@@ -149,10 +150,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                         continue;
                     }
 
-                    if(morningShiftToAssign.ShiftLength != TimeSpan.Zero)
-                    {
-                        currentState.AssignNurseToMorningShift(_currentNurse);
-                    }
+                    currentState.AssignNurseToMorningShift(_currentNurse);
 
                     _currentNurse.UpdateStateOnMorningShiftAssign(morningShiftToAssign, currentDay,
                         _departamentSettings, _workTimeService);

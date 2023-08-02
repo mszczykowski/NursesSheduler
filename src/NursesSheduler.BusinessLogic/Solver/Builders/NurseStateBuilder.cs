@@ -21,8 +21,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         private TimeSpan _nightHoursAssigned;
         private TimeSpan _workTimeInQuarterLeft;
         private bool[] _timeOff;
-        private HashSet<MorningShiftIndex> _previouslyAssignedMorningShifts;
-        private MorningShiftIndex? _assignedMorningShift;
+        private HashSet<int> _previouslyAssignedMorningShifts;
+        private int? _assignedMorningShiftId;
         private ShiftTypes _previousMonthLastShift;
         private NurseTeams _nurseTeam;
 
@@ -137,17 +137,17 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseStateBuilder SetPreviouslyAssignedMorningShifts(NurseStats nurseQuarterStats)
         {
-            _previouslyAssignedMorningShifts = new HashSet<MorningShiftIndex>(nurseQuarterStats.MorningShiftsAssigned);
+            _previouslyAssignedMorningShifts = new HashSet<int>(nurseQuarterStats.AssignedMorningShiftsIds);
 
             return this;
         }
 
         public INurseStateBuilder SetAssignedMorningShift(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            _assignedMorningShift = nurseWorkDays
+            _assignedMorningShiftId = nurseWorkDays
                 .FirstOrDefault(wd => wd.ShiftType == ShiftTypes.Morning)?
                 .MorningShift?
-                .Index;
+                .MorningShiftId;
 
             return this;
         }
@@ -181,7 +181,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
                 WorkTimeInQuarterLeft = _workTimeInQuarterLeft,
                 TimeOff = _timeOff,
                 PreviouslyAssignedMorningShifts = _previouslyAssignedMorningShifts,
-                AssignedMorningShiftIndex = _assignedMorningShift,
+                AssignedMorningShiftId = _assignedMorningShiftId,
                 PreviousMonthLastShift = _previousMonthLastShift,
                 NurseTeam = _nurseTeam,
             };

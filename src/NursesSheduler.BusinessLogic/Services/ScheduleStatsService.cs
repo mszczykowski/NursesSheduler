@@ -135,7 +135,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 LastState = GetLastState(scheduleNurse.NurseWorkDays),
                 HoursFromLastAssignedShift = _workTimeService.GetHoursFromLastAssignedShift(scheduleNurse.NurseWorkDays),
                 HoursToFirstAssignedShift = _workTimeService.GetHoursToFirstAssignedShift(scheduleNurse.NurseWorkDays),
-                MorningShiftsAssigned = GetAssignedMorningShifts(scheduleNurse.NurseWorkDays),
+                AssignedMorningShiftsIds = GetAssignedMorningShiftsIds(scheduleNurse.NurseWorkDays),
                 WorkTimeAssignedInWeeks = GetWorkTimeInWeeks(scheduleNurse.NurseWorkDays, monthDays),
                 TimeOffToAssign = _workTimeService.GetTimeOffTimeToAssign(scheduleNurse.NurseWorkDays, monthDays,
                         departamentSettings),
@@ -196,7 +196,7 @@ namespace NursesScheduler.BusinessLogic.Services
                     LastState = GetLastState(nurseSchedule.NurseWorkDays),
                     HoursFromLastAssignedShift = _workTimeService.GetHoursFromLastAssignedShift(nurseSchedule.NurseWorkDays),
                     HoursToFirstAssignedShift = _workTimeService.GetHoursToFirstAssignedShift(nurseSchedule.NurseWorkDays),
-                    MorningShiftsAssigned = GetAssignedMorningShifts(nurseSchedule.NurseWorkDays),
+                    AssignedMorningShiftsIds = GetAssignedMorningShiftsIds(nurseSchedule.NurseWorkDays),
                     WorkTimeAssignedInWeeks = GetWorkTimeInWeeks(nurseSchedule.NurseWorkDays, days),
                 };
 
@@ -208,11 +208,11 @@ namespace NursesScheduler.BusinessLogic.Services
             return scheduleStats;
         }
 
-        private IEnumerable<MorningShiftIndex> GetAssignedMorningShifts(IEnumerable<NurseWorkDay> nurseWorkDays)
+        private IEnumerable<int> GetAssignedMorningShiftsIds(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
             return nurseWorkDays
                 .Where(d => d.ShiftType == ShiftTypes.Morning)
-                .Select(d => d.MorningShift.Index);
+                .Select(d => d.MorningShift.MorningShiftId);
         }
 
         private ShiftTypes GetLastState(IEnumerable<NurseWorkDay> nurseWorkDays)

@@ -43,6 +43,14 @@
     private EditContext _editContext;
     private IMonthPickerViewModel _monthPickerViewModel;
 
+    protected override Task OnInitializedAsync()
+    {
+        _editContext = new(Departament);
+        _monthPickerViewModel = new MonthPickerViewModel(Departament.FirstQuarterStart);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        return base.OnInitializedAsync();
+    }
+
     private async void OnSubmit()
     {
         if (!_editContext.Validate())
@@ -52,13 +60,6 @@
 
         await SaveDepartament.InvokeAsync();
         StateHasChanged();
-    }
-
-    protected override void OnInitialized()
-    {
-        _editContext = new(Departament);
-        _monthPickerViewModel = new MonthPickerViewModel(Departament.FirstQuarterStart);
-        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
     }
 
     private void OnPickedMonthChanged()

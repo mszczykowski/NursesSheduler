@@ -50,7 +50,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
             {
                 thread = new Thread(new ThreadStart(() => TryGenerateSchedule(response, solverSettings, solver, 
                     currentSchedule, cancellationToken)));
-                thread.IsBackground = true;
                 thread.Start();
             }
 

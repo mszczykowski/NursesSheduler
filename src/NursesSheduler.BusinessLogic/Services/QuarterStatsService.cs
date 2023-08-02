@@ -140,7 +140,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var nurseQuarterStats = new NurseStats
             {
                 NurseId = quarterSchedulesNurseStats.First().NurseId,
-                MorningShiftsAssigned = new List<MorningShiftIndex>(),
+                AssignedMorningShiftsIds = new List<int>(),
                 WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(),
             };
 
@@ -152,10 +152,10 @@ namespace NursesScheduler.BusinessLogic.Services
                 nurseQuarterStats.TimeOffToAssign += scheduleNurseStats.TimeOffToAssign;
                 nurseQuarterStats.TimeOffAssigned += scheduleNurseStats.TimeOffAssigned;
 
-                if(scheduleNurseStats.MorningShiftsAssigned is not null)
+                if(scheduleNurseStats.AssignedMorningShiftsIds is not null)
                 {
-                    nurseQuarterStats.MorningShiftsAssigned = nurseQuarterStats.MorningShiftsAssigned
-                        .Union(scheduleNurseStats.MorningShiftsAssigned);
+                    nurseQuarterStats.AssignedMorningShiftsIds = nurseQuarterStats.AssignedMorningShiftsIds
+                        .Union(scheduleNurseStats.AssignedMorningShiftsIds);
                 }
 
                 if(scheduleNurseStats.WorkTimeAssignedInWeeks is not null)

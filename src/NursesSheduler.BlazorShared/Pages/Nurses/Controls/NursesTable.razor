@@ -17,7 +17,7 @@ else
         <thead>
             <tr>
                 <th>L.p.</th>
-                <th class="is-maincolumn">Imie i nazwisko</th>
+                <th class="is-maincolumn">Nazwisko i imię</th>
                 <th>Bilans godzin nocnych</th>
                 <th>Bilans godzin świątecznych</th>
                 <th></th>
@@ -26,7 +26,7 @@ else
         </thead>
         <tbody>
             @{
-                nurseIndex = 0;
+                var nurseIndex = 0;
                 foreach (var nurse in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name))
                 {
                     <tr>
@@ -49,8 +49,6 @@ else
     public ICollection<NurseViewModel> Nurses { get; set; }
 
     private DeleteModal _deleteModal;
-
-    private int nurseIndex;
 
     private async Task DeleteNurse(int nurseId)
     {

@@ -23,7 +23,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Up
             public int Day { get; set; }
             public bool IsTimeOff { get; set; }
             public ShiftTypes ShiftType { get; set; }
-            public int MorningShiftId { get; set; }
+            public int? MorningShiftId { get; set; }
         }
     }
 }

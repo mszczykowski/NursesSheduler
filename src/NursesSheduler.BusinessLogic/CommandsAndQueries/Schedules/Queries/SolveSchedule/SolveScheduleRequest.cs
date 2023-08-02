@@ -14,6 +14,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
         public sealed class ScheduleRequest
         {
             public int ScheduleId { get; set; }
+            public int QuarterId { get; set; }
             public int Month { get; set; }
             public bool IsClosed { get; set; }
             public IEnumerable<ScheduleNurseRequest> ScheduleNurses { get; set; }
@@ -30,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
             public int Day { get; set; }
             public bool IsTimeOff { get; set; }
             public ShiftTypes ShiftType { get; set; }
-            public int MorningShiftId { get; set; }
+            public int? MorningShiftId { get; set; }
         }
 
         public sealed class SolverSettingsRequest

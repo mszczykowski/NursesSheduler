@@ -11,6 +11,6 @@ namespace NursesScheduler.Domain.ValueObjects.Stats
         public TimeSpan TimeOffAssigned { get; set; }
         public TimeSpan NightHoursAssigned { get; set; }
         public IDictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; set; }
-        public IEnumerable<MorningShiftIndex> MorningShiftsAssigned { get; set; }
+        public IEnumerable<int> AssignedMorningShiftsIds { get; set; }
     }
 }

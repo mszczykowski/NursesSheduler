@@ -64,14 +64,14 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
                 initialNurseStates.Count();
 
             var numberOfAssignedMorningShifts = initialNurseStates
-                .Where(n => n.AssignedMorningShiftIndex != null && morningShifts
-                    .First(m => m.Index == n.AssignedMorningShiftIndex).ShiftLength != TimeSpan.Zero)
+                .Where(n => n.AssignedMorningShiftId != null && morningShifts
+                    .First(m => m.MorningShiftId == n.AssignedMorningShiftId).ShiftLength != TimeSpan.Zero)
                 .Count()
                 +
                 initialNurseStates
                 .SelectMany(n => n.PreviouslyAssignedMorningShifts)
                 .Where(p => morningShifts
-                    .First(m => m.Index == p).ShiftLength != TimeSpan.Zero)
+                    .First(m => m.MorningShiftId == p).ShiftLength != TimeSpan.Zero)
                 .Count();
 
             return (totalNumberOfMorningShifts - numberOfAssignedMorningShifts) / 3 - (scheduleStats.MonthInQuarter - 1);

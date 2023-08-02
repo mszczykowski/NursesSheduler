@@ -55,17 +55,6 @@ else
     [Parameter]
     public ScheduleDataWrapper ScheduleData { get; set; }
 
-
-    protected override Task OnParametersSetAsync()
-    {
-        if(ScheduleData is not null)
-        {
-            ScheduleData.ScheduleNeedsRefreshing += RefreshSchedule;
-        }
-
-        return base.OnParametersSetAsync();
-    }
-
     private bool ShouldDisplayTable()
     {
         return ScheduleData.Schedule is not null && ScheduleData.Schedule.ScheduleNurses is not null 

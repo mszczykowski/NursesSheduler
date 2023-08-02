@@ -8,12 +8,13 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
         public int Day { get; set; }
         public bool IsTimeOff { get; set; }
         public ShiftTypes ShiftType { get; set; }
-        public int MorningShiftId { get; set; }
+        public int? MorningShiftId { get; set; }
         public MorningShiftViewModel? MorningShift { get; set; }
 
         public void SetShift(ShiftTypes type)
         {
             ShiftType = type;
+            MorningShiftId = null;
             MorningShift = null;
         }
 
@@ -29,7 +30,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
         {
             ShiftType = ShiftTypes.Morning;
             MorningShift = morningShifts.First(m => m.Index == index);
-            MorningShiftId = MorningShiftId;
+            MorningShiftId = MorningShift.MorningShiftId;
         }
     }
 }

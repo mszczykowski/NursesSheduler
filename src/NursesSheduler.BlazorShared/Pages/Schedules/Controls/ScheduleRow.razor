@@ -14,7 +14,7 @@
     @foreach (var workDay in _scheduleNurse.NurseWorkDays)
     {
         <ScheduleShift WorkDay=workDay Day=@ScheduleData.Days.First(d=>d.Date.Day == workDay.Day)
-                   MorningShifts="QuarterData.MorningShifts" OnChange="RecalcuateStatsAsync" ReadOnly=ScheduleData.ReadOnly />
+                   MorningShifts="QuarterData.MorningShifts" OnChange="ScheduleData.RequestScheduleRecalculation" ReadOnly=ScheduleData.ReadOnly />
     }
     @if (ScheduleData.CurrentStatsDipslayed == StatsDisplayed.Schedule)
     {
@@ -49,24 +49,14 @@
     private NurseStatsViewModel _scheduleNurseStats => ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId];
     private NurseStatsViewModel _quarterNurseStats => QuarterData.QuarterStats.NurseStats[Nurse.NurseId];
     private ScheduleNurseViewModel _scheduleNurse => ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == Nurse.NurseId);
-
-    protected override Task OnParametersSetAsync()
-    {
-        if(ScheduleData is not null)
-        {
-            ScheduleData.ScheduleNeedsRecalculation += (async () => await RecalcuateStatsAsync());
-        }
-
-        return base.OnParametersSetAsync();
-    }
     
 
-    public async Task RecalcuateStatsAsync()
+    public async Task RecalcuateRowStatsAsync()
     {
         try
         {
-            await RecalcuateScheduleStatsAsync();
-            await RecalcuateQuarterStatsAsync();
+            await RecalcuateScheduleRowStatsAsync();
+            await RecalcuateQuarterRowStatsAsync();
             ScheduleData.RequestScheduleViewRefresh();
         }
         catch(Exception e)
@@ -75,7 +65,7 @@
         }
     }
 
-    private async Task RecalcuateScheduleStatsAsync()
+    private async Task RecalcuateScheduleRowStatsAsync()
     {
         var request = new RecalculateNurseScheduleStatsRequest
             {
@@ -88,7 +78,7 @@
         ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
     }
 
-    private async Task RecalcuateQuarterStatsAsync()
+    private async Task RecalcuateQuarterRowStatsAsync()
     {
         var request = new RecalculateNurseQuarterStatsRequest
             {

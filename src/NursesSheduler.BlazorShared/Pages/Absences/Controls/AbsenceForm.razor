@@ -90,7 +90,7 @@
 
     public void HandleInvalidAbsence(AbsenceVeryficationResult result)
     {
-        _errorModal.ShowError(result.GetEnumDisplayName());
+        _errorModal.ShowModal(result.GetEnumDisplayName());
     }
 
     private async Task OnSubmit()
