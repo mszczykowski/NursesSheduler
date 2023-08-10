@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.CloseSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
@@ -22,6 +23,9 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<Schedule, UpsertScheduleResponse>();
 
             CreateMap<SolveScheduleRequest.ScheduleRequest, Schedule>();
+
+            CreateMap<CloseScheduleRequest, Schedule>();
+            CreateMap<Schedule, CloseScheduleResponse>();
         }
     }
 }

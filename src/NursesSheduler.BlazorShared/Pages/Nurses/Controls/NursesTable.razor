@@ -3,7 +3,7 @@
 @inject IMediator _mediatr
 @inject IExceptionHandler _exceptionHandler;
 
-<DeleteModal @ref="_deleteModal" DeleteAction="DeleteNurse" />
+<DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteNurse" />
 
 @if (Nurses == null || !Nurses.Any())
 {
@@ -48,7 +48,7 @@ else
     [Parameter]
     public ICollection<NurseViewModel> Nurses { get; set; }
 
-    private DeleteModal _deleteModal;
+    private DeleteModalWithId _deleteModal;
 
     private async Task DeleteNurse(int nurseId)
     {

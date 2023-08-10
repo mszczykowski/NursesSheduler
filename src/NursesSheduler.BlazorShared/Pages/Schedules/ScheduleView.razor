@@ -36,7 +36,9 @@
 <SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
 
 <SolverModal @ref="_solverModal" CurrentQuarterData=_currentQuarterData
-                            CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings/>
+             CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings />
+
+<DeleteModal @ref="_deleteModal" DeleteAction="DeleteSchedule" />
 
 @if (_isLoading)
 {
@@ -68,14 +70,14 @@ else
             </div>
             <div class="level-right">
                 <div class="level-item">
-                    <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())" >Konfiguracja ranków</a>
+                    <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())">Konfiguracja ranków</a>
                 </div>
                 <div class="level-item">
-                    <a @onclick="(() => _solverSettingsModal.ShowModal())" >Konfiguracja generatora</a>
+                    <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
-                <div class="level-item">
-                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" />
-                </div>
+@*                <div class="level-item">
+                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
+                </div>*@
             </div>
         </div>
         <div class="level is-boxed">
@@ -94,7 +96,7 @@ else
                             OnChange="OnSeletedDateChangedAsync" />
                 </div>
                 <div class="level-item">
-                    <button class="button is-info" @onclick="OnCurrentDateClickAsync">Bieżący miesiąc</button>
+                    <Button Style="is-info" Text="Bieżący miesiąc" Action="OnCurrentDateClickAsync" />
                 </div>
             </div>
             <div class="level-right">
@@ -117,42 +119,44 @@ else
                 else
                 {
                     <div class="level-item">
-                        <p class="control">
-                            <a class="button is-danger is-inverted" disabled=@_deleteDisabled>Usuń</a>
-                        </p>
+                        <Button Style="is-danger is-inverted" Text="Usuń" Action="@(() => _deleteModal.ShowModal($"grafik: {_pickedDate.ToString()}"))" 
+                            Disabled=@(!ShouldDisplayTable() || _deleteDisabled)/>
                     </div>
                     <div class="level-item">
-                        <p class="control">
-                            <a class="button is-info">
-                                <span class="icon">
-                                    <i class="fas fa-check" aria-hidden="true"></i>
-                                </span>
-                                <span>Sprawdź</span>
-                            </a>
-                        </p>
+                        <LoadingButton Style="is-info" Icon="fas fa-print" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule"/>
+                        <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj" 
-                            Action="(() => _solverModal.StartSolving())" />
+                        <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
+                        Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule"/>
+                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
                     </div>
                 }
             </div>
         </div>
     </div>
 
-    @if (_currentDisplayedSchedule == ScheduleDisplayed.Current)
+    @if (!ShouldDisplayTable())
     {
-        <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData />
+        <br />
+        <div class="has-text-centered">
+            <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
+        </div>
     }
     else
     {
-        <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData />
+        @if (_currentDisplayedSchedule == ScheduleDisplayed.Current)
+        {
+            <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData />
+        }
+        else
+        {
+            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData />
+        }
     }
 }
 
@@ -175,6 +179,7 @@ else
     private OkModal _errorModal;
     private OkModal _infoModal;
     private SolverModal _solverModal;
+    private DeleteModal _deleteModal;
 
     private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
     private bool _holidaysLoaded;
@@ -559,5 +564,11 @@ else
         {
             _exceptionHandler.HandleException(e);
         }
+    }
+
+    private bool ShouldDisplayTable()
+    {
+        return _currentScheduleData.Schedule is not null && _currentScheduleData.Schedule.ScheduleNurses is not null
+            && _currentScheduleData.Schedule.ScheduleNurses.Any();
     }
 }

@@ -1,45 +1,36 @@
-﻿ @inherits ModalBase
+﻿@inherits YesNoModal
 
-
-<div class="modal @CssHelper.SetIsActive(_isVisible)">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Usuń</p>
-            <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
-        </header>
-        <section class="modal-card-body">
-            <section>Czy na pewno chcesz usunąć <b>@_name</b>?</section>
-            <section>Tej operecji nie da się cofnąć.</section>
-        </section>
-        <footer class="modal-card-foot">
-            <div class="footer-buttons">
-                <Button Style="button" Text="Anuluj" Action=base.ChangeVisibility/>
-                <LoadingButton Style="button is-danger" Text="Usuń" Action="Delete"/>
-            </div>
-        </footer>
-    </div>
-</div>
-
+@{
+    base.BuildRenderTree(__builder);
+}
 
 @code {
     [Parameter]
-    public EventCallback<int> DeleteAction { get; set; }
+    public EventCallback DeleteAction { get; set; }
 
-    private string _name;
-    private int _id;
-
-    public void ShowModal(string name, int id)
+    protected override Task OnInitializedAsync()
     {
-        _name = name;
-        _id = id;
+        base._title = "Usuń";
+        base._yesText = "Usuń";
+        return base.OnInitializedAsync();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        base._yesAction = DeleteAction;
+
+        return base.OnParametersSetAsync();
+    }
+
+    public void ShowModal(string deletedObjectName)
+    {
+        SetModalContent(deletedObjectName);
         ChangeVisibility();
     }
 
-    private async Task Delete()
+    public void SetModalContent(string deletedObjectName)
     {
-        await DeleteAction.InvokeAsync(_id);
-        ChangeVisibility();
+        base._content = "<p>Czy na pewno chcesz usunąć <b>@deletedObjectName</b>?</p>" +
+            "<section>Tej operecji nie da się cofnąć.</section>";
     }
 }
-

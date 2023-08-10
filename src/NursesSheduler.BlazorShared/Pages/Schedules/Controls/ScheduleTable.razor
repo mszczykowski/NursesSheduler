@@ -1,50 +1,40 @@
-﻿@if (!ShouldDisplayTable())
-{
-    <br />
-    <div class="has-text-centered">
-        <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
-    </div>
-}
-else
-{
-    <ScheduleHeader QuarterData=QuarterData ScheduleData=ScheduleData/>
-    <table class="table-schedule">
-        <thead>
-            <tr>
-                <th class="no">L.p.</th>
-                <th class="name">Pracownik</th>
-                @foreach (var day in ScheduleData.Days)
-                {
-                    <th class="@ScheduleCssHelper.GetDayClass(day) day">
-                        <div class="tooltip">
-                            <p>@day.ToString()</p>
-                            <p>@day.GetDayOfWeekAbreviation()</p>
-                            @if (day.IsHoliday && !String.IsNullOrEmpty(day.HolidayName))
-                            {
-                                <div class="tooltiptext">@day.HolidayName</div>
-                            }
-                        </div>
-                    </th>
-                }
-                <th class="summary">Poz. czas pracy</th>
-                <th class="summary">Przyp. urlop</th>
-                <th class="summary">Urlop do przyp.</th>
-                <th class="summary">Godz. świąt.</th>
-                <th class="summary">Godz. noc.</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                int i = 1;
-                foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
-                {
-                    <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
-                        ScheduleData=ScheduleData />
-                }
+﻿<ScheduleHeader QuarterData=QuarterData ScheduleData=ScheduleData />
+<table class="table-schedule">
+    <thead>
+        <tr>
+            <th class="no">L.p.</th>
+            <th class="name-col">Pracownik</th>
+            @foreach (var day in ScheduleData.Days)
+            {
+                <th class="@ScheduleCssHelper.GetDayClass(day) day">
+                    <div class="tooltip">
+                        <p>@day.ToString()</p>
+                        <p>@day.GetDayOfWeekAbreviation()</p>
+                        @if (day.IsHoliday && !String.IsNullOrEmpty(day.HolidayName))
+                        {
+                            <div class="tooltiptext">@day.HolidayName</div>
+                        }
+                    </div>
+                </th>
             }
-        </tbody>
-    </table>
-}
+            <th class="summary">Poz. czas pracy</th>
+            <th class="summary">Przyp. urlop</th>
+            <th class="summary">Urlop do przyp.</th>
+            <th class="summary">Godz. świąt.</th>
+            <th class="summary">Godz. noc.</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 1;
+            foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
+            {
+                <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
+                     ScheduleData=ScheduleData />
+            }
+        }
+    </tbody>
+</table>
 
 
 @code {
@@ -54,12 +44,6 @@ else
     public QuarterDataWrapper QuarterData { get; set; }
     [Parameter]
     public ScheduleDataWrapper ScheduleData { get; set; }
-
-    private bool ShouldDisplayTable()
-    {
-        return ScheduleData.Schedule is not null && ScheduleData.Schedule.ScheduleNurses is not null 
-            && ScheduleData.Schedule.ScheduleNurses.Any();
-    }
 
     private void RefreshSchedule()
     {

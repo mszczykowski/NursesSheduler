@@ -11,5 +11,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
             AbsenceTypes type);
         Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence);
         Task<IEnumerable<Absence>> GetNurseAbsencesInMonthAsync(int year, int month, int nurseId);
+        Task AssignTimeOffsWorkTime(Schedule closedSchedule, int year, CancellationToken cancellationToken);
     }
 }

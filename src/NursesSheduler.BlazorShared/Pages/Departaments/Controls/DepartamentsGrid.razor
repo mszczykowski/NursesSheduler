@@ -7,7 +7,7 @@
 @inject IExceptionHandler _exceptionHandler
 @inject NavigationManager _navigationManager;
 
-<DeleteModal @ref="_deleteModal" DeleteAction="DeleteDepratament" />
+<DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteDepratament" />
 
 @if(Departaments == null || Departaments.Count == 0)
 {
@@ -33,7 +33,7 @@ else
     [Parameter]
     public List<DepartamentViewModel> Departaments { get; set; }
 
-    private DeleteModal _deleteModal;
+    private DeleteModalWithId _deleteModal;
 
     private async Task OnDepartamentPick(DepartamentViewModel departament)
     {

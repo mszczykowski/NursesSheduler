@@ -8,10 +8,10 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class WorkTimeService : IWorkTimeService
     {
-        public TimeSpan GetHoursFromLastAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays)
+        public TimeSpan GetHoursFromLastAssignedShift(int toDay, IEnumerable<NurseWorkDay> nurseWorkDays)
         {
             TimeSpan hoursFromLastAssignedShift = TimeSpan.Zero;
-            foreach (var workDay in nurseWorkDays.OrderByDescending(d => d.Day))
+            foreach (var workDay in nurseWorkDays.Where(d => d.Day < toDay).OrderByDescending(d => d.Day))
             {
                 switch (workDay.ShiftType)
                 {
@@ -32,6 +32,10 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
             }
             return hoursFromLastAssignedShift;
+        }
+        public TimeSpan GetHoursFromLastAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays)
+        {
+            return GetHoursFromLastAssignedShift(31, nurseWorkDays);
         }
         public TimeSpan GetHoursToFirstAssignedShift(int fromDay, IEnumerable<NurseWorkDay> nurseWorkDays)
         {

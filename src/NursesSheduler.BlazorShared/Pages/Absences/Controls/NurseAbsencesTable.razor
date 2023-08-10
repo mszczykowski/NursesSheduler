@@ -7,7 +7,7 @@
 @inject IExceptionHandler _exceptionHandler
 
 
-<DeleteModal @ref="_deleteModal" DeleteAction="DeleteAbsence" />
+<DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteAbsence" />
 
 @if (Absences == null || !Absences.Any())
 {
@@ -46,7 +46,7 @@ else
 
 
 @code {
-    private DeleteModal _deleteModal;
+    private DeleteModalWithId _deleteModal;
     private EditAbsenceModal _editModal;
 
     [Parameter]

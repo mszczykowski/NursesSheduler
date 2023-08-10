@@ -4,16 +4,16 @@
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-card-title">@Title</p>
+            <p class="modal-card-title">@_title</p>
             <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
         </header>
         <section class="modal-card-body">
-            <p>@Content</p>
+            <p>@_content</p>
         </section>
         <footer class="modal-card-foot">
             <div class="footer-buttons">
                 <Button Style="button" Text="Anuluj" Action=base.ChangeVisibility/>
-                <LoadingButton Style="button is-danger" Text="Tak" Action="YesAction"/>
+                <LoadingButton Style="button is-danger" Text="@_yesText" Action="ExecuteYesAction"/>
             </div>
         </footer>
     </div>
@@ -21,11 +21,15 @@
 
 
 @code {
-    [Parameter]
-    public string Title { get; set; }
-    [Parameter]
-    public string Content { get; set; }
-    [Parameter]
-    public EventCallback YesAction { get; set; }
+    protected string _title;
+    protected string _content;
+    protected string _yesText;
+    protected EventCallback _yesAction;
+
+    private async Task ExecuteYesAction()
+    {
+        await _yesAction.InvokeAsync();
+        base.ChangeVisibility();
+    }
 }
 

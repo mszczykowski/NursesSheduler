@@ -3,23 +3,62 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
+using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
-    internal sealed class AbsencesServiceLegacy : IAbsencesService
+    internal sealed class AbsencesService : IAbsencesService
     {
-        private readonly IApplicationDbContext _context;
+        private readonly IApplicationDbContext _applicationDbContext;
         private readonly ICurrentDateService _currentDateService;
+        private readonly IWorkTimeService _workTimeService;
 
-        public AbsencesServiceLegacy(IApplicationDbContext context, ICurrentDateService currentDateService)
+        public AbsencesService(IApplicationDbContext applicationDbContext, ICurrentDateService currentDateService, IWorkTimeService workTimeService)
         {
-            _context = context;
+            _applicationDbContext = applicationDbContext;
             _currentDateService = currentDateService;
+            _workTimeService = workTimeService;
         }
+
+        public async Task AssignTimeOffsWorkTime(Schedule closedSchedule, int year, CancellationToken cancellationToken)
+        {
+            var absencesSummaries = await _applicationDbContext.AbsencesSummaries
+                .Where(s => s.Year == year && closedSchedule.ScheduleNurses.Any(n => n.NurseId == s.NurseId))
+                .ToListAsync();
+
+            foreach(var absenceSummary in absencesSummaries)
+            {
+                var absences = absenceSummary.Absences.Where(a => a.Month == closedSchedule.Month);
+
+                foreach(var absence in absences)
+                {
+                    var assignedWorkTime = TimeSpan.Zero;
+
+                    var absenceWorkDays = closedSchedule.ScheduleNurses
+                        .First(n => n.NurseId == absenceSummary.NurseId)
+                        .NurseWorkDays
+                        .Where(wd => absence.Days.Contains(wd.Day));
+
+                    foreach(var workday in absenceWorkDays)
+                    {
+                        assignedWorkTime += _workTimeService.GetAssignedShiftWorkTime(workday.ShiftType, 
+                            workday.MorningShift?.ShiftLength);
+                    }
+
+                    absence.IsClosed = true;
+                    absence.AssignedWorkingHours = assignedWorkTime;
+                }
+
+                SubtractAvailablePTOTime(absenceSummary, absences);
+            }
+
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
+        }
+
 
         public async Task<IEnumerable<Absence>> GetNurseAbsencesInMonthAsync(int year, int month, int nurseId)
         {
-            return await _context.AbsencesSummaries
+            return await _applicationDbContext.AbsencesSummaries
                 .Include(s => s.Absences)
                 .Where(s => s.NurseId == nurseId && s.Year == year)
                 .SelectMany(s => s.Absences)
@@ -32,7 +71,7 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             var shouldBeInitializedToYear = _currentDateService.GetCurrentDate().Year + 1;
 
-            var nurses = await _context.Nurses
+            var nurses = await _applicationDbContext.Nurses
                 .Include(n => n.AbsencesSummaries)
                 .Where(n => n.DepartamentId == departament.DepartamentId && n.IsDeleted == false)
                 .ToListAsync();
@@ -43,7 +82,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 RecalculatePreviousYearAbsencesSummary(nurse, departament);
             }
 
-            await _context.SaveChangesAsync(cancellationToken);
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
         }
 
         public void InitializeNewNurseAbsencesSummaries(Nurse nurse, Departament departament)
@@ -94,7 +133,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 return AbsenceVeryficationResult.AbsenceAlreadyExists;
             }
 
-            if (await _context.Schedules
+            if (await _applicationDbContext.Schedules
                 .Include(s => s.Quarter)
                 .AnyAsync(s => s.Quarter.DepartamentId == absencesSummary.Nurse.DepartamentId &&
                     s.Quarter.Year == absencesSummary.Year &&
@@ -142,6 +181,28 @@ namespace NursesScheduler.BusinessLogic.Services
                             Year = i,
                             PTOTime = nurse.PTOentitlement * TimeSpan.FromDays(1),
                         });
+                }
+            }
+        }
+
+        private void SubtractAvailablePTOTime(AbsencesSummary absencesSummary, IEnumerable<Absence> absences)
+        {
+            foreach (var absence in absences)
+            {
+                if(absence.Type != AbsenceTypes.PersonalTimeOff)
+                {
+                    continue;
+                }
+
+                if(absencesSummary.PTOTimeLeftFromPreviousYear > TimeSpan.Zero)
+                {
+                    absencesSummary.PTOTimeLeftFromPreviousYear -= absence.AssignedWorkingHours;
+
+                    if(absencesSummary.PTOTimeLeftFromPreviousYear < TimeSpan.Zero)
+                    {
+                        absencesSummary.PTOTime -= absencesSummary.PTOTimeLeftFromPreviousYear;
+                        absencesSummary.PTOTimeLeftFromPreviousYear = TimeSpan.Zero;
+                    }
                 }
             }
         }

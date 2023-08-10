@@ -7,9 +7,12 @@
 
 <tr>
     <td class="no">@No</td>
-    <td class="name">
-        <p>@Nurse.Surname</p>
-        <p>@Nurse.Name</p>
+    <td class="name-col">
+        <div class="name">
+            <p>@Nurse.Surname</p>
+            <p>@Nurse.Name</p>
+        </div>
+        <Button Text="!" Style="is-small is-danger is-outlined"/>
     </td>
     @foreach (var workDay in _scheduleNurse.NurseWorkDays)
     {

@@ -18,5 +18,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         TimeSpan GetShiftNightHours(ShiftTypes shiftType, Day day, DepartamentSettings departamentSettings);
         TimeSpan GetShiftHolidayHours(ShiftTypes shiftType, TimeSpan? optionalMorningShiftLenght, Day day,
             DepartamentSettings departamentSettings);
+        TimeSpan GetHoursFromLastAssignedShift(int toDay, IEnumerable<NurseWorkDay> nurseWorkDays);
     }
 }

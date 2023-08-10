@@ -1,0 +1,20 @@
+﻿<DeleteModal @ref=_deleteModal DeleteAction="OnDelete"/>
+
+@code {
+    [Parameter]
+    public EventCallback<int> DeleteAction { get; set; }
+
+    private DeleteModal _deleteModal;
+    private int _itemToDeleteId;
+
+    public void ShowModal(string deletedObjectName, int itemToDeleteId)
+    {
+        _itemToDeleteId = itemToDeleteId;
+        _deleteModal.ShowModal(deletedObjectName);
+    }
+
+    private async Task OnDelete()
+    {
+        await DeleteAction.InvokeAsync(_itemToDeleteId);
+    }
+}

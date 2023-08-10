@@ -1,4 +1,5 @@
 ﻿using NursesScheduler.BlazorShared.Abstracions;
+using NursesScheduler.BlazorShared.Models.Enums;
 
 namespace NursesScheduler.BlazorShared.Models.ViewModels.Common
 {
@@ -9,5 +10,10 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Common
 
         public int PreviousMonth => MonthNumber - 1 > 0 ? MonthNumber - 1 : 12;
         public int PreviousYear => MonthNumber - 1 > 0 ? YearNumber : YearNumber - 1;
+
+        public override string ToString()
+        {
+            return $"{((Months)MonthNumber).ToString()} {YearNumber}";
+        }
     }
 }

@@ -37,30 +37,30 @@
     transform: translateZ(0);
 }
 
-    .loader-spin:before {
-        width: 50%;
-        height: 50%;
-        background: #000000;
-        border-radius: 100% 0 0 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        content: '';
-    }
+.loader-spin:before {
+    width: 50%;
+    height: 50%;
+    background: #000000;
+    border-radius: 100% 0 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+}
 
-    .loader-spin:after {
-        background: #ffffff;
-        width: 75%;
-        height: 75%;
-        border-radius: 50%;
-        content: '';
-        margin: auto;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-    }
+.loader-spin:after {
+    background: #ffffff;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    content: '';
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
 
 @-webkit-keyframes load3 {
     0% {
@@ -92,20 +92,20 @@
     position: relative;
 }
 
-    .tooltip .tooltiptext {
-        visibility: hidden;
-        background-color: black;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px 0;
-        width: 120px;
-        bottom: 130%;
-        left: 50%;
-        margin-left: -60px;
-        position: absolute;
-        z-index: 9999;
-    }
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    width: 120px;
+    bottom: 130%;
+    left: 50%;
+    margin-left: -60px;
+    position: absolute;
+    z-index: 9999;
+}
 
 /*table*/
 
@@ -163,13 +163,6 @@ th.holiday {
     cursor: pointer;
 }
 
-th.previous {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    font-size: 3px;
-    width: 24px;
-}
-
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
@@ -189,10 +182,10 @@ th.previous {
     width: 38px;
 }
 
-    .day p {
-        width: 100%;
-        text-align: center;
-    }
+.day p {
+    width: 100%;
+    text-align: center;
+}
 
 .summary {
     width: 50px;
@@ -208,9 +201,20 @@ th.previous {
     border-bottom: 2px solid black !important;
 }
 
-th.name, td.name {
+th.name-col, td.name-col {
     overflow: hidden;
     white-space: nowrap;
+}
+
+td.name-col {
+    display: flex;
+    border: none;
+    justify-content: space-between;
+    align-items: center;
+}
+
+td.name-col .name {
+    min-width: 0px;
 }
 
 .time-off {
