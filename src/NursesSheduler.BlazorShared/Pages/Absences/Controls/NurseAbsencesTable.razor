@@ -9,7 +9,22 @@
 
 <DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteAbsence" />
 
-@if (Absences == null || !Absences.Any())
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <label class="label">Nieobecności</label>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <label class="label">Miesiąc</label>
+        </div>
+        <div class="level-item">
+            <MonthSelect MonthPickerViewModel=_selectedMonth OnChange="(() => StateHasChanged())" />
+        </div>
+    </div>
+</div>
+@if (Absences is null || Absences.Count() == 0)
 {
     <div class="has-text-centered">
         <h4 class="subtitle is-4">Brak wprowadzonych nieobecności</h4>
@@ -24,12 +39,13 @@ else
                 <th>Długość(dni)</th>
                 <th>Godzin pracy</th>
                 <th>Przypisanych godzin pracy</th>
-                <th class="is-fullwidth">Typ</th>
+                <th class="is-maincolumn">Typ</th>
+                <th></th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach(var absence in Absences.OrderBy(a => a.Days.Min()).ToList())
+            @foreach (var absence in Absences.Where(a => a.Month == _selectedMonth.MonthNumber).OrderBy(a => a.Days.Min()).ToList())
             {
                 <tr>
                     <td>@absence.ToString()</td>
@@ -37,7 +53,10 @@ else
                     <td>@absence.WorkingHoursToAssign.GetTotalHoursAndMinutes()</td>
                     <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
                     <td class="is-fullwidth">@absence.Type.GetEnumDisplayName()</td>
-                    <td><a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
+                    @if(!absence.IsClosed)
+                    {
+                        <td><a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
+                    }
                 </tr>
             }
         </tbody>
@@ -49,23 +68,27 @@ else
     private DeleteModalWithId _deleteModal;
     private EditAbsenceModal _editModal;
 
+    private MonthPickerViewModel _selectedMonth = new(DateTime.Now.Month);
+
     [Parameter]
-    public List<AbsenceViewModel> Absences { get; set; }
+    public ICollection<AbsenceViewModel> Absences { get; set; }
 
     private async Task DeleteAbsence(int absenceId)
     {
         try
         {
             var request = new DeleteAbsenceRequest
-            {
-                AbsenceId = absenceId,
-            };
+                {
+                    AbsenceId = absenceId,
+                };
             var response = await _mediatr.Send(request);
 
             if (!response.Success)
+            {
                 throw new EntityNotDeletedException(absenceId, nameof(AbsenceViewModel));
+            }
 
-            Absences.RemoveAll(a => a.AbsenceId == absenceId);
+            Absences.Remove(Absences.First(a => a.AbsenceId == absenceId));
 
         }
         catch (Exception e)

@@ -119,39 +119,35 @@ namespace NursesScheduler.BusinessLogic.Services
             InitializeNurseAbsencesSummary(nurse, departament);
         }
 
-        public ICollection<Absence> GetAbsencesFromAddAbsenceRequest(DateOnly from, DateOnly to, int absencesSummaryId,
+        public IEnumerable<Absence> GetAbsencesFromDates(DateOnly from, DateOnly to, int absencesSummaryId,
             AbsenceTypes type)
         {
-            var result = new List<Absence>();
+            Absence currentAbsence = null;
 
-            var currentAbsence = new Absence
-            {
-                Month = from.Month,
-            };
-
-            result.Add(currentAbsence);
+            var absences = new List<Absence>();
 
             for (var date = from; date <= to; date = date.AddDays(1))
             {
-                if (date.Month != currentAbsence.Month)
+                if (!absences.Any(a => a.Month == date.Month))
                 {
                     currentAbsence = new Absence
                     {
                         Month = from.Month,
+                        Days = new List<int>(),
                     };
-                    result.Add(currentAbsence);
+                    absences.Add(currentAbsence);
                 }
 
                 currentAbsence.Days.Add(date.Day);
             }
 
-            foreach(var absence in result)
+            foreach(var absence in absences)
             {
                 absence.AbsencesSummaryId = absencesSummaryId;
                 absence.Type = type;
             }
             
-            return result;
+            return absences;
         }
 
         public async Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence)

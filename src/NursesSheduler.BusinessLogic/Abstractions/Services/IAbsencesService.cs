@@ -7,7 +7,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
     {
         Task InitializeDepartamentAbsencesSummaries(Departament departament, CancellationToken cancellationToken);
         void InitializeNewNurseAbsencesSummaries(Nurse nurse, Departament departament);
-        ICollection<Absence> GetAbsencesFromAddAbsenceRequest(DateOnly from, DateOnly to, int absencesSummaryId,
+        IEnumerable<Absence> GetAbsencesFromDates(DateOnly from, DateOnly to, int absencesSummaryId,
             AbsenceTypes type);
         Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence);
         Task<IEnumerable<Absence>> GetNurseAbsencesInMonthAsync(int year, int month, int nurseId);

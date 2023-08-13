@@ -40,7 +40,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var absences = _absencesService.GetAbsencesFromAddAbsenceRequest(request.From, request.To, 
+            var absences = _absencesService.GetAbsencesFromDates(request.From, request.To, 
                 request.AbsencesSummaryId, request.Type);
 
             var absencesSummary = await _context.AbsencesSummaries

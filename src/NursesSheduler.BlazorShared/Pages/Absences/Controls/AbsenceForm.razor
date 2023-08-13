@@ -3,7 +3,7 @@
 <ErrorModal @ref=_errorModal />
 
 
-<EditForm EditContext="@_editContext" OnSubmit="@OnSubmit">
+<EditForm EditContext="@_editContext">
     <DataAnnotationsValidator />
     <div class="level">
         <div class="level-left">
@@ -11,7 +11,7 @@
                 <div class="field">
                     <label class="label">Początek</label>
                     <div class="control">
-                        <InputDate class="input" @bind-Value="_absence.From" min="@GetMinDate()" max="@GetMaxDate()" onchange="FromChanged" />
+                        <InputDate class="input" @bind-Value="_absence.From" min="@GetMinDate()" max="@GetMaxDate()"/>
                         <div class="help is-danger">
                             <ValidationMessage For="@(() => _absence.From)" />
                         </div>
@@ -43,14 +43,12 @@
         </div>
         <div class="level-right">
             <div class="level-item">
-                <button type="submit" class="button is-success @CssHelper.SetIsLoading(_isLoading)">Dodaj nieobecność</button>
+                <div class="has-text-danger">
+                    <ValidationSummary />
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="level">
-        <div class="level-right level-item">
-            <div class="has-text-danger">
-                <ValidationSummary />
+            <div class="level-item">
+                <LoadingButton Style="is-success" Text="Dodaj nieobecność" Icon="fas fa-plus" Action="OnSubmit"/>
             </div>
         </div>
     </div>
@@ -63,7 +61,6 @@
     [Parameter]
     public EventCallback<AbsenceFormViewModel> SaveAbsence { get; set; }
 
-    private bool _isLoading;
     private EditContext _editContext;
     private ErrorModal _errorModal;
     private AbsenceFormViewModel _absence;
@@ -95,19 +92,16 @@
 
     private async Task OnSubmit()
     {
-        if (_editContext.Validate())
+        if (!_editContext.Validate())
         {
-            _isLoading = true;
-            await Task.Delay(1);
-            await SaveAbsence.InvokeAsync();
-            _isLoading = false;
+            return;
         }
+
+        await SaveAbsence.InvokeAsync(_absence);
     }
 
     protected override void OnInitialized()
     {
-        _isLoading = false;
-
         ResetForm();
 
         _editContext = new(_absence);
@@ -123,13 +117,5 @@
     private string GetMaxDate()
     {
         return $"{Year}-12-31";
-    }
-
-    private void FromChanged()
-    {
-        if (_absence.From > _absence.To)
-        {
-            _absence.To = _absence.From;
-        }
     }
 }

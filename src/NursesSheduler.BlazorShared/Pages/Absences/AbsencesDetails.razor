@@ -10,6 +10,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
+@using NursesScheduler.BusinessLogic.Extensions
 
 @inject IMediator _mediatr;
 @inject IMapper _mapper;
@@ -32,75 +33,90 @@ else
             </div>
             <div class="level-right">
                 <div class="level-item">
+                    <label class="label">Rok</label>
+                </div>
+                <div class="level-item">
+                    <YearSelect YearPickerViewModel=_selectedYear FirstYear=@_absencesSummaries.Min(a => a.Year)
+                            OnChange="SelectedYearChanged" />
+                </div>
+                <div class="level-item">
                     <a class="button is-info" href="/Absences">Powrót</a>
                 </div>
             </div>
         </div>
-        <div class="mb-4">
-            <div class="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <p>
-                            <b>Przysługujący urlop:</b> @_nurse.PTOentitlement dni
-                        </p>
-                    </div>
-                    <div class="level-item">
-                        <p>
-                            <b>Pozostały urlop:</b> @_currentAbsencesSummary.PTOTimeLeft.GetTotalHoursAndMinutes()
-                        </p>
-                    </div>
-                    <div class="level-item">
-                        @if (_selectedYear.YearNumber <= DateTime.Now.Year)
-                        {
+        <div class="card mb-4">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Urlop wypoczynkowy
+                </p>
+                <div class="card-header-icon">
+                    <a @onclick="(() => _editAbsencesSummaryModal.ShowModal(_currentAbsencesSummary))">Edytuj</a>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
                             <p>
-                                <b>Zaległy urlop:</b> @_currentAbsencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()
+                                <b>Przysługujący urlop:</b> @_nurse.PTOentitlement dni
                             </p>
+                        </div>
+                        <div class="level-item">
+                            <p>
+                                <b>Pozostały urlop:</b> @_currentAbsencesSummary.PTOTimeLeft.GetTotalHoursAndMinutes()
+                            </p>
+                        </div>
+                        <div class="level-item">
+                            @if (_selectedYear.YearNumber <= DateTime.Now.Year)
+                            {
+                                <p>
+                                    <b>Zaległy urlop:</b> @_currentAbsencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()
+                                </p>
+                            }
+                        </div>
+                        <div class="level-item">
+                        </div>
+                    </div>
+                    <div class="level-right">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Przypisane godziny nieobecności
+                </p>
+            </header>
+            <div class="card-content">
+                <div class="level">
+                    <div class="level-left">
+                        @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                        {
+                            <div class="level-item">
+                                <div>
+                                    <p>
+                                        <b>@absenceType.GetEnumDisplayName():</b> @_currentAbsencesSummary.Absences.Where(a => a.Type == absenceType).SumTimeSpan(a => a.AssignedWorkingHours).GetTotalHoursAndMinutes()
+                                    </p>
+                                </div>
+                            </div>
                         }
                     </div>
-                    <div class="level-item">
-                        <a @onclick="(() => _editAbsencesSummaryModal.ShowModal(_currentAbsencesSummary))">Edytuj</a>
-                    </div>
-                </div>
-                <div class="level-right">
-                    <div class="level-item">
-                        <label class="label">Rok</label>
-                    </div>
-                    <div class="level-item">
-                        <YearSelect YearPickerViewModel=_selectedYear FirstYear=@_absencesSummaries.Min(a => a.Year)
-                                OnChange="SelectedYearChanged" />
-                    </div>
                 </div>
             </div>
         </div>
         <div class="card mb-4">
-            <div class="level">
-                @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
-                {
-                    <div class="level-item">
-                        <div class="label">@absenceType.GetEnumDisplayName()</div>
-                        <p>5435</p>
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="card mb-4">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Dodaj nową nieobecność
+                </p>
+            </header>
             <div class="card-content">
                 <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" Year=@_currentAbsencesSummary.Year />
             </div>
         </div>
-        <div class="level">
-            <div class="level-right">
-                <div class="level-item">
-                    <div class="level-item">
-                        <label class="label">Miesiąc</label>
-                    </div>
-                </div>
-                <div class="level-item">
-                    <MonthSelect MonthPickerViewModel=_selectedMonth OnChange="(() => StateHasChanged())" />
-                </div>
-            </div>
-        </div>
-        @*<NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences.Where(a => a.Month == _dateViewModel.MonthNumber).ToList() />*@
+        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences />
     </div>
 }
 
@@ -112,7 +128,6 @@ else
     public int Year { get; set; }
 
     private YearPickerViewModel _selectedYear;
-    private MonthPickerViewModel _selectedMonth;
 
     private NurseViewModel _nurse;
 
@@ -126,7 +141,6 @@ else
     protected override Task OnParametersSetAsync()
     {
         _selectedYear = new YearPickerViewModel(Year);
-        _selectedMonth = new MonthPickerViewModel(DateTime.Now.Month);
 
         return base.OnParametersSetAsync();
     }
@@ -181,19 +195,22 @@ else
         if (response == null)
             NavigationManager.NavigateTo("/notFound");
 
-        _absencesSummaries = _mapper.Map<ICollection<AbsencesSummaryViewModel>>(response);
+        _absencesSummaries = _mapper.Map<IEnumerable<AbsencesSummaryViewModel>>(response);
     }
 
     private async Task AddAbsence(AbsenceFormViewModel _newAbsence)
     {
         try
         {
+            _newAbsence.AbsencesSummaryId = _currentAbsencesSummary.AbsencesSummaryId;
             var addRequest = _mapper.Map<AddAbsenceRequest>(_newAbsence);
 
             var addResponse = await _mediatr.Send(addRequest);
 
             if (addResponse == null)
+            {
                 throw new EntityNotAddedException(nameof(AbsenceViewModel));
+            }
 
             var veryficationResult = (AbsenceVeryficationResult)addResponse.VeryficationResult;
 
@@ -203,14 +220,7 @@ else
                 return;
             }
 
-            var getRequest = new GetAbsencesRequest
-                {
-                    AbsencesSummaryId = _currentAbsencesSummary.AbsencesSummaryId
-                };
-
-            var getResponse = await _mediatr.Send(getRequest);
-
-            //_currentAbsencesSummary.Absences = _mapper.Map<ICollection<AbsenceViewModel>>(getResponse).ToList();
+            _currentAbsencesSummary.Absences.Add(_mapper.Map<AbsenceViewModel>(addResponse));
 
             _newAbsenceForm.ResetForm();
 
