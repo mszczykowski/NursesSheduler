@@ -7,6 +7,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         void ResolveMorningShifts(Schedule schedule, IEnumerable<MorningShift> morningShifts);
         Task<Schedule> CreateNewScheduleAsync(int month, Quarter quarter);
         Task SetTimeOffsAsync(int year, int month, ScheduleNurse scheduleNurse);
-        Task<int> UpsertSchedule(Schedule updatedSchdeule, CancellationToken cancellationToken)
+        Task<int> UpsertSchedule(Schedule updatedSchdeule, CancellationToken cancellationToken);
     }
 }

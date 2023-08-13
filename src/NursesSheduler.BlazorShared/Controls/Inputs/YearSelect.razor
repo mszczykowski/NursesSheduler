@@ -20,6 +20,7 @@
     private async Task SelectedYearChanged(ChangeEventArgs e)
     {
         YearPickerViewModel.YearNumber = Int32.Parse(e.Value.ToString());
+        
         await OnChange.InvokeAsync();
     }
 }

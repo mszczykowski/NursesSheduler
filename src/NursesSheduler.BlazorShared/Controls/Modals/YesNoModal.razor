@@ -8,7 +8,7 @@
             <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
         </header>
         <section class="modal-card-body">
-            <p>@_content</p>
+            @((MarkupString)_content)
         </section>
         <footer class="modal-card-foot">
             <div class="footer-buttons">

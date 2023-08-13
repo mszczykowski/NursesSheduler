@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.BlazorShared.Models.Enums;
 
-namespace NursesScheduler.BlazorShared.Models.ViewModels
+namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
 {
     public sealed class NurseWorkDayViewModel
     {
@@ -20,7 +20,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels
 
         public void RefreshMorningShift(IEnumerable<MorningShiftViewModel> morningShifts)
         {
-            if(ShiftType == ShiftTypes.Morning)
+            if (ShiftType == ShiftTypes.Morning)
             {
                 MorningShift = morningShifts.First(m => m.MorningShiftId == MorningShiftId);
             }

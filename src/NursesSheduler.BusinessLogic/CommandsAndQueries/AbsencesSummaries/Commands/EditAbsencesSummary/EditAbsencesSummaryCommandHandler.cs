@@ -29,13 +29,17 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Com
             var modifiedSummary = _mapper.Map<AbsencesSummary>(request);
 
             var validationResult = await _validator.ValidateAsync(modifiedSummary);
-            if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
 
             var originalSummary = await _context.AbsencesSummaries
-                                            .FirstOrDefaultAsync(s => s.AbsencesSummaryId == request.AbsencesSummaryId)
-                                ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
+                .Include(s => s.Nurse)
+                .FirstOrDefaultAsync(s => s.AbsencesSummaryId == request.AbsencesSummaryId)
+                ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
 
-            _context.Entry(originalSummary).CurrentValues.SetValues(modifiedSummary);
+            _context.Entry(originalSummary).CurrentValues.SetValues(request);
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 

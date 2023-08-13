@@ -3,7 +3,6 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
-using NursesScheduler.Domain.Exceptions;
 
 namespace NursesScheduler.BusinessLogic.Services
 {
@@ -18,6 +17,35 @@ namespace NursesScheduler.BusinessLogic.Services
             _applicationDbContext = applicationDbContext;
             _currentDateService = currentDateService;
             _workTimeService = workTimeService;
+        }
+
+        public async Task<AbsencesSummary> RecalculateAbsencesSummary(int currentSummaryId)
+        {
+            var currentSummary = await _applicationDbContext.AbsencesSummaries
+                .Include(s => s.Absences)
+                .Include(s => s.Nurse)
+                .FirstOrDefaultAsync(s => s.AbsencesSummaryId == currentSummaryId);
+
+            var previousSummary = await _applicationDbContext.AbsencesSummaries
+                .FirstOrDefaultAsync(s => s.NurseId == currentSummary.NurseId && s.Year == currentSummary.Year - 1);
+
+            var recalculatedSummary = new AbsencesSummary();
+
+            if (previousSummary is null)
+            {
+                recalculatedSummary.PTOTimeLeftFromPreviousYear = TimeSpan.Zero;
+            }
+            else
+            {
+                recalculatedSummary.PTOTimeLeftFromPreviousYear = previousSummary.PTOTimeLeftFromPreviousYear
+                    + previousSummary.PTOTimeLeft;
+            }
+
+            recalculatedSummary.PTOTimeLeft = TimeSpan.FromDays(currentSummary.Nurse.PTOentitlement);
+
+            SubtractAvailablePTOTime(recalculatedSummary, currentSummary.Absences);
+
+            return recalculatedSummary;
         }
 
         public async Task AssignTimeOffsWorkTime(Schedule closedSchedule, int year, CancellationToken cancellationToken)
@@ -156,11 +184,10 @@ namespace NursesScheduler.BusinessLogic.Services
             var previousYearSummary = nurse.AbsencesSummaries
                                             .FirstOrDefault(y => y.Year == currentYear - 1);
 
-            if (currentYearSummary != null && previousYearSummary != null)
+            if (currentYearSummary is not null && previousYearSummary is not null)
             {
                 currentYearSummary.PTOTimeLeftFromPreviousYear =
-                    previousYearSummary.PTOTimeLeftFromPreviousYear + previousYearSummary.PTOTime
-                    - previousYearSummary.PTOTimeUsed;
+                    previousYearSummary.PTOTimeLeftFromPreviousYear + previousYearSummary.PTOTimeLeft;
             }
         }
 
@@ -179,7 +206,7 @@ namespace NursesScheduler.BusinessLogic.Services
                         {
                             NurseId = nurse.NurseId,
                             Year = i,
-                            PTOTime = nurse.PTOentitlement * TimeSpan.FromDays(1),
+                            PTOTimeLeft = nurse.PTOentitlement * TimeSpan.FromDays(1),
                         });
                 }
             }
@@ -200,7 +227,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
                     if(absencesSummary.PTOTimeLeftFromPreviousYear < TimeSpan.Zero)
                     {
-                        absencesSummary.PTOTime -= absencesSummary.PTOTimeLeftFromPreviousYear;
+                        absencesSummary.PTOTimeLeft -= absencesSummary.PTOTimeLeftFromPreviousYear;
                         absencesSummary.PTOTimeLeftFromPreviousYear = TimeSpan.Zero;
                     }
                 }

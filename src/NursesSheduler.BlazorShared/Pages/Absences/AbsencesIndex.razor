@@ -19,105 +19,76 @@
             </div>
         </div>
         <div class="level-right">
-            @if (_nursesWithSummary != null && _nursesWithSummary.Any())
-            {
-                <div class="level-item">
-                    <div class="level-item">
-                        <label class="label">Rok</label>
-                    </div>
-                </div>
-                <div class="level-item">
-                    <div class="level-item">
-                        <div class="control">
-                            <div class="select">
-                                <select value=@_selectedYear>
-                                    @for (int i = _minYear; i <= _maxYear; i++)
-                                    {
-                                        <option value="@i">@i</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="level-item">
-                    <button class="button is-info" @onclick="CurrentYearClick">Bieżący rok</button>
-                </div>
-            }
+            <div class="level-item">
+                <label class="label">Rok</label>
+            </div>
+            <div class="level-item">
+                <YearSelect YearPickerViewModel=_selectedYear FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear
+                            OnChange=@(() => {}) />
+            </div>
+            <div class="level-item">
+                <button class="button is-info" @onclick="CurrentYearClick">Bieżący rok</button>
+            </div>
         </div>
     </div>
-    @if (_nursesWithSummary == null)
+    @if (_nurses is null || _absenceSummaries is null)
     {
         <LoadingSpinner />
     }
     else
     {
-        <AbsencesSummaryTable NursesWithSummary=_nursesWithSummary SelectedYear=_selectedYear />
+        <AbsencesSummaryTable Nurses=_nurses AbsencesSummaries=_absenceSummaries SelectedYear=_selectedYear.YearNumber />
     }
 </div>
 
 
 @code {
-    private ICollection<NurseWithAbsencesSummariesViewModel> _nursesWithSummary;
-    private int _minYear, _maxYear;
-    private int _selectedYear;
-    private int _currentYear = DateTime.Now.Year;
+    private IEnumerable<NurseViewModel> _nurses;
+    private IEnumerable<AbsencesSummaryViewModel> _absenceSummaries;
+    private YearPickerViewModel _selectedYear = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await LoadNursesWithAbsencesSummary();
-            CalculateYearScope();
-            _selectedYear = _currentYear;
-            StateHasChanged();
+            try
+            {
+                await LoadNursesAsync();
+                await LoadAbsenceSummaries();
+                base.StateHasChanged();
+            }
+            catch (Exception e)
+            {
+                _exceptionHandler.HandleException(e);
+            }
         }
     }
 
-    private async Task LoadNursesWithAbsencesSummary()
+    private async Task LoadNursesAsync()
     {
-        try
-        {
-            var request = new GetAbsencesSummaryByDepartamentRequest
-                {
-                    DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
-                };
-            var response = await _mediatr.Send(request);
+        var request = new GetNursesFromDepartamentRequest
+            {
+                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+            };
+        var response = await _mediatr.Send(request);
 
-            _nursesWithSummary = _mapper.Map<ICollection<NurseWithAbsencesSummariesViewModel>>(response);
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
+        _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(response).OrderBy(n => n.Surname).ThenBy(n => n.Name);
     }
 
-    private void CalculateYearScope()
+    private async Task LoadAbsenceSummaries()
     {
-        _minYear = _maxYear = _currentYear;
-
-        foreach (var _nurse in _nursesWithSummary)
-        {
-            if (_nurse.AbsencesSummaries == null || !_nurse.AbsencesSummaries.Any())
-                continue;
-
-            var min = _nurse.AbsencesSummaries.Min(s => s.Year);
-            var max = _nurse.AbsencesSummaries.Max(s => s.Year);
-
-            if (min < _minYear)
+        var request = new GetAbsencesSummaryByDepartamentRequest
             {
-                _minYear = min;
-            }
-            if (max > _maxYear)
-            {
-                _maxYear = max;
-            }
-        }
+                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+            };
+        var response = await _mediatr.Send(request);
+
+        _absenceSummaries = _mapper.Map<IEnumerable<AbsencesSummaryViewModel>>(response);
     }
 
     private void CurrentYearClick()
     {
-        _selectedYear = _currentYear;
+        _selectedYear.YearNumber = DateTime.Now.Year;
         StateHasChanged();
     }
 }

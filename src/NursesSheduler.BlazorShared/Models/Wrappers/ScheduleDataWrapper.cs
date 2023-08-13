@@ -1,5 +1,5 @@
 ﻿using NursesScheduler.BlazorShared.Models.Enums;
-using NursesScheduler.BlazorShared.Models.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels.Entities;
 using NursesScheduler.BlazorShared.Models.ViewModels.ValueObjects;
 
 namespace NursesScheduler.BlazorShared.Models.Wrappers

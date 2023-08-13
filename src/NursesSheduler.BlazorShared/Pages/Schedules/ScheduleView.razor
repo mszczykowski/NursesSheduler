@@ -12,6 +12,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.CloseSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.DeleteSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
@@ -39,6 +40,8 @@
              CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings />
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteSchedule" />
+
+<CloseModal @ref="_closeModal" CloseAction="CloseSchedule"/>
 
 @if (_isLoading)
 {
@@ -75,9 +78,9 @@ else
                 <div class="level-item">
                     <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
-@*                <div class="level-item">
+                <div class="level-item">
                     <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
-                </div>*@
+                </div>
             </div>
         </div>
         <div class="level is-boxed">
@@ -123,9 +126,6 @@ else
                             Disabled=@(!ShouldDisplayTable() || _deleteDisabled)/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-info" Icon="fas fa-print" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
-                    </div>
-                    <div class="level-item">
                         <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
@@ -134,6 +134,9 @@ else
                     </div>
                     <div class="level-item">
                         <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
+                    </div>
+                    <div class="level-item">
+                        <LoadingButton Style="is-info" Icon="fas fa-lock" Text="Zamknij" Action="@(() => _closeModal.ShowModal(_pickedDate.ToString()))" Disabled=!ShouldDisplayTable()/>
                     </div>
                 }
             </div>
@@ -180,6 +183,7 @@ else
     private OkModal _infoModal;
     private SolverModal _solverModal;
     private DeleteModal _deleteModal;
+    private CloseModal _closeModal;
 
     private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
     private bool _holidaysLoaded;
@@ -540,6 +544,21 @@ else
 
             _infoModal.ShowModal("Pomyślnie zapisano");
             _deleteDisabled = false;
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task CloseSchedule()
+    {
+        try
+        {
+            var request = _mapper.Map<CloseScheduleRequest>(_currentScheduleData.Schedule);
+            await _mediatr.Send(request);
+
+            await ChangeScheduleAsync();
         }
         catch (Exception e)
         {

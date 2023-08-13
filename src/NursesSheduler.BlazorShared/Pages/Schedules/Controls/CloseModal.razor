@@ -6,18 +6,18 @@
 
 @code {
     [Parameter]
-    public EventCallback DeleteAction { get; set; }
+    public EventCallback CloseAction { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-        base._title = "Usuń";
-        base._yesText = "Usuń";
+        base._title = "Zamknij";
+        base._yesText = "Zamknij";
         return base.OnInitializedAsync();
     }
 
     protected override Task OnParametersSetAsync()
     {
-        base._yesAction = DeleteAction;
+        base._yesAction = CloseAction;
 
         return base.OnParametersSetAsync();
     }
@@ -30,7 +30,7 @@
 
     public void SetModalContent(string deletedObjectName)
     {
-        base._content = $"<p>Czy na pewno chcesz usunąć <b>{deletedObjectName}</b>?</p>" +
+        base._content = $"<p>Czy na pewno chcesz zamknąć grafik: <b>{deletedObjectName}</b>?</p>" +
             "<section>Tej operecji nie da się cofnąć.</section>";
     }
 }

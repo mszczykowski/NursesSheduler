@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using NursesScheduler.BlazorShared.Models.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels.Entities;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.CloseSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule;
@@ -26,6 +27,8 @@ namespace NursesScheduler.BlazorShared.Mapping
 
             CreateMap<NurseWorkDayViewModel, UpsertScheduleRequest.NurseWorkDayRequest>();
             CreateMap<UpsertScheduleResponse.NurseWorkDayResponse, NurseWorkDayViewModel>();
+
+            CreateMap<NurseWorkDayViewModel, CloseScheduleRequest.NurseWorkDayRequest>();
         }
     }
 }

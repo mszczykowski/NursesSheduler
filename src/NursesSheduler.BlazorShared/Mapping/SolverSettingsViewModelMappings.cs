@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NursesScheduler.BlazorShared.Models.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule;
 
 namespace NursesScheduler.BlazorShared.Mapping

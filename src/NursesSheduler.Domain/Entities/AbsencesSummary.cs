@@ -4,8 +4,7 @@
     {
         public int AbsencesSummaryId { get; set; }
         public int Year { get; set; }
-        public TimeSpan PTOTime { get; set; }
-        public TimeSpan PTOTimeUsed { get; set; }
+        public TimeSpan PTOTimeLeft { get; set; }
         public TimeSpan PTOTimeLeftFromPreviousYear { get; set; }
 
         public virtual IEnumerable<Absence> Absences { get; set; }

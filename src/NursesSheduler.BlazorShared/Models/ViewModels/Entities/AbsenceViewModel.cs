@@ -1,7 +1,7 @@
 ﻿using NursesScheduler.BlazorShared.Models.Enums;
 using System.Text;
 
-namespace NursesScheduler.BlazorShared.Models.ViewModels
+namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
 {
     public sealed class AbsenceViewModel
     {

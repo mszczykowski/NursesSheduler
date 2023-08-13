@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NursesScheduler.BlazorShared.Models.ViewModels.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
 {

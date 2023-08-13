@@ -1,7 +1,7 @@
 ﻿using NursesScheduler.BlazorShared.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace NursesScheduler.BlazorShared.Models.ViewModels
+namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
 {
     public sealed class AbsenceFormViewModel : IValidatableObject
     {

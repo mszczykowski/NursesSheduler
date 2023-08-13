@@ -1,4 +1,4 @@
-﻿@if (!NursesWithSummary.Any())
+﻿@if (!Nurses.Any())
 {
     <div class="has-text-centered">
         <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
@@ -11,9 +11,8 @@ else
             <tr>
                 <th>L.p.</th>
                 <th class="is-maincolumn">Nazwisko i imię</th>
-                <th>Wykorzystany urlop</th>
-                <th>Pozostały urlop</th>
                 <th>Przysługujący urlop (dni)</th>
+                <th>Pozostały urlop</th>
                 <th>Zaległy urlop</th>
                 <th></th>
             </tr>
@@ -21,27 +20,25 @@ else
         <tbody>
             @{
                 var nurseIndex = 0;
-                @foreach (var nurse in NursesWithSummary.OrderBy(n => n.Surname).ThenBy(n => n.Name))
+                @foreach (var nurse in Nurses)
                 {
+                    var absencesSumamry = AbsencesSummaries.FirstOrDefault(s => s.NurseId == nurse.NurseId && s.Year == SelectedYear);
                     <tr>
                         <td>@(++nurseIndex)</td>
-                        <td>@nurse.Surname @nurse.Name</td>
-                        @{
-                            _absencesSummary = nurse.AbsencesSummaries.FirstOrDefault(s => s.Year == SelectedYear);
-                        }
-                        @if (_absencesSummary == null || currentYear < SelectedYear)
+                        <td>@nurse.ToString()</td>
+                        <td>@nurse.PTOentitlement</td>
+                        @if (absencesSumamry == null)
                         {
-                            <td></td>
-                            <td></td>
                             <td></td>
                             <td></td>
                         }
                         else
                         {
-                            <td>@_absencesSummary.PTOTimeUsed.GetTotalHoursAndMinutes()</td>
-                            <td>@_absencesSummary.PTOLeft.GetTotalHoursAndMinutes()</td>
-                            <td>@_absencesSummary.PTODays</td>
-                            <td>@_absencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()</td>
+                            <td>@absencesSumamry.PTOTimeLeft.GetTotalHoursAndMinutes()</td>
+                            @if(SelectedYear <= DateTime.Now.Year)
+                            {
+                                <td>@absencesSumamry.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()</td>
+                            }
                         }
                         <td><a href="/absences/details/@nurse.NurseId/@SelectedYear">Więcej</a></td>
                     </tr>
@@ -54,10 +51,9 @@ else
 
 @code {
     [Parameter]
-    public IEnumerable<NurseWithAbsencesSummariesViewModel> NursesWithSummary { get; set; }
+    public IEnumerable<NurseViewModel> Nurses { get; set; }
+    [Parameter]
+    public IEnumerable<AbsencesSummaryViewModel> AbsencesSummaries { get; set; }
     [Parameter]
     public int SelectedYear { get; set; }
-
-    private int currentYear = DateTime.Now.Year;
-    private AbsencesSummaryViewModel _absencesSummary;
 }

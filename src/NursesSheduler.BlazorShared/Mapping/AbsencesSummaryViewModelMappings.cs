@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NursesScheduler.BlazorShared.Models.ViewModels;
+using NursesScheduler.BlazorShared.Models.ViewModels.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary;
@@ -12,10 +12,13 @@ namespace NursesScheduler.BlazorShared.Mapping
         public AbsencesSummaryViewModelMappings()
         {
             CreateMap<GetAbsencesSummaryResponse, AbsencesSummaryViewModel>();
-            CreateMap<GetAbsencesSummaryByDepartamentResponse.AbsencesSummaryResponse, AbsencesSummaryViewModel>();
-            CreateMap<AbsencesSummaryViewModel, AbsencesSummaryEditViewModel>();
-            CreateMap<RecalculateAbsencesSummaryResponse, AbsencesSummaryEditViewModel>();
-            CreateMap<AbsencesSummaryEditViewModel, EditAbsencesSummaryRequest>();
+
+            CreateMap<GetAbsencesSummaryByDepartamentResponse, AbsencesSummaryViewModel>();
+
+            CreateMap<AbsencesSummaryViewModel, EditAbsencesSummaryRequest>();
+            CreateMap<EditAbsencesSummaryResponse, AbsencesSummaryViewModel>();
+
+            CreateMap<RecalculateAbsencesSummaryResponse, AbsencesSummaryViewModel>();
         }
     }
 }

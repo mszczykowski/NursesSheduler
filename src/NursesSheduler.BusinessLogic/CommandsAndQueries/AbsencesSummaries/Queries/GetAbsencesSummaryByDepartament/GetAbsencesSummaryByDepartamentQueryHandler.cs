@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament
 {
     internal sealed class GetAbsencesSummaryByDepartamentQueryHandler
-                    : IRequestHandler<GetAbsencesSummaryByDepartamentRequest, ICollection<GetAbsencesSummaryByDepartamentResponse>>
+        : IRequestHandler<GetAbsencesSummaryByDepartamentRequest, IEnumerable<GetAbsencesSummaryByDepartamentResponse>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -17,15 +17,15 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Que
             _mapper = mapper;
         }
 
-        public async Task<ICollection<GetAbsencesSummaryByDepartamentResponse>> Handle(
+        public async Task<IEnumerable<GetAbsencesSummaryByDepartamentResponse>> Handle(
             GetAbsencesSummaryByDepartamentRequest request, CancellationToken cancellationToken)
         {
-            var x = _mapper.Map<ICollection<GetAbsencesSummaryByDepartamentResponse>>(await _context.Nurses
-                        .Where(n => n.DepartamentId == request.DepartamentId)
-                        .Include(n => n.AbsencesSummaries)
-                        .ToListAsync());
-
-            return x;
+            return _mapper.Map<IEnumerable<GetAbsencesSummaryByDepartamentResponse>>(await
+                _context.Nurses
+                .Include(n => n.AbsencesSummaries)
+                .Where(n => n.DepartamentId == request.DepartamentId)
+                .SelectMany(n => n.AbsencesSummaries)
+                .ToListAsync());
         }
     }
 }

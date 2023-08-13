@@ -15,9 +15,9 @@
 @inject IMapper _mapper;
 @inject IExceptionHandler _exceptionHandler;
 
-<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" Recalculate="RecalculateSummary" Save="EditSummary" />
+<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" />
 
-@if (_nurse == null || _absencesSummaries == null)
+@if (_nurse is null || _absencesSummaries is null)
 {
     <LoadingSpinner />
 }
@@ -38,40 +38,49 @@ else
         </div>
         <div class="mb-4">
             <div class="level">
-                @if (_dateViewModel.YearNumber <= _currentDate.Year)
-                {
-                    <div class="level-left">
-                        <div class="level-item">
-                            <p>
-                                <b>Przysługujący urlop(zaległy):</b> @_currentAbsencesSummary.PTODays dni (@_currentAbsencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes())
-                            </p>
-                        </div>
-                        <div class="level-item">
-                            <p>
-                                <b>Wykorzystany urlop:</b> @_currentAbsencesSummary.PTOTimeUsed.GetTotalHoursAndMinutes()
-                            </p>
-                        </div>
-                        <div class="level-item">
-                            <p>
-                                <b>Pozostały urlop:</b> @_currentAbsencesSummary.PTOLeft.GetTotalHoursAndMinutes()
-                            </p>
-                        </div>
-                        <div class="level-item">
-                            <a @onclick="(() => _editAbsencesSummaryModal.SetModal(_currentAbsencesSummary))">Edytuj</a>
-                        </div>
+                <div class="level-left">
+                    <div class="level-item">
+                        <p>
+                            <b>Przysługujący urlop:</b> @_nurse.PTOentitlement dni
+                        </p>
                     </div>
-                }
+                    <div class="level-item">
+                        <p>
+                            <b>Pozostały urlop:</b> @_currentAbsencesSummary.PTOTimeLeft.GetTotalHoursAndMinutes()
+                        </p>
+                    </div>
+                    <div class="level-item">
+                        @if (_selectedYear.YearNumber <= DateTime.Now.Year)
+                        {
+                            <p>
+                                <b>Zaległy urlop:</b> @_currentAbsencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()
+                            </p>
+                        }
+                    </div>
+                    <div class="level-item">
+                        <a @onclick="(() => _editAbsencesSummaryModal.ShowModal(_currentAbsencesSummary))">Edytuj</a>
+                    </div>
+                </div>
                 <div class="level-right">
                     <div class="level-item">
-                        <div class="level-item">
-                            <label class="label">Rok</label>
-                        </div>
+                        <label class="label">Rok</label>
                     </div>
                     <div class="level-item">
-                        <YearSelect YearViewModel=_dateViewModel FirstYear=@_absencesSummaries.Min(a => a.Year)
+                        <YearSelect YearPickerViewModel=_selectedYear FirstYear=@_absencesSummaries.Min(a => a.Year)
                                 OnChange="SelectedYearChanged" />
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="level">
+                @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                {
+                    <div class="level-item">
+                        <div class="label">@absenceType.GetEnumDisplayName()</div>
+                        <p>5435</p>
+                    </div>
+                }
             </div>
         </div>
         <div class="card mb-4">
@@ -87,11 +96,11 @@ else
                     </div>
                 </div>
                 <div class="level-item">
-                    <MonthSelect MonthViewModel=_dateViewModel OnChange="(() => StateHasChanged())" />
+                    <MonthSelect MonthPickerViewModel=_selectedMonth OnChange="(() => StateHasChanged())" />
                 </div>
             </div>
         </div>
-        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences.Where(a => a.Month == _dateViewModel.MonthNumber).ToList() />
+        @*<NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences.Where(a => a.Month == _dateViewModel.MonthNumber).ToList() />*@
     </div>
 }
 
@@ -102,31 +111,30 @@ else
     [Parameter]
     public int Year { get; set; }
 
+    private YearPickerViewModel _selectedYear;
+    private MonthPickerViewModel _selectedMonth;
+
     private NurseViewModel _nurse;
-    private ICollection<AbsencesSummaryViewModel> _absencesSummaries;
+
+    private IEnumerable<AbsencesSummaryViewModel> _absencesSummaries;
     private AbsencesSummaryViewModel _currentAbsencesSummary;
 
     private AbsenceForm _newAbsenceForm;
+
     private EditAbsencesSummaryModal _editAbsencesSummaryModal;
 
-    private DatePickerViewModel _dateViewModel = new();
-    private DateTime _currentDate = DateTime.Now;
+    protected override Task OnParametersSetAsync()
+    {
+        _selectedYear = new YearPickerViewModel(Year);
+        _selectedMonth = new MonthPickerViewModel(DateTime.Now.Month);
+
+        return base.OnParametersSetAsync();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _dateViewModel.YearNumber = Year;
-
-            if (_currentDate.Year == Year)
-            {
-                _dateViewModel.MonthNumber = _currentDate.Month;
-            }
-            else
-            {
-                _dateViewModel.MonthNumber = 1;
-            }
-
             await LoadData();
         }
     }
@@ -137,7 +145,7 @@ else
         {
             await LoadNurse();
             await LoadAbsencesSummary();
-            SelectedYearChanged();
+            _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _selectedYear.YearNumber);
             StateHasChanged();
         }
         catch (Exception e)
@@ -202,7 +210,7 @@ else
 
             var getResponse = await _mediatr.Send(getRequest);
 
-            _currentAbsencesSummary.Absences = _mapper.Map<ICollection<AbsenceViewModel>>(getResponse).ToList();
+            //_currentAbsencesSummary.Absences = _mapper.Map<ICollection<AbsenceViewModel>>(getResponse).ToList();
 
             _newAbsenceForm.ResetForm();
 
@@ -216,46 +224,7 @@ else
 
     private void SelectedYearChanged()
     {
-        _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _dateViewModel.YearNumber);
+        _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _selectedYear.YearNumber);
         _newAbsenceForm.ResetForm();
-    }
-
-    private async Task EditSummary(AbsencesSummaryEditViewModel summary)
-    {
-        try
-        {
-            var request = _mapper.Map<EditAbsencesSummaryRequest>(summary);
-
-            var respone = await _mediatr.Send(request);
-
-            if (respone == null)
-                throw new EntityNotEditedException(summary.AbsencesSummaryId, nameof(AbsencesSummaryEditViewModel));
-
-            await LoadAbsencesSummary();
-            SelectedYearChanged();
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
-    }
-
-    private async Task RecalculateSummary(AbsencesSummaryEditViewModel summary)
-    {
-        try
-        {
-            var request = new RecalculateAbsencesSummaryRequest
-                {
-                    AbsencesSummaryId = summary.AbsencesSummaryId,
-                };
-
-            var respone = await _mediatr.Send(request);
-
-            summary = _mapper.Map<AbsencesSummaryEditViewModel>(respone);
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
     }
 }
