@@ -11,9 +11,9 @@
                 <div class="field">
                     <label class="label">Początek</label>
                     <div class="control">
-                        <InputDate class="input" @bind-Value="_absence.From" min="@GetMinDate()" max="@GetMaxDate()"/>
+                        <InputDate class="input" @bind-Value="_absenceForm.From" min="@GetMinDate()" max="@GetMaxDate()" />
                         <div class="help is-danger">
-                            <ValidationMessage For="@(() => _absence.From)" />
+                            <ValidationMessage For="@(() => _absenceForm.From)" />
                         </div>
                     </div>
                 </div>
@@ -21,9 +21,9 @@
             <div class="level-item">
                 <div class="field">
                     <label class="label">Koniec</label>
-                    <InputDate class="input" @bind-Value="_absence.To" min="@GetMinDate()" max="@GetMaxDate()" />
+                    <InputDate class="input" @bind-Value="_absenceForm.To" min="@GetMinDate()" max="@GetMaxDate()" />
                     <div class="help is-danger">
-                        <ValidationMessage For="@(() => _absence.To)" />
+                        <ValidationMessage For="@(() => _absenceForm.To)" />
                     </div>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                 <div class="field">
                     <label class="label">Typ</label>
                     <div class="select">
-                        <InputSelect @bind-Value="_absence.Type">
+                        <InputSelect @bind-Value="_absenceForm.Type">
                             @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
                             {
                                 <option value="@absenceType">@absenceType.GetEnumDisplayName()</option>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="level-item">
-                <LoadingButton Style="is-success" Text="Dodaj nieobecność" Icon="fas fa-plus" Action="OnSubmit"/>
+                <LoadingButton Style="is-success" Text="Dodaj nieobecność" Icon="fas fa-plus" Action="OnSubmit" />
             </div>
         </div>
     </div>
@@ -59,29 +59,27 @@
     [Parameter]
     public int Year { get; set; }
     [Parameter]
+    public int NurseId { get; set; }
+    [Parameter]
     public EventCallback<AbsenceFormViewModel> SaveAbsence { get; set; }
 
     private EditContext _editContext;
     private ErrorModal _errorModal;
-    private AbsenceFormViewModel _absence;
+    private AbsenceFormViewModel _absenceForm = new();
 
     public void ResetForm()
     {
+        _absenceForm.NurseId = NurseId;
+
         if (Year == DateTime.Now.Year)
         {
-            _absence = new AbsenceFormViewModel
-                {
-                    From = DateOnly.FromDateTime(DateTime.Now),
-                    To = DateOnly.FromDateTime(DateTime.Now),
-                };
+            _absenceForm.From = DateOnly.FromDateTime(DateTime.Now);
+            _absenceForm.To = DateOnly.FromDateTime(DateTime.Now);
         }
         else
         {
-            _absence = new AbsenceFormViewModel
-                {
-                    From = new DateOnly(Year, 1, 1),
-                    To = new DateOnly(Year, 1, 1),
-                };
+            _absenceForm.From = new DateOnly(Year, 1, 1);
+            _absenceForm.To = new DateOnly(Year, 1, 1);
         }
     }
 
@@ -97,14 +95,14 @@
             return;
         }
 
-        await SaveAbsence.InvokeAsync(_absence);
+        await SaveAbsence.InvokeAsync(_absenceForm);
     }
 
     protected override void OnInitialized()
     {
         ResetForm();
 
-        _editContext = new(_absence);
+        _editContext = new(_absenceForm);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
         base.OnInitialized();
     }

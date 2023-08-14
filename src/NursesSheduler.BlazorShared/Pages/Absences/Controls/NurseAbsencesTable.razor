@@ -1,4 +1,5 @@
 ﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.DeleteAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence
 
 @inherits ComponenentUsingDepartament
 
@@ -9,6 +10,7 @@
 
 <DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteAbsence" />
 <AbsenceFormModal @ref="_absenceFormModal" IsEdit=true SaveAbsence="EditAbsence" />
+<ErrorModal @ref=_errorModal />
 
 <div class="level">
     <div class="level-left">
@@ -57,7 +59,7 @@ else
                     @if (!absence.IsClosed)
                     {
                         <td>
-                            <a @onclick="(() => _absenceFormModal.ShowModal())">Edytuj</a>
+                            <a @onclick="(() => _absenceFormModal.ShowModal(absence, Year))">Edytuj</a>
                         </td>
                         <td>
                             <a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a>
@@ -72,14 +74,17 @@ else
 
 @code {
     [Parameter]
-    public ICollection<AbsenceViewModel> Absences { get; set; }
+    public List<AbsenceViewModel> Absences { get; set; }
+    [Parameter]
+    public int Year { get; set; }
 
     private DeleteModalWithId _deleteModal;
-    private EditAbsenceModal _editModal;
+    private AbsenceFormModal _editModal;
 
     private MonthPickerViewModel _selectedMonth = new(DateTime.Now.Month);
 
     private AbsenceFormModal _absenceFormModal;
+    private ErrorModal _errorModal;
 
     private async Task DeleteAbsence(int absenceId)
     {
@@ -109,6 +114,28 @@ else
     {
         try
         {
+            var response = await _mediatr.Send(_mapper.Map<EditAbsenceRequest>(_modifiedAbsence));
+
+            if (response is null)
+            {
+                throw new EntityNotEditedException(_modifiedAbsence.AbsenceId, nameof(AbsenceViewModel));
+            }
+
+            var veryficationResult = (AbsenceVeryficationResult)response.VeryficationResult;
+
+            if (veryficationResult != AbsenceVeryficationResult.Valid)
+            {
+                _errorModal.ShowModal(veryficationResult.GetEnumDisplayName());
+                return;
+            }
+
+            if(response.Absence is null)
+            {
+                return;
+            }
+
+            Absences.RemoveAll(a => a.AbsenceId == _modifiedAbsence.AbsenceId);
+            Absences.Add(_mapper.Map<AbsenceViewModel>(response.Absence));
 
             StateHasChanged();
         }

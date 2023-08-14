@@ -8,7 +8,7 @@
             <header class="modal-card-head">
                 @if (IsEdit)
                 {
-                    <p class="modal-card-title">Edytuj nieobecność: @_nurse.ToString()</p>
+                    <p class="modal-card-title">Edytuj nieobecność: @_absence.ToString()</p>
                 }
                 else
                 {
@@ -84,12 +84,30 @@
     public bool IsEdit { get; set; }
 
     private NurseViewModel _nurse;
+    private AbsenceViewModel _absence;
     private AbsenceFormViewModel _absenceForm;
     private EditContext _editContext;
 
     private bool _datePickersEnabled;
     private int _month;
     private int _year;
+
+    public void ShowModal(AbsenceViewModel existingAbsnece, int year)
+    {
+        _datePickersEnabled = true;
+
+        _absenceForm = new AbsenceFormViewModel
+            {
+                AbsenceId = existingAbsnece.AbsenceId,
+                From = new DateOnly(year, existingAbsnece.Month, existingAbsnece.Days.Min()),
+                To = new DateOnly(year, existingAbsnece.Month, existingAbsnece.Days.Max()),
+            };
+
+        _editContext = new(_absenceForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+
+        base.ChangeVisibility();
+    }
 
     public void ShowModal(NewAbsenceSelection newAbsenceSelection)
     {

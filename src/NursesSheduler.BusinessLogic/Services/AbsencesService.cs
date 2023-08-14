@@ -152,7 +152,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
         public async Task<AbsenceVeryficationResult> VerifyAbsence(AbsencesSummary absencesSummary, Absence absence)
         {
-            if (absencesSummary.Absences.Any(a => a.Month == absence.Month && a.Days.Intersect(absence.Days).Any()))
+            if (absencesSummary.Absences.Any(a => a.Month == absence.Month && a.Days.Intersect(absence.Days).Any() 
+                && a.AbsenceId != absence.AbsenceId))
             {
                 return AbsenceVeryficationResult.AbsenceAlreadyExists;
             }

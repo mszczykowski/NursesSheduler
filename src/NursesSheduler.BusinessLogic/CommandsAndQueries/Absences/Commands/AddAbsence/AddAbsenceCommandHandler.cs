@@ -16,14 +16,14 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IValidator<AddAbsenceRequest> _validator;
-        private readonly IWorkTimeServiceLegacy _workTimeService;
+        private readonly IWorkTimeService _workTimeService;
         private readonly IAbsencesService _absencesService;
         private readonly ICalendarService _calendarService;
-        private readonly IDepartamentSettingsProvider _settingsManager;
+        private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
 
         public AddAbsenceCommandHandler(IApplicationDbContext context, IMapper mapper, 
-            IValidator<AddAbsenceRequest> validator, IWorkTimeServiceLegacy workTimeService, IAbsencesService absencesService,
-            ICalendarService calendarService, IDepartamentSettingsProvider settingsManager)
+            IValidator<AddAbsenceRequest> validator, IWorkTimeService workTimeService, IAbsencesService absencesService,
+            ICalendarService calendarService, IDepartamentSettingsProvider departamentSettingsProvider)
         {
             _context = context;
             _mapper = mapper;
@@ -31,7 +31,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
             _workTimeService = workTimeService;
             _absencesService = absencesService;
             _calendarService = calendarService;
-            _settingsManager = settingsManager;
+            _departamentSettingsProvider = departamentSettingsProvider;
         }
 
         public async Task<AddAbsenceResponse> Handle(AddAbsenceRequest request, CancellationToken cancellationToken)
@@ -64,16 +64,19 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
             if (veryficationResult != AbsenceVeryficationResult.Valid)
             {
-                return new AddAbsenceResponse(veryficationResult);
+                return new AddAbsenceResponse
+                {
+                    VeryficationResult = veryficationResult,
+                };
             }
 
-            var departamentSettings = await _settingsManager.GetCachedDataAsync(absencesSummary.Nurse.DepartamentId);
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(absencesSummary.Nurse.DepartamentId);
 
             foreach (var absence in absences)
             {
                 var days = await _calendarService.GetDaysFromDayNumbersAsync(absencesSummary.Year, absence.Month, 
                     absence.Days);
-                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings.WorkDayLength);
+                absence.WorkTimeToAssign = _workTimeService.GetWorkTimeFromDays(days, departamentSettings);
                 absence.AbsencesSummaryId = absencesSummary.AbsencesSummaryId;
 
                 await _context.Absences.AddAsync(absence);
@@ -81,7 +84,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            return result > 0 ? new AddAbsenceResponse(AbsenceVeryficationResult.Valid) : null;
+            return new AddAbsenceResponse
+            {
+                VeryficationResult = veryficationResult,
+                Absences = result > 0 ? _mapper.Map<IEnumerable<AddAbsenceResponse.AbsenceResponse>>(absences) : null,
+            };
         }
     }
 }

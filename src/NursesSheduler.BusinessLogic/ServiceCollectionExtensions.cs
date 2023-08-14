@@ -9,6 +9,7 @@ using NursesScheduler.Domain.Entities;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence;
 using NursesScheduler.BusinessLogic.Abstractions.Solver;
 using NursesScheduler.BusinessLogic.Solver;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence;
 
 namespace NursesScheduler.BusinessLogic
 {
@@ -23,6 +24,7 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IValidator<Nurse>, NurseValidator>();
             services.AddTransient<IValidator<Departament>, DepartamentValidator>();
             services.AddTransient<IValidator<AddAbsenceRequest>, AddAbsenceRequestValidator>();
+            services.AddTransient<IValidator<EditAbsenceRequest>, EditAbsenceRequestValidator>();
             services.AddTransient<IValidator<AbsencesSummary>, AbsenceSummaryValidator>();
             services.AddTransient<IValidator<DepartamentSettings>, DepartamentSettingsValidator>();
             services.AddTransient<IValidator<MorningShift>, MorningShiftValidator>();
@@ -33,7 +35,6 @@ namespace NursesScheduler.BusinessLogic
             services.AddSingleton<ISolverLoggerService, SolverLoggerService>();
 
             services.AddTransient<IWorkTimeService, WorkTimeService>();
-            services.AddTransient<IWorkTimeServiceLegacy, WorkTimeServiceLegacy>();
             services.AddTransient<IAbsencesService, AbsencesService>();
             services.AddTransient<ISchedulesService, SchedulesService>();
             services.AddTransient<ICalendarService, CalendarService>();

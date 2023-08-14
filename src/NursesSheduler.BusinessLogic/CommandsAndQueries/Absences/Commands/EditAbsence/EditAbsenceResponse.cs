@@ -1,10 +1,10 @@
 ﻿using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence
 {
-    public sealed class AddAbsenceResponse
+    public sealed class EditAbsenceResponse
     {
-        public IEnumerable<AbsenceResponse>? Absences { get; set; }
+        public AbsenceResponse? Absence { get; set; }
         public AbsenceVeryficationResult VeryficationResult { get; set; }
 
         public sealed class AbsenceResponse

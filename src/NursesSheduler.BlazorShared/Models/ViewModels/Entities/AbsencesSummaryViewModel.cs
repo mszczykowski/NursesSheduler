@@ -16,7 +16,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
         [Range(typeof(TimeSpan), "00:00:00", "10675199.02:48:05.4775807", ErrorMessage = "Wartość musi być większa od 0")]
         public TimeSpan PTOTimeLeftFromPreviousYear { get; set; }
 
-        public ICollection<AbsenceViewModel> Absences { get; set; }
+        public List<AbsenceViewModel> Absences { get; set; }
 
         public AbsencesSummaryViewModel()
         {

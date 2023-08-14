@@ -114,10 +114,11 @@ else
                 </p>
             </header>
             <div class="card-content">
-                <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" Year=@_currentAbsencesSummary.Year />
+                <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" Year=_currentAbsencesSummary.Year 
+                    NurseId=_nurse.NurseId/>
             </div>
         </div>
-        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences />
+        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences Year=_currentAbsencesSummary.Year/>
     </div>
 }
 
@@ -204,25 +205,20 @@ else
     {
         try
         {
-            _newAbsence.NurseId = NurseId;
-            var addRequest = _mapper.Map<AddAbsenceRequest>(_newAbsence);
+            var response = await _mediatr.Send(_mapper.Map<AddAbsenceRequest>(_newAbsence));
 
-            var addResponse = await _mediatr.Send(addRequest);
-
-            if (addResponse == null)
+            if (response is null)
             {
                 throw new EntityNotAddedException(nameof(AbsenceViewModel));
             }
 
-            var veryficationResult = (AbsenceVeryficationResult)addResponse.VeryficationResult;
-
-            if (veryficationResult != AbsenceVeryficationResult.Valid)
+            if ((AbsenceVeryficationResult)response.VeryficationResult != AbsenceVeryficationResult.Valid)
             {
-                _newAbsenceForm.HandleInvalidAbsence(veryficationResult);
+                _newAbsenceForm.HandleInvalidAbsence((AbsenceVeryficationResult)response.VeryficationResult);
                 return;
             }
 
-            _currentAbsencesSummary.Absences.Add(_mapper.Map<AbsenceViewModel>(addResponse));
+            _currentAbsencesSummary.Absences.AddRange(_mapper.Map<IEnumerable<AbsenceViewModel>>(response.Absences));
 
             _newAbsenceForm.ResetForm();
 
