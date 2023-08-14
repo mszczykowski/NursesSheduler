@@ -18,17 +18,17 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
 
         public override string ToString()
         {
-            var stringBuilder = new StringBuilder();
-            foreach (var day in Days.OrderBy(d => d))
-            {
-                stringBuilder.Append(day);
-                stringBuilder.Append(',');
-            }
-            if (stringBuilder.Length > 0)
-            {
-                stringBuilder.Remove(stringBuilder.Length - 1, 1);
-            }
-            return stringBuilder.ToString();
+            //var stringBuilder = new StringBuilder();
+            //foreach (var day in Days.OrderBy(d => d))
+            //{
+            //    stringBuilder.Append(day);
+            //    stringBuilder.Append(',');
+            //}
+            //if (stringBuilder.Length > 0)
+            //{
+            //    stringBuilder.Remove(stringBuilder.Length - 1, 1);
+            //}
+            return $"{Days.First()} - {Days.Last()}";
         }
     }
 }

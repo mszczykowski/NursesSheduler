@@ -8,6 +8,7 @@
 
 
 <DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteAbsence" />
+<AbsenceFormModal @ref="_absenceFormModal" IsEdit=true SaveAbsence="EditAbsence" />
 
 <div class="level">
     <div class="level-left">
@@ -53,9 +54,14 @@ else
                     <td>@absence.WorkingHoursToAssign.GetTotalHoursAndMinutes()</td>
                     <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
                     <td class="is-fullwidth">@absence.Type.GetEnumDisplayName()</td>
-                    @if(!absence.IsClosed)
+                    @if (!absence.IsClosed)
                     {
-                        <td><a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a></td>
+                        <td>
+                            <a @onclick="(() => _absenceFormModal.ShowModal())">Edytuj</a>
+                        </td>
+                        <td>
+                            <a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a>
+                        </td>
                     }
                 </tr>
             }
@@ -65,13 +71,15 @@ else
 
 
 @code {
+    [Parameter]
+    public ICollection<AbsenceViewModel> Absences { get; set; }
+
     private DeleteModalWithId _deleteModal;
     private EditAbsenceModal _editModal;
 
     private MonthPickerViewModel _selectedMonth = new(DateTime.Now.Month);
 
-    [Parameter]
-    public ICollection<AbsenceViewModel> Absences { get; set; }
+    private AbsenceFormModal _absenceFormModal;
 
     private async Task DeleteAbsence(int absenceId)
     {
@@ -90,6 +98,19 @@ else
 
             Absences.Remove(Absences.First(a => a.AbsenceId == absenceId));
 
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task EditAbsence(AbsenceFormViewModel _modifiedAbsence)
+    {
+        try
+        {
+
+            StateHasChanged();
         }
         catch (Exception e)
         {

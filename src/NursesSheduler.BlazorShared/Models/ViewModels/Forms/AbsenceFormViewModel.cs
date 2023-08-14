@@ -5,6 +5,9 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
 {
     public sealed class AbsenceFormViewModel : IValidatableObject
     {
+        public int NurseId { get; set; }
+        public int AbsenceId { get; set; }
+
         private DateOnly _from;
 
         [Required(ErrorMessage = "Należy podać datę początkową")]
@@ -27,7 +30,6 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
         [Required(ErrorMessage = "Należy wybrać typ")]
         public AbsenceTypes Type { get; set; }
 
-        public int AbsencesSummaryId { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (To < From)

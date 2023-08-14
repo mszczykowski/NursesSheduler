@@ -2,6 +2,7 @@
 
 @using Append.Blazor.Printing
 @using BlazorTemplater
+@using NursesScheduler.BlazorShared.Pages.Absences.Controls
 @using NursesScheduler.BlazorShared.Pages.Schedules.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
@@ -41,7 +42,9 @@
 
 <DeleteModal @ref="_deleteModal" DeleteAction="DeleteSchedule" />
 
-<CloseModal @ref="_closeModal" CloseAction="CloseSchedule"/>
+<CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseSchedule"/>
+
+<AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsence"/>
 
 @if (_isLoading)
 {
@@ -129,14 +132,14 @@ else
                         <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
+                        <Button Style="is-info" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
                         Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="@(() => _closeScheduleModal.ShowModal(_pickedDate.ToString()))" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-info" Icon="fas fa-lock" Text="Zamknij" Action="@(() => _closeModal.ShowModal(_pickedDate.ToString()))" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
                     </div>
                 }
             </div>
@@ -154,11 +157,12 @@ else
     {
         @if (_currentDisplayedSchedule == ScheduleDisplayed.Current)
         {
-            <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData />
+            <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData 
+                OnAbsenceSelected="(NewAbsenceSelection selection) => _absenceFormModal.ShowModal(selection)"/>
         }
         else
         {
-            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData />
+            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData OnAbsenceSelected="() => {}"/>
         }
     }
 }
@@ -183,7 +187,8 @@ else
     private OkModal _infoModal;
     private SolverModal _solverModal;
     private DeleteModal _deleteModal;
-    private CloseModal _closeModal;
+    private CloseScheduleModal _closeScheduleModal;
+    private AbsenceFormModal _absenceFormModal;
 
     private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
     private bool _holidaysLoaded;
@@ -589,5 +594,10 @@ else
     {
         return _currentScheduleData.Schedule is not null && _currentScheduleData.Schedule.ScheduleNurses is not null
             && _currentScheduleData.Schedule.ScheduleNurses.Any();
+    }
+
+    private async Task SaveAbsence(AbsenceFormViewModel newAbsenceSelection)
+    {
+        throw new NotImplementedException();
     }
 }

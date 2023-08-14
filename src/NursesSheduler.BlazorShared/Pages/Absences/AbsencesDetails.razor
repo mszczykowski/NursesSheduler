@@ -18,6 +18,7 @@
 
 <EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" />
 
+
 @if (_nurse is null || _absencesSummaries is null)
 {
     <LoadingSpinner />
@@ -137,6 +138,7 @@ else
     private AbsenceForm _newAbsenceForm;
 
     private EditAbsencesSummaryModal _editAbsencesSummaryModal;
+    
 
     protected override Task OnParametersSetAsync()
     {
@@ -202,7 +204,7 @@ else
     {
         try
         {
-            _newAbsence.AbsencesSummaryId = _currentAbsencesSummary.AbsencesSummaryId;
+            _newAbsence.NurseId = NurseId;
             var addRequest = _mapper.Map<AddAbsenceRequest>(_newAbsence);
 
             var addResponse = await _mediatr.Send(addRequest);

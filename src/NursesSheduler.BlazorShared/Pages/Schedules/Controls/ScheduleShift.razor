@@ -1,6 +1,7 @@
 ﻿
 
-<td class="day @ScheduleCssHelper.GetDayClass(Day) @ScheduleCssHelper.SetIsTimeOff(WorkDay.IsTimeOff)" @oncontextmenu="SetTimeOff" @oncontextmenu:preventDefault="true">
+<td class="day @ScheduleCssHelper.GetDayClass(Day) @ScheduleCssHelper.SetIsTimeOff(WorkDay.IsTimeOff)" @onmousedown="RightButtonDown" @onmouseup="RigthButtonUp"
+   oncontextmenu="return false;">
     <select @onchange="AssignShift" value="@_selectedValue" disabled=@ReadOnly>
         <option value="@nameof(ShiftTypes.None)"> </option>
         <option value="@nameof(ShiftTypes.Day)">D</option>
@@ -32,6 +33,11 @@
     public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
     [Parameter]
     public EventCallback OnChange { get; set; }
+
+    [Parameter]
+    public EventCallback<int> SelectTimeOffFrom { get; set; }
+    [Parameter]
+    public EventCallback<int> SelectTimeOffTo { get; set; }
 
     private string _selectedValue;
 
@@ -82,9 +88,29 @@
         await OnChange.InvokeAsync();
     }
 
-    private async Task SetTimeOff(MouseEventArgs args)
+    private async Task RightButtonDown(MouseEventArgs args)
     {
-        WorkDay.IsTimeOff = !WorkDay.IsTimeOff;
-        await OnChange.InvokeAsync();
+        if(WorkDay.IsTimeOff || ReadOnly)
+        {
+            return;
+        }
+        
+        if (args.Button == 2)
+        {
+            await SelectTimeOffFrom.InvokeAsync(WorkDay.Day);
+        }
+    }
+
+    private async Task RigthButtonUp(MouseEventArgs args)
+    {
+        if(WorkDay.IsTimeOff || ReadOnly)
+        {
+            return;
+        }
+
+        if (args.Button == 2)
+        {
+            await SelectTimeOffTo.InvokeAsync(WorkDay.Day);
+        }
     }
 }

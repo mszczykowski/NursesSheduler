@@ -38,16 +38,18 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Add
         {
             var validationResult = await _validator.ValidateAsync(request);
             if (!validationResult.IsValid)
+            {
                 throw new ValidationException(validationResult.Errors);
-
-            var absences = _absencesService.GetAbsencesFromDates(request.From, request.To, 
-                request.AbsencesSummaryId, request.Type);
-
+            }
+                
             var absencesSummary = await _context.AbsencesSummaries
-                .Include(y => y.Absences)
-                .Include(y => y.Nurse)
-                .FirstOrDefaultAsync(y => y.AbsencesSummaryId == request.AbsencesSummaryId)
-                ?? throw new EntityNotFoundException(request.AbsencesSummaryId, nameof(AbsencesSummary));
+                .Include(s => s.Absences)
+                .Include(s => s.Nurse)
+                .FirstOrDefaultAsync(s => s.NurseId == request.NurseId && s.Year == request.From.Year)
+                ?? throw new EntityNotFoundException(nameof(AbsencesSummary));
+
+            var absences = _absencesService.GetAbsencesFromDates(request.From, request.To,
+                absencesSummary.AbsencesSummaryId, request.Type);
 
             var veryficationResult = AbsenceVeryficationResult.Valid;
             foreach (var absence in absences)
