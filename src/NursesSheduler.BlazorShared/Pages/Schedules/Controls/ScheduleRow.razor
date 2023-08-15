@@ -12,7 +12,7 @@
             <p>@Nurse.Surname</p>
             <p>@Nurse.Name</p>
         </div>
-        @if(!ScheduleData.ReadOnly && _scheduleValidationErrors is not null && _scheduleValidationErrors.Count() > 0)
+        @if(_scheduleValidationErrors is not null && _scheduleValidationErrors.Count() > 0)
         {
             <Button Text="!" Style="is-small is-danger is-outlined" Action="async() => await ShowValidationErrorModal.InvokeAsync(_scheduleValidationErrors)"/>
         }
@@ -60,7 +60,7 @@
     private NurseStatsViewModel _scheduleNurseStats => ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId];
     private NurseStatsViewModel _quarterNurseStats => QuarterData.QuarterStats.NurseStats[Nurse.NurseId];
     private ScheduleNurseViewModel _scheduleNurse => ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == Nurse.NurseId);
-    private IEnumerable<ScheduleValidationErrorViewModel> _scheduleValidationErrors => ScheduleData.ValidationErrors[Nurse.NurseId];
+    private IEnumerable<ScheduleValidationErrorViewModel>? _scheduleValidationErrors => ScheduleData.ReadOnly ? null : ScheduleData.ValidationErrors[Nurse.NurseId];
 
     private NewAbsenceSelection? _newAbsenceSelection;
 

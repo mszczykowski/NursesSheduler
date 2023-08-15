@@ -42,11 +42,11 @@
 <SolverModal @ref="_solverModal" CurrentQuarterData=_currentQuarterData
              CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings />
 
-<DeleteModal @ref="_deleteModal" DeleteAction="DeleteSchedule" />
+<DeleteModal @ref="_deleteModal" DeleteAction="DeleteScheduleAsync" />
 
-<CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseSchedule"/>
+<CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseScheduleAsync"/>
 
-<AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsence"/>
+<AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsenceAsync"/>
 
 <ErrorModal @ref="_errorModal" />
 
@@ -143,7 +143,7 @@ else
                         <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="ShowCloseScheduleModal" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertScheduleAsync" Disabled=!ShouldDisplayTable()/>
                     </div>
                 }
             </div>
@@ -279,6 +279,8 @@ else
             await SetPreviousQuarter();
             await SetPreviousStats();
         }
+
+        InitializeValidationErrors();
 
         ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
 
@@ -545,7 +547,7 @@ else
         }
     }
 
-    private async Task UpsertSchedule()
+    private async Task UpsertScheduleAsync()
     {
         try
         {
@@ -558,6 +560,8 @@ else
                 return;
             }
 
+            _currentScheduleData.Schedule.ScheduleId = response.ScheduleId;
+
             _infoModal.ShowModal("Pomyślnie zapisano");
             _deleteDisabled = false;
         }
@@ -567,7 +571,7 @@ else
         }
     }
 
-    private async Task CloseSchedule()
+    private async Task CloseScheduleAsync()
     {
         try
         {
@@ -582,7 +586,7 @@ else
         }
     }
 
-    private async Task DeleteSchedule()
+    private async Task DeleteScheduleAsync()
     {
         try
         {
@@ -607,7 +611,7 @@ else
             && _currentScheduleData.Schedule.ScheduleNurses.Any();
     }
 
-    private async Task SaveAbsence(AbsenceFormViewModel newAbsenceForm)
+    private async Task SaveAbsenceAsync(AbsenceFormViewModel newAbsenceForm)
     {
         var response = await _mediatr.Send(_mapper.Map<AddAbsenceRequest>(newAbsenceForm));
 
@@ -627,7 +631,7 @@ else
         _currentScheduleData.RequestScheduleRecalculation();
     }
 
-    public async Task RecalculateStatsAsync()
+    private async Task RecalculateStatsAsync()
     {
         foreach (var nurseId in _currentScheduleData.Schedule.ScheduleNurses.Select(n => n.NurseId))
         {
@@ -635,7 +639,7 @@ else
         }
     }
 
-    public async Task RecalcuateRowStatsAsync(int nurseId)
+    private async Task RecalcuateRowStatsAsync(int nurseId)
     {
         try
         {
@@ -661,13 +665,23 @@ else
         }
     }
 
-    public void ShowCloseScheduleModal()
+    private void ShowCloseScheduleModal()
     {
         _closeScheduleModal.ShowModal(_pickedDate.ToString());
 
         if(_currentScheduleData.ValidationErrors.Any(e => e.Value is not null || e.Value.Count() > 0))
         {
             _errorModal.ShowModal("Uwaga! Grafik posiada błędy!");
+        }
+    }
+
+    private void InitializeValidationErrors()
+    {
+        _currentScheduleData.ValidationErrors = new Dictionary<int, IEnumerable<ScheduleValidationErrorViewModel>>();
+
+        foreach(var nurseId in _currentScheduleData.Schedule.ScheduleNurses.Select(n => n.NurseId))
+        {
+            _currentScheduleData.ValidationErrors.Add(nurseId, Enumerable.Empty<ScheduleValidationErrorViewModel>());
         }
     }
 }

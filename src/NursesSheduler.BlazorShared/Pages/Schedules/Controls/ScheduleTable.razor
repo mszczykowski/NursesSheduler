@@ -29,9 +29,9 @@
     <tbody>
         @{
             int i = 1;
-            foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
+            foreach (var nurse in Nurses.Where(n => ScheduleData.Schedule.ScheduleNurses.Any(sn => sn.NurseId == n.NurseId)).OrderBy(n => n.Surname).ThenBy(n => n.Name))
             {
-                <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
+                <ScheduleRow No=i++ Nurse=nurse QuarterData=QuarterData
                      ScheduleData=ScheduleData OnAbsenceSelected="OnAbsenceSelected" 
                      ShowValidationErrorModal="ShowValidationErrorModal"/>
             }

@@ -18,11 +18,6 @@ namespace NursesScheduler.BlazorShared.Models.Wrappers
         public event Action RecalculateScheduleStats;
         public event Action<int> RecalculateRowStats;
 
-        public ScheduleDataWrapper()
-        {
-            ValidationErrors = new Dictionary<int, IEnumerable<ScheduleValidationErrorViewModel>>();
-        }
-
         public void RequestScheduleViewRefresh()
         {
             RefreshScheduleView.Invoke();

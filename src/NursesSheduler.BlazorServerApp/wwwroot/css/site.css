@@ -109,6 +109,9 @@
 
 /*table*/
 
+.schedule-header {
+}
+
 .schedule-view {
     width: 100%;
     margin: 0 auto;
@@ -201,7 +204,6 @@ th.holiday {
 th.name-col, td.name-col {
     overflow: hidden;
     white-space: nowrap;
-    max-width: 200px;
 }
 
 td.name-col {
@@ -260,4 +262,12 @@ th.name-col-pr, td.name-col-pr {
     overflow: hidden;
     white-space: nowrap;
     width: 100px;
+}
+
+.table-schedule th .pr {
+    font-size: 12px;
+    border: 1px solid rgb(100, 100, 100);
+    vertical-align: middle;
+    padding: 2px;
+    position:inherit;
 }
