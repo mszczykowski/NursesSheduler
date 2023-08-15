@@ -14,14 +14,14 @@ namespace NursesScheduler.BusinessLogic.Services
             _workTimeService = workTimeService;
         }
 
-        public IEnumerable<ScheduleValidationResult> ValidateScheduleNurse(TimeSpan maxWorkTimeInQuarter,
+        public IEnumerable<ScheduleValidationError> ValidateScheduleNurse(TimeSpan maxWorkTimeInQuarter,
             ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, DepartamentSettings departamentSettings)
         {
-            var validationResult = new List<ScheduleValidationResult>();
+            var validationResult = new List<ScheduleValidationError>();
 
             if (nurseQuarterStats.AssignedWorkTime > maxWorkTimeInQuarter)
             {
-                validationResult.Add(new ScheduleValidationResult
+                validationResult.Add(new ScheduleValidationError
                 {
                     Reason = Domain.Enums.ScheduleInvalidReasons.TooMuchHoursInQuarter,
                     AdditionalInfo = Math.Floor(nurseQuarterStats.AssignedWorkTime.TotalHours).ToString().PadLeft(2, '0') + ":" +
@@ -34,7 +34,7 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 if (nurseQuarterStats.WorkTimeAssignedInWeeks[weekNumber] > departamentSettings.MaximumWeekWorkTimeLength)
                 {
-                    validationResult.Add(new ScheduleValidationResult
+                    validationResult.Add(new ScheduleValidationError
                     {
                         Reason = Domain.Enums.ScheduleInvalidReasons.TooMuchHoursInWeek,
                         AdditionalInfo = weekNumber.ToString(),
@@ -52,7 +52,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 if (_workTimeService.GetHoursFromLastAssignedShift(workDay.Day, scheduleNurse.NurseWorkDays) >
                     departamentSettings.MinimalShiftBreak)
                 {
-                    validationResult.Add(new ScheduleValidationResult
+                    validationResult.Add(new ScheduleValidationError
                     {
                         Reason = Domain.Enums.ScheduleInvalidReasons.BreakBetweenShiftsTooShort,
                         AdditionalInfo = workDay.Day.ToString(),

@@ -6,7 +6,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
     internal interface IScheduleValidatorService
     {
-        IEnumerable<ScheduleValidationResult> ValidateScheduleNurse(TimeSpan maxWorkTimeInQuarter,
+        IEnumerable<ScheduleValidationError> ValidateScheduleNurse(TimeSpan maxWorkTimeInQuarter,
             ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, DepartamentSettings departamentSettings);
     }
 }

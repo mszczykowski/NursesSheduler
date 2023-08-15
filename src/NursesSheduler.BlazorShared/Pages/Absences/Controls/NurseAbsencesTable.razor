@@ -42,7 +42,7 @@ else
                 <th>Długość(dni)</th>
                 <th>Godzin pracy</th>
                 <th>Przypisanych godzin pracy</th>
-                <th class="is-maincolumn">Typ</th>
+                <th>Typ</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -55,7 +55,7 @@ else
                     <td>@absence.Lenght</td>
                     <td>@absence.WorkingHoursToAssign.GetTotalHoursAndMinutes()</td>
                     <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
-                    <td class="is-fullwidth">@absence.Type.GetEnumDisplayName()</td>
+                    <td>@absence.Type.GetEnumDisplayName()</td>
                     @if (!absence.IsClosed)
                     {
                         <td>

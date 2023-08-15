@@ -190,8 +190,6 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private void InitializeNurseAbsencesSummary(Nurse nurse, Departament departament)
         {
-            var currentYear = _currentDateService.GetCurrentDate().Year;
-
             var shouldBeInitializedToYear = _currentDateService.GetCurrentDate().Year + 1;
 
             for (int i = departament.CreationYear; i <= shouldBeInitializedToYear; i++)

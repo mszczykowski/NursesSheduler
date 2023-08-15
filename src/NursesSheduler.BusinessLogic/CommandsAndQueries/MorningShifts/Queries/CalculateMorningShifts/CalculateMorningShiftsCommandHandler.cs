@@ -6,13 +6,13 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
 {
     internal sealed class CalculateMorningShiftsCommandHandler : IRequestHandler<CalculateMorningShiftsRequest,
-        ICollection<CalculateMorningShiftsResponse>>
+        IEnumerable<CalculateMorningShiftsResponse>>
     {
-        private readonly IWorkTimeServiceLegacy _workTimeService;
+        private readonly IWorkTimeService _workTimeService;
         private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly IMapper _mapper;
 
-        public CalculateMorningShiftsCommandHandler(IWorkTimeServiceLegacy workTimeService,
+        public CalculateMorningShiftsCommandHandler(IWorkTimeService workTimeService,
             IDepartamentSettingsProvider departamentSettingsManager,
             IMapper mapper)
         {
@@ -21,12 +21,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries
             _mapper = mapper;
         }
 
-        public async Task<ICollection<CalculateMorningShiftsResponse>> Handle(CalculateMorningShiftsRequest request,
+        public async Task<IEnumerable<CalculateMorningShiftsResponse>> Handle(CalculateMorningShiftsRequest request,
             CancellationToken cancellationToken)
         {
             var departamentSettings = await _departamentSettingsManager.GetCachedDataAsync(request.DepartamentId);
 
-            return _mapper.Map<ICollection<CalculateMorningShiftsResponse>>(_workTimeService
+            return _mapper.Map<IEnumerable<CalculateMorningShiftsResponse>>(_workTimeService
                 .CalculateMorningShifts(request.TimeForMorningShifts, departamentSettings));
         }
     }

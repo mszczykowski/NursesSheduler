@@ -8,6 +8,54 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class WorkTimeService : IWorkTimeService
     {
+        public IEnumerable<MorningShift> CalculateMorningShifts(TimeSpan timeForMorningShifts,
+            DepartamentSettings departamentSettings)
+        {
+            var lengths = new List<TimeSpan>();
+
+            if (timeForMorningShifts < departamentSettings.TargetMinimalMorningShiftLenght)
+            {
+                timeForMorningShifts += ScheduleConstatns.RegularShiftLength;
+            }
+
+            while (timeForMorningShifts > ScheduleConstatns.RegularShiftLength
+                && timeForMorningShifts - ScheduleConstatns.RegularShiftLength
+                > departamentSettings.TargetMinimalMorningShiftLenght)
+            {
+                timeForMorningShifts -= ScheduleConstatns.RegularShiftLength;
+                lengths.Add(ScheduleConstatns.RegularShiftLength);
+            }
+
+            if (timeForMorningShifts > ScheduleConstatns.RegularShiftLength)
+            {
+                lengths.Add(timeForMorningShifts / 2);
+                lengths.Add(timeForMorningShifts / 2);
+            }
+            else
+            {
+                lengths.Add(timeForMorningShifts);
+            }
+
+            var morningShifts = new MorningShift[3];
+
+            for (int i = 0; i < 3; i++)
+            {
+                morningShifts[i] = new MorningShift
+                {
+                    Index = (MorningShiftIndex)i,
+                    ShiftLength = TimeSpan.Zero,
+                };
+            }
+
+            int j = 0;
+            foreach (var length in lengths)
+            {
+                morningShifts[j++].ShiftLength = length;
+            }
+
+            return morningShifts;
+        }
+
         public TimeSpan GetHoursFromLastAssignedShift(int toDay, IEnumerable<NurseWorkDay> nurseWorkDays)
         {
             TimeSpan hoursFromLastAssignedShift = TimeSpan.Zero;

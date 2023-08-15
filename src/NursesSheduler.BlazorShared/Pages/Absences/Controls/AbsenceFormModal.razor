@@ -95,6 +95,7 @@
     public void ShowModal(AbsenceViewModel existingAbsnece, int year)
     {
         _datePickersEnabled = true;
+        _absence = existingAbsnece;
 
         _absenceForm = new AbsenceFormViewModel
             {

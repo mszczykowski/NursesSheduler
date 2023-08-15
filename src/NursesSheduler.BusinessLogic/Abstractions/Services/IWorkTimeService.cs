@@ -6,6 +6,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
     internal interface IWorkTimeService
     {
+        IEnumerable<MorningShift> CalculateMorningShifts(TimeSpan timeForMorningShifts,
+            DepartamentSettings departamentSettings);
         TimeSpan GetHoursFromLastAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays);
         TimeSpan GetHoursToFirstAssignedShift(int fromDay, IEnumerable<NurseWorkDay> nurseWorkDays);
         TimeSpan GetHoursToFirstAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays);
