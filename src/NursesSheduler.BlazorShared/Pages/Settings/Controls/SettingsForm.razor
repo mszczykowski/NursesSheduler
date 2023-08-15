@@ -1,0 +1,69 @@
+﻿
+
+<div class='columns is-mobile is-centered'>
+    <div class='column is-5'>
+        <div class="card">
+            <div class="card-content">
+                <EditForm EditContext="@_editContext">
+                    <DataAnnotationsValidator />
+                    <p class="title is-4">
+                        Konfigruracja czasu pracy
+                    </p>
+                    <TimeSpanInput Label="Dzienny wymiar pracy" @bind-Value="Settings.WorkDayLength" ValidationFor="@(() => Settings.WorkDayLength)" />
+                    <TimeSpanInput Label="Maksymalny tygodniowy wymiar pracy" @bind-Value="Settings.MaximumWeekWorkTimeLength" ValidationFor="@(() => Settings.MaximumWeekWorkTimeLength)" />
+                    <TimeSpanInput Label="Minimalna przerwa między dyżurami" @bind-Value="Settings.MinimalShiftBreak" ValidationFor="@(() => Settings.MinimalShiftBreak)" />
+                    <p class="mt-5 title is-4">
+                        Konfigruracja świąt
+                    </p>
+                    <TimeSpanInput Label="Ilość godzin świątecznych należna za zmianę dzienną" @bind-Value="Settings.DayShiftHolidayEligibleHours" ValidationFor="@(() => Settings.DayShiftHolidayEligibleHours)" />
+                    <TimeSpanInput Label="Ilość godzin świątecznych należna za zmianę nocną" @bind-Value="Settings.NightShiftHolidayEligibleHours" ValidationFor="@(() => Settings.NightShiftHolidayEligibleHours)" />
+                    <br />
+                    <p class="mt-5 title is-4">
+                        Konfigruracja generatora
+                    </p>
+                    <NumberInput Label="Docelowa liczba pracowników na dyżurze" @bind-Value="Settings.TargetMinNumberOfNursesOnShift" ValidationFor="@(() => Settings.TargetMinNumberOfNursesOnShift)"/>
+                    <TimeSpanInput Label="Docelowa minimalna długość dyżuru (ranki)" @bind-Value="Settings.TargetMinimalMorningShiftLenght" ValidationFor="@(() => Settings.TargetMinimalMorningShiftLenght)" />
+                    <NumberInput Label="Domyślna liczba prób generatora" @bind-Value="Settings.DefaultGeneratorRetryValue" ValidationFor="@(() => Settings.DefaultGeneratorRetryValue)"/>
+                    <NumberInput Label="Maksymanly czas próby generatora (w sekundach)" @bind-Value="Settings.DefaultGeneratorTimeOut" ValidationFor="@(() => Settings.DefaultGeneratorTimeOut)"/>
+                    <div class="field">
+                        <InputCheckbox @bind-Value="Settings.UseTeams" />
+                        <label class="checkbox">Użyj zespołów przy generacji grafików (eksperymentalne)</label>
+                    </div>
+                    <div class="buttons is-right">
+                        <LoadingButton Text="Anuluj" Action="Cancel"/>
+                        <LoadingButton Style="is-primary" Text="Zapisz" Action="OnSubmit"/>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public DepratamentSettingsViewModel Settings { get; set; }
+    [Parameter]
+    public EventCallback SaveSettings { get; set; }
+    [Parameter]
+    public EventCallback Cancel { get; set; }
+
+    private EditContext _editContext;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new(Settings);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+    }
+
+
+    private async Task OnSubmit()
+    {
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
+        await SaveSettings.InvokeAsync();
+    }
+}

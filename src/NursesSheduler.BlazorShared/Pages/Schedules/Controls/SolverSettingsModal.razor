@@ -1,0 +1,84 @@
+﻿@inherits ModalBase
+
+@if (_solverSettingsForm is not null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Ustawienia generatora</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <EditForm EditContext="@_editContext">
+                <section class="modal-card-body">
+                    <fieldset disabled=@SolverSettings.UseOwnSeed>
+                        <DataAnnotationsValidator />
+                        <div class="field">
+                            <label class="label">Liczba prób generatora</label>
+                            <div class="control">
+                                <InputNumber class="input" @bind-Value="SolverSettings.NumberOfRetries" />
+                                <div class="help is-danger">
+                                    <ValidationMessage For="@(() => SolverSettings.NumberOfRetries)" />
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset disabled=@(!SolverSettings.UseOwnSeed)>
+                        <div class="field">
+                            <label class="label">Ziarno generatora</label>
+                            <div class="control">
+                                <InputText class="input" @bind-Value="SolverSettings.GeneratorSeed" />
+                                <div class="help is-danger">
+                                    <ValidationMessage For="@(() => SolverSettings.GeneratorSeed)" />
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                <InputCheckbox @bind-Value="SolverSettings.UseOwnSeed" />
+                                Użyj własnego ziarna generatora
+                            </label>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="footer-buttons">
+                        <Button Text="Anuluj" Action="base.ChangeVisibility" />
+                        <LoadingButton Style="is-success" Text="Zapisz" Action="OnSubmit" />
+                    </div>
+                </footer>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public SolverSettingsViewModel SolverSettings { get; set; }
+
+    private EditContext _editContext;
+    private SolverSettingsFormViewModel _solverSettingsForm;
+
+    public override void ShowModal()
+    {
+        _solverSettingsForm = new(SolverSettings);
+
+        _editContext = new(_solverSettingsForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+
+        ChangeVisibility();
+    }
+
+    private void OnSubmit()
+    {
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
+        SolverSettings = _solverSettingsForm.SolverSettings;
+        ChangeVisibility();
+    }
+}

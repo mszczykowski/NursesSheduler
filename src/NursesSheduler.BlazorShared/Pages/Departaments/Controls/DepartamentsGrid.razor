@@ -1,0 +1,86 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.DeleteDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.PickDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject CurrentDepartamentStore _currentDepartamentStore
+@inject IExceptionHandler _exceptionHandler
+@inject NavigationManager _navigationManager;
+
+<DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteDepratament" />
+
+@if(Departaments == null || Departaments.Count == 0)
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Najpierw <a href="/departaments/add">dodaj</a> oddział</h4>
+    </div>
+}
+else
+{
+    <div class="columns is-centered is-multiline">
+    @foreach (var departament in Departaments)
+    {
+        <div class="column is-one-quarter">
+            <DepartamentCard Departament=departament 
+                OnDepartamentPick="OnDepartamentPick" OnDeleteClick="(() => _deleteModal.ShowModal(departament.Name, departament.DepartamentId))"/>
+        </div>
+    }
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public List<DepartamentViewModel> Departaments { get; set; }
+
+    private DeleteModalWithId _deleteModal;
+
+    private async Task OnDepartamentPick(DepartamentViewModel departament)
+    {
+        try
+        {
+            var request = new PickDepartamentRequest
+            {
+                DepartamentId = departament.DepartamentId,
+            };
+            var response = await _mediatr.Send(request)
+                ?? throw new EntityNotFoundException(departament.DepartamentId, nameof(DepartamentViewModel));;
+
+            _currentDepartamentStore.CurrentDepartament = _mapper.Map<DepartamentViewModel>(response);
+            _navigationManager.NavigateTo("/scheduleView");
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task DeleteDepratament(int departamentId)
+    {
+        try
+        {
+            var request = new DeleteDepartamentRequest
+            {
+                DepartamentId = departamentId
+            };
+            var response = await _mediatr.Send(request);
+
+            if (response.Success == false)
+            {
+                throw new EntityNotDeletedException(departamentId, "Departament");
+            }
+
+            if (_currentDepartamentStore.CurrentDepartament is not null &&
+                _currentDepartamentStore.CurrentDepartament.DepartamentId == departamentId)
+            {
+                _currentDepartamentStore.CurrentDepartament = null;
+            }
+
+            Departaments.RemoveAll(n => n.DepartamentId == departamentId);
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+}

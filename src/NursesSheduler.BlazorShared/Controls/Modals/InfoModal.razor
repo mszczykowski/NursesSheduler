@@ -1,0 +1,15 @@
+﻿@inherits OkModal
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code{
+    protected override Task OnInitializedAsync()
+    {
+        base.Title = "Informacja";
+        base.ButtonStyle = "is-primary";
+        return base.OnInitializedAsync();
+    }
+}
+

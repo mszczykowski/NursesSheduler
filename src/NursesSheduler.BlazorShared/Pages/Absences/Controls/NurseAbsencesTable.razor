@@ -1,0 +1,147 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.DeleteAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.EditAbsence
+
+@inherits ComponenentUsingDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler
+
+
+<DeleteModalWithId @ref="_deleteModal" DeleteAction="DeleteAbsence" />
+<AbsenceFormModal @ref="_absenceFormModal" IsEdit=true SaveAbsence="EditAbsence" />
+<ErrorModal @ref=_errorModal />
+
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <label class="label">Nieobecności</label>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <label class="label">Miesiąc</label>
+        </div>
+        <div class="level-item">
+            <MonthSelect MonthPickerViewModel=_selectedMonth OnChange="(() => StateHasChanged())" />
+        </div>
+    </div>
+</div>
+@if (Absences is null || Absences.Count() == 0)
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Brak wprowadzonych nieobecności</h4>
+    </div>
+}
+else
+{
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th>Dni</th>
+                <th>Długość(dni)</th>
+                <th>Godzin pracy</th>
+                <th>Przypisanych godzin pracy</th>
+                <th>Typ</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var absence in Absences.Where(a => a.Month == _selectedMonth.MonthNumber).OrderBy(a => a.Days.Min()).ToList())
+            {
+                <tr>
+                    <td>@absence.ToString()</td>
+                    <td>@absence.Lenght</td>
+                    <td>@absence.WorkingHoursToAssign.GetTotalHoursAndMinutes()</td>
+                    <td>@absence.AssignedWorkingHours.GetTotalHoursAndMinutes()</td>
+                    <td>@absence.Type.GetEnumDisplayName()</td>
+                    @if (!absence.IsClosed)
+                    {
+                        <td>
+                            <a @onclick="(() => _absenceFormModal.ShowModal(absence, Year))">Edytuj</a>
+                        </td>
+                        <td>
+                            <a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    [Parameter]
+    public List<AbsenceViewModel> Absences { get; set; }
+    [Parameter]
+    public int Year { get; set; }
+
+    private DeleteModalWithId _deleteModal;
+    private AbsenceFormModal _editModal;
+
+    private MonthPickerViewModel _selectedMonth = new(DateTime.Now.Month);
+
+    private AbsenceFormModal _absenceFormModal;
+    private ErrorModal _errorModal;
+
+    private async Task DeleteAbsence(int absenceId)
+    {
+        try
+        {
+            var request = new DeleteAbsenceRequest
+                {
+                    AbsenceId = absenceId,
+                };
+            var response = await _mediatr.Send(request);
+
+            if (!response.Success)
+            {
+                throw new EntityNotDeletedException(absenceId, nameof(AbsenceViewModel));
+            }
+
+            Absences.Remove(Absences.First(a => a.AbsenceId == absenceId));
+
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task EditAbsence(AbsenceFormViewModel _modifiedAbsence)
+    {
+        try
+        {
+            var response = await _mediatr.Send(_mapper.Map<EditAbsenceRequest>(_modifiedAbsence));
+
+            if (response is null)
+            {
+                throw new EntityNotEditedException(_modifiedAbsence.AbsenceId, nameof(AbsenceViewModel));
+            }
+
+            var veryficationResult = (AbsenceVeryficationResult)response.VeryficationResult;
+
+            if (veryficationResult != AbsenceVeryficationResult.Valid)
+            {
+                _errorModal.ShowModal(veryficationResult.GetEnumDisplayName());
+                return;
+            }
+
+            if(response.Absence is null)
+            {
+                return;
+            }
+
+            Absences.RemoveAll(a => a.AbsenceId == _modifiedAbsence.AbsenceId);
+            Absences.Add(_mapper.Map<AbsenceViewModel>(response.Absence));
+
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+}

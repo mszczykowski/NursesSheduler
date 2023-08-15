@@ -1,0 +1,35 @@
+﻿@inherits ModalBase
+
+<div class="modal @CssHelper.SetIsActive(_isVisible)">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">@_title</p>
+            <button class="delete" aria-label="close" @onclick="base.ChangeVisibility"></button>
+        </header>
+        <section class="modal-card-body">
+            @((MarkupString)_content)
+        </section>
+        <footer class="modal-card-foot">
+            <div class="footer-buttons">
+                <Button Style="button" Text="Anuluj" Action=base.ChangeVisibility/>
+                <LoadingButton Style="button is-danger" Text="@_yesText" Action="ExecuteYesAction"/>
+            </div>
+        </footer>
+    </div>
+</div>
+
+
+@code {
+    protected string _title;
+    protected string _content;
+    protected string _yesText;
+    protected EventCallback _yesAction;
+
+    private async Task ExecuteYesAction()
+    {
+        await _yesAction.InvokeAsync();
+        base.ChangeVisibility();
+    }
+}
+

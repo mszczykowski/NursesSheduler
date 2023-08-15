@@ -1,0 +1,50 @@
+﻿<div class="tabs is-boxed">
+    <ul>
+        @foreach (var tab in Tabs)
+        {
+            <li class="@CssHelper.SetIsActive(tab.IsSelected)">
+                <a @onclick="(() => SetTab(tab.Index))">@tab.Title</a>
+            </li>
+        }
+    </ul>
+</div>
+
+@foreach (var tab in Tabs)
+{
+    <div style="@CssHelper.SetVisibility(tab.IsSelected)">
+        @tab.PageContent
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public int DefaultSelectedTab { get; set; }
+    [Parameter]
+    public IEnumerable<TabViewModel> Tabs { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        int i = 0;
+        foreach (var tab in Tabs)
+        {
+            tab.IsSelected = false;
+            tab.Index = i++;
+        }
+
+        Tabs.First(t => t.Index == DefaultSelectedTab).IsSelected = true;
+
+        return base.OnParametersSetAsync();
+    }
+
+    private void SetTab(int index)
+    {
+        foreach (var tab in Tabs)
+        {
+            tab.IsSelected = false;
+        }
+
+        Tabs.First(t => t.Index == index).IsSelected = true;
+    }
+}

@@ -1,0 +1,94 @@
+﻿@page "/absences"
+
+@using NursesScheduler.BlazorShared.Pages.Absences.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummaryByDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
+
+@inherits ComponenentUsingDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler;
+
+
+<div class="container">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Nieobecności</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <label class="label">Rok</label>
+            </div>
+            <div class="level-item">
+                <YearSelect YearPickerViewModel=_selectedYear FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear
+                            OnChange=@(() => {}) />
+            </div>
+            <div class="level-item">
+                <button class="button is-info" @onclick="CurrentYearClick">Bieżący rok</button>
+            </div>
+        </div>
+    </div>
+    @if (_nurses is null || _absenceSummaries is null)
+    {
+        <LoadingSpinner />
+    }
+    else
+    {
+        <AbsencesSummaryTable Nurses=_nurses AbsencesSummaries=_absenceSummaries SelectedYear=_selectedYear.YearNumber />
+    }
+</div>
+
+
+@code {
+    private IEnumerable<NurseViewModel> _nurses;
+    private IEnumerable<AbsencesSummaryViewModel> _absenceSummaries;
+    private YearPickerViewModel _selectedYear = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await LoadNursesAsync();
+                await LoadAbsenceSummaries();
+                base.StateHasChanged();
+            }
+            catch (Exception e)
+            {
+                _exceptionHandler.HandleException(e);
+            }
+        }
+    }
+
+    private async Task LoadNursesAsync()
+    {
+        var request = new GetNursesFromDepartamentRequest
+            {
+                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+            };
+        var response = await _mediatr.Send(request);
+
+        _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(response).OrderBy(n => n.Surname).ThenBy(n => n.Name);
+    }
+
+    private async Task LoadAbsenceSummaries()
+    {
+        var request = new GetAbsencesSummaryByDepartamentRequest
+            {
+                DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId
+            };
+        var response = await _mediatr.Send(request);
+
+        _absenceSummaries = _mapper.Map<IEnumerable<AbsencesSummaryViewModel>>(response);
+    }
+
+    private void CurrentYearClick()
+    {
+        _selectedYear.YearNumber = DateTime.Now.Year;
+        StateHasChanged();
+    }
+}

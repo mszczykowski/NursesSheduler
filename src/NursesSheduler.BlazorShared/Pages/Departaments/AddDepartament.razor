@@ -1,0 +1,44 @@
+﻿@page "/departaments/add"
+
+@using NursesScheduler.BlazorShared.Pages.Departaments.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptonHandler
+@inject NavigationManager _navigationManager
+
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Dodaj nowy oddział</p>
+            </div>
+        </div>
+    </div>
+
+    <DepartamentForm Departament=_departament SaveDepartament="SaveDepartament" IsEdit=false/>
+
+</div>
+
+
+
+
+@code {
+    protected DepartamentViewModel _departament = new DepartamentViewModel();
+    
+    protected async void SaveDepartament()
+    {
+        try
+        {
+            var request = _mapper.Map<CreateDepartamentRequest>(_departament);
+            var response = await _mediatr.Send(request);
+
+            _navigationManager.NavigateTo("/departaments");
+        }
+        catch (Exception e)
+        {
+            _exceptonHandler.HandleException(e);
+        }
+    }
+}

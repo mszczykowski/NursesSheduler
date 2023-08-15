@@ -1,0 +1,59 @@
+﻿@if (!Nurses.Any())
+{
+    <div class="has-text-centered">
+        <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
+    </div>
+}
+else
+{
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th>L.p.</th>
+                <th class="is-maincolumn">Nazwisko i imię</th>
+                <th>Przysługujący urlop (dni)</th>
+                <th>Pozostały urlop</th>
+                <th>Zaległy urlop</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var nurseIndex = 0;
+                @foreach (var nurse in Nurses)
+                {
+                    var absencesSumamry = AbsencesSummaries.FirstOrDefault(s => s.NurseId == nurse.NurseId && s.Year == SelectedYear);
+                    <tr>
+                        <td>@(++nurseIndex)</td>
+                        <td>@nurse.ToString()</td>
+                        <td>@nurse.PTOentitlement</td>
+                        @if (absencesSumamry == null)
+                        {
+                            <td></td>
+                            <td></td>
+                        }
+                        else
+                        {
+                            <td>@absencesSumamry.PTOTimeLeft.GetTotalHoursAndMinutes()</td>
+                            @if(SelectedYear <= DateTime.Now.Year)
+                            {
+                                <td>@absencesSumamry.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()</td>
+                            }
+                        }
+                        <td><a href="/absences/details/@nurse.NurseId/@SelectedYear">Więcej</a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    [Parameter]
+    public IEnumerable<NurseViewModel> Nurses { get; set; }
+    [Parameter]
+    public IEnumerable<AbsencesSummaryViewModel> AbsencesSummaries { get; set; }
+    [Parameter]
+    public int SelectedYear { get; set; }
+}

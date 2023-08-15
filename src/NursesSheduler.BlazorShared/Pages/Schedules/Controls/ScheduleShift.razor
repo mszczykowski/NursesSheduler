@@ -1,0 +1,116 @@
+﻿
+
+<td class="day @ScheduleCssHelper.GetDayClass(Day) @ScheduleCssHelper.SetIsTimeOff(WorkDay.IsTimeOff)" @onmousedown="RightButtonDown" @onmouseup="RigthButtonUp"
+   oncontextmenu="return false;">
+    <select @onchange="AssignShift" value="@_selectedValue" disabled=@ReadOnly>
+        <option value="@nameof(ShiftTypes.None)"> </option>
+        <option value="@nameof(ShiftTypes.Day)">D</option>
+        <option value="@nameof(ShiftTypes.Night)">N</option>
+        @if (MorningShifts != null && MorningShifts.Any(m => m.ShiftLength != TimeSpan.Zero))
+        {
+            <optgroup label="Ranki">
+                @foreach (var morningShift in MorningShifts)
+                {
+                    @if (morningShift.ShiftLength != TimeSpan.Zero)
+                    {
+                        <option value="@morningShift.Index.ToString()">@morningShift.ShiftLength.GetTotalHoursAndMinutes()</option>
+                    }
+                }
+            </optgroup>
+        }
+    </select>
+</td>
+
+
+@code {
+    [Parameter]
+    public bool ReadOnly { get; set; }
+    [Parameter]
+    public NurseWorkDayViewModel WorkDay { get; set; }
+    [Parameter]
+    public DayViewModel Day { get; set; }
+    [Parameter]
+    public IEnumerable<MorningShiftViewModel> MorningShifts { get; set; }
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    [Parameter]
+    public EventCallback<int> SelectTimeOffFrom { get; set; }
+    [Parameter]
+    public EventCallback<int> SelectTimeOffTo { get; set; }
+
+    private string _selectedValue;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (WorkDay == null)
+            return;
+
+        if (WorkDay.ShiftType == ShiftTypes.Morning)
+        {
+            WorkDay.RefreshMorningShift(MorningShifts);
+            _selectedValue = WorkDay.MorningShift.Index.ToString();
+        }
+        else
+        {
+            _selectedValue = WorkDay.ShiftType.ToString();
+        }
+    }
+
+    private async Task AssignShift(ChangeEventArgs e)
+    {
+        _selectedValue = e.Value.ToString();
+
+        switch (_selectedValue)
+        {
+            case nameof(ShiftTypes.None):
+                WorkDay.SetShift(ShiftTypes.None);
+                break;
+            case nameof(ShiftTypes.Day):
+                WorkDay.SetShift(ShiftTypes.Day);
+                break;
+            case nameof(ShiftTypes.Night):
+                WorkDay.SetShift(ShiftTypes.Night);
+                break;
+            case nameof(MorningShiftIndexes.R1):
+                WorkDay.SetMorningShift(MorningShiftIndexes.R1, MorningShifts);
+                break;
+            case nameof(MorningShiftIndexes.R2):
+                WorkDay.SetMorningShift(MorningShiftIndexes.R2, MorningShifts);
+                break;
+            case nameof(MorningShiftIndexes.R3):
+                WorkDay.SetMorningShift(MorningShiftIndexes.R3, MorningShifts);
+                break;
+        }
+
+        await OnChange.InvokeAsync();
+    }
+
+    private async Task RightButtonDown(MouseEventArgs args)
+    {
+        if(WorkDay.IsTimeOff || ReadOnly)
+        {
+            return;
+        }
+        
+        if (args.Button == 2)
+        {
+            await SelectTimeOffFrom.InvokeAsync(WorkDay.Day);
+        }
+    }
+
+    private async Task RigthButtonUp(MouseEventArgs args)
+    {
+        if(WorkDay.IsTimeOff || ReadOnly)
+        {
+            return;
+        }
+
+        if (args.Button == 2)
+        {
+            await SelectTimeOffTo.InvokeAsync(WorkDay.Day);
+        }
+    }
+}

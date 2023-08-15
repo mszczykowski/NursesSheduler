@@ -1,0 +1,16 @@
+﻿@inherits Button
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override async Task OnClick()
+    {
+        _isLoading = true;
+        await Task.Delay(1);
+        await Action.InvokeAsync();
+        _isLoading = false;
+        StateHasChanged();
+    }
+}

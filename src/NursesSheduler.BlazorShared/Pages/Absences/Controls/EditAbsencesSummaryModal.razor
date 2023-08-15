@@ -1,0 +1,105 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
+@inherits ModalBase
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler;
+
+@if (_formAbsencesSummary != null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edytuj posumowanie roku @_formAbsencesSummary.Year</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <EditForm EditContext="@_editContext">
+                <section class="modal-card-body">
+                    <DataAnnotationsValidator />
+                    <TimeSpanInput Label="Godzin pozostałego urlpu" @bind-Value="_formAbsencesSummary.PTOTimeLeft" ValidationFor="@(() => _formAbsencesSummary.PTOTimeLeft)" />
+                    <TimeSpanInput Label="Godzin pozostałego urlopu z zeszłego roku" @bind-Value="_formAbsencesSummary.PTOTimeLeftFromPreviousYear"
+                               ValidationFor="@(() => _formAbsencesSummary.PTOTimeLeftFromPreviousYear)" />
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="footer-buttons">
+                        <Button Action="base.ChangeVisibility" Text="Anuluj" />
+                        <LoadingButton Style="is-info" Action="OnRecalculateAsync" Text="Przelicz" />
+                        <LoadingButton Style="is-primary" Action="OnSaveAsync" Text="Zapisz" />
+                    </div>
+                </footer>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    private EditContext _editContext;
+
+    private AbsencesSummaryViewModel _formAbsencesSummary;
+    private AbsencesSummaryViewModel _originalAbsencesSummary;
+
+    public void ShowModal(AbsencesSummaryViewModel absencesSummary)
+    {
+        _originalAbsencesSummary = absencesSummary;
+        _formAbsencesSummary = new AbsencesSummaryViewModel(absencesSummary);
+
+        _editContext = new(_formAbsencesSummary);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        ChangeVisibility();
+    }
+
+    private async Task OnSaveAsync()
+    {
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
+        try
+        {
+            var request = _mapper.Map<EditAbsencesSummaryRequest>(_formAbsencesSummary);
+
+            var response = await _mediatr.Send(request);
+
+            if(response is not null)
+            {
+                var updatedSummary = _mapper.Map<EditAbsencesSummaryResponse>(response);
+
+                _originalAbsencesSummary.PTOTimeLeft = updatedSummary.PTOTimeLeft;
+                _originalAbsencesSummary.PTOTimeLeftFromPreviousYear = updatedSummary.PTOTimeLeftFromPreviousYear;
+            }
+
+            base.ChangeVisibility();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task OnRecalculateAsync()
+    {
+        try
+        {
+            var request = new RecalculateAbsencesSummaryRequest
+                {
+                    AbsencesSummaryId = _formAbsencesSummary.AbsencesSummaryId,
+                };
+
+            var response = await _mediatr.Send(request);
+
+            var recalculatedSummary = _mapper.Map<EditAbsencesSummaryResponse>(response);
+
+            _formAbsencesSummary.PTOTimeLeft = recalculatedSummary.PTOTimeLeft;
+            _formAbsencesSummary.PTOTimeLeftFromPreviousYear = recalculatedSummary.PTOTimeLeftFromPreviousYear;
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+}

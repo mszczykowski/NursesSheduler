@@ -1,0 +1,25 @@
+﻿
+
+<div class="card">
+    <div class="card-content">
+        <p class="title is-4">@Departament.Name</p>
+    </div>
+    <footer class="card-footer">
+        <LoadingButton Style="card-footer-item button is-ghost" Text="Wybierz" 
+            Action="(async () => await OnDepartamentPick.InvokeAsync(Departament))"/>
+    </footer>
+    <footer class="card-footer">
+        <a class="card-footer-item button is-link is-inverted" href="/departaments/edit/@Departament.DepartamentId">Edytuj</a>
+        <a class="card-footer-item button is-danger is-inverted" @onclick="(async () => await OnDeleteClick.InvokeAsync())">Usuń</a>
+    </footer>
+</div>
+
+
+@code {
+    [Parameter]
+    public EventCallback OnDeleteClick { get; set; }
+    [Parameter]
+    public EventCallback<DepartamentViewModel> OnDepartamentPick { get; set; }
+    [Parameter]
+    public DepartamentViewModel Departament { get; set; }
+}

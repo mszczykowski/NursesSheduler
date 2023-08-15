@@ -1,0 +1,31 @@
+﻿<button class="button @Style @CssHelper.SetIsLoading(_isLoading)" type="button" @onclick="OnClick" disabled=@Disabled>
+    @if (Icon is not null)
+    {
+        <span class="icon">
+            <i class="@Icon" aria-hidden="true"></i>
+        </span>
+    }
+    <span>@Text</span>
+</button>
+
+
+@code {
+    [Parameter]
+    public string Style { get; set; }
+    [Parameter]
+    public string? Icon { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; }
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    protected bool _isLoading = false;
+
+    protected virtual async Task OnClick()
+    {
+        await Action.InvokeAsync();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,128 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.RecalculateNurseQuarterStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
+
+@inject IMapper _mapper
+@inject IMediator _mediatr
+@inject IExceptionHandler _exceptionHandler
+
+<tr>
+    <td class="no">@No</td>
+    <td class="name-col">
+        <div class="name">
+            <p>@Nurse.Surname</p>
+            <p>@Nurse.Name</p>
+        </div>
+        <Button Text="!" Style="is-small is-danger is-outlined" />
+    </td>
+    @foreach (var workDay in _scheduleNurse.NurseWorkDays)
+    {
+        <ScheduleShift WorkDay=workDay Day=@ScheduleData.Days.First(d=>d.Date.Day == workDay.Day)
+                   MorningShifts="QuarterData.MorningShifts" OnChange="ScheduleData.RequestScheduleRecalculation" ReadOnly=ScheduleData.ReadOnly
+                   SelectTimeOffFrom="StartSelectingNewTimeOff" SelectTimeOffTo="EndSelectingNewTimeOff" />
+    }
+    @if (ScheduleData.CurrentStatsDipslayed == StatsDisplayed.Schedule)
+    {
+        <td class="summary">@((ScheduleData.ScheduleStats.WorkTimeInMonth - _scheduleNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+        <td class="summary">@_scheduleNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
+        <td class="summary">@_scheduleNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
+        <td class="summary">@_scheduleNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
+        <td class="summary">@_scheduleNurseStats.NightHoursAssigned.GetTotalHoursAndMinutes()</td>
+    }
+    else
+    {
+        <td class="summary">@((QuarterData.QuarterStats.WorkTimeInQuarter - _quarterNurseStats.AssignedWorkTime).GetTotalHoursAndMinutes())</td>
+        <td class="summary">@_quarterNurseStats.TimeOffAssigned.GetTotalHoursAndMinutes()</td>
+        <td class="summary">@_quarterNurseStats.TimeOffToAssign.GetTotalHoursAndMinutes()</td>
+        <td class="summary">@_quarterNurseStats.HolidayHoursAssigned.GetTotalHoursAndMinutes()</td>
+        <td class="summary">@_quarterNurseStats.NightHoursAssigned.GetTotalHoursAndMinutes()</td>
+    }
+</tr>
+
+
+@code {
+    [Parameter]
+    public int No { get; set; }
+    [Parameter]
+    public NurseViewModel Nurse { get; set; }
+    [Parameter]
+    public QuarterDataWrapper QuarterData { get; set; }
+    [Parameter]
+    public ScheduleDataWrapper ScheduleData { get; set; }
+
+    [Parameter]
+    public EventCallback<NewAbsenceSelection> OnAbsenceSelected { get; set; }
+
+
+    private NurseStatsViewModel _scheduleNurseStats => ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId];
+    private NurseStatsViewModel _quarterNurseStats => QuarterData.QuarterStats.NurseStats[Nurse.NurseId];
+    private ScheduleNurseViewModel _scheduleNurse => ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == Nurse.NurseId);
+
+    private NewAbsenceSelection? _newAbsenceSelection;
+
+    public async Task RecalcuateRowStatsAsync()
+    {
+        try
+        {
+            await RecalcuateScheduleRowStatsAsync();
+            await RecalcuateQuarterRowStatsAsync();
+            ScheduleData.RequestScheduleViewRefresh();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task RecalcuateScheduleRowStatsAsync()
+    {
+        var request = new RecalculateNurseScheduleStatsRequest
+            {
+                DepartamentId = QuarterData.Quarter.DepartamentId,
+                Year = QuarterData.Quarter.Year,
+                Month = ScheduleData.Schedule.Month,
+                ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(_scheduleNurse),
+            };
+
+        ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task RecalcuateQuarterRowStatsAsync()
+    {
+        var request = new RecalculateNurseQuarterStatsRequest
+            {
+                DepartamentId = QuarterData.Quarter.DepartamentId,
+                Year = QuarterData.Quarter.Year,
+                Month = ScheduleData.Schedule.Month,
+                CurrentScheduleNurseStats = _mapper
+                                .Map<RecalculateNurseQuarterStatsRequest.NurseStatsRequest>(_scheduleNurseStats),
+            };
+
+        QuarterData.QuarterStats.NurseStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
+    }
+
+
+    private void StartSelectingNewTimeOff(int day)
+    {
+        _newAbsenceSelection = new NewAbsenceSelection
+            {
+                From = day,
+                Month = ScheduleData.Schedule.Month,
+                Year = QuarterData.Quarter.Year,
+                Nurse = Nurse,
+            };
+    }
+
+    private async Task EndSelectingNewTimeOff(int day)
+    {
+        if(_newAbsenceSelection is null)
+        {
+            return;
+        }
+
+        _newAbsenceSelection.To = day;
+
+        await OnAbsenceSelected.InvokeAsync(_newAbsenceSelection);
+
+        _newAbsenceSelection = null;
+    }
+}

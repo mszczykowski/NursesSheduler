@@ -1,0 +1,119 @@
+﻿
+
+<ErrorModal @ref=_errorModal />
+
+
+<EditForm EditContext="@_editContext">
+    <DataAnnotationsValidator />
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Początek</label>
+                    <div class="control">
+                        <InputDate class="input" @bind-Value="_absenceForm.From" min="@GetMinDate()" max="@GetMaxDate()" />
+                        <div class="help is-danger">
+                            <ValidationMessage For="@(() => _absenceForm.From)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Koniec</label>
+                    <InputDate class="input" @bind-Value="_absenceForm.To" min="@GetMinDate()" max="@GetMaxDate()" />
+                    <div class="help is-danger">
+                        <ValidationMessage For="@(() => _absenceForm.To)" />
+                    </div>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="field">
+                    <label class="label">Typ</label>
+                    <div class="select">
+                        <InputSelect @bind-Value="_absenceForm.Type">
+                            @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                            {
+                                <option value="@absenceType">@absenceType.GetEnumDisplayName()</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <div class="has-text-danger">
+                    <ValidationSummary />
+                </div>
+            </div>
+            <div class="level-item">
+                <LoadingButton Style="is-success" Text="Dodaj nieobecność" Icon="fas fa-plus" Action="OnSubmit" />
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int Year { get; set; }
+    [Parameter]
+    public int NurseId { get; set; }
+    [Parameter]
+    public EventCallback<AbsenceFormViewModel> SaveAbsence { get; set; }
+
+    private EditContext _editContext;
+    private ErrorModal _errorModal;
+    private AbsenceFormViewModel _absenceForm = new();
+
+    public void ResetForm()
+    {
+        _absenceForm.NurseId = NurseId;
+
+        if (Year == DateTime.Now.Year)
+        {
+            _absenceForm.From = DateOnly.FromDateTime(DateTime.Now);
+            _absenceForm.To = DateOnly.FromDateTime(DateTime.Now);
+        }
+        else
+        {
+            _absenceForm.From = new DateOnly(Year, 1, 1);
+            _absenceForm.To = new DateOnly(Year, 1, 1);
+        }
+    }
+
+    public void HandleInvalidAbsence(AbsenceVeryficationResult result)
+    {
+        _errorModal.ShowModal(result.GetEnumDisplayName());
+    }
+
+    private async Task OnSubmit()
+    {
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
+        await SaveAbsence.InvokeAsync(_absenceForm);
+    }
+
+    protected override void OnInitialized()
+    {
+        ResetForm();
+
+        _editContext = new(_absenceForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        base.OnInitialized();
+    }
+
+    private string GetMinDate()
+    {
+        return $"{Year}-01-01";
+    }
+
+    private string GetMaxDate()
+    {
+        return $"{Year}-12-31";
+    }
+}

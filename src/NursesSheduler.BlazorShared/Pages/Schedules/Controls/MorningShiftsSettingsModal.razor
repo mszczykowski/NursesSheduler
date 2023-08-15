@@ -1,0 +1,143 @@
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.UpsertMorningShifts
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
+
+@inherits ModalBase
+
+@inject IMapper _mapper;
+@inject IMediator _mediatr;
+@inject IExceptionHandler _exceptionHandler;
+
+@if (_morningShiftsForm is not null && CurrentQuarterData.QuarterStats is not null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Ustawienia ranków</p>
+                <button class="delete" aria-label="close" @onclick="ChangeVisibility"></button>
+            </header>
+            <EditForm EditContext="@_editContext">
+                <ObjectGraphDataAnnotationsValidator />
+                <section class="modal-card-body">
+                    <p>Reszta niepodzielna na 12 godzinne dyżury: <b>@CurrentQuarterData.QuarterStats.TimeForMorningShifts.GetTotalHoursAndMinutes()</b></p>
+                    <br />
+                    @for(int i = 0; i < _morningShiftsForm.MorningShifts.Length; i++)
+                    {
+                        int copy = i;
+                        <fieldset disabled=@_morningShiftsForm.MorningShifts[copy].ReadOnly>
+                            <TimeSpanInput Label=@GetInputLabel(_morningShiftsForm.MorningShifts[copy].Index) @bind-Value="_morningShiftsForm.MorningShifts[copy].ShiftLength" ValidationFor="@(() => _morningShiftsForm.MorningShifts[copy].ShiftLength)" />
+                        </fieldset>
+                    }
+                    <p>Ranków użytych w <b>zamkniętych grafikach</b> nie można edytować!</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="footer-buttons">
+                        <Button Text="Anuluj" Action="base.ChangeVisibility"/>
+                        <Button Style="is-info" Text="Przelicz" Action="OnRecalculate" Disabled=(!CanEdit())/>
+                        <LoadingButton Style="is-success" Text="Zapisz" Action="OnSubmit" Disabled=(!CanSave())/>
+                    </div>
+                </footer>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public QuarterDataWrapper CurrentQuarterData { get; set; }
+    [Parameter]
+    public ScheduleDataWrapper CurrentScheduleData { get; set; }
+    [Parameter]
+    public ScheduleDataWrapper PreviousScheduleData { get; set; }
+
+    private MorningShiftsFormViewModel _morningShiftsForm;
+    private EditContext _editContext;
+
+
+    public override void ShowModal()
+    {
+        _morningShiftsForm = new MorningShiftsFormViewModel(CurrentQuarterData.MorningShifts);
+        _editContext = new(_morningShiftsForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+        
+
+        base.ChangeVisibility();
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            if (!CanEdit() || !_morningShiftsForm.IsDirty(CurrentQuarterData.MorningShifts) || !_editContext.Validate())
+            {
+                return;
+            }
+
+            var request = new UpsertMorningShiftsRequest
+                {
+                    QuarterId = CurrentQuarterData.Quarter.QuarterId,
+                    MorningShifts = _mapper
+                                .Map<IEnumerable<UpsertMorningShiftsRequest.MorningShiftRequest>>(_morningShiftsForm
+                                    .MorningShifts
+                                    .Where(m => !m.ReadOnly)),
+                };
+            var response = await _mediatr.Send(request);
+
+            CurrentQuarterData.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
+
+            CurrentScheduleData.RequestScheduleRecalculation();
+            if (PreviousScheduleData.Schedule is not null
+                && PreviousScheduleData.Schedule.QuarterId == CurrentQuarterData.Quarter.QuarterId)
+            {
+                PreviousScheduleData.RequestScheduleRecalculation();
+            }
+
+            base.ChangeVisibility();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task OnRecalculate()
+    {
+        try
+        {
+            if (!CanEdit())
+            {
+                return;
+            }
+
+            var request = new CalculateMorningShiftsRequest
+                {
+                    TimeForMorningShifts = CurrentQuarterData.QuarterStats.TimeForMorningShifts,
+                    DepartamentId = CurrentQuarterData.Quarter.DepartamentId,
+                };
+            var response = await _mediatr.Send(request);
+
+            _morningShiftsForm.MorningShifts = _mapper.Map<MorningShiftViewModel[]>(response);
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private bool CanSave()
+    {
+        return CanEdit() && _morningShiftsForm.IsDirty(CurrentQuarterData.MorningShifts);
+    }
+
+    private bool CanEdit()
+    {
+        return _morningShiftsForm.MorningShifts.Any(s => !s.ReadOnly);
+    }
+
+    private string GetInputLabel(MorningShiftIndexes index)
+    {
+        return "Długość ranka " + ((int)index + 1);
+    }
+}

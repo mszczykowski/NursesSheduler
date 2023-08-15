@@ -1,0 +1,51 @@
+﻿@page "/nurses/add"
+
+@inherits ComponenentUsingDepartament
+
+@using NursesScheduler.BlazorShared.Pages.Nurses.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.AddNurse
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler
+
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Dodaj nowego pracownika</p>
+            </div>
+        </div>
+    </div>
+    <NurseForm Nurse=_nurse UseTeams=CurrentDepartamentStore.CurrentDepartament.UseTeamsSetting SaveNurse="SaveNurse" />
+</div>
+
+
+@code {
+    private NurseViewModel _nurse;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _nurse = new NurseViewModel();
+        _nurse.DepartamentId = CurrentDepartamentStore.CurrentDepartament.DepartamentId;
+    }
+
+    private async Task SaveNurse()
+    {
+        try
+        {
+            var request = _mapper.Map<AddNurseRequest>(_nurse);
+            var response = await _mediatr.Send(request);
+
+            NavigationManager.NavigateTo("/nurses");
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+}
+

@@ -1,0 +1,36 @@
+﻿@inherits YesNoModal
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    [Parameter]
+    public EventCallback DeleteAction { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        base._title = "Usuń";
+        base._yesText = "Usuń";
+        return base.OnInitializedAsync();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        base._yesAction = DeleteAction;
+
+        return base.OnParametersSetAsync();
+    }
+
+    public void ShowModal(string deletedObjectName)
+    {
+        SetModalContent(deletedObjectName);
+        ChangeVisibility();
+    }
+
+    public void SetModalContent(string deletedObjectName)
+    {
+        base._content = $"<p>Czy na pewno chcesz usunąć <b>{deletedObjectName}</b>?</p>" +
+            "<section>Tej operecji nie da się cofnąć.</section>";
+    }
+}

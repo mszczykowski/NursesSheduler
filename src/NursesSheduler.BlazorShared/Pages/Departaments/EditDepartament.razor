@@ -1,0 +1,84 @@
+﻿@page "/departaments/edit/{Id:int}"
+
+@using NursesScheduler.BlazorShared.Pages.Departaments.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptonHandler
+@inject NavigationManager _navigationManager
+
+<div class='container'>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item has-text-centered">
+                <p class="title">Edytuj oddział</p>
+            </div>
+        </div>
+    </div>
+
+    @if (_departament == null)
+    {
+        <LoadingSpinner />
+    }
+    else
+    {
+        <DepartamentForm Departament=@_departament SaveDepartament="SaveDepartament" IsEdit=true />
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected DepartamentViewModel _departament;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadDepartament();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task LoadDepartament()
+    {
+        try
+        {
+            var request = new GetDepartamentRequest
+                {
+                    DepartamentId = Id
+                };
+            var response = await _mediatr.Send(request)
+                ?? throw new EntityNotFoundException(Id, nameof(DepartamentViewModel));
+
+            _departament = _mapper.Map<DepartamentViewModel>(response);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _exceptonHandler.HandleException(e);
+        }
+
+    }
+
+    protected async void SaveDepartament()
+    {
+        try
+        {
+            var request = _mapper.Map<EditDepartamentRequest>(_departament);
+            var response = await _mediatr.Send(request);
+
+            _navigationManager.NavigateTo("/departaments");
+        }
+        catch (Exception e)
+        {
+            _exceptonHandler.HandleException(e);
+        }
+    }
+}

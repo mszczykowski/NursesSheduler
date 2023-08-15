@@ -1,0 +1,54 @@
+﻿<ScheduleHeader QuarterData=QuarterData ScheduleData=ScheduleData />
+<table class="table-schedule">
+    <thead>
+        <tr>
+            <th class="no">L.p.</th>
+            <th class="name-col">Pracownik</th>
+            @foreach (var day in ScheduleData.Days)
+            {
+                <th class="@ScheduleCssHelper.GetDayClass(day) day">
+                    <div class="tooltip">
+                        <p>@day.ToString()</p>
+                        <p>@day.GetDayOfWeekAbreviation()</p>
+                        @if (day.IsHoliday && !String.IsNullOrEmpty(day.HolidayName))
+                        {
+                            <div class="tooltiptext">@day.HolidayName</div>
+                        }
+                    </div>
+                </th>
+            }
+            <th class="summary">Poz. czas pracy</th>
+            <th class="summary">Przyp. urlop</th>
+            <th class="summary">Urlop do przyp.</th>
+            <th class="summary">Godz. świąt.</th>
+            <th class="summary">Godz. noc.</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 1;
+            foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
+            {
+                <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
+                     ScheduleData=ScheduleData OnAbsenceSelected="OnAbsenceSelected"/>
+            }
+        }
+    </tbody>
+</table>
+
+
+@code {
+    [Parameter]
+    public IEnumerable<NurseViewModel> Nurses { get; set; }
+    [Parameter]
+    public QuarterDataWrapper QuarterData { get; set; }
+    [Parameter]
+    public ScheduleDataWrapper ScheduleData { get; set; }
+    [Parameter]
+    public EventCallback<NewAbsenceSelection> OnAbsenceSelected { get; set; }
+
+    private void RefreshSchedule()
+    {
+        StateHasChanged();
+    }
+}

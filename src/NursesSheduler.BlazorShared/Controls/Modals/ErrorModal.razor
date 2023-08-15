@@ -1,0 +1,15 @@
+﻿@inherits OkModal
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code{
+    protected override Task OnInitializedAsync()
+    {
+        base.Title = "Błąd!";
+        base.ButtonStyle = "is-danger";
+        return base.OnInitializedAsync();
+    }
+}
+

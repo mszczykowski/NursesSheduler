@@ -1,0 +1,101 @@
+﻿@inject CurrentDepartamentStore currentDepartamentStore;
+
+
+@if (isNavVisible)
+{
+    <nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+        <div class="container is-fluid">
+            <div class="navbar-start">
+                <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/scheduleView">
+                    <p class="control">
+                        <span>
+                            <i class="far fa-calendar-days" aria-hidden="true"></i>
+                        </span>
+                        <span>
+                            Grafiki
+                        </span>
+                    </p>
+                </NavLink>
+                <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Nurses">
+                    <p class="control">
+                        <span>
+                            <i class="fas fa-user-nurse" aria-hidden="true"></i>
+                        </span>
+                        <span>
+                            Pracownicy
+                        </span>
+                    </p>
+                </NavLink>
+                <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Absences">
+                    <p class="control">
+                        <span>
+                            <i class="fas fa-person-walking-arrow-right" aria-hidden="true"></i>
+                        </span>
+                        <span>
+                            Nieobecności
+                        </span>
+                    </p>
+                </NavLink>
+                <NavLink ActiveClass="is-active" Match="NavLinkMatch.All" class="navbar-item" href="/Settings">
+                    <p class="control">
+                        <span>
+                            <i class="fas fa-gear" aria-hidden="true"></i>
+                        </span>
+                        <span>
+                            Ustawienia
+                        </span>
+                    </p>
+                </NavLink>
+            </div>
+
+            <div class="navbar-end">
+                <b class="navbar-item">
+                    Oddział: @departamentName
+                </b>
+                <div class="navbar-item">
+                    <NavLink class="button is-outlined" href="/departaments">Zmień oddział</NavLink>
+                </div>
+            </div>
+        </div>
+    </nav>
+}
+
+
+@code {
+    private bool isNavVisible;
+    private string departamentName;
+    protected override void OnInitialized()
+    {
+        SetNavbarVisibility();
+
+        currentDepartamentStore.OnChange += OnDepartamentChange;
+    }
+
+    public void Dispose()
+    {
+        currentDepartamentStore.OnChange -= OnDepartamentChange;
+    }
+
+    private async void OnDepartamentChange()
+    {
+        await InvokeAsync(() =>
+        {
+            SetNavbarVisibility();
+        });
+    }
+
+    private void SetNavbarVisibility()
+    {
+        if (currentDepartamentStore.CurrentDepartament == null)
+        {
+            departamentName = "";
+            isNavVisible = false;
+        }
+        else
+        {
+            departamentName = currentDepartamentStore.CurrentDepartament.Name;
+            isNavVisible = true;
+        }
+        StateHasChanged();
+    }
+}

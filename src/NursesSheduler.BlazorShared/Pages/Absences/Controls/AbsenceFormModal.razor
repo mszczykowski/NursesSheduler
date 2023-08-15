@@ -1,0 +1,152 @@
+﻿@inherits ModalBase
+
+@if (_absenceForm is not null)
+{
+    <div class="modal @CssHelper.SetIsActive(_isVisible)">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                @if (IsEdit)
+                {
+                    <p class="modal-card-title">Edytuj nieobecność: @_absence.ToString()</p>
+                }
+                else
+                {
+                    <p class="modal-card-title">Dodaj nieobecność: @_nurse.ToString()</p>
+                }
+                <button class="delete" aria-label="close" @onclick="(() => base.ChangeVisibility())"></button>
+            </header>
+            <EditForm EditContext="@_editContext">
+                <DataAnnotationsValidator />
+                <section class="modal-card-body">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <fieldset disabled=@(!_datePickersEnabled)>
+                                    <div class="field">
+                                        <label class="label">Początek</label>
+                                        <div class="control">
+                                            <InputDate class="input" @bind-Value="_absenceForm.From" min="@GetMinDate()" max="@GetMaxDate()" />
+                                            <div class="help is-danger">
+                                                <ValidationMessage For="@(() => _absenceForm.From)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="level-item">
+                                <fieldset disabled=@(!_datePickersEnabled)>
+                                    <div class="field">
+                                        <label class="label">Koniec</label>
+                                        <InputDate class="input" @bind-Value="_absenceForm.To" min="@GetMinDate()" max="@GetMaxDate()" />
+                                        <div class="help is-danger">
+                                            <ValidationMessage For="@(() => _absenceForm.To)" />
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div class="level-item">
+                                <div class="field">
+                                    <label class="label">Typ</label>
+                                    <div class="select">
+                                        <InputSelect @bind-Value="_absenceForm.Type">
+                                            @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                                            {
+                                            <option value="@absenceType">@absenceType.GetEnumDisplayName()</option>
+                                            }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="has-text-danger">
+                    <ValidationSummary />
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <div class="footer-buttons">
+                    <Button Text="Anuluj" Action="(() => base.ChangeVisibility())" />
+                    <LoadingButton Style="is-success" Text="Zapisz nieobecność" Action=@(async () => await SaveAbsence.InvokeAsync()) />
+                </div>
+            </footer>
+        </EditForm>
+    </div>
+</div>
+}
+
+
+@code {
+    [Parameter]
+    public EventCallback<AbsenceFormViewModel> SaveAbsence { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    private NurseViewModel _nurse;
+    private AbsenceViewModel _absence;
+    private AbsenceFormViewModel _absenceForm;
+    private EditContext _editContext;
+
+    private bool _datePickersEnabled;
+    private int _month;
+    private int _year;
+
+    public void ShowModal(AbsenceViewModel existingAbsnece, int year)
+    {
+        _datePickersEnabled = true;
+        _absence = existingAbsnece;
+
+        _absenceForm = new AbsenceFormViewModel
+            {
+                AbsenceId = existingAbsnece.AbsenceId,
+                From = new DateOnly(year, existingAbsnece.Month, existingAbsnece.Days.Min()),
+                To = new DateOnly(year, existingAbsnece.Month, existingAbsnece.Days.Max()),
+            };
+
+        _editContext = new(_absenceForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+
+        base.ChangeVisibility();
+    }
+
+    public void ShowModal(NewAbsenceSelection newAbsenceSelection)
+    {
+        _datePickersEnabled = false;
+
+        _nurse = newAbsenceSelection.Nurse;
+        _year = newAbsenceSelection.Year;
+
+        _absenceForm = new AbsenceFormViewModel
+            {
+                From = new DateOnly(newAbsenceSelection.Year, newAbsenceSelection.Month, newAbsenceSelection.From),
+                To = new DateOnly(newAbsenceSelection.Year, newAbsenceSelection.Month, newAbsenceSelection.To),
+                NurseId = _nurse.NurseId,
+            };
+
+        _editContext = new(_absenceForm);
+        _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
+
+        base.ChangeVisibility();
+    }
+
+    private string GetMinDate()
+    {
+        if (IsEdit)
+        {
+            return "{_year}-{_month}-01";
+        }
+
+        return $"{_year}-01-01";
+    }
+
+    private string GetMaxDate()
+    {
+        if (IsEdit)
+        {
+            return $"{_year}-{_month}-31";
+        }
+
+        return $"{_year}-12-31";
+    }
+}

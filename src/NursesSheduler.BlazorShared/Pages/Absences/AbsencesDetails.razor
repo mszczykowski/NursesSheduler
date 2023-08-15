@@ -1,0 +1,238 @@
+﻿@page "/absences/details/{NurseId:int}/{Year:int}"
+
+@inherits ComponenentUsingDepartament
+
+@using NursesScheduler.BlazorShared.Pages.Absences.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries.GetAbsences
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.EditAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNurse
+@using NursesScheduler.BusinessLogic.Extensions
+
+@inject IMediator _mediatr;
+@inject IMapper _mapper;
+@inject IExceptionHandler _exceptionHandler;
+
+<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" />
+
+
+@if (_nurse is null || _absencesSummaries is null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="container">
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item has-text-centered">
+                    <p class="title">Nieobecności: @_nurse.ToString()</p>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+                    <label class="label">Rok</label>
+                </div>
+                <div class="level-item">
+                    <YearSelect YearPickerViewModel=_selectedYear FirstYear=@_absencesSummaries.Min(a => a.Year)
+                            OnChange="SelectedYearChanged" />
+                </div>
+                <div class="level-item">
+                    <a class="button is-info" href="/Absences">Powrót</a>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Urlop wypoczynkowy
+                </p>
+                <div class="card-header-icon">
+                    <a @onclick="(() => _editAbsencesSummaryModal.ShowModal(_currentAbsencesSummary))">Edytuj</a>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <p>
+                                <b>Przysługujący urlop:</b> @_nurse.PTOentitlement dni
+                            </p>
+                        </div>
+                        <div class="level-item">
+                            <p>
+                                <b>Pozostały urlop:</b> @_currentAbsencesSummary.PTOTimeLeft.GetTotalHoursAndMinutes()
+                            </p>
+                        </div>
+                        <div class="level-item">
+                            @if (_selectedYear.YearNumber <= DateTime.Now.Year)
+                            {
+                                <p>
+                                    <b>Zaległy urlop:</b> @_currentAbsencesSummary.PTOTimeLeftFromPreviousYear.GetTotalHoursAndMinutes()
+                                </p>
+                            }
+                        </div>
+                        <div class="level-item">
+                        </div>
+                    </div>
+                    <div class="level-right">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Przypisane godziny nieobecności
+                </p>
+            </header>
+            <div class="card-content">
+                <div class="level">
+                    <div class="level-left">
+                        @foreach (var absenceType in (AbsenceTypes[])Enum.GetValues(typeof(AbsenceTypes)))
+                        {
+                            <div class="level-item">
+                                <div>
+                                    <p>
+                                        <b>@absenceType.GetEnumDisplayName():</b> @_currentAbsencesSummary.Absences.Where(a => a.Type == absenceType).SumTimeSpan(a => a.AssignedWorkingHours).GetTotalHoursAndMinutes()
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Dodaj nową nieobecność
+                </p>
+            </header>
+            <div class="card-content">
+                <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" Year=_currentAbsencesSummary.Year 
+                    NurseId=_nurse.NurseId/>
+            </div>
+        </div>
+        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences Year=_currentAbsencesSummary.Year/>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int NurseId { get; set; }
+    [Parameter]
+    public int Year { get; set; }
+
+    private YearPickerViewModel _selectedYear;
+
+    private NurseViewModel _nurse;
+
+    private IEnumerable<AbsencesSummaryViewModel> _absencesSummaries;
+    private AbsencesSummaryViewModel _currentAbsencesSummary;
+
+    private AbsenceForm _newAbsenceForm;
+
+    private EditAbsencesSummaryModal _editAbsencesSummaryModal;
+    
+
+    protected override Task OnParametersSetAsync()
+    {
+        _selectedYear = new YearPickerViewModel(Year);
+
+        return base.OnParametersSetAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            await LoadNurse();
+            await LoadAbsencesSummary();
+            _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _selectedYear.YearNumber);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task LoadNurse()
+    {
+        var request = new GetNurseRequest
+            {
+                NurseId = NurseId
+            };
+
+        var response = await _mediatr.Send(request);
+        if (response == null)
+        {
+            NavigationManager.NavigateTo("/notFound");
+        }
+
+        _nurse = _mapper.Map<NurseViewModel>(response);
+    }
+
+    private async Task LoadAbsencesSummary()
+    {
+        var request = new GetAbsencesSummaryRequest
+            {
+                NurseId = NurseId
+            };
+        var response = await _mediatr.Send(request);
+
+        if (response == null)
+            NavigationManager.NavigateTo("/notFound");
+
+        _absencesSummaries = _mapper.Map<IEnumerable<AbsencesSummaryViewModel>>(response);
+    }
+
+    private async Task AddAbsence(AbsenceFormViewModel _newAbsence)
+    {
+        try
+        {
+            var response = await _mediatr.Send(_mapper.Map<AddAbsenceRequest>(_newAbsence));
+
+            if (response is null)
+            {
+                throw new EntityNotAddedException(nameof(AbsenceViewModel));
+            }
+
+            if ((AbsenceVeryficationResult)response.VeryficationResult != AbsenceVeryficationResult.Valid)
+            {
+                _newAbsenceForm.HandleInvalidAbsence((AbsenceVeryficationResult)response.VeryficationResult);
+                return;
+            }
+
+            _currentAbsencesSummary.Absences.AddRange(_mapper.Map<IEnumerable<AbsenceViewModel>>(response.Absences));
+
+            _newAbsenceForm.ResetForm();
+
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private void SelectedYearChanged()
+    {
+        _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _selectedYear.YearNumber);
+        _newAbsenceForm.ResetForm();
+    }
+}

@@ -1,0 +1,619 @@
+﻿@page "/scheduleView"
+
+@using Append.Blazor.Printing
+@using BlazorTemplater
+@using NursesScheduler.BlazorShared.Pages.Absences.Controls
+@using NursesScheduler.BlazorShared.Pages.Schedules.Controls
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.AddAbsence
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Days.Queries.GetMonthDays
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.DepartamentsSettings.Queries.GetDepartamentSettings
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Documents.Commands.GeneratePdfDocument
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.CloseSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.DeleteSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
+
+@inherits ComponenentUsingDepartament
+
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptionHandler
+@inject IPrintingService _printingService
+
+<ErrorModal @ref="_errorModal" />
+<InfoModal @ref="_infoModal" />
+
+<MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
+                            CurrentScheduleData=_currentScheduleData PreviousScheduleData=_previousScheduleData />
+
+<SolverSettingsModal @ref="_solverSettingsModal" SolverSettings=_solverSettings />
+
+<SolverModal @ref="_solverModal" CurrentQuarterData=_currentQuarterData
+             CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings />
+
+<DeleteModal @ref="_deleteModal" DeleteAction="DeleteSchedule" />
+
+<CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseSchedule"/>
+
+<AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsence"/>
+
+@if (_isLoading)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="schedule-view">
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <div class="tabs is-toggle is-toggle-rounded">
+                        <ul>
+                            <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Previous)">
+                                <a @onclick="@(() => SetScheduleVisibility(ScheduleDisplayed.Previous))">
+                                    <span class="icon is-small @CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)"><i class="fa fa-backward" aria-hidden="true"></i></span>
+                                    <span class="@CssHelper.SetDisbaled(!_isPreviousScheduleAvailable)">Podgląd poprzedniego</span>
+                                </a>
+                            </li>
+                            <li class="@CssHelper.SetIsActive(_currentDisplayedSchedule == ScheduleDisplayed.Current)">
+                                <a @onclick="@(() => SetScheduleVisibility(ScheduleDisplayed.Current))">
+                                    <span>Aktualnie edytowany</span>
+                                    <span class="icon is-small"><i class="fa fa-forward" aria-hidden="true"></i></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+                    <a @onclick="(() => _morningShiftsSettingsModal.ShowModal())">Konfiguracja ranków</a>
+                </div>
+                <div class="level-item">
+                    <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
+                </div>
+                <div class="level-item">
+                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
+                </div>
+            </div>
+        </div>
+        <div class="level is-boxed">
+            <div class="level-left">
+                <div class="level-item">
+                    <label class="label">Miesiąc</label>
+                </div>
+                <div class="level-item">
+                    <MonthSelect MonthPickerViewModel=_pickedDate OnChange="OnSeletedDateChangedAsync" />
+                </div>
+                <div class="level-item">
+                    <label class="label">Rok</label>
+                </div>
+                <div class="level-item">
+                    <YearSelect YearPickerViewModel=_pickedDate FirstYear=CurrentDepartamentStore.CurrentDepartament.CreationYear
+                            OnChange="OnSeletedDateChangedAsync" />
+                </div>
+                <div class="level-item">
+                    <Button Style="is-info" Text="Bieżący miesiąc" Action="OnCurrentDateClickAsync" />
+                </div>
+            </div>
+            <div class="level-right">
+                @if (_currentDisplayedSchedule == ScheduleDisplayed.Previous)
+                {
+                    <div class="level-item">
+                        <p class="control">
+                            <b>Podgląd</b>
+                        </p>
+                    </div>
+                }
+                else if (_currentScheduleData.Schedule.IsClosed)
+                {
+                    <div class="level-item">
+                        <p class="control">
+                            <b>Grafik zamknięty</b>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="level-item">
+                        <Button Style="is-danger is-inverted" Text="Usuń" Action="@(() => _deleteModal.ShowModal($"grafik: {_pickedDate.ToString()}"))" 
+                            Disabled=@(!ShouldDisplayTable() || _deleteDisabled)/>
+                    </div>
+                    <div class="level-item">
+                        <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable()/>
+                    </div>
+                    <div class="level-item">
+                        <Button Style="is-info" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
+                        Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable()/>
+                    </div>
+                    <div class="level-item">
+                        <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="@(() => _closeScheduleModal.ShowModal(_pickedDate.ToString()))" Disabled=!ShouldDisplayTable()/>
+                    </div>
+                    <div class="level-item">
+                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (!ShouldDisplayTable())
+    {
+        <br />
+        <div class="has-text-centered">
+            <h4 class="subtitle is-4">Najpierw <a href="/nurses/add">dodaj</a> pracowników</h4>
+        </div>
+    }
+    else
+    {
+        @if (_currentDisplayedSchedule == ScheduleDisplayed.Current)
+        {
+            <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData 
+                OnAbsenceSelected="(NewAbsenceSelection selection) => _absenceFormModal.ShowModal(selection)"/>
+        }
+        else
+        {
+            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData OnAbsenceSelected="() => {}"/>
+        }
+    }
+}
+
+
+@code {
+    private bool _deleteDisabled;
+
+    private IEnumerable<NurseViewModel> _nurses;
+
+    private ScheduleDataWrapper _currentScheduleData = new();
+    private QuarterDataWrapper _currentQuarterData = new();
+
+    private ScheduleDataWrapper _previousScheduleData = new();
+    private QuarterDataWrapper _previousQuarterData = new();
+
+    private SolverSettingsViewModel _solverSettings;
+
+    private ModalBase _morningShiftsSettingsModal;
+    private ModalBase _solverSettingsModal;
+    private OkModal _errorModal;
+    private OkModal _infoModal;
+    private SolverModal _solverModal;
+    private DeleteModal _deleteModal;
+    private CloseScheduleModal _closeScheduleModal;
+    private AbsenceFormModal _absenceFormModal;
+
+    private bool _isPreviousScheduleAvailable => _previousScheduleData.Schedule is not null;
+    private bool _holidaysLoaded;
+
+    private DatePickerViewModel _pickedDate = new DatePickerViewModel
+        {
+            YearNumber = DateTime.Now.Year,
+            MonthNumber = DateTime.Now.Month,
+        };
+
+    private bool _isLoading = true;
+
+    private ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isLoading = true;
+
+            try
+            {
+                await SetNursesAsync();
+                InitializeSolverSettings();
+
+                await ChangeScheduleAsync();
+
+                _currentScheduleData.RecalculateScheduleStats += (async () => await SetCurrentStats());
+                _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
+                _previousScheduleData.RecalculateScheduleStats += (() => StateHasChanged());
+
+                _isLoading = false;
+                base.StateHasChanged();
+
+                if (!_holidaysLoaded)
+                {
+                    _errorModal
+                        .ShowModal("Nie wczytano świąt!\nUpewnij się że masz połączenie z internetem i uruchom ponownie program");
+                }
+            }
+            catch (Exception e)
+            {
+                _exceptionHandler.HandleException(e);
+            }
+        }
+    }
+
+    private async Task OnSeletedDateChangedAsync()
+    {
+        _isLoading = true;
+        await Task.Delay(1);
+
+        try
+        {
+            await ChangeScheduleAsync();
+        }
+        catch (Exception ex)
+        {
+            _exceptionHandler.HandleException(ex);
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task OnCurrentDateClickAsync()
+    {
+        _pickedDate.MonthNumber = DateTime.Now.Month;
+        _pickedDate.YearNumber = DateTime.Now.Year;
+
+        await OnSeletedDateChangedAsync();
+    }
+
+    private async Task ChangeScheduleAsync()
+    {
+        await SetCurrentQuarter();
+        await SetCurrentSchedule();
+        await SetCurrentStats();
+
+        await SetPreviousSchedule();
+        if (_previousScheduleData.Schedule is not null)
+        {
+            await SetPreviousQuarter();
+            await SetPreviousStats();
+        }
+
+        ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
+    }
+
+    private async Task SetCurrentQuarter()
+    {
+        _currentQuarterData.Quarter = await GetOrAddQuarterAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+        _currentQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
+    }
+
+    private async Task SetCurrentSchedule()
+    {
+        _currentScheduleData.Days = await GetMonthDaysAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+
+        _currentScheduleData.Schedule = await GetScheduleAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
+        _deleteDisabled = false;
+        if (_currentScheduleData.Schedule is null)
+        {
+            _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
+                _currentQuarterData.Quarter.QuarterId);
+        }
+
+        _currentScheduleData.ReadOnly = _currentScheduleData.Schedule.IsClosed;
+    }
+
+    private async Task SetCurrentStats()
+    {
+        _currentScheduleData.ScheduleStats = await GetScheduleStatsAsync(_currentQuarterData.Quarter.Year,
+            _currentScheduleData.Schedule);
+        _currentQuarterData.QuarterStats = await GetQuarterStatsAsync(_currentQuarterData.Quarter.Year,
+            _currentScheduleData.Schedule.Month, _currentScheduleData.ScheduleStats);
+    }
+
+    private async Task SetPreviousQuarter()
+    {
+        if (_previousScheduleData.Schedule.QuarterId == _currentQuarterData.Quarter.QuarterId)
+        {
+            _previousQuarterData.MorningShifts = _currentQuarterData.MorningShifts;
+            _previousQuarterData.Quarter = _currentQuarterData.Quarter;
+            _previousQuarterData.QuarterStats = _currentQuarterData.QuarterStats;
+        }
+        else
+        {
+            _previousQuarterData.Quarter = await GetQuarterAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
+            _previousQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
+        }
+
+    }
+
+    private async Task SetPreviousSchedule()
+    {
+        _previousScheduleData.Schedule = await GetScheduleAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
+
+        if (_previousScheduleData.Schedule is null)
+        {
+            return;
+        }
+        _previousScheduleData.Days = await GetMonthDaysAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
+        _previousScheduleData.ReadOnly = true;
+    }
+
+    private async Task SetPreviousStats()
+    {
+        _previousScheduleData.ScheduleStats = await GetScheduleStatsAsync(_previousQuarterData.Quarter.Year,
+            _pickedDate.PreviousMonth);
+
+        if (_previousQuarterData.Quarter.QuarterId != _currentQuarterData.Quarter.QuarterId)
+        {
+            _previousQuarterData.QuarterStats = await GetQuarterStatsAsync(_previousQuarterData.Quarter.Year,
+                _previousScheduleData.Schedule.Month, _previousScheduleData.ScheduleStats);
+        }
+    }
+
+
+    private async Task<QuarterViewModel> GetOrAddQuarterAsync(int year, int month)
+    {
+        var quarter = await GetQuarterAsync(year, month);
+        if (quarter is null)
+        {
+            quarter = await AddQuarterAsync(year, month);
+        }
+        return quarter;
+    }
+
+    private async Task<QuarterViewModel> AddQuarterAsync(int year, int month)
+    {
+        var request = new AddQuarterRequest
+            {
+                Month = month,
+                Year = year,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+        var response = await _mediatr.Send(request);
+
+        if (response is null)
+        {
+            throw new EntityNotAddedException(nameof(QuarterViewModel));
+        }
+
+        return _mapper.Map<QuarterViewModel>(response);
+    }
+
+    private async Task<QuarterViewModel?> GetQuarterAsync(int year, int month)
+    {
+        var request = new GetQuarterRequest
+            {
+                Month = month,
+                Year = year,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+        var response = await _mediatr.Send(request);
+
+        return response is not null ? _mapper.Map<QuarterViewModel>(response) : null;
+    }
+
+    private async Task SetNursesAsync()
+    {
+        var request = new GetNursesFromDepartamentRequest()
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                IncludeDeleted = true,
+            };
+
+        _nurses = _mapper.Map<IEnumerable<NurseViewModel>>(await _mediatr.Send(request));
+    }
+
+    private async Task<ScheduleViewModel?> GetScheduleAsync(int year, int month)
+    {
+        var request = new GetScheduleRequest
+            {
+                Month = month,
+                Year = year,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+            };
+
+        return _mapper.Map<ScheduleViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<ScheduleViewModel> BuildScheduleAsync(int month, int quarterId)
+    {
+        _deleteDisabled = true;
+
+        var request = new BuildScheduleRequest
+            {
+                Month = month,
+                QuarterId = quarterId,
+            };
+
+        return _mapper.Map<ScheduleViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<IEnumerable<DayViewModel>> GetMonthDaysAsync(int year, int month)
+    {
+        var request = new GetMonthDaysRequest
+            {
+                Month = month,
+                Year = year,
+            };
+
+        var response = await _mediatr.Send(request);
+
+        _holidaysLoaded = response.HolidaysLoaded;
+        return _mapper.Map<IEnumerable<DayViewModel>>(response.MonthDays);
+    }
+
+    private async Task<IEnumerable<MorningShiftViewModel>> GetMorningShiftsAsync(int quarterId)
+    {
+        var request = new GetMorningShiftsRequest
+            {
+                QuarterId = quarterId,
+            };
+
+        return _mapper.Map<IEnumerable<MorningShiftViewModel>>(await _mediatr.Send(request));
+    }
+
+
+
+    private async Task<ScheduleStatsViewModel> GetScheduleStatsAsync(int year, ScheduleViewModel schedule)
+    {
+        var request = new GetScheduleStatsFromScheduleRequest
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                Year = year,
+                Schedule = _mapper.Map<GetScheduleStatsFromScheduleRequest.ScheduleRequest>(schedule),
+            };
+
+        return _mapper.Map<ScheduleStatsViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<ScheduleStatsViewModel> GetScheduleStatsAsync(int year, int month)
+    {
+        var request = new GetScheduleStatsRequest
+            {
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                Year = year,
+                Month = month,
+            };
+
+        return _mapper.Map<ScheduleStatsViewModel>(await _mediatr.Send(request));
+    }
+
+    private async Task<QuarterStatsViewModel> GetQuarterStatsAsync(int year, int month,
+        ScheduleStatsViewModel scheduleStats)
+    {
+        var request = new GetQuarterStatsRequest
+            {
+                Month = month,
+                Year = year,
+                DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                CurrentScheduleStats = _mapper.Map<GetQuarterStatsRequest.ScheduleStatsRequest>(scheduleStats),
+            };
+
+        return _mapper.Map<QuarterStatsViewModel>(await _mediatr.Send(request));
+    }
+
+    private void InitializeSolverSettings()
+    {
+        _solverSettings =
+            new SolverSettingsViewModel(base.CurrentDepartamentStore.CurrentDepartament.DefaultGeneratorRetryValue);
+    }
+
+    private void SetScheduleVisibility(ScheduleDisplayed pickedSchedule)
+    {
+        if (pickedSchedule != ScheduleDisplayed.Previous || _isPreviousScheduleAvailable)
+        {
+            _currentDisplayedSchedule = pickedSchedule;
+        }
+    }
+
+    private void ClearSchedule()
+    {
+        foreach (var workDay in _currentScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays))
+        {
+            workDay.ShiftType = ShiftTypes.None;
+        }
+        _currentScheduleData.RequestScheduleRecalculation();
+    }
+
+    private async Task PrintScheule()
+    {
+        try
+        {
+            var documentHtmlContent = new ComponentRenderer<ScheduleTablePrintView>()
+                .Set(t => t.Nurses, _nurses)
+                .Set(t => t.QuarterData, _currentQuarterData)
+                .Set(t => t.ScheduleData, _currentScheduleData)
+                .Render();
+
+            var response = await _mediatr.Send(new GeneratePdfDocumentRequest
+                {
+                    DocumentHtmlContent = documentHtmlContent,
+                });
+
+            await _printingService.Print(response.GeneratedFilePath);
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task UpsertSchedule()
+    {
+        try
+        {
+            var request = _mapper.Map<UpsertScheduleRequest>(_currentScheduleData.Schedule);
+            var response = await _mediatr.Send(request);
+
+            if (response is null)
+            {
+                _errorModal.ShowModal("Nie znaleziono zmian!");
+                return;
+            }
+
+            _infoModal.ShowModal("Pomyślnie zapisano");
+            _deleteDisabled = false;
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task CloseSchedule()
+    {
+        try
+        {
+            var request = _mapper.Map<CloseScheduleRequest>(_currentScheduleData.Schedule);
+            await _mediatr.Send(request);
+
+            await ChangeScheduleAsync();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private async Task DeleteSchedule()
+    {
+        try
+        {
+            await _mediatr.Send(new DeleteScheduleRequest
+                {
+                    ScheduleId = _currentScheduleData.Schedule.ScheduleId,
+                });
+
+            _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
+                _currentQuarterData.Quarter.QuarterId);
+            _currentScheduleData.RequestScheduleRecalculation();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private bool ShouldDisplayTable()
+    {
+        return _currentScheduleData.Schedule is not null && _currentScheduleData.Schedule.ScheduleNurses is not null
+            && _currentScheduleData.Schedule.ScheduleNurses.Any();
+    }
+
+    private async Task SaveAbsence(AbsenceFormViewModel newAbsenceForm)
+    {
+        var response = await _mediatr.Send(_mapper.Map<AddAbsenceRequest>(newAbsenceForm));
+
+        if(response.VeryficationResult != Domain.Enums.AbsenceVeryficationResult.Valid || response.Absences is null)
+        {
+            return;
+        }
+
+        var newAbsence = _mapper.Map<AbsenceViewModel>(response);
+
+        foreach(var workDay in _currentScheduleData.Schedule.ScheduleNurses
+            .First(n => n.NurseId == newAbsenceForm.NurseId).NurseWorkDays.Where(wd => newAbsence.Days.Contains(wd.Day)))
+        {
+            workDay.IsTimeOff = true;
+        }
+        
+        _currentScheduleData.RequestScheduleRecalculation();
+    }
+}
