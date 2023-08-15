@@ -17,12 +17,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Commands.Delet
 
         public async Task<DeleteNurseResponse> Handle(DeleteNurseRequest request, CancellationToken cancellationToken)
         {
-            var nurse = await _context.Nurses.Include(n => n.NurseWorkDays).FirstOrDefaultAsync(n => n.NurseId == request.NurseId)
+            var nurse = await _context.Nurses.Include(n => n.ScheduleNurses)
+                .FirstOrDefaultAsync(n => n.NurseId == request.NurseId)
                 ?? throw new EntityNotFoundException(request.NurseId, nameof(Nurse));
 
 
             //soft delete if nurse is assinged to any shift
-            if (nurse.NurseWorkDays.Any())
+            if (nurse.ScheduleNurses.Any())
             {
                 nurse.IsDeleted = true;
             }

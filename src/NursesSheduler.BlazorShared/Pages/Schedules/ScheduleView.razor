@@ -86,7 +86,7 @@ else
                     <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
-                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
+                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheduleAsync" Disabled=!ShouldDisplayTable()/>
                 </div>
             </div>
         </div>
@@ -136,11 +136,11 @@ else
                         <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <Button Style="is-info" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
+                        <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
                         Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="ShowCloseScheduleModal" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-info" Icon="fas fa-lock" Text="Zamknij" Action="ShowCloseScheduleModal" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
                         <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertScheduleAsync" Disabled=!ShouldDisplayTable()/>
@@ -269,15 +269,15 @@ else
 
     private async Task ChangeScheduleAsync()
     {
-        await SetCurrentQuarter();
-        await SetCurrentSchedule();
-        await SetCurrentStats();
+        await SetCurrentQuarterAsync();
+        await SetCurrentScheduleAsync();
+        await SetCurrentStatsAsync();
 
-        await SetPreviousSchedule();
+        await SetPreviousScheduleAsync();
         if (_previousScheduleData.Schedule is not null)
         {
-            await SetPreviousQuarter();
-            await SetPreviousStats();
+            await SetPreviousQuarterAsync();
+            await SetPreviousStatsAsync();
         }
 
         InitializeValidationErrors();
@@ -290,13 +290,13 @@ else
         }
     }
 
-    private async Task SetCurrentQuarter()
+    private async Task SetCurrentQuarterAsync()
     {
         _currentQuarterData.Quarter = await GetOrAddQuarterAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
         _currentQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
     }
 
-    private async Task SetCurrentSchedule()
+    private async Task SetCurrentScheduleAsync()
     {
         _currentScheduleData.Days = await GetMonthDaysAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
 
@@ -311,7 +311,7 @@ else
         _currentScheduleData.ReadOnly = _currentScheduleData.Schedule.IsClosed;
     }
 
-    private async Task SetCurrentStats()
+    private async Task SetCurrentStatsAsync()
     {
         _currentScheduleData.ScheduleStats = await GetScheduleStatsAsync(_currentQuarterData.Quarter.Year,
             _currentScheduleData.Schedule);
@@ -319,7 +319,7 @@ else
             _currentScheduleData.Schedule.Month, _currentScheduleData.ScheduleStats);
     }
 
-    private async Task SetPreviousQuarter()
+    private async Task SetPreviousQuarterAsync()
     {
         if (_previousScheduleData.Schedule.QuarterId == _currentQuarterData.Quarter.QuarterId)
         {
@@ -335,7 +335,7 @@ else
 
     }
 
-    private async Task SetPreviousSchedule()
+    private async Task SetPreviousScheduleAsync()
     {
         _previousScheduleData.Schedule = await GetScheduleAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
 
@@ -347,7 +347,7 @@ else
         _previousScheduleData.ReadOnly = true;
     }
 
-    private async Task SetPreviousStats()
+    private async Task SetPreviousStatsAsync()
     {
         _previousScheduleData.ScheduleStats = await GetScheduleStatsAsync(_previousQuarterData.Quarter.Year,
             _pickedDate.PreviousMonth);
@@ -524,7 +524,7 @@ else
         _currentScheduleData.RequestScheduleRecalculation();
     }
 
-    private async Task PrintScheule()
+    private async Task PrintScheduleAsync()
     {
         try
         {

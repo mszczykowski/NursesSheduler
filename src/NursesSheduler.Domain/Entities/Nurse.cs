@@ -19,7 +19,7 @@ namespace NursesScheduler.Domain.Entities
         public int DepartamentId { get; set; }
         public virtual Departament Departament { get; set; }
 
-        public virtual ICollection<NurseWorkDay> NurseWorkDays { get; set; }
+        public virtual ICollection<ScheduleNurse> ScheduleNurses { get; set; }
         public virtual ICollection<AbsencesSummary> AbsencesSummaries { get; set; }
     }
 }

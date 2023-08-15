@@ -10,6 +10,14 @@ namespace NursesScheduler.Infrastructure.Configuration
         {
             builder.HasKey(n => n.NurseId);
 
+            builder.HasMany(n => n.ScheduleNurses)
+                .WithOne(sn => sn.Nurse)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(n => n.AbsencesSummaries)
+                .WithOne(s => s.Nurse)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(n => n.Name)
                 .IsRequired()
                 .HasMaxLength(20);

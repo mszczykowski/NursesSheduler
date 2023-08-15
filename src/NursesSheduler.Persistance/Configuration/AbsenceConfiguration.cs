@@ -11,12 +11,16 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Absence> builder)
         {
+            builder.HasKey(a => a.AbsenceId);
+
+            //builder.HasOne(a => a.AbsencesSummary)
+            //    .WithMany(s => s.Absences)
+            //    .OnDelete(DeleteBehavior.NoAction);
+
             var valueComparer = new ValueComparer<ICollection<int>>(
                 (c1, c2) => c1.SequenceEqual(c2),
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => c.ToList());
-
-            builder.HasKey(a => a.AbsenceId);
 
             builder.Property(a => a.Days)
                 .HasConversion(new ValueConverter<ICollection<int>, string>(

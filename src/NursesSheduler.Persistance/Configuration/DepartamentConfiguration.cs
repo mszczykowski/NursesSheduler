@@ -4,7 +4,7 @@ using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.Infrastructure.Configuration
 {
-    internal class DepartamentConfiguration : IEntityTypeConfiguration<Departament>
+    internal sealed class DepartamentConfiguration : IEntityTypeConfiguration<Departament>
     {
         public void Configure(EntityTypeBuilder<Departament> builder)
         {
@@ -12,6 +12,14 @@ namespace NursesScheduler.Infrastructure.Configuration
 
             builder.HasMany(d => d.Nurses)
                 .WithOne(n => n.Departament)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(d => d.Quarters)
+                .WithOne(q => q.Departament)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(d => d.DepartamentSettings)
+                .WithOne(s => s.Departament)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(d => d.Name)

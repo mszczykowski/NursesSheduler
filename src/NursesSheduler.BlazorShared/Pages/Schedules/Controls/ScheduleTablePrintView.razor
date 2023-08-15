@@ -34,12 +34,11 @@
         <tbody>
             @{
                 int i = 1;
-                foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
+                foreach (var nurse in Nurses.Where(n => ScheduleData.Schedule.ScheduleNurses.Any(sn => sn.NurseId == n.NurseId)).OrderBy(n => n.Surname).ThenBy(n => n.Name))
                 {
-                    var nurse = Nurses.First(n => n.NurseId == nurseId);
-                    var schdeuleNurse = ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == nurseId);
-                    var scheduleNurseStats = ScheduleData.ScheduleStats.NursesScheduleStats[nurseId];
-                    var quarterNurseStats = QuarterData.QuarterStats.NurseStats[nurseId];
+                    var schdeuleNurse = ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == nurse.NurseId);
+                    var scheduleNurseStats = ScheduleData.ScheduleStats.NursesScheduleStats[nurse.NurseId];
+                    var quarterNurseStats = QuarterData.QuarterStats.NurseStats[nurse.NurseId];
                     <tr>
                         <td class="no">@(i++)</td>
                         <td class="name-col-pr">

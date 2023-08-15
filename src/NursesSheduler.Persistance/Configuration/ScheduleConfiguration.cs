@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.Infrastructure.Configuration
@@ -11,12 +8,15 @@ namespace NursesScheduler.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Schedule> builder)
         {
-            var valueComparer = new ValueComparer<ICollection<int>>(
-                (c1, c2) => c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList());
-
             builder.HasKey(s => s.ScheduleId);
+
+            builder.HasMany(s => s.ScheduleNurses)
+                .WithOne(sn => sn.Schedule)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //builder.HasOne(s => s.Quarter)
+            //    .WithMany(q => q.Schedules)
+            //    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
