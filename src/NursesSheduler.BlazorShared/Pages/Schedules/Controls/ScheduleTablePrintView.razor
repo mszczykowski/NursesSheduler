@@ -1,10 +1,5 @@
 ﻿<head>
     <meta charset="utf-8" />
-    <base href="https://localhost:7270/" />
-    @*<base href="/" />*@
-    <link href="_content/NursesScheduler.BlazorShared/css/bulma.min.css" rel="stylesheet" />
-    <link href="_content/NursesScheduler.BlazorShared/css/all.min.css" rel="stylesheet" />
-    <link href="_content/NursesScheduler.BlazorShared/css/site.css" rel="stylesheet" />
 </head>
 <body>
     <p>
@@ -20,7 +15,7 @@
         <thead>
             <tr>
                 <th class="no">L.p.</th>
-                <th class="name">Pracownik</th>
+                <th class="name-col">Pracownik</th>
                 @foreach (var day in ScheduleData.Days)
                 {
                     <th class="@ScheduleCssHelper.GetDayClass(day) day">
@@ -29,7 +24,7 @@
                     </th>
                 }
                 <th class="summary">Poz. czas mies.</th>
-                <th class="summary">Poz. czas qwart.</th>
+                <th class="summary">Poz. czas kwart.</th>
                 <th class="summary">Przyp. urlop</th>
                 <th class="summary">Urlop do przyp.</th>
                 <th class="summary">Godz. świąt.</th>
@@ -47,7 +42,7 @@
                     var quarterNurseStats = QuarterData.QuarterStats.NurseStats[nurseId];
                     <tr>
                         <td class="no">@(i++)</td>
-                        <td class="name">
+                        <td>
                             <p>@nurse.Surname</p>
                             <p>@nurse.Name</p>
                         </td>

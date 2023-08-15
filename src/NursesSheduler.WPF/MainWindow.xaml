@@ -7,7 +7,7 @@
         xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
         xmlns:shared="clr-namespace:NursesScheduler.BlazorShared;assembly=NursesScheduler.BlazorShared"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="{StaticResource app_name}"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
         <blazor:BlazorWebView HostPage="wwwroot\index.html" Services="{Binding Services}">

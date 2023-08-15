@@ -7,6 +7,5 @@ namespace NursesScheduler.Domain.ValueObjects.Stats
         public ShiftTypes LastState { get; set; }
         public TimeSpan HoursFromLastAssignedShift { get; set; }
         public TimeSpan HoursToFirstAssignedShift { get; set; }
-        public IEnumerable<ScheduleValidationError> ValidationErrors { get; set; }
     }
 }

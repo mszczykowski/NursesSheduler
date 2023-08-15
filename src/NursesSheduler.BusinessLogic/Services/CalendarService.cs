@@ -21,8 +21,8 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task<IEnumerable<DayNumbered>> GetNumberedMonthDaysAsync(int year, int month, int firstQuarterStart)
         {
             var quarterNumber = GetQuarterNumber(month, firstQuarterStart);
-            var quarterMonths = GetQuarterMonths(firstQuarterStart, quarterNumber, year);
-            var dayInQuarterOffset = 0;
+            var quarterMonths = GetQuarterMonths(year, quarterNumber, firstQuarterStart);
+            var dayInQuarterOffset = 1;
 
             foreach (var monthDate in quarterMonths)
             {

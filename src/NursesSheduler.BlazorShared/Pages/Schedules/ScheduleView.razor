@@ -22,6 +22,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
 
 @inherits ComponenentUsingDepartament
 
@@ -30,7 +31,7 @@
 @inject IExceptionHandler _exceptionHandler
 @inject IPrintingService _printingService
 
-<ErrorModal @ref="_errorModal" />
+
 <InfoModal @ref="_infoModal" />
 
 <MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
@@ -46,6 +47,8 @@
 <CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseSchedule"/>
 
 <AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsence"/>
+
+<ErrorModal @ref="_errorModal" />
 
 @if (_isLoading)
 {
@@ -137,7 +140,7 @@ else
                         Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="@(() => _closeScheduleModal.ShowModal(_pickedDate.ToString()))" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="ShowCloseScheduleModal" Disabled=!ShouldDisplayTable()/>
                     </div>
                     <div class="level-item">
                         <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
@@ -163,7 +166,8 @@ else
         }
         else
         {
-            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData OnAbsenceSelected="() => {}"/>
+            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData 
+                OnAbsenceSelected="(NewAbsenceSelection selection) => {}"/>
         }
     }
 }
@@ -212,14 +216,15 @@ else
 
             try
             {
+                _currentScheduleData.RecalculateScheduleStats += (async () => await RecalculateStatsAsync());
+                _currentScheduleData.RecalculateRowStats += (async (int nurseId) => await RecalcuateRowStatsAsync(nurseId));
+                _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
+                _previousScheduleData.RefreshScheduleView += (() => StateHasChanged());
+
                 await SetNursesAsync();
                 InitializeSolverSettings();
 
                 await ChangeScheduleAsync();
-
-                _currentScheduleData.RecalculateScheduleStats += (async () => await SetCurrentStats());
-                _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
-                _previousScheduleData.RecalculateScheduleStats += (() => StateHasChanged());
 
                 _isLoading = false;
                 base.StateHasChanged();
@@ -276,6 +281,11 @@ else
         }
 
         ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
+
+        if(!_currentScheduleData.ReadOnly)
+        {
+            await RecalculateStatsAsync();
+        }
     }
 
     private async Task SetCurrentQuarter()
@@ -613,7 +623,51 @@ else
         {
             workDay.IsTimeOff = true;
         }
-        
+
         _currentScheduleData.RequestScheduleRecalculation();
+    }
+
+    public async Task RecalculateStatsAsync()
+    {
+        foreach (var nurseId in _currentScheduleData.Schedule.ScheduleNurses.Select(n => n.NurseId))
+        {
+            await RecalcuateRowStatsAsync(nurseId);
+        }
+    }
+
+    public async Task RecalcuateRowStatsAsync(int nurseId)
+    {
+        try
+        {
+            var response = await _mediatr.Send(new RecalculateNurseStatsRequest
+            {
+                DepartamentId = _currentQuarterData.Quarter.DepartamentId,
+                Year = _currentQuarterData.Quarter.Year,
+                Month = _currentScheduleData.Schedule.Month,
+                TotalWorkTimeInQuarter = _currentQuarterData.QuarterStats.WorkTimeInQuarter,
+                ScheduleNurse = _mapper.Map<RecalculateNurseStatsRequest.ScheduleNurseRequest>(_currentScheduleData
+                    .Schedule.ScheduleNurses.First(n => n.NurseId == nurseId)),
+            });
+
+            _currentScheduleData.ScheduleStats.NursesScheduleStats[nurseId] = _mapper.Map<NurseStatsViewModel>(response.NursesScheduleStats);
+            _currentQuarterData.QuarterStats.NurseStats[nurseId] = _mapper.Map<NurseStatsViewModel>(response.NursesQuarterStats);
+            _currentScheduleData.ValidationErrors[nurseId] = _mapper.Map<IEnumerable<ScheduleValidationErrorViewModel>>(response.ValidationErrors);
+
+            _currentScheduleData.RequestScheduleViewRefresh();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    public void ShowCloseScheduleModal()
+    {
+        _closeScheduleModal.ShowModal(_pickedDate.ToString());
+
+        if(_currentScheduleData.ValidationErrors.Any(e => e.Value is not null || e.Value.Count() > 0))
+        {
+            _errorModal.ShowModal("Uwaga! Grafik posiada błędy!");
+        }
     }
 }

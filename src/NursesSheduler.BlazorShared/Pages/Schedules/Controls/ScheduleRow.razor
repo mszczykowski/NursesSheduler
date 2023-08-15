@@ -12,12 +12,15 @@
             <p>@Nurse.Surname</p>
             <p>@Nurse.Name</p>
         </div>
-        <Button Text="!" Style="is-small is-danger is-outlined" />
+        @if(!ScheduleData.ReadOnly && _scheduleValidationErrors is not null && _scheduleValidationErrors.Count() > 0)
+        {
+            <Button Text="!" Style="is-small is-danger is-outlined" Action="async() => await ShowValidationErrorModal.InvokeAsync(_scheduleValidationErrors)"/>
+        }
     </td>
     @foreach (var workDay in _scheduleNurse.NurseWorkDays)
     {
         <ScheduleShift WorkDay=workDay Day=@ScheduleData.Days.First(d=>d.Date.Day == workDay.Day)
-                   MorningShifts="QuarterData.MorningShifts" OnChange="ScheduleData.RequestScheduleRecalculation" ReadOnly=ScheduleData.ReadOnly
+                   MorningShifts="QuarterData.MorningShifts" OnChange=@(() => ScheduleData.RequestRowRecalculation(Nurse.NurseId)) ReadOnly=ScheduleData.ReadOnly
                    SelectTimeOffFrom="StartSelectingNewTimeOff" SelectTimeOffTo="EndSelectingNewTimeOff" />
     }
     @if (ScheduleData.CurrentStatsDipslayed == StatsDisplayed.Schedule)
@@ -48,58 +51,18 @@
     public QuarterDataWrapper QuarterData { get; set; }
     [Parameter]
     public ScheduleDataWrapper ScheduleData { get; set; }
-
     [Parameter]
     public EventCallback<NewAbsenceSelection> OnAbsenceSelected { get; set; }
+    [Parameter]
+    public EventCallback<IEnumerable<ScheduleValidationErrorViewModel>> ShowValidationErrorModal { get; set; }
 
 
     private NurseStatsViewModel _scheduleNurseStats => ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId];
     private NurseStatsViewModel _quarterNurseStats => QuarterData.QuarterStats.NurseStats[Nurse.NurseId];
     private ScheduleNurseViewModel _scheduleNurse => ScheduleData.Schedule.ScheduleNurses.First(n => n.NurseId == Nurse.NurseId);
+    private IEnumerable<ScheduleValidationErrorViewModel> _scheduleValidationErrors => ScheduleData.ValidationErrors[Nurse.NurseId];
 
     private NewAbsenceSelection? _newAbsenceSelection;
-
-    public async Task RecalcuateRowStatsAsync()
-    {
-        try
-        {
-            await RecalcuateScheduleRowStatsAsync();
-            await RecalcuateQuarterRowStatsAsync();
-            ScheduleData.RequestScheduleViewRefresh();
-        }
-        catch (Exception e)
-        {
-            _exceptionHandler.HandleException(e);
-        }
-    }
-
-    private async Task RecalcuateScheduleRowStatsAsync()
-    {
-        var request = new RecalculateNurseScheduleStatsRequest
-            {
-                DepartamentId = QuarterData.Quarter.DepartamentId,
-                Year = QuarterData.Quarter.Year,
-                Month = ScheduleData.Schedule.Month,
-                ScheduleNurse = _mapper.Map<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest>(_scheduleNurse),
-            };
-
-        ScheduleData.ScheduleStats.NursesScheduleStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
-    }
-
-    private async Task RecalcuateQuarterRowStatsAsync()
-    {
-        var request = new RecalculateNurseQuarterStatsRequest
-            {
-                DepartamentId = QuarterData.Quarter.DepartamentId,
-                Year = QuarterData.Quarter.Year,
-                Month = ScheduleData.Schedule.Month,
-                CurrentScheduleNurseStats = _mapper
-                                .Map<RecalculateNurseQuarterStatsRequest.NurseStatsRequest>(_scheduleNurseStats),
-            };
-
-        QuarterData.QuarterStats.NurseStats[Nurse.NurseId] = _mapper.Map<NurseStatsViewModel>(await _mediatr.Send(request));
-    }
-
 
     private void StartSelectingNewTimeOff(int day)
     {

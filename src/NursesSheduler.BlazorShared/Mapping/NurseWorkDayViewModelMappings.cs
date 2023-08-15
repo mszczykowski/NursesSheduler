@@ -20,7 +20,7 @@ namespace NursesScheduler.BlazorShared.Mapping
 
             CreateMap<NurseWorkDayViewModel, GetScheduleStatsFromScheduleRequest.NurseWorkDayRequest>();
 
-            CreateMap<NurseWorkDayViewModel, RecalculateNurseScheduleStatsRequest.NurseWorkDayRequest>();
+            CreateMap<NurseWorkDayViewModel, RecalculateNurseStatsRequest.NurseWorkDayRequest>();
 
             CreateMap<NurseWorkDayViewModel, SolveScheduleRequest.NurseWorkDayRequest>();
             CreateMap<SolveScheduleResponse.NurseWorkDayResponse , NurseWorkDayViewModel>();

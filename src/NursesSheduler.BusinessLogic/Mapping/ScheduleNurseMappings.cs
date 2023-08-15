@@ -6,7 +6,6 @@ using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSche
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.ScheduleValidations.Queries.ValidateScheduleNurse;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
@@ -19,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
 
             CreateMap<ScheduleNurse, GetScheduleResponse.ScheduleNurseResponse>();
 
-            CreateMap<RecalculateNurseScheduleStatsRequest.ScheduleNurseRequest, ScheduleNurse>();
+            CreateMap<RecalculateNurseStatsRequest.ScheduleNurseRequest, ScheduleNurse>();
 
             CreateMap<GetScheduleStatsFromScheduleRequest.ScheduleNurseRequest, ScheduleNurse>();
 
@@ -28,8 +27,6 @@ namespace NursesScheduler.BusinessLogic.Mapping
 
             CreateMap<SolveScheduleRequest.ScheduleNurseRequest, ScheduleNurse>();
             CreateMap<ScheduleNurse, SolveScheduleResponse.ScheduleNurseResponse>();
-
-            CreateMap<ValidateScheduleNurseRequest, ScheduleNurse>();
 
             CreateMap<CloseScheduleRequest.ScheduleNurseRequest, ScheduleNurse>();
             CreateMap<ScheduleNurse, CloseScheduleResponse.ScheduleNurseResponse>();

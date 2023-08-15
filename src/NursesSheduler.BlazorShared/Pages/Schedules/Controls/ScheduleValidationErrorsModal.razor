@@ -1,0 +1,49 @@
+﻿@using System.Text
+@inherits OkModal
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code{
+    protected override Task OnInitializedAsync()
+    {
+        base.Title = "Błędy grafiku";
+        base.ButtonStyle = "is-danger";
+        return base.OnInitializedAsync();
+    }
+
+    public void ShowModal(IEnumerable<ScheduleValidationErrorViewModel> _scheduleValidationErrors)
+    {
+        base.ShowModal(BuildErrorMessage(_scheduleValidationErrors));
+    }
+
+    private string BuildErrorMessage(IEnumerable<ScheduleValidationErrorViewModel> _scheduleValidationErrors)
+    {
+        var errorMessage = new StringBuilder();
+
+        foreach(var validationError in _scheduleValidationErrors)
+        {
+            errorMessage.Append("<p>");
+
+            switch(validationError.Reason)
+            {
+                case ScheduleInvalidReasons.TooMuchHoursInQuarter:
+                    errorMessage.Append($"Przekroczono dopuszczalną ilość godzin w kwartale: {validationError.AdditionalInfo}!");
+                    break;
+                case ScheduleInvalidReasons.TooMuchHoursInWeek:
+                    errorMessage.Append($"Przekroczono dopuszczalną ilość godzin w tygodniu: {validationError.AdditionalInfo}!");
+                    break;
+                case ScheduleInvalidReasons.BreakBetweenShiftsTooShort:
+                    errorMessage.Append($"Przerwa pomiędzy dyżurami w dniu: {validationError.AdditionalInfo} jest za krótka!");
+                    break;
+            }
+
+            errorMessage.Append("</p>");
+        }
+
+        return errorMessage.ToString();
+    }
+
+}
+

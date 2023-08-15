@@ -1,4 +1,6 @@
-﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
+﻿using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
+using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects;
 using NursesScheduler.Domain.ValueObjects.Stats;
@@ -7,16 +9,22 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class ScheduleValidatorService : IScheduleValidatorService
     {
+        private readonly IDepartamentSettingsProvider _departamentSettingsProvider;
         private readonly IWorkTimeService _workTimeService;
 
-        public ScheduleValidatorService(IWorkTimeService workTimeService)
+        public ScheduleValidatorService(IDepartamentSettingsProvider departamentSettingsProvider, 
+            IWorkTimeService workTimeService)
         {
+            _departamentSettingsProvider = departamentSettingsProvider;
             _workTimeService = workTimeService;
         }
 
-        public IEnumerable<ScheduleValidationError> ValidateScheduleNurse(TimeSpan maxWorkTimeInQuarter,
-            ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, DepartamentSettings departamentSettings)
+        public async Task<IEnumerable<ScheduleValidationError>> ValidateScheduleNurse(TimeSpan maxWorkTimeInQuarter,
+            ScheduleNurse scheduleNurse, NurseStats nurseQuarterStats, NurseScheduleStats? previousScheduleNurseStats, 
+            int departamentId)
         {
+            var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
+
             var validationResult = new List<ScheduleValidationError>();
 
             if (nurseQuarterStats.AssignedWorkTime > maxWorkTimeInQuarter)
@@ -49,7 +57,23 @@ namespace NursesScheduler.BusinessLogic.Services
                     continue;
                 }
 
-                if (_workTimeService.GetHoursFromLastAssignedShift(workDay.Day, scheduleNurse.NurseWorkDays) >
+                if(workDay.Day == 1 && previousScheduleNurseStats is null)
+                {
+                    continue;
+                }
+
+                var hoursFromLastShift = _workTimeService.GetHoursFromLastAssignedShift(workDay.Day, scheduleNurse.NurseWorkDays);
+                if(workDay.ShiftType == Domain.Enums.ShiftTypes.Night)
+                {
+                    hoursFromLastShift += ScheduleConstatns.RegularShiftLength;
+                }
+
+                if ((workDay.Day == 1 &&
+                    hoursFromLastShift
+                    + previousScheduleNurseStats.HoursFromLastAssignedShift <
+                    departamentSettings.MinimalShiftBreak)
+                    ||
+                    workDay.Day != 1 && hoursFromLastShift <
                     departamentSettings.MinimalShiftBreak)
                 {
                     validationResult.Add(new ScheduleValidationError
@@ -58,6 +82,7 @@ namespace NursesScheduler.BusinessLogic.Services
                         AdditionalInfo = workDay.Day.ToString(),
                     });
                 }
+                
             }
 
             return validationResult;

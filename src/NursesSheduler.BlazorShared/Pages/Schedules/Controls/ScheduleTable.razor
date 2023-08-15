@@ -1,4 +1,6 @@
-﻿<ScheduleHeader QuarterData=QuarterData ScheduleData=ScheduleData />
+﻿<ScheduleValidationErrorsModal @ref="_scheduleValidationErrorsModal"/>
+
+<ScheduleHeader QuarterData=QuarterData ScheduleData=ScheduleData />
 <table class="table-schedule">
     <thead>
         <tr>
@@ -30,7 +32,8 @@
             foreach (var nurseId in Nurses.OrderBy(n => n.Surname).ThenBy(n => n.Name).Select(n => n.NurseId))
             {
                 <ScheduleRow No=i++ Nurse=@Nurses.First(n=>n.NurseId == nurseId) QuarterData=QuarterData
-                     ScheduleData=ScheduleData OnAbsenceSelected="OnAbsenceSelected"/>
+                     ScheduleData=ScheduleData OnAbsenceSelected="OnAbsenceSelected" 
+                     ShowValidationErrorModal="ShowValidationErrorModal"/>
             }
         }
     </tbody>
@@ -46,6 +49,13 @@
     public ScheduleDataWrapper ScheduleData { get; set; }
     [Parameter]
     public EventCallback<NewAbsenceSelection> OnAbsenceSelected { get; set; }
+
+    private ScheduleValidationErrorsModal _scheduleValidationErrorsModal;
+
+    private void ShowValidationErrorModal(IEnumerable<ScheduleValidationErrorViewModel> scheduleValidationErrors)
+    {
+        _scheduleValidationErrorsModal.ShowModal(scheduleValidationErrors);
+    }
 
     private void RefreshSchedule()
     {

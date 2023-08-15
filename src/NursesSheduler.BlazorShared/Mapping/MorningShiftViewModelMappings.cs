@@ -18,7 +18,7 @@ namespace NursesScheduler.BlazorShared.Mapping
             CreateMap<MorningShiftViewModel, UpsertMorningShiftsRequest.MorningShiftRequest>();
             CreateMap<UpsertMorningShiftsResponse, MorningShiftViewModel>();
 
-            CreateMap<MorningShiftViewModel, RecalculateNurseScheduleStatsRequest.MorningShiftRequest>();
+            CreateMap<MorningShiftViewModel, RecalculateNurseStatsRequest.MorningShiftRequest>();
         }
     }
 }

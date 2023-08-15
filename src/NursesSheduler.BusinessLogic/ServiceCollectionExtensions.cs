@@ -42,6 +42,7 @@ namespace NursesScheduler.BusinessLogic
             services.AddTransient<IActiveNursesService, ActiveNursesService>();
             services.AddTransient<IQuarterStatsService, QuarterStatsService>();
             services.AddTransient<IScheduleSolverService, ScheduleSolverService>();
+            services.AddTransient<IScheduleValidatorService, ScheduleValidatorService>();
 
             //solver
             services.AddTransient<IScheduleSolver, ScheduleSolver>();

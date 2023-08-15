@@ -18,7 +18,7 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<UpsertMorningShiftsRequest.MorningShiftRequest, MorningShift>();
             CreateMap<MorningShift, UpsertMorningShiftsResponse>();
 
-            CreateMap<RecalculateNurseScheduleStatsRequest.MorningShiftRequest, MorningShift>();
+            CreateMap<RecalculateNurseStatsRequest.MorningShiftRequest, MorningShift>();
         }
     }
 }
