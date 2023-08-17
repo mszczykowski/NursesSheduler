@@ -7,5 +7,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries
         public int MorningShiftId { get; set; }
         public MorningShiftIndex Index { get; set; }
         public TimeSpan ShiftLength { get; set; }
+        public bool ReadOnly { get; set; }
     }
 }

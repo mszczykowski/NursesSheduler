@@ -50,11 +50,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
                 quarter.MorningShifts.First(m => m.MorningShiftId == morningShiftId).ReadOnly = true;
             }
 
-            await _applicationDbContext.SaveChangesAsync(cancellationToken);
-
             _schedulesService.ResolveMorningShifts(closedSchedule, quarter.MorningShifts);
 
             await _absencesService.AssignTimeOffsWorkTime(closedSchedule, quarter.Year, cancellationToken);
+
+            await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<CloseScheduleResponse>(closedSchedule);
         }

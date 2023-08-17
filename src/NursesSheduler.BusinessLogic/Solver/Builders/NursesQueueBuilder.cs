@@ -77,8 +77,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
                 sortedNurses.InsertRange(0, _nursesPrioritised.AsQueryable().OrderBy(orderBy).ToList());
             }
 
-            var queue = new Queue<int>();
-            sortedNurses.ForEach(n => queue.Enqueue(n.NurseId));
+            var queue = new Queue<int>(sortedNurses.Select(n => n.NurseId));
 
             return queue;
         }

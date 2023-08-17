@@ -3,9 +3,10 @@
 @using NursesScheduler.BlazorShared.Pages.Departaments.Controls
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments
 
-@inject IMediator _mediatr;
-@inject IMapper _mapper;
-@inject IExceptionHandler _exceptonHandler;
+@inject IMediator _mediatr
+@inject IMapper _mapper
+@inject IExceptionHandler _exceptonHandler
+@inject CurrentDepartamentStore _currentDepartamentStore
 
 
 <div class="container">
@@ -45,7 +46,15 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender) await LoadDepartaments();
+        if(firstRender)
+        {
+            if(_currentDepartamentStore.CurrentDepartament is not null)
+            {
+                _currentDepartamentStore.CurrentDepartament = null;
+            }
+
+             await LoadDepartaments();
+        }
 
         await base.OnAfterRenderAsync(firstRender);
     }

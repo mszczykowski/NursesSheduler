@@ -36,7 +36,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands
                 .FirstOrDefaultAsync(d => d.DepartamentId == request.DepartamentId) 
                 ?? throw new EntityNotFoundException(request.DepartamentId, nameof(Departament));
 
-            _context.Entry(originalDepartament).CurrentValues.SetValues(modifiedDepartament);
+            originalDepartament.Name = modifiedDepartament.Name;
 
             var result = await _context.SaveChangesAsync(cancellationToken);
 

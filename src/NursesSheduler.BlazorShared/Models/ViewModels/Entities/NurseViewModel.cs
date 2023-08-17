@@ -12,7 +12,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Nazwisko jest wymagane")]
-        [StringLength(30, ErrorMessage = "Nzwisko jest zbyt długie (maksymalnie 30 znaków).")]
+        [StringLength(20, ErrorMessage = "Nzwisko jest zbyt długie (maksymalnie 20 znaków).")]
         public string Surname { get; set; }
 
         [Required(ErrorMessage = "Należy wybrać opcję")]

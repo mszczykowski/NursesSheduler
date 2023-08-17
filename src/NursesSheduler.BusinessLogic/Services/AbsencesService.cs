@@ -51,11 +51,16 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task AssignTimeOffsWorkTime(Schedule closedSchedule, int year, CancellationToken cancellationToken)
         {
             var absencesSummaries = await _applicationDbContext.AbsencesSummaries
-                .Where(s => s.Year == year && closedSchedule.ScheduleNurses.Any(n => n.NurseId == s.NurseId))
+                .Where(s => s.Year == year && closedSchedule.ScheduleNurses.Select(n => n.NurseId).Contains(s.NurseId))
                 .ToListAsync();
 
             foreach(var absenceSummary in absencesSummaries)
             {
+                if(absenceSummary.Absences is null)
+                {
+                    continue;
+                }
+
                 var absences = absenceSummary.Absences.Where(a => a.Month == closedSchedule.Month);
 
                 foreach(var absence in absences)
@@ -79,8 +84,6 @@ namespace NursesScheduler.BusinessLogic.Services
 
                 SubtractAvailablePTOTime(absenceSummary, absences);
             }
-
-            await _applicationDbContext.SaveChangesAsync(cancellationToken);
         }
 
 
@@ -225,6 +228,10 @@ namespace NursesScheduler.BusinessLogic.Services
                         absencesSummary.PTOTimeLeft -= absencesSummary.PTOTimeLeftFromPreviousYear;
                         absencesSummary.PTOTimeLeftFromPreviousYear = TimeSpan.Zero;
                     }
+                }
+                else
+                {
+                    absencesSummary.PTOTimeLeft -= absencesSummary.PTOTimeLeftFromPreviousYear;
                 }
             }
         }

@@ -184,16 +184,12 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             }
         }
 
-
         private void RandomiseShiftCapacities(Random random)
         {
             _regularDayShiftCapacities = _regularDayShiftCapacities.OrderBy(i => random.Next()).ToArray();
             _holidayDayShiftCapacities = _holidayDayShiftCapacities.OrderBy(i => random.Next()).ToArray();
             _nightShiftsCapacities = _nightShiftsCapacities.OrderBy(i => random.Next()).ToArray();
         }
-
-
-
         private int GetNumberOfSurplusShifts(int minimalNumberOfNursesOnShift)
         {
             var result = _totalNumberOfShiftsToAssign

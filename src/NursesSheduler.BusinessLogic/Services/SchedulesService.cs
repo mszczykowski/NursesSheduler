@@ -36,7 +36,15 @@ namespace NursesScheduler.BusinessLogic.Services
             };
         }
 
-        public async Task SetTimeOffsAsync(int year, int month, ScheduleNurse scheduleNurse)
+        public async Task SetTimeOffsAsync(int year, int month, Schedule schedule)
+        {
+            foreach(var schdeuleNurse in schedule.ScheduleNurses)
+            {
+                await SetTimeOffsAsync(year, month, schdeuleNurse);
+            }
+        }
+
+        private async Task SetTimeOffsAsync(int year, int month, ScheduleNurse scheduleNurse)
         {
             var absences = await _absencesService.GetNurseAbsencesInMonthAsync(year, month, scheduleNurse.NurseId);
 
@@ -95,6 +103,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private async Task<int> EditSchedule(Schedule oldSchedule, Schedule updatedSchedule, CancellationToken cancellationToken)
         {
+            oldSchedule.IsClosed = updatedSchedule.IsClosed;
+
             foreach (var oldScheduleNurse in oldSchedule.ScheduleNurses)
             {
                 var updatedWorkDays = updatedSchedule

@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
 {
@@ -9,11 +10,13 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ISchedulesService _schedulesService;
 
-        public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetScheduleQueryHandler(IApplicationDbContext context, IMapper mapper, ISchedulesService schedulesService)
         {
             _context = context;
             _mapper = mapper;
+            _schedulesService = schedulesService;
         }
 
         public async Task<GetScheduleResponse?> Handle(GetScheduleRequest request, CancellationToken cancellationToken)
@@ -25,6 +28,11 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Get
                 .FirstOrDefaultAsync(s => s.Quarter.Year == request.Year 
                     && s.Quarter.DepartamentId == request.DepartamentId 
                     && s.Month == request.Month);
+
+            if(schedule is not null && !schedule.IsClosed)
+            {
+                await _schedulesService.SetTimeOffsAsync(request.Year, request.Month, schedule);
+            }
 
             return schedule is not null ? _mapper.Map<GetScheduleResponse>(schedule) : null;
         }

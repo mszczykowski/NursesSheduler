@@ -26,6 +26,8 @@
         if (!Int32.TryParse(value, out result))
         {
             result = 0;
+            validationErrorMessage = "Należy wpisać liczbę";
+            return false;
         }
 
         validationErrorMessage = null;

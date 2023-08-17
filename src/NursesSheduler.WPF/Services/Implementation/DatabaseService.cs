@@ -66,11 +66,10 @@ namespace NursesScheduler.WPF.Services.Implementation
 
         public void DeleteDb()
         {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
             if (IsDbCreated())
+            {
                 File.Delete(dbLocation);
+            }
         }
 
         public bool IsDbCreated()

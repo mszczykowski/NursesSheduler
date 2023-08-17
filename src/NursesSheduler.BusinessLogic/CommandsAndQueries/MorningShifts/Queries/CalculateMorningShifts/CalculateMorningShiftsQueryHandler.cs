@@ -5,14 +5,14 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
 {
-    internal sealed class CalculateMorningShiftsCommandHandler : IRequestHandler<CalculateMorningShiftsRequest,
+    internal sealed class CalculateMorningShiftsQueryHandler : IRequestHandler<CalculateMorningShiftsRequest,
         IEnumerable<CalculateMorningShiftsResponse>>
     {
         private readonly IWorkTimeService _workTimeService;
         private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly IMapper _mapper;
 
-        public CalculateMorningShiftsCommandHandler(IWorkTimeService workTimeService,
+        public CalculateMorningShiftsQueryHandler(IWorkTimeService workTimeService,
             IDepartamentSettingsProvider departamentSettingsManager,
             IMapper mapper)
         {

@@ -80,7 +80,7 @@ namespace NursesScheduler.BusinessLogic.Solver
         private ISolverState? AssignShift(ISolverState previousState, INursesQueue previousQueue, bool shouldRebuildQueue)
         {
             ISolverState currentState = new SolverState(previousState);
-            INursesQueue currentQueue = CopyQueue(previousQueue, true);
+            INursesQueue currentQueue = CopyQueue(previousQueue);
 
             if (shouldRebuildQueue)
             {
@@ -161,8 +161,8 @@ namespace NursesScheduler.BusinessLogic.Solver
                 if(currentState.IsShiftAssigned)
                 {
                     currentState.AdvanceUnassignedNursesState();
-                    
                     currentState.AdvanceShiftAndDay();
+
                     if (currentState.CurrentDay > _monthDays.Length)
                     {
                         return currentState;
@@ -204,7 +204,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                 return true;
             }
 
-            if((_currentDateService.GetCurrentDateTime() - _startTime).TotalSeconds > 
+            if ((_currentDateService.GetCurrentDateTime() - _startTime).TotalSeconds >
                 _departamentSettings.DefaultGeneratorTimeOut)
             {
                 _solverLoggerService.LogEvent(SolverEvents.TimedOut);
@@ -226,14 +226,14 @@ namespace NursesScheduler.BusinessLogic.Solver
             return new NursesQueue(_random);
         }
 
-        private INursesQueue CopyQueue(INursesQueue currentQueue, bool shouldCopyInternalQueues)
+        private INursesQueue CopyQueue(INursesQueue currentQueue)
         {
             if(_departamentSettings.UseTeams)
             {
-                return new NursesQueueTeams((NursesQueueTeams)currentQueue, shouldCopyInternalQueues);
+                return new NursesQueueTeams((NursesQueueTeams)currentQueue);
             }
 
-            return new NursesQueue((NursesQueue)currentQueue, shouldCopyInternalQueues);
+            return new NursesQueue((NursesQueue)currentQueue);
         }
     }
 }

@@ -11,33 +11,17 @@
             </header>
             <EditForm EditContext="@_editContext">
                 <section class="modal-card-body">
-                    <fieldset disabled=@SolverSettings.UseOwnSeed>
-                        <DataAnnotationsValidator />
-                        <div class="field">
-                            <label class="label">Liczba prób generatora</label>
-                            <div class="control">
-                                <InputNumber class="input" @bind-Value="SolverSettings.NumberOfRetries" />
-                                <div class="help is-danger">
-                                    <ValidationMessage For="@(() => SolverSettings.NumberOfRetries)" />
-                                </div>
-                            </div>
-                        </div>
+                    <ObjectGraphDataAnnotationsValidator/>
+                    <fieldset disabled=@_solverSettingsForm.SolverSettings.UseOwnSeed>
+                        <NumberInput Label="Liczba prób generatora" @bind-Value="_solverSettingsForm.SolverSettings.NumberOfRetries" ValidationFor="@(() => _solverSettingsForm.SolverSettings.NumberOfRetries)" />
                     </fieldset>
-                    <fieldset disabled=@(!SolverSettings.UseOwnSeed)>
-                        <div class="field">
-                            <label class="label">Ziarno generatora</label>
-                            <div class="control">
-                                <InputText class="input" @bind-Value="SolverSettings.GeneratorSeed" />
-                                <div class="help is-danger">
-                                    <ValidationMessage For="@(() => SolverSettings.GeneratorSeed)" />
-                                </div>
-                            </div>
-                        </div>
+                    <fieldset disabled=@(!_solverSettingsForm.SolverSettings.UseOwnSeed)>
+                        <TextInput Label="Ziarno generatora" @bind-Value="_solverSettingsForm.SolverSettings.GeneratorSeed" ValidationFor="@(() => _solverSettingsForm.SolverSettings.GeneratorSeed)"/>
                     </fieldset>
                     <div class="field">
                         <div class="control">
                             <label class="checkbox">
-                                <InputCheckbox @bind-Value="SolverSettings.UseOwnSeed" />
+                                <InputCheckbox @bind-Value="_solverSettingsForm.SolverSettings.UseOwnSeed" />
                                 Użyj własnego ziarna generatora
                             </label>
                         </div>
@@ -46,7 +30,7 @@
                 <footer class="modal-card-foot">
                     <div class="footer-buttons">
                         <Button Text="Anuluj" Action="base.ChangeVisibility" />
-                        <LoadingButton Style="is-success" Text="Zapisz" Action="OnSubmit" />
+                        <Button Style="is-success" Text="Zapisz" Action="OnSubmit" />
                     </div>
                 </footer>
             </EditForm>

@@ -44,6 +44,7 @@
     <system:String x:Key="passwd_created">Password created. You can log in now.</system:String>
     <system:String x:Key="clear">Clear</system:String>
     <system:String x:Key="delete_db_message">Clear all data? You can't revert this operation!</system:String>
+    <system:String x:Key="delete_db_error">Can't delete data. Restart application and try again.</system:String>
 
     <!--window names-->
     <system:String x:Key="auth_win">Log in</system:String>
