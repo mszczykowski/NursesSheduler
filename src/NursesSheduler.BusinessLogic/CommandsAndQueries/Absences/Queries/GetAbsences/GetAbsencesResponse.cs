@@ -10,6 +10,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Queries.GetA
         public TimeSpan WorkingHoursToAssign { get; set; }
         public TimeSpan AssignedWorkingHours { get; set; }
         public AbsenceTypes Type { get; set; }
+        public bool IsClosed { get; set; }
         public int AbsencesSummaryId { get; set; }
     }
 }

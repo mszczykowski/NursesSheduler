@@ -16,7 +16,7 @@
 @inject IMapper _mapper;
 @inject IExceptionHandler _exceptionHandler;
 
-<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" />
+<EditAbsencesSummaryModal @ref="_editAbsencesSummaryModal" RefreshParent=@(() => StateHasChanged()) />
 
 
 @if (_nurse is null || _absencesSummaries is null)

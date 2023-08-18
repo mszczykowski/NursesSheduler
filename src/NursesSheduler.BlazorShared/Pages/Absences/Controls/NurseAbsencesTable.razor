@@ -65,6 +65,14 @@ else
                             <a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a>
                         </td>
                     }
+                    else
+                    {
+                        <td>
+                        </td>
+                        <td>
+                            Zamknięto
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

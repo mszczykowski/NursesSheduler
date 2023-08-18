@@ -33,7 +33,9 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Forms
             {
                 foreach (var morningShift in morningShifts)
                 {
-                    MorningShifts.First(m => m.Index == morningShift.Index).ShiftLength = morningShift.ShiftLength;
+                    var matchingMorningShift = MorningShifts.First(m => m.Index == morningShift.Index);
+                    matchingMorningShift.ShiftLength = morningShift.ShiftLength;
+                    matchingMorningShift.ReadOnly = morningShift.ReadOnly;
                 }
             }
         }

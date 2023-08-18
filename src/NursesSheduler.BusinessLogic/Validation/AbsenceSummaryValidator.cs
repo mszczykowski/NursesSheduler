@@ -8,10 +8,8 @@ namespace NursesScheduler.BusinessLogic.Validation
         public AbsenceSummaryValidator()
         {
             RuleFor(s => s.PTOTimeLeft)
-                .NotEmpty()
                 .GreaterThanOrEqualTo(TimeSpan.Zero);
             RuleFor(s => s.PTOTimeLeftFromPreviousYear)
-                .NotEmpty()
                 .GreaterThanOrEqualTo(TimeSpan.Zero);
         }
     }

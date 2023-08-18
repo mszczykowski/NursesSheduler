@@ -231,7 +231,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
                 else
                 {
-                    absencesSummary.PTOTimeLeft -= absencesSummary.PTOTimeLeftFromPreviousYear;
+                    absencesSummary.PTOTimeLeft -= absence.AssignedWorkingHours;
                 }
             }
         }

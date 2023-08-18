@@ -188,10 +188,10 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     NurseId = nurseSchedule.NurseId,
                     AssignedWorkTime = nurseSchedule.AssignedWorkTime,
-                    HolidayHoursAssigned = nurseSchedule.HolidaysHoursAssigned,
+                    HolidayHoursAssigned = nurseSchedule.HolidayHoursAssigned,
                     NightHoursAssigned = nurseSchedule.NightHoursAssigned,
                     TimeOffToAssign = nurseSchedule.TimeOffToAssign,
-                    TimeOffAssigned = nurseSchedule.TimeOffToAssiged,
+                    TimeOffAssigned = nurseSchedule.TimeOffAssigned,
                     LastState = GetLastState(nurseSchedule.NurseWorkDays),
                     HoursFromLastAssignedShift = _workTimeService.GetHoursFromLastAssignedShift(nurseSchedule.NurseWorkDays),
                     HoursToFirstAssignedShift = _workTimeService.GetHoursToFirstAssignedShift(nurseSchedule.NurseWorkDays),

@@ -11,12 +11,12 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class SchedulesService : ISchedulesService
     {
-        private readonly IActiveNursesService _activeNursesService;
+        private readonly INursesService _activeNursesService;
         private readonly IAbsencesService _absencesService;
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
-        public SchedulesService(IActiveNursesService activeNursesService, IApplicationDbContext applicationDbContext,
+        public SchedulesService(INursesService activeNursesService, IApplicationDbContext applicationDbContext,
             IAbsencesService absencesService, IScheduleStatsProvider scheduleStatsProvider)
         {
             _activeNursesService = activeNursesService;
@@ -65,6 +65,22 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     nurseWorkDay.MorningShift = morningShifts.First(m => m.MorningShiftId == nurseWorkDay.MorningShiftId);
                 }
+            }
+        }
+
+        public void SetScheduleStats(Schedule schedule, ScheduleStats scheduleStats)
+        {
+            schedule.WorkTimeInMonth = scheduleStats.WorkTimeInMonth;
+            schedule.WorkTimeBalance = scheduleStats.WorkTimeBalance;
+            foreach(var scheduleNurse in schedule.ScheduleNurses)
+            {
+                var nurseScheduleStats = scheduleStats.NursesScheduleStats.First(s => s.NurseId == scheduleNurse.NurseId);
+
+                scheduleNurse.NightHoursAssigned = nurseScheduleStats.NightHoursAssigned;
+                scheduleNurse.HolidayHoursAssigned = nurseScheduleStats.HolidayHoursAssigned;
+                scheduleNurse.AssignedWorkTime = nurseScheduleStats.AssignedWorkTime;
+                scheduleNurse.TimeOffToAssign = nurseScheduleStats.TimeOffToAssign;
+                scheduleNurse.TimeOffAssigned = nurseScheduleStats.TimeOffAssigned;
             }
         }
 

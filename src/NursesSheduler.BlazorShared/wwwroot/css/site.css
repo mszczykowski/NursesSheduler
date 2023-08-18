@@ -160,6 +160,11 @@ th.holiday {
     cursor: pointer;
 }
 
+.table-schedule td select:disabled {
+    cursor: default;
+    color: black;
+}
+
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }

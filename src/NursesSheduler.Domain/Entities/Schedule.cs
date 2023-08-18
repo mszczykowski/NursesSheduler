@@ -6,7 +6,6 @@
         public int Month { get; set; }
         public TimeSpan WorkTimeInMonth { get; set; }
         public TimeSpan WorkTimeBalance { get; set; }
-        public TimeSpan TimeOffAssigned { get; set; }
         public bool IsClosed { get; set; }
 
         public virtual IEnumerable<ScheduleNurse> ScheduleNurses { get; set; }

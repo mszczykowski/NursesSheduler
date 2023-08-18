@@ -14,13 +14,19 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
         private readonly ISchedulesService _schedulesService;
         private readonly IAbsencesService _absencesService;
         private readonly IApplicationDbContext _applicationDbContext;
+        private readonly INursesService _nursesService;
+        private readonly IScheduleStatsService _scheduleStatsService;
 
-        public CloseScheduleCommandHandler(IMapper mapper, ISchedulesService schedulesService, IAbsencesService absencesService, IApplicationDbContext applicationDbContext)
+        public CloseScheduleCommandHandler(IMapper mapper, ISchedulesService schedulesService, 
+            IAbsencesService absencesService, IApplicationDbContext applicationDbContext, INursesService nursesService, 
+            IScheduleStatsService scheduleStatsService)
         {
             _mapper = mapper;
             _schedulesService = schedulesService;
             _absencesService = absencesService;
             _applicationDbContext = applicationDbContext;
+            _nursesService = nursesService;
+            _scheduleStatsService = scheduleStatsService;
         }
 
         public async Task<CloseScheduleResponse> Handle(CloseScheduleRequest request, CancellationToken cancellationToken)
@@ -33,10 +39,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
                 .FirstOrDefaultAsync(q => q.QuarterId == closedSchedule.QuarterId)
                 ?? throw new EntityNotFoundException(closedSchedule.QuarterId, nameof(Quarter));
 
-            if (await _schedulesService.UpsertSchedule(closedSchedule, cancellationToken) == 0)
-            {
-                throw new InvalidOperationException();
-            }
+            var scheduleStats = await _scheduleStatsService
+                .GetScheduleStatsAsync(quarter.Year, quarter.DepartamentId, closedSchedule);
+
+            _schedulesService.SetScheduleStats(closedSchedule, scheduleStats);
+
+            await _schedulesService.UpsertSchedule(closedSchedule, cancellationToken);
 
             var usedMorningShiftsIds = closedSchedule
                 .ScheduleNurses
@@ -53,6 +61,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
             _schedulesService.ResolveMorningShifts(closedSchedule, quarter.MorningShifts);
 
             await _absencesService.AssignTimeOffsWorkTime(closedSchedule, quarter.Year, cancellationToken);
+            await _nursesService.SetSpecialHoursBalance(closedSchedule);
 
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
