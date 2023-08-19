@@ -24,7 +24,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
 
             if (schedule.IsClosed)
             {
-                _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year,
+                return _mapper.Map<GetScheduleStatsFromScheduleResponse>(await _scheduleStatsService.GetScheduleStatsAsync(request.Year,
                     schedule.Month, request.DepartamentId));
             }
 

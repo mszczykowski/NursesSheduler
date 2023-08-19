@@ -120,17 +120,24 @@ namespace NursesScheduler.BusinessLogic.Services
         private async Task<int> EditSchedule(Schedule oldSchedule, Schedule updatedSchedule, CancellationToken cancellationToken)
         {
             oldSchedule.IsClosed = updatedSchedule.IsClosed;
+            oldSchedule.WorkTimeBalance = updatedSchedule.WorkTimeBalance;
+            oldSchedule.WorkTimeInMonth = updatedSchedule.WorkTimeInMonth;
 
             foreach (var oldScheduleNurse in oldSchedule.ScheduleNurses)
             {
-                var updatedWorkDays = updatedSchedule
+                var updatedScheduleNurse = updatedSchedule
                     .ScheduleNurses
-                    .First(n => n.NurseId == oldScheduleNurse.NurseId)
-                    .NurseWorkDays;
+                    .First(n => n.NurseId == oldScheduleNurse.NurseId);
+
+                oldScheduleNurse.NightHoursAssigned = updatedScheduleNurse.NightHoursAssigned;
+                oldScheduleNurse.HolidayHoursAssigned = updatedScheduleNurse.HolidayHoursAssigned;
+                oldScheduleNurse.AssignedWorkTime = updatedScheduleNurse.AssignedWorkTime;
+                oldScheduleNurse.TimeOffToAssign = updatedScheduleNurse.TimeOffToAssign;
+                oldScheduleNurse.TimeOffAssigned = updatedScheduleNurse.TimeOffAssigned;
 
                 foreach (var oldWorkDay in oldScheduleNurse.NurseWorkDays)
                 {
-                    var updatedWorkDay = updatedWorkDays.First(wd => wd.Day == oldWorkDay.Day);
+                    var updatedWorkDay = updatedScheduleNurse.NurseWorkDays.First(wd => wd.Day == oldWorkDay.Day);
 
                     oldWorkDay.ShiftType = updatedWorkDay.ShiftType;
 

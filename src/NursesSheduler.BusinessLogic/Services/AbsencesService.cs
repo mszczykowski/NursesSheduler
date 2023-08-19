@@ -135,7 +135,7 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     currentAbsence = new Absence
                     {
-                        Month = from.Month,
+                        Month = date.Month,
                         Days = new List<int>(),
                     };
                     absences.Add(currentAbsence);

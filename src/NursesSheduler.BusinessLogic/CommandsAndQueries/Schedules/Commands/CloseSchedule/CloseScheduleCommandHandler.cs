@@ -31,22 +31,25 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
 
         public async Task<CloseScheduleResponse> Handle(CloseScheduleRequest request, CancellationToken cancellationToken)
         {
-            var closedSchedule = _mapper.Map<Schedule>(request);
-            closedSchedule.IsClosed = true;
-
+            var scheduleToClose = _mapper.Map<Schedule>(request);
+            
             var quarter = await _applicationDbContext.Quarters
                 .Include(q => q.MorningShifts)
-                .FirstOrDefaultAsync(q => q.QuarterId == closedSchedule.QuarterId)
-                ?? throw new EntityNotFoundException(closedSchedule.QuarterId, nameof(Quarter));
+                .FirstOrDefaultAsync(q => q.QuarterId == scheduleToClose.QuarterId)
+                ?? throw new EntityNotFoundException(scheduleToClose.QuarterId, nameof(Quarter));
+            
+            _schedulesService.ResolveMorningShifts(scheduleToClose, quarter.MorningShifts);
 
             var scheduleStats = await _scheduleStatsService
-                .GetScheduleStatsAsync(quarter.Year, quarter.DepartamentId, closedSchedule);
+                .GetScheduleStatsAsync(quarter.Year, quarter.DepartamentId, scheduleToClose);
 
-            _schedulesService.SetScheduleStats(closedSchedule, scheduleStats);
+            
+            scheduleToClose.IsClosed = true;
+            _schedulesService.SetScheduleStats(scheduleToClose, scheduleStats);
+            
+            await _schedulesService.UpsertSchedule(scheduleToClose, cancellationToken);
 
-            await _schedulesService.UpsertSchedule(closedSchedule, cancellationToken);
-
-            var usedMorningShiftsIds = closedSchedule
+            var usedMorningShiftsIds = scheduleToClose
                 .ScheduleNurses
                 .SelectMany(n => n.NurseWorkDays)
                 .Where(wd => wd.ShiftType == Domain.Enums.ShiftTypes.Morning)
@@ -58,14 +61,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
                 quarter.MorningShifts.First(m => m.MorningShiftId == morningShiftId).ReadOnly = true;
             }
 
-            _schedulesService.ResolveMorningShifts(closedSchedule, quarter.MorningShifts);
-
-            await _absencesService.AssignTimeOffsWorkTime(closedSchedule, quarter.Year, cancellationToken);
-            await _nursesService.SetSpecialHoursBalance(closedSchedule);
+            await _absencesService.AssignTimeOffsWorkTime(scheduleToClose, quarter.Year, cancellationToken);
+            await _nursesService.SetSpecialHoursBalance(scheduleToClose);
 
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
-            return _mapper.Map<CloseScheduleResponse>(closedSchedule);
+            return _mapper.Map<CloseScheduleResponse>(scheduleToClose);
         }
     }
 }
