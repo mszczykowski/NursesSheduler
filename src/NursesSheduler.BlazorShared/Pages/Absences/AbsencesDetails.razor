@@ -114,11 +114,26 @@ else
                 </p>
             </header>
             <div class="card-content">
-                <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" Year=_currentAbsencesSummary.Year 
-                    NurseId=_nurse.NurseId/>
+                <AbsenceForm @ref=_newAbsenceForm SaveAbsence="AddAbsence" YearPicker=_selectedYear
+                         NurseId=_nurse.NurseId />
             </div>
         </div>
-        <NurseAbsencesTable Absences=@_currentAbsencesSummary.Absences Year=_currentAbsencesSummary.Year/>
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <label class="label">Nieobecności</label>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+                    <label class="label">Miesiąc</label>
+                </div>
+                <div class="level-item">
+                    <MonthSelect MonthPickerViewModel=_selectedMonth OnChange="(() => StateHasChanged())" />
+                </div>
+            </div>
+        </div>
+        <NurseAbsencesTable AbsencesSummaries=@_absencesSummaries YearPicker=_selectedYear MonthPicker=_selectedMonth />
     </div>
 }
 
@@ -130,6 +145,7 @@ else
     public int Year { get; set; }
 
     private YearPickerViewModel _selectedYear;
+    private MonthPickerViewModel _selectedMonth;
 
     private NurseViewModel _nurse;
 
@@ -139,11 +155,12 @@ else
     private AbsenceForm _newAbsenceForm;
 
     private EditAbsencesSummaryModal _editAbsencesSummaryModal;
-    
+
 
     protected override Task OnParametersSetAsync()
     {
         _selectedYear = new YearPickerViewModel(Year);
+        _selectedMonth = new(DateTime.Now.Month);
 
         return base.OnParametersSetAsync();
     }
@@ -218,9 +235,13 @@ else
                 return;
             }
 
-            _currentAbsencesSummary.Absences.AddRange(_mapper.Map<IEnumerable<AbsenceViewModel>>(response.Absences));
+            var newAbsences = _mapper.Map<IEnumerable<AbsenceViewModel>>(response.Absences);
+
+            _currentAbsencesSummary.Absences.AddRange(newAbsences);
 
             _newAbsenceForm.ResetForm();
+
+            _selectedMonth.MonthNumber = newAbsences.First().Month;
 
             StateHasChanged();
         }
@@ -232,7 +253,17 @@ else
 
     private void SelectedYearChanged()
     {
-        _currentAbsencesSummary = _absencesSummaries.FirstOrDefault(y => y.Year == _selectedYear.YearNumber);
+        _currentAbsencesSummary = _absencesSummaries.First(y => y.Year == _selectedYear.YearNumber);
+
+        if(_selectedYear.YearNumber == DateTime.Now.Year)
+        {
+            _selectedMonth.MonthNumber = DateTime.Now.Month;
+        }
+        else
+        {
+            _selectedMonth.MonthNumber = 1;
+        }
+
         _newAbsenceForm.ResetForm();
     }
 }

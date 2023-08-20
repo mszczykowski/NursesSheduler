@@ -94,6 +94,8 @@
 
     public void ShowModal(AbsenceViewModel existingAbsnece, int year)
     {
+        _month = existingAbsnece.Month;
+        _year = year;
         _datePickersEnabled = true;
         _absence = existingAbsnece;
 
@@ -145,7 +147,7 @@
     {
         if (IsEdit)
         {
-            return "{_year}-{_month}-01";
+            return $"{_year}-{_month.ToString().PadLeft(2, '0')}-01";
         }
 
         return $"{_year}-01-01";
@@ -155,7 +157,7 @@
     {
         if (IsEdit)
         {
-            return $"{_year}-{_month}-31";
+            return $"{_year}-{_month.ToString().PadLeft(2, '0')}-{DateTime.DaysInMonth(_year, _month)}";
         }
 
         return $"{_year}-12-31";

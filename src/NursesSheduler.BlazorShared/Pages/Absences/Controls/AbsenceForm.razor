@@ -57,11 +57,13 @@
 
 @code {
     [Parameter]
-    public int Year { get; set; }
+    public IYearPickerViewModel YearPicker { get; set; }
     [Parameter]
     public int NurseId { get; set; }
     [Parameter]
     public EventCallback<AbsenceFormViewModel> SaveAbsence { get; set; }
+
+    private int _year => YearPicker.YearNumber;
 
     private EditContext _editContext;
     private ErrorModal _errorModal;
@@ -71,15 +73,15 @@
     {
         _absenceForm.NurseId = NurseId;
 
-        if (Year == DateTime.Now.Year)
+        if (_year == DateTime.Now.Year)
         {
             _absenceForm.From = DateOnly.FromDateTime(DateTime.Now);
             _absenceForm.To = DateOnly.FromDateTime(DateTime.Now);
         }
         else
         {
-            _absenceForm.From = new DateOnly(Year, 1, 1);
-            _absenceForm.To = new DateOnly(Year, 1, 1);
+            _absenceForm.From = new DateOnly(_year, 1, 1);
+            _absenceForm.To = new DateOnly(_year, 1, 1);
         }
     }
 
@@ -109,11 +111,11 @@
 
     private string GetMinDate()
     {
-        return $"{Year}-01-01";
+        return $"{_year}-01-01";
     }
 
     private string GetMaxDate()
     {
-        return $"{Year}-12-31";
+        return $"{_year}-12-31";
     }
 }
