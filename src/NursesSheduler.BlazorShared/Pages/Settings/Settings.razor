@@ -10,6 +10,8 @@
 @inject IMapper _mapper;
 @inject IExceptionHandler _exceptionHandler;
 
+<InfoModal @ref="_infoModal" />
+
 <div class='container'>
     <div class="level">
         <div class="level-left">
@@ -30,6 +32,7 @@
 
 
 @code {
+    private InfoModal _infoModal;
     private DepratamentSettingsViewModel _settings;
 
 
@@ -67,7 +70,17 @@
         try
         {
             var response = await _mediatr.Send(_mapper.Map<EditDepartamentSettingsRequest>(_settings));
+
+            if(response is null)
+            {
+                _infoModal.ShowModal("Nie znaleziono zmian");
+                return;
+            }
+
+            _infoModal.ShowModal("Zapisano");
+
             CurrentDepartamentStore.CurrentDepartament.UseTeamsSetting = response.UseTeams;
+            CurrentDepartamentStore.CurrentDepartament.DefaultGeneratorRetryValue = response.DefaultGeneratorRetryValue;
         }
         catch (Exception e)
         {

@@ -68,7 +68,7 @@
             <footer class="modal-card-foot">
                 <div class="footer-buttons">
                     <Button Text="Anuluj" Action="(() => base.ChangeVisibility())" />
-                    <LoadingButton Style="is-success" Text="Zapisz nieobecność" Action=@(async () => await SaveAbsence.InvokeAsync()) />
+                    <LoadingButton Style="is-success" Text="Zapisz nieobecność" Action="OnSave" />
                 </div>
             </footer>
         </EditForm>
@@ -127,6 +127,17 @@
         _editContext = new(_absenceForm);
         _editContext.SetFieldCssClassProvider(new CustomFieldClassHelper());
 
+        base.ChangeVisibility();
+    }
+
+    private async Task OnSave()
+    {
+        if (!_editContext.Validate())
+        {
+            return;
+        }
+
+        await SaveAbsence.InvokeAsync(_absenceForm);
         base.ChangeVisibility();
     }
 

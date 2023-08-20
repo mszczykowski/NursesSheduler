@@ -4,13 +4,13 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Commands.RecalculateAbsencesSummary
 {
-    internal sealed class RecalculateAbsencesSummaryCommandHandler 
+    internal sealed class RecalculateAbsencesSummaryQueryHandler 
         : IRequestHandler<RecalculateAbsencesSummaryRequest, RecalculateAbsencesSummaryResponse>
     {
         private readonly IMapper _mapper;
         private readonly IAbsencesService _absencesService;
 
-        public RecalculateAbsencesSummaryCommandHandler(IMapper mapper, IAbsencesService absencesService)
+        public RecalculateAbsencesSummaryQueryHandler(IMapper mapper, IAbsencesService absencesService)
         {
             _mapper = mapper;
             _absencesService = absencesService;

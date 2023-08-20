@@ -2,7 +2,6 @@
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
-using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects;
@@ -189,10 +188,10 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     NurseId = nurseSchedule.NurseId,
                     AssignedWorkTime = nurseSchedule.AssignedWorkTime,
-                    HolidayHoursAssigned = nurseSchedule.HolidaysHoursAssigned,
+                    HolidayHoursAssigned = nurseSchedule.HolidayHoursAssigned,
                     NightHoursAssigned = nurseSchedule.NightHoursAssigned,
                     TimeOffToAssign = nurseSchedule.TimeOffToAssign,
-                    TimeOffAssigned = nurseSchedule.TimeOffToAssiged,
+                    TimeOffAssigned = nurseSchedule.TimeOffAssigned,
                     LastState = GetLastState(nurseSchedule.NurseWorkDays),
                     HoursFromLastAssignedShift = _workTimeService.GetHoursFromLastAssignedShift(nurseSchedule.NurseWorkDays),
                     HoursToFirstAssignedShift = _workTimeService.GetHoursToFirstAssignedShift(nurseSchedule.NurseWorkDays),
@@ -234,7 +233,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
                 var workDay = nurseWorkDays.First(d => d.Day == day.Date.Day);
 
-                _workTimeService.GetAssignedShiftWorkTime(workDay.ShiftType, workDay.MorningShift?.ShiftLength);
+                workTimeInWeeks[day.WeekInQuarter] += _workTimeService.GetAssignedShiftWorkTime(workDay.ShiftType, 
+                    workDay.MorningShift?.ShiftLength);
             }
 
             return workTimeInWeeks;

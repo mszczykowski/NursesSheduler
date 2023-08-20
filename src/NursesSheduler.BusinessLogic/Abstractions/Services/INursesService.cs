@@ -2,8 +2,9 @@
 
 namespace NursesScheduler.BusinessLogic.Abstractions.Services
 {
-    internal interface IActiveNursesService
+    internal interface INursesService
     {
         Task<IEnumerable<Nurse>> GetActiveDepartamentNurses(int departamentId);
+        Task SetSpecialHoursBalance(Schedule schedule);
     }
 }

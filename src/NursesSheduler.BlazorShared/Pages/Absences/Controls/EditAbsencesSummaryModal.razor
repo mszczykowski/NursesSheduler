@@ -37,6 +37,9 @@
 
 
 @code {
+    [Parameter]
+    public EventCallback RefreshParent { get; set; }
+
     private EditContext _editContext;
 
     private AbsencesSummaryViewModel _formAbsencesSummary;
@@ -67,13 +70,14 @@
 
             if(response is not null)
             {
-                var updatedSummary = _mapper.Map<EditAbsencesSummaryResponse>(response);
+                var updatedSummary = _mapper.Map<AbsencesSummaryViewModel>(response);
 
                 _originalAbsencesSummary.PTOTimeLeft = updatedSummary.PTOTimeLeft;
                 _originalAbsencesSummary.PTOTimeLeftFromPreviousYear = updatedSummary.PTOTimeLeftFromPreviousYear;
             }
 
             base.ChangeVisibility();
+            RefreshParent.InvokeAsync();
         }
         catch (Exception e)
         {
@@ -92,7 +96,7 @@
 
             var response = await _mediatr.Send(request);
 
-            var recalculatedSummary = _mapper.Map<EditAbsencesSummaryResponse>(response);
+            var recalculatedSummary = _mapper.Map<AbsencesSummaryViewModel>(response);
 
             _formAbsencesSummary.PTOTimeLeft = recalculatedSummary.PTOTimeLeft;
             _formAbsencesSummary.PTOTimeLeftFromPreviousYear = recalculatedSummary.PTOTimeLeftFromPreviousYear;

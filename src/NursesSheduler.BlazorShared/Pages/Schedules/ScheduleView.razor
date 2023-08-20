@@ -22,6 +22,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
 
 @inherits ComponenentUsingDepartament
 
@@ -30,7 +31,7 @@
 @inject IExceptionHandler _exceptionHandler
 @inject IPrintingService _printingService
 
-<ErrorModal @ref="_errorModal" />
+
 <InfoModal @ref="_infoModal" />
 
 <MorningShiftsSettingsModal @ref="_morningShiftsSettingsModal" CurrentQuarterData=_currentQuarterData
@@ -41,11 +42,13 @@
 <SolverModal @ref="_solverModal" CurrentQuarterData=_currentQuarterData
              CurrentScheduleData=_currentScheduleData SolverSettings=_solverSettings />
 
-<DeleteModal @ref="_deleteModal" DeleteAction="DeleteSchedule" />
+<DeleteModal @ref="_deleteModal" DeleteAction="DeleteScheduleAsync" />
 
-<CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseSchedule"/>
+<CloseScheduleModal @ref="_closeScheduleModal" CloseAction="CloseScheduleAsync" />
 
-<AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsence"/>
+<AbsenceFormModal @ref="_absenceFormModal" IsEdit=false SaveAbsence="SaveAbsenceAsync" />
+
+<ErrorModal @ref="_errorModal" />
 
 @if (_isLoading)
 {
@@ -83,7 +86,7 @@ else
                     <a @onclick="(() => _solverSettingsModal.ShowModal())">Konfiguracja generatora</a>
                 </div>
                 <div class="level-item">
-                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheule" Disabled=!ShouldDisplayTable()/>
+                    <LoadingButton Style="is-ghost" Text="Drukuj" Action="PrintScheduleAsync" Disabled=!ShouldDisplayTable() />
                 </div>
             </div>
         </div>
@@ -126,21 +129,21 @@ else
                 else
                 {
                     <div class="level-item">
-                        <Button Style="is-danger is-inverted" Text="Usuń" Action="@(() => _deleteModal.ShowModal($"grafik: {_pickedDate.ToString()}"))" 
-                            Disabled=@(!ShouldDisplayTable() || _deleteDisabled)/>
+                        <Button Style="is-danger is-inverted" Text="Usuń" Action="@(() => _deleteModal.ShowModal($"grafik: {_pickedDate.ToString()}"))"
+                        Disabled=@(!ShouldDisplayTable() || _deleteDisabled) />
                     </div>
                     <div class="level-item">
-                        <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable()/>
+                        <Button Style="is-danger" Icon="fas fa-xmark" Text="Wyczyść" Action="ClearSchedule" Disabled=!ShouldDisplayTable() />
                     </div>
                     <div class="level-item">
-                        <Button Style="is-info" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
-                        Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable()/>
+                        <Button Style="is-warning" Icon="fas fa-wand-magic-sparkles" Text="Generuj"
+                        Action="(() => _solverModal.StartSolving())" Disabled=!ShouldDisplayTable() />
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-warning" Icon="fas fa-lock" Text="Zamknij" Action="@(() => _closeScheduleModal.ShowModal(_pickedDate.ToString()))" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-info" Icon="fas fa-lock" Text="Zamknij" Action="ShowCloseScheduleModal" Disabled=!ShouldDisplayTable() />
                     </div>
                     <div class="level-item">
-                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertSchedule" Disabled=!ShouldDisplayTable()/>
+                        <LoadingButton Style="is-success" Icon="far fa-floppy-disk" Text="Zapisz" Action="UpsertScheduleAsync" Disabled=!ShouldDisplayTable() />
                     </div>
                 }
             </div>
@@ -158,12 +161,13 @@ else
     {
         @if (_currentDisplayedSchedule == ScheduleDisplayed.Current)
         {
-            <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData 
-                OnAbsenceSelected="(NewAbsenceSelection selection) => _absenceFormModal.ShowModal(selection)"/>
+            <ScheduleTable Nurses=_nurses QuarterData=_currentQuarterData ScheduleData=_currentScheduleData
+               OnAbsenceSelected="(NewAbsenceSelection selection) => _absenceFormModal.ShowModal(selection)" />
         }
         else
         {
-            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData OnAbsenceSelected="() => {}"/>
+            <ScheduleTable Nurses=_nurses QuarterData=_previousQuarterData ScheduleData=_previousScheduleData
+               OnAbsenceSelected="(NewAbsenceSelection selection) => {}" />
         }
     }
 }
@@ -212,14 +216,15 @@ else
 
             try
             {
+                _currentScheduleData.RecalculateScheduleStats += (async () => await RecalculateStatsAsync());
+                _currentScheduleData.RecalculateRowStats += (async (int nurseId) => await RecalcuateRowStatsAsync(nurseId));
+                _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
+                _previousScheduleData.RefreshScheduleView += (() => StateHasChanged());
+
                 await SetNursesAsync();
                 InitializeSolverSettings();
 
                 await ChangeScheduleAsync();
-
-                _currentScheduleData.RecalculateScheduleStats += (async () => await SetCurrentStats());
-                _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
-                _previousScheduleData.RecalculateScheduleStats += (() => StateHasChanged());
 
                 _isLoading = false;
                 base.StateHasChanged();
@@ -264,27 +269,34 @@ else
 
     private async Task ChangeScheduleAsync()
     {
-        await SetCurrentQuarter();
-        await SetCurrentSchedule();
-        await SetCurrentStats();
+        await SetCurrentQuarterAsync();
+        await SetCurrentScheduleAsync();
+        await SetCurrentStatsAsync();
 
-        await SetPreviousSchedule();
+        await SetPreviousScheduleAsync();
         if (_previousScheduleData.Schedule is not null)
         {
-            await SetPreviousQuarter();
-            await SetPreviousStats();
+            await SetPreviousQuarterAsync();
+            await SetPreviousStatsAsync();
         }
 
+        InitializeValidationErrors();
+
         ScheduleDisplayed _currentDisplayedSchedule = ScheduleDisplayed.Current;
+
+        if (!_currentScheduleData.ReadOnly)
+        {
+            await RecalculateStatsAsync();
+        }
     }
 
-    private async Task SetCurrentQuarter()
+    private async Task SetCurrentQuarterAsync()
     {
         _currentQuarterData.Quarter = await GetOrAddQuarterAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
         _currentQuarterData.MorningShifts = await GetMorningShiftsAsync(_currentQuarterData.Quarter.QuarterId);
     }
 
-    private async Task SetCurrentSchedule()
+    private async Task SetCurrentScheduleAsync()
     {
         _currentScheduleData.Days = await GetMonthDaysAsync(_pickedDate.YearNumber, _pickedDate.MonthNumber);
 
@@ -295,11 +307,15 @@ else
             _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
                 _currentQuarterData.Quarter.QuarterId);
         }
+        else
+        {
+            ResolveMorningShifts();
+        }
 
         _currentScheduleData.ReadOnly = _currentScheduleData.Schedule.IsClosed;
     }
 
-    private async Task SetCurrentStats()
+    private async Task SetCurrentStatsAsync()
     {
         _currentScheduleData.ScheduleStats = await GetScheduleStatsAsync(_currentQuarterData.Quarter.Year,
             _currentScheduleData.Schedule);
@@ -307,7 +323,7 @@ else
             _currentScheduleData.Schedule.Month, _currentScheduleData.ScheduleStats);
     }
 
-    private async Task SetPreviousQuarter()
+    private async Task SetPreviousQuarterAsync()
     {
         if (_previousScheduleData.Schedule.QuarterId == _currentQuarterData.Quarter.QuarterId)
         {
@@ -323,7 +339,7 @@ else
 
     }
 
-    private async Task SetPreviousSchedule()
+    private async Task SetPreviousScheduleAsync()
     {
         _previousScheduleData.Schedule = await GetScheduleAsync(_pickedDate.PreviousYear, _pickedDate.PreviousMonth);
 
@@ -335,7 +351,7 @@ else
         _previousScheduleData.ReadOnly = true;
     }
 
-    private async Task SetPreviousStats()
+    private async Task SetPreviousStatsAsync()
     {
         _previousScheduleData.ScheduleStats = await GetScheduleStatsAsync(_previousQuarterData.Quarter.Year,
             _pickedDate.PreviousMonth);
@@ -512,7 +528,7 @@ else
         _currentScheduleData.RequestScheduleRecalculation();
     }
 
-    private async Task PrintScheule()
+    private async Task PrintScheduleAsync()
     {
         try
         {
@@ -535,7 +551,7 @@ else
         }
     }
 
-    private async Task UpsertSchedule()
+    private async Task UpsertScheduleAsync()
     {
         try
         {
@@ -548,6 +564,8 @@ else
                 return;
             }
 
+            _currentScheduleData.Schedule.ScheduleId = response.ScheduleId;
+
             _infoModal.ShowModal("Pomyślnie zapisano");
             _deleteDisabled = false;
         }
@@ -557,7 +575,7 @@ else
         }
     }
 
-    private async Task CloseSchedule()
+    private async Task CloseScheduleAsync()
     {
         try
         {
@@ -572,7 +590,7 @@ else
         }
     }
 
-    private async Task DeleteSchedule()
+    private async Task DeleteScheduleAsync()
     {
         try
         {
@@ -597,23 +615,94 @@ else
             && _currentScheduleData.Schedule.ScheduleNurses.Any();
     }
 
-    private async Task SaveAbsence(AbsenceFormViewModel newAbsenceForm)
+    private async Task SaveAbsenceAsync(AbsenceFormViewModel newAbsenceForm)
     {
-        var response = await _mediatr.Send(_mapper.Map<AddAbsenceRequest>(newAbsenceForm));
-
-        if(response.VeryficationResult != Domain.Enums.AbsenceVeryficationResult.Valid || response.Absences is null)
+        try
         {
-            return;
+            var response = await _mediatr.Send(_mapper.Map<AddAbsenceRequest>(newAbsenceForm));
+
+            if (response.VeryficationResult != Domain.Enums.AbsenceVeryficationResult.Valid || response.Absences is null ||
+                response.Absences.Count() == 0)
+            {
+                return;
+            }
+
+            var newAbsence = _mapper.Map<AbsenceViewModel>(response.Absences.First());
+
+            foreach (var workDay in _currentScheduleData.Schedule.ScheduleNurses
+                .First(n => n.NurseId == newAbsenceForm.NurseId).NurseWorkDays.Where(wd => newAbsence.Days.Contains(wd.Day)))
+            {
+                workDay.IsTimeOff = true;
+            }
+
+            _currentScheduleData.RequestScheduleRecalculation();
         }
-
-        var newAbsence = _mapper.Map<AbsenceViewModel>(response);
-
-        foreach(var workDay in _currentScheduleData.Schedule.ScheduleNurses
-            .First(n => n.NurseId == newAbsenceForm.NurseId).NurseWorkDays.Where(wd => newAbsence.Days.Contains(wd.Day)))
+        catch (Exception e)
         {
-            workDay.IsTimeOff = true;
+            _exceptionHandler.HandleException(e);
         }
-        
-        _currentScheduleData.RequestScheduleRecalculation();
+    }
+
+    private async Task RecalculateStatsAsync()
+    {
+        foreach (var nurseId in _currentScheduleData.Schedule.ScheduleNurses.Select(n => n.NurseId))
+        {
+            await RecalcuateRowStatsAsync(nurseId);
+        }
+    }
+
+    private async Task RecalcuateRowStatsAsync(int nurseId)
+    {
+        try
+        {
+            var response = await _mediatr.Send(new RecalculateNurseStatsRequest
+                {
+                    DepartamentId = _currentQuarterData.Quarter.DepartamentId,
+                    Year = _currentQuarterData.Quarter.Year,
+                    Month = _currentScheduleData.Schedule.Month,
+                    TotalWorkTimeInQuarter = _currentQuarterData.QuarterStats.WorkTimeInQuarter,
+                    ScheduleNurse = _mapper.Map<RecalculateNurseStatsRequest.ScheduleNurseRequest>(_currentScheduleData
+                        .Schedule.ScheduleNurses.First(n => n.NurseId == nurseId)),
+                });
+
+            _currentScheduleData.ScheduleStats.NursesScheduleStats[nurseId] = _mapper.Map<NurseStatsViewModel>(response.NursesScheduleStats);
+            _currentQuarterData.QuarterStats.NurseStats[nurseId] = _mapper.Map<NurseStatsViewModel>(response.NursesQuarterStats);
+            _currentScheduleData.ValidationErrors[nurseId] = _mapper.Map<IEnumerable<ScheduleValidationErrorViewModel>>(response.ValidationErrors);
+
+            _currentScheduleData.RequestScheduleViewRefresh();
+        }
+        catch (Exception e)
+        {
+            _exceptionHandler.HandleException(e);
+        }
+    }
+
+    private void ShowCloseScheduleModal()
+    {
+        _closeScheduleModal.ShowModal(_pickedDate.ToString());
+
+        if (_currentScheduleData.ValidationErrors.Any(e => e.Value is not null && e.Value.Count() > 0))
+        {
+            _errorModal.ShowModal("Uwaga! Grafik posiada błędy!");
+        }
+    }
+
+    private void InitializeValidationErrors()
+    {
+        _currentScheduleData.ValidationErrors = new Dictionary<int, IEnumerable<ScheduleValidationErrorViewModel>>();
+
+        foreach (var nurseId in _currentScheduleData.Schedule.ScheduleNurses.Select(n => n.NurseId))
+        {
+            _currentScheduleData.ValidationErrors.Add(nurseId, Enumerable.Empty<ScheduleValidationErrorViewModel>());
+        }
+    }
+
+    private void ResolveMorningShifts()
+    {
+        foreach(var workDay in _currentScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays)
+            .Where(wd => wd.ShiftType == ShiftTypes.Morning))
+        {
+            workDay.MorningShift = _currentQuarterData.MorningShifts.First(m => m.MorningShiftId == workDay.MorningShiftId);
+        }
     }
 }

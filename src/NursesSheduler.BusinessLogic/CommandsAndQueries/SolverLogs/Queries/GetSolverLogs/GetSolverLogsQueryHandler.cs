@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
+using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
 {
@@ -19,7 +20,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
         public Task<IEnumerable<GetSolverLogsResponse>> Handle(GetSolverLogsRequest request, 
             CancellationToken cancellationToken)
         {
-            return Task.FromResult(_mapper.Map<IEnumerable<GetSolverLogsResponse>>(_solverLoggerService.SolverLogs));
+            return Task.FromResult(_mapper
+                .Map<IEnumerable<GetSolverLogsResponse>>(new List<SolverLog>(_solverLoggerService.SolverLogs)));
         }
     }
 }

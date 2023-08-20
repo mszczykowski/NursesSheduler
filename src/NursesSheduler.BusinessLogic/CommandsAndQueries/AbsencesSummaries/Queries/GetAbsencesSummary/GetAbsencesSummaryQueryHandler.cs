@@ -6,7 +6,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Queries.GetAbsencesSummary
 {
     public sealed class GetAbsencesSummaryQueryHandler : IRequestHandler<GetAbsencesSummaryRequest,
-                                                                        ICollection<GetAbsencesSummaryResponse>>
+                                                                        IEnumerable<GetAbsencesSummaryResponse>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -17,10 +17,10 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.AbsencesSummaries.Que
             _mapper = mapper;
         }
 
-        public async Task<ICollection<GetAbsencesSummaryResponse>> Handle(GetAbsencesSummaryRequest request,
+        public async Task<IEnumerable<GetAbsencesSummaryResponse>> Handle(GetAbsencesSummaryRequest request,
                                                                                     CancellationToken cancellationToken)
         {
-            return _mapper.Map<ICollection<GetAbsencesSummaryResponse>>(await _context.AbsencesSummaries
+            return _mapper.Map<IEnumerable<GetAbsencesSummaryResponse>>(await _context.AbsencesSummaries
                         .Where(y => y.NurseId == request.NurseId).Include(y => y.Absences).ToListAsync());
         }
     }

@@ -36,15 +36,15 @@
         }
 
         if (stringSpilitted == null || stringSpilitted.Length != 2 || !Int32.TryParse(stringSpilitted[0], out hours)
-            || !Int32.TryParse(stringSpilitted[1], out minutes) || minutes >= 60 || hours > 999)
+            || !Int32.TryParse(stringSpilitted[1], out minutes) || minutes > 60 || hours > 999)
         {
-            validationErrorMessage = "Należy wpisać wartość w formacie hhh:mm";
-            result = TimeSpan.Zero;
+            validationErrorMessage = "Należy wpisać wartość w formacie ggg:mm";
+            result = default;
             return false;
         }
 
-        result = new TimeSpan(hours, minutes, 0);
         validationErrorMessage = null;
+        result = new TimeSpan(hours, minutes, 0);
         return true;
     }
 }

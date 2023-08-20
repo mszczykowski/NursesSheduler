@@ -4,9 +4,9 @@ namespace NursesScheduler.BlazorShared.Stores
 {
     public sealed class CurrentDepartamentStore
     {
-        private DepartamentViewModel _currentDepartament;
+        private DepartamentViewModel? _currentDepartament;
         public event Action OnChange;
-        public DepartamentViewModel CurrentDepartament
+        public DepartamentViewModel? CurrentDepartament
         {
             get => _currentDepartament;
             set

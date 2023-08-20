@@ -11,12 +11,12 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class SchedulesService : ISchedulesService
     {
-        private readonly IActiveNursesService _activeNursesService;
+        private readonly INursesService _activeNursesService;
         private readonly IAbsencesService _absencesService;
         private readonly IApplicationDbContext _applicationDbContext;
         private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
-        public SchedulesService(IActiveNursesService activeNursesService, IApplicationDbContext applicationDbContext,
+        public SchedulesService(INursesService activeNursesService, IApplicationDbContext applicationDbContext,
             IAbsencesService absencesService, IScheduleStatsProvider scheduleStatsProvider)
         {
             _activeNursesService = activeNursesService;
@@ -36,7 +36,15 @@ namespace NursesScheduler.BusinessLogic.Services
             };
         }
 
-        public async Task SetTimeOffsAsync(int year, int month, ScheduleNurse scheduleNurse)
+        public async Task SetTimeOffsAsync(int year, int month, Schedule schedule)
+        {
+            foreach(var schdeuleNurse in schedule.ScheduleNurses)
+            {
+                await SetTimeOffsAsync(year, month, schdeuleNurse);
+            }
+        }
+
+        private async Task SetTimeOffsAsync(int year, int month, ScheduleNurse scheduleNurse)
         {
             var absences = await _absencesService.GetNurseAbsencesInMonthAsync(year, month, scheduleNurse.NurseId);
 
@@ -57,6 +65,22 @@ namespace NursesScheduler.BusinessLogic.Services
                 {
                     nurseWorkDay.MorningShift = morningShifts.First(m => m.MorningShiftId == nurseWorkDay.MorningShiftId);
                 }
+            }
+        }
+
+        public void SetScheduleStats(Schedule schedule, ScheduleStats scheduleStats)
+        {
+            schedule.WorkTimeInMonth = scheduleStats.WorkTimeInMonth;
+            schedule.WorkTimeBalance = scheduleStats.WorkTimeBalance;
+            foreach(var scheduleNurse in schedule.ScheduleNurses)
+            {
+                var nurseScheduleStats = scheduleStats.NursesScheduleStats.First(s => s.NurseId == scheduleNurse.NurseId);
+
+                scheduleNurse.NightHoursAssigned = nurseScheduleStats.NightHoursAssigned;
+                scheduleNurse.HolidayHoursAssigned = nurseScheduleStats.HolidayHoursAssigned;
+                scheduleNurse.AssignedWorkTime = nurseScheduleStats.AssignedWorkTime;
+                scheduleNurse.TimeOffToAssign = nurseScheduleStats.TimeOffToAssign;
+                scheduleNurse.TimeOffAssigned = nurseScheduleStats.TimeOffAssigned;
             }
         }
 
@@ -95,16 +119,25 @@ namespace NursesScheduler.BusinessLogic.Services
 
         private async Task<int> EditSchedule(Schedule oldSchedule, Schedule updatedSchedule, CancellationToken cancellationToken)
         {
+            oldSchedule.IsClosed = updatedSchedule.IsClosed;
+            oldSchedule.WorkTimeBalance = updatedSchedule.WorkTimeBalance;
+            oldSchedule.WorkTimeInMonth = updatedSchedule.WorkTimeInMonth;
+
             foreach (var oldScheduleNurse in oldSchedule.ScheduleNurses)
             {
-                var updatedWorkDays = updatedSchedule
+                var updatedScheduleNurse = updatedSchedule
                     .ScheduleNurses
-                    .First(n => n.NurseId == oldScheduleNurse.NurseId)
-                    .NurseWorkDays;
+                    .First(n => n.NurseId == oldScheduleNurse.NurseId);
+
+                oldScheduleNurse.NightHoursAssigned = updatedScheduleNurse.NightHoursAssigned;
+                oldScheduleNurse.HolidayHoursAssigned = updatedScheduleNurse.HolidayHoursAssigned;
+                oldScheduleNurse.AssignedWorkTime = updatedScheduleNurse.AssignedWorkTime;
+                oldScheduleNurse.TimeOffToAssign = updatedScheduleNurse.TimeOffToAssign;
+                oldScheduleNurse.TimeOffAssigned = updatedScheduleNurse.TimeOffAssigned;
 
                 foreach (var oldWorkDay in oldScheduleNurse.NurseWorkDays)
                 {
-                    var updatedWorkDay = updatedWorkDays.First(wd => wd.Day == oldWorkDay.Day);
+                    var updatedWorkDay = updatedScheduleNurse.NurseWorkDays.First(wd => wd.Day == oldWorkDay.Day);
 
                     oldWorkDay.ShiftType = updatedWorkDay.ShiftType;
 

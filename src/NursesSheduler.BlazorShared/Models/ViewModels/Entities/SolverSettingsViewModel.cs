@@ -8,7 +8,27 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
         [Range(1, 30, ErrorMessage = "Minimalna liczba powtórzeń to 1, maksymalna 30")]
         public int NumberOfRetries { get; set; }
         public string GeneratorSeed { get; set; }
-        public bool UseOwnSeed { get; set; }
+
+        private bool _useOwnSeed;
+        public bool UseOwnSeed
+        {
+            get => _useOwnSeed;
+            set
+            {
+                _useOwnSeed = value;
+                if (_useOwnSeed)
+                {
+                    _previousNumberOfRetries = NumberOfRetries;
+                    NumberOfRetries = 1;
+                }
+                else if(_previousNumberOfRetries > 0)
+                {
+                    NumberOfRetries = _previousNumberOfRetries;
+                }
+            }
+        }
+
+        private int _previousNumberOfRetries;
 
         public SolverSettingsViewModel(int numberOfRetries)
         {

@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
             _nursesQueueTeamB = new Queue<int>();
         }
 
-        public NursesQueueTeams(NursesQueueTeams queueToCopy, bool shouldCopyInternalQueues) : base(queueToCopy)
+        public NursesQueueTeams(NursesQueueTeams queueToCopy) : base(queueToCopy)
         {
             _teamToDequeue = queueToCopy._teamToDequeue;
 

@@ -23,9 +23,21 @@ namespace NursesScheduler.WPF.Commands
             if (MessageBox.Show((string)Application.Current.FindResource("delete_db_message"), 
                 (string)Application.Current.FindResource("clear"), MessageBoxButton.YesNo,
                 MessageBoxImage.Warning) == MessageBoxResult.No)
+            {
                 return;
-
-            _databaseService.DeleteDb();
+            }
+            
+            try
+            {
+                _databaseService.DeleteDb();
+            }
+            catch
+            {
+                MessageBox.Show((string)Application.Current.FindResource("delete_db_error"), 
+                    (string)Application.Current.FindResource("clear"));
+                return;
+            }
+            
             _passwordService.TryRemovePassword();
 
             _navigationService.Navigate();

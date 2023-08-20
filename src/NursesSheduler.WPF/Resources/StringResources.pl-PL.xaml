@@ -43,5 +43,9 @@
     <system:String x:Key="passwd_created">Hasło utworzone. Możesz się teraz zalogować</system:String>
     <system:String x:Key="clear">Wyczyść</system:String>
     <system:String x:Key="delete_db_message">Wyczyścić wszytskie dane? Tej operacji nie da się cofnąć!</system:String>
+    <system:String x:Key="delete_db_error">Nie udało się usunąć danych. Zamknij program i spróbuj ponownie.</system:String>
+
+    <!--window names-->
+    <system:String x:Key="auth_win">Zaloguj</system:String>
 
 </ResourceDictionary>

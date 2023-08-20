@@ -25,10 +25,16 @@ namespace NursesScheduler.Infrastructure.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(NurseConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AbsenceConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AbsencesSummaryConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DepartamentConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(DepartamentSettingsConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(MorningShiftConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(NurseConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(NurseWorkDayConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuarterConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ScheduleConfiguration).Assembly);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Absence).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ScheduleNurseConfiguration).Assembly);
 
             base.OnModelCreating(modelBuilder);
         }

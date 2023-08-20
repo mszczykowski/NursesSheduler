@@ -2,6 +2,7 @@
 using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.UpsertMorningShifts;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
 using NursesScheduler.Domain.Entities;
 
@@ -18,7 +19,9 @@ namespace NursesScheduler.BusinessLogic.Mapping
             CreateMap<UpsertMorningShiftsRequest.MorningShiftRequest, MorningShift>();
             CreateMap<MorningShift, UpsertMorningShiftsResponse>();
 
-            CreateMap<RecalculateNurseScheduleStatsRequest.MorningShiftRequest, MorningShift>();
+            CreateMap<RecalculateNurseStatsRequest.MorningShiftRequest, MorningShift>();
+
+            CreateMap<GetScheduleStatsFromScheduleRequest.MorningShiftRequest, MorningShift>();
         }
     }
 }

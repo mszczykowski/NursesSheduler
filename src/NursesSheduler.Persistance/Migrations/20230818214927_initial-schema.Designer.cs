@@ -11,8 +11,8 @@ using NursesScheduler.Infrastructure.Context;
 namespace NursesScheduler.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230813100823_summaryUpdate")]
-    partial class summaryUpdate
+    [Migration("20230818214927_initial-schema")]
+    partial class initialschema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -232,9 +232,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int?>("MorningShiftIndex")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("NurseId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("ScheduleNurseId")
                         .HasColumnType("INTEGER");
 
@@ -244,8 +241,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.HasKey("NurseWorkDayId");
 
                     b.HasIndex("MorningShiftId");
-
-                    b.HasIndex("NurseId");
 
                     b.HasIndex("ScheduleNurseId");
 
@@ -289,9 +284,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("QuarterId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("TimeOffAssigned")
-                        .HasColumnType("TEXT");
-
                     b.Property<TimeSpan>("WorkTimeBalance")
                         .HasColumnType("TEXT");
 
@@ -314,7 +306,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<TimeSpan>("AssignedWorkTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("HolidaysHoursAssigned")
+                    b.Property<TimeSpan>("HolidayHoursAssigned")
                         .HasColumnType("TEXT");
 
                     b.Property<TimeSpan>("NightHoursAssigned")
@@ -323,13 +315,10 @@ namespace NursesScheduler.Infrastructure.Migrations
                     b.Property<int>("NurseId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("PreviousMonthBalance")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ScheduleId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("TimeOffToAssiged")
+                    b.Property<TimeSpan>("TimeOffAssigned")
                         .HasColumnType("TEXT");
 
                     b.Property<TimeSpan>("TimeOffToAssign")
@@ -405,10 +394,6 @@ namespace NursesScheduler.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("MorningShiftId");
 
-                    b.HasOne("NursesScheduler.Domain.Entities.Nurse", null)
-                        .WithMany("NurseWorkDays")
-                        .HasForeignKey("NurseId");
-
                     b.HasOne("NursesScheduler.Domain.Entities.ScheduleNurse", "ScheduleNurse")
                         .WithMany("NurseWorkDays")
                         .HasForeignKey("ScheduleNurseId")
@@ -445,7 +430,7 @@ namespace NursesScheduler.Infrastructure.Migrations
             modelBuilder.Entity("NursesScheduler.Domain.Entities.ScheduleNurse", b =>
                 {
                     b.HasOne("NursesScheduler.Domain.Entities.Nurse", "Nurse")
-                        .WithMany()
+                        .WithMany("ScheduleNurses")
                         .HasForeignKey("NurseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -480,7 +465,7 @@ namespace NursesScheduler.Infrastructure.Migrations
                 {
                     b.Navigation("AbsencesSummaries");
 
-                    b.Navigation("NurseWorkDays");
+                    b.Navigation("ScheduleNurses");
                 });
 
             modelBuilder.Entity("NursesScheduler.Domain.Entities.Quarter", b =>

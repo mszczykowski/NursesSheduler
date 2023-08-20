@@ -12,7 +12,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
             _nursesQueue = new Queue<int>();
         }
 
-        public NursesQueue(NursesQueue queueToCopy, bool shouldCopyInternalQueues) : base(queueToCopy)
+        public NursesQueue(NursesQueue queueToCopy) : base(queueToCopy)
         {
             _nursesQueue = new Queue<int>(queueToCopy._nursesQueue);
         }
@@ -38,7 +38,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
 
         public override bool TryDequeue(out int result, bool isFirstTry)
         {
-            return _nursesQueue.TryDequeue(out result) ? true : false;
+            return _nursesQueue.TryDequeue(out result);
         }
     }
 }

@@ -109,9 +109,6 @@
 
 /*table*/
 
-.schedule-header {
-}
-
 .schedule-view {
     width: 100%;
     margin: 0 auto;
@@ -163,6 +160,11 @@ th.holiday {
     cursor: pointer;
 }
 
+.table-schedule td select:disabled {
+    cursor: default;
+    color: black;
+}
+
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
@@ -204,6 +206,7 @@ th.holiday {
 th.name-col, td.name-col {
     overflow: hidden;
     white-space: nowrap;
+    max-width: 200px;
 }
 
 td.name-col {
@@ -256,4 +259,10 @@ th {
     align-items: center;
     height: 100%;
     width: 100%;
+}
+
+th.name-col-pr, td.name-col-pr {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100px;
 }

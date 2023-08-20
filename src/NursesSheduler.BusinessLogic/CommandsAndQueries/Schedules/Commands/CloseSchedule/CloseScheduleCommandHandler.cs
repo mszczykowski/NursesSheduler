@@ -14,31 +14,42 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
         private readonly ISchedulesService _schedulesService;
         private readonly IAbsencesService _absencesService;
         private readonly IApplicationDbContext _applicationDbContext;
+        private readonly INursesService _nursesService;
+        private readonly IScheduleStatsService _scheduleStatsService;
 
-        public CloseScheduleCommandHandler(IMapper mapper, ISchedulesService schedulesService, IAbsencesService absencesService, IApplicationDbContext applicationDbContext)
+        public CloseScheduleCommandHandler(IMapper mapper, ISchedulesService schedulesService, 
+            IAbsencesService absencesService, IApplicationDbContext applicationDbContext, INursesService nursesService, 
+            IScheduleStatsService scheduleStatsService)
         {
             _mapper = mapper;
             _schedulesService = schedulesService;
             _absencesService = absencesService;
             _applicationDbContext = applicationDbContext;
+            _nursesService = nursesService;
+            _scheduleStatsService = scheduleStatsService;
         }
 
         public async Task<CloseScheduleResponse> Handle(CloseScheduleRequest request, CancellationToken cancellationToken)
         {
-            var closedSchedule = _mapper.Map<Schedule>(request);
-            closedSchedule.IsClosed = true;
-
+            var scheduleToClose = _mapper.Map<Schedule>(request);
+            
             var quarter = await _applicationDbContext.Quarters
                 .Include(q => q.MorningShifts)
-                .FirstOrDefaultAsync(q => q.QuarterId == closedSchedule.QuarterId)
-                ?? throw new EntityNotFoundException(closedSchedule.QuarterId, nameof(Quarter));
+                .FirstOrDefaultAsync(q => q.QuarterId == scheduleToClose.QuarterId)
+                ?? throw new EntityNotFoundException(scheduleToClose.QuarterId, nameof(Quarter));
+            
+            _schedulesService.ResolveMorningShifts(scheduleToClose, quarter.MorningShifts);
 
-            if (await _schedulesService.UpsertSchedule(closedSchedule, cancellationToken) == 0)
-            {
-                throw new InvalidOperationException();
-            }
+            var scheduleStats = await _scheduleStatsService
+                .GetScheduleStatsAsync(quarter.Year, quarter.DepartamentId, scheduleToClose);
 
-            var usedMorningShiftsIds = closedSchedule
+            
+            scheduleToClose.IsClosed = true;
+            _schedulesService.SetScheduleStats(scheduleToClose, scheduleStats);
+            
+            await _schedulesService.UpsertSchedule(scheduleToClose, cancellationToken);
+
+            var usedMorningShiftsIds = scheduleToClose
                 .ScheduleNurses
                 .SelectMany(n => n.NurseWorkDays)
                 .Where(wd => wd.ShiftType == Domain.Enums.ShiftTypes.Morning)
@@ -50,13 +61,12 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.Cl
                 quarter.MorningShifts.First(m => m.MorningShiftId == morningShiftId).ReadOnly = true;
             }
 
+            await _absencesService.AssignTimeOffsWorkTime(scheduleToClose, quarter.Year, cancellationToken);
+            await _nursesService.SetSpecialHoursBalance(scheduleToClose);
+
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
 
-            _schedulesService.ResolveMorningShifts(closedSchedule, quarter.MorningShifts);
-
-            await _absencesService.AssignTimeOffsWorkTime(closedSchedule, quarter.Year, cancellationToken);
-
-            return _mapper.Map<CloseScheduleResponse>(closedSchedule);
+            return _mapper.Map<CloseScheduleResponse>(scheduleToClose);
         }
     }
 }

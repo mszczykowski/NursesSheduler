@@ -54,6 +54,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Absences.Commands.Edi
             var modifiedAbsence = _absencesService.GetAbsencesFromDates(request.From, request.To,
                 originalAbsence.AbsencesSummaryId, request.Type).First();
 
+            modifiedAbsence.AbsenceId = request.AbsenceId;
+
             var veryficationResult = await _absencesService.VerifyAbsence(absencesSummary, modifiedAbsence);
             if (veryficationResult != AbsenceVeryficationResult.Valid)
             {

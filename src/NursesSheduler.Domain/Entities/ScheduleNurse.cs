@@ -12,11 +12,10 @@
         public virtual Schedule Schedule { get; set; }
 
 
-        public TimeSpan PreviousMonthBalance { get; set; }
         public TimeSpan AssignedWorkTime { get; set; }
         public TimeSpan TimeOffToAssign { get; set; }
-        public TimeSpan TimeOffToAssiged { get; set; }
-        public TimeSpan HolidaysHoursAssigned { get; set; }
+        public TimeSpan TimeOffAssigned { get; set; }
+        public TimeSpan HolidayHoursAssigned { get; set; }
         public TimeSpan NightHoursAssigned { get; set; }
     }
 }

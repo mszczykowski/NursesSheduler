@@ -2,9 +2,9 @@
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
 {
-    public sealed class CalculateMorningShiftsRequest : IRequest<ICollection<CalculateMorningShiftsResponse>>
+    public sealed class CalculateMorningShiftsRequest : IRequest<IEnumerable<CalculateMorningShiftsResponse>>
     {
-        public TimeSpan TimeForMorningShifts { get; set; }
         public int DepartamentId { get; set; }
+        public TimeSpan TimeForMorningShifts { get; set; }
     }
 }
