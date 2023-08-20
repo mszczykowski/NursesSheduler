@@ -599,9 +599,7 @@ else
                     ScheduleId = _currentScheduleData.Schedule.ScheduleId,
                 });
 
-            _currentScheduleData.Schedule = await BuildScheduleAsync(_pickedDate.MonthNumber,
-                _currentQuarterData.Quarter.QuarterId);
-            _currentScheduleData.RequestScheduleRecalculation();
+            await ChangeScheduleAsync();
         }
         catch (Exception e)
         {
