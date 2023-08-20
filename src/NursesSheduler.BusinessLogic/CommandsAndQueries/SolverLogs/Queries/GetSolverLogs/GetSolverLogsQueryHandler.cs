@@ -20,8 +20,22 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
         public Task<IEnumerable<GetSolverLogsResponse>> Handle(GetSolverLogsRequest request, 
             CancellationToken cancellationToken)
         {
-            return Task.FromResult(_mapper
-                .Map<IEnumerable<GetSolverLogsResponse>>(new List<SolverLog>(_solverLoggerService.SolverLogs)));
+            bool shouldTryAgain = false;
+            do
+            {
+                try
+                {
+                    return Task.FromResult(_mapper
+                        .Map<IEnumerable<GetSolverLogsResponse>>(new List<SolverLog>(_solverLoggerService.SolverLogs)));
+                }
+                catch
+                {
+                    shouldTryAgain = true;
+                }
+            }
+            while (shouldTryAgain);
+
+            return null;
         }
     }
 }
