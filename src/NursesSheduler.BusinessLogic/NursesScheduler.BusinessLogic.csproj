@@ -32,10 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CommandsAndQueries\Schedules\Queries\CheckSchedule\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\NursesSheduler.Domain\NursesScheduler.Domain.csproj" />
   </ItemGroup>
 

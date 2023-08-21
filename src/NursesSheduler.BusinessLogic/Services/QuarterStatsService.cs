@@ -49,7 +49,8 @@ namespace NursesScheduler.BusinessLogic.Services
             return GetQuarterNurseStats(quarterSchedulesNurseStats);
         }
 
-        public async Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, int year, int month,
+        public async Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, TimeSpan timeUsedForMorningShifts,
+            int year, int month,
             int departamentId)
         {
             var quarterSchedulesStats = new List<ScheduleStats>
@@ -64,11 +65,40 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 WorkTimeInQuarter = workTimeInQuarter,
                 TimeForMorningShifts = CalculateTimeForMorningShifts(workTimeInQuarter),
+                ShiftsToAssignInMonths = CalculateShiftsToAssignInMonths(quarterSchedulesStats, workTimeInQuarter, 
+                    timeUsedForMorningShifts),
             };
 
             quarterStats.NurseStats = GetQuarterNursesStats(quarterSchedulesStats);
 
             return quarterStats;
+        }
+
+        private int[] CalculateShiftsToAssignInMonths(IEnumerable<ScheduleStats> quarterScheduleStats, 
+            TimeSpan workTimeInQuarter, TimeSpan timeUsedForMorningShifts)
+        {
+            var totalTimeForShifts = workTimeInQuarter - timeUsedForMorningShifts;
+            var totalNumberOfShifts = (int)Math.Floor(totalTimeForShifts / ScheduleConstatns.RegularShiftLength);
+
+            var shiftToAssignInMonths = new int[3];
+
+            for (var i = 0; i < shiftToAssignInMonths.Length; i++)
+            {
+                var currentScheduleStats = quarterScheduleStats.First(s => s.MonthInQuarter == i + 1);
+                shiftToAssignInMonths[i] = (int)Math.Round(currentScheduleStats.WorkTimeInMonth 
+                    / ScheduleConstatns.RegularShiftLength);
+            }
+
+            while (shiftToAssignInMonths.Sum() < totalNumberOfShifts)
+            {
+                shiftToAssignInMonths[Array.IndexOf(shiftToAssignInMonths, shiftToAssignInMonths.Min())]++;
+            }
+            while (shiftToAssignInMonths.Sum() > totalNumberOfShifts)
+            {
+                shiftToAssignInMonths[Array.IndexOf(shiftToAssignInMonths, shiftToAssignInMonths.Max())]--;
+            }
+
+            return shiftToAssignInMonths;
         }
 
         private async Task<IEnumerable<ScheduleStatsKey>> GetStatsKeysQuarterSchedulesAsync(int year, int quarterNumber,

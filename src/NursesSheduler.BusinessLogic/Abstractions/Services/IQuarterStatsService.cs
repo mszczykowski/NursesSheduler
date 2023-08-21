@@ -6,7 +6,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
     {
         Task<NurseStats> RecalculateQuarterNurseStatsAsync(NurseStats currentScheduleNursesStats, int year, int month,
             int departamentId);
-        Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, int year, int month, int departamentId);
+        Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, TimeSpan timeUsedForMorningShifts,
+            int year, int month, int departamentId);
         Task InvalidateQuarterCacheAsync(int year, int quarterNumber, int departamentId);
     }
 }

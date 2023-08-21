@@ -42,15 +42,10 @@ namespace NursesScheduler.BusinessLogic.Services
         public async Task<IScheduleSolver> GetScheduleSolver(int year, int departamentId, Schedule currentSchedule,
             CancellationToken cancellationToken)
         {
-            var morningShifts = await _applicationDbContext.MorningShifts
-                .Where(m => m.QuarterId == currentSchedule.QuarterId)
-                .ToListAsync();
-
+            var morningShifts = await GetMorningShifts(currentSchedule.QuarterId);
             _schedulesService.ResolveMorningShifts(currentSchedule, morningShifts);
 
-            var nurses = await _applicationDbContext.Nurses
-                .Where(n => n.DepartamentId == departamentId)
-                .ToListAsync();
+            var nurses = await GetNurses(departamentId);
 
             var departamentSettings = await _departamentSettingsProvider.GetCachedDataAsync(departamentId);
 
@@ -76,8 +71,8 @@ namespace NursesScheduler.BusinessLogic.Services
                 Month = currentSchedule.Month + 1 <= 12 ? currentSchedule.Month + 1 : 1,
             });
 
-            var quarterStats = await _quarterStatsService.GetQuarterStatsAsync(currentScheduleStats, year,
-                currentSchedule.Month, departamentId);
+            var quarterStats = await _quarterStatsService.GetQuarterStatsAsync(currentScheduleStats, morningShifts.SumTimeSpan(m => m.ShiftLength),
+                year, currentSchedule.Month, departamentId);
 
             var initialNurseStates = new NursesStatesDirector().BuildNurseStats(currentSchedule, quarterStats, previousScheduleStats,
                 currentScheduleStats, nextScheduleStats, _workTimeService, nurses);
@@ -85,12 +80,27 @@ namespace NursesScheduler.BusinessLogic.Services
             var initialSolverState = new SolverState(currentSchedule, scheduleMonthDays.Count(), initialNurseStates);
 
             var shiftCapacityManager = new ShiftCapacityManager(initialNurseStates, initialSolverState, departamentSettings,
-                scheduleMonthDays, currentSchedule, currentScheduleStats, morningShifts);
+                scheduleMonthDays, currentSchedule, currentScheduleStats, morningShifts, quarterStats
+                .ShiftsToAssignInMonths[currentScheduleStats.MonthInQuarter - 1]);
 
             _scheduleSolver.InitialiseSolver(morningShifts, scheduleMonthDays, constraints, departamentSettings,
                 shiftCapacityManager, initialSolverState, cancellationToken);
 
             return _scheduleSolver;
+        }
+
+        private async Task<IEnumerable<MorningShift>> GetMorningShifts(int quarterId)
+        {
+            return await _applicationDbContext.MorningShifts
+                .Where(m => m.QuarterId == quarterId)
+                .ToListAsync();
+        }
+
+        private async Task<IEnumerable<Nurse>> GetNurses(int departamentId)
+        {
+            return await _applicationDbContext.Nurses
+                .Where(n => n.DepartamentId == departamentId)
+                .ToListAsync();
         }
     }
 }

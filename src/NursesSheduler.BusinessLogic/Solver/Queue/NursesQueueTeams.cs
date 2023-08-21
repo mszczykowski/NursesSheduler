@@ -45,13 +45,15 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
                     .BuildSortedNursesQueue(solverState.CurrentShift,
                     day.IsWorkDay,
                     solverState.GetPreviousDayDayShift(),
-                    solverState.NurseStates.Where(n => n.NurseTeam == NurseTeams.A));
+                    solverState.NurseStates.Where(n => n.NurseTeam == NurseTeams.A),
+                    solverState.CurrentDay);
 
             _nursesQueueTeamB = _nurseQueueDirector
                 .BuildSortedNursesQueue(solverState.CurrentShift,
                 day.IsWorkDay,
                 solverState.GetPreviousDayDayShift(),
-                solverState.NurseStates.Where(n => n.NurseTeam == NurseTeams.B));
+                solverState.NurseStates.Where(n => n.NurseTeam == NurseTeams.B),
+                solverState.CurrentDay);
         }
 
         public override bool TryDequeue(out int result, bool isFirstTry)

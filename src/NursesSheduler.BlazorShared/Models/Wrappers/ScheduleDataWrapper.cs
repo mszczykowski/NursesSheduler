@@ -16,6 +16,7 @@ namespace NursesScheduler.BlazorShared.Models.Wrappers
 
         public event Action RefreshScheduleView;
         public event Action RecalculateScheduleStats;
+        public event Action ResolveMorningShifts;
         public event Action<int> RecalculateRowStats;
 
         public void RequestScheduleViewRefresh()
@@ -26,6 +27,11 @@ namespace NursesScheduler.BlazorShared.Models.Wrappers
         public void RequestScheduleRecalculation()
         {
             RecalculateScheduleStats.Invoke();
+        }
+
+        public void RequestResolveMorningShifts()
+        {
+            ResolveMorningShifts.Invoke();
         }
 
         public void RequestRowRecalculation(int nurseId)

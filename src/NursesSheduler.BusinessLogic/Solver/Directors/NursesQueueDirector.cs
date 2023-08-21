@@ -18,9 +18,11 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
         }
 
         public Queue<int> BuildSortedNursesQueue(ShiftIndex shiftIndex, bool IsWorkDay,
-            HashSet<int> previousDayShift, IEnumerable<INurseState> nurses)
+            HashSet<int> previousDayShift, IEnumerable<INurseState> nurses, int currentDay)
         {
             _nurseQueueBuilder = new NursesQueueBuilder(nurses, _random);
+
+            _nurseQueueBuilder.ProritiseWorkersOnTimeOff(currentDay);
 
             switch (shiftIndex, IsWorkDay)
             {

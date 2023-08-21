@@ -23,6 +23,7 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
+@using NursesScheduler.BusinessLogic.Extensions
 
 @inherits ComponenentUsingDepartament
 
@@ -216,9 +217,11 @@ else
 
             try
             {
-                _currentScheduleData.RecalculateScheduleStats += (async () => await RecalculateStatsAsync());
+                _currentScheduleData.RecalculateScheduleStats += (async () => await RecalculateCurrentStatsAsync());
                 _currentScheduleData.RecalculateRowStats += (async (int nurseId) => await RecalcuateRowStatsAsync(nurseId));
                 _currentScheduleData.RefreshScheduleView += (() => StateHasChanged());
+                _currentScheduleData.ResolveMorningShifts += (() => ResolveMorningShifts());
+                _previousScheduleData.RecalculateScheduleStats += (async () => await SetPreviousStatsAsync());;
                 _previousScheduleData.RefreshScheduleView += (() => StateHasChanged());
 
                 await SetNursesAsync();
@@ -269,6 +272,9 @@ else
 
     private async Task ChangeScheduleAsync()
     {
+        _currentScheduleData.CurrentStatsDipslayed = StatsDisplayed.Schedule;
+        _previousScheduleData.CurrentStatsDipslayed = StatsDisplayed.Schedule;
+
         await SetCurrentQuarterAsync();
         await SetCurrentScheduleAsync();
         await SetCurrentStatsAsync();
@@ -286,7 +292,7 @@ else
 
         if (!_currentScheduleData.ReadOnly)
         {
-            await RecalculateStatsAsync();
+            await RecalculateCurrentStatsAsync();
         }
     }
 
@@ -499,6 +505,7 @@ else
                 Month = month,
                 Year = year,
                 DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
+                TimeUsedForMorningShifts = _currentQuarterData.MorningShifts.SumTimeSpan(m => m.ShiftLength),
                 CurrentScheduleStats = _mapper.Map<GetQuarterStatsRequest.ScheduleStatsRequest>(scheduleStats),
             };
 
@@ -641,7 +648,7 @@ else
         }
     }
 
-    private async Task RecalculateStatsAsync()
+    private async Task RecalculateCurrentStatsAsync()
     {
         foreach (var nurseId in _currentScheduleData.Schedule.ScheduleNurses.Select(n => n.NurseId))
         {

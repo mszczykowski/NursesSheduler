@@ -4,6 +4,7 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Builders
 {
     internal interface INurseQueueBuilder : IBuilder<Queue<int>>
     {
+        INurseQueueBuilder ProritiseWorkersOnTimeOff(int currentDay);
         INurseQueueBuilder FilterTeam(NurseTeams nursesTeam);
         INurseQueueBuilder OrderByLongestBreak();
         INurseQueueBuilder OrderByLowestNumberOfHolidayShitfs();

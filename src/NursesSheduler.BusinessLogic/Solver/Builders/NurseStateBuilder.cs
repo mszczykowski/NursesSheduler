@@ -75,24 +75,26 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats)
+        public INurseStateBuilder SetNumbersOfShifts(int numberOfShiftsToAssignInMonth, 
+            NurseScheduleStats nurseScheduleStats, IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            if(nurseScheduleStats.TimeOffAssigned > nurseScheduleStats.TimeOffToAssign)
-            {
-                _numberOfTimeOffShiftsToAssign = (int)Math
-                    .Round(nurseScheduleStats.TimeOffAssigned
-                        / ScheduleConstatns.RegularShiftLength);
-            }
-            else
-            {
-                _numberOfTimeOffShiftsToAssign = (int)Math
-                    .Round((nurseScheduleStats.TimeOffToAssign - nurseScheduleStats.TimeOffAssigned)
-                        / ScheduleConstatns.RegularShiftLength);
-            }
+            _numberOfRegularShiftsToAssign = numberOfShiftsToAssignInMonth;
 
-            _numberOfRegularShiftsToAssign = (int)Math
-                .Floor((workTimeInMonth - nurseScheduleStats.AssignedWorkTime)
-                    / ScheduleConstatns.RegularShiftLength) - _numberOfTimeOffShiftsToAssign;
+            _numberOfTimeOffShiftsToAssign = (int)Math.Round(nurseScheduleStats.TimeOffToAssign 
+                / ScheduleConstatns.RegularShiftLength);
+
+            _numberOfTimeOffShiftsToAssign -= nurseWorkDays
+                .Count(wd => wd.IsTimeOff && wd.ShiftType != ShiftTypes.None && wd.ShiftType != ShiftTypes.Morning);
+
+            if (_numberOfTimeOffShiftsToAssign < 0)
+            {
+                _numberOfRegularShiftsToAssign += _numberOfTimeOffShiftsToAssign;
+                _numberOfTimeOffShiftsToAssign = 0;
+            }
+            _numberOfRegularShiftsToAssign -= _numberOfTimeOffShiftsToAssign;
+
+            _numberOfRegularShiftsToAssign -= nurseWorkDays
+                .Count(wd => !wd.IsTimeOff && wd.ShiftType != ShiftTypes.None && wd.ShiftType != ShiftTypes.Morning);
 
             return this;
         }

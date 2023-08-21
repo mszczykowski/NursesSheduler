@@ -109,6 +109,7 @@
         CurrentScheduleData.Schedule.ScheduleNurses = _mapper.Map<ICollection<ScheduleNurseViewModel>>(_solveScheduleResponse.SolverResult.ScheduleNurses);
         SolverSettings.GeneratorSeed = _solveScheduleResponse.SolverResult.SolverSettings.GeneratorSeed;
 
+        CurrentScheduleData.RequestResolveMorningShifts();
         CurrentScheduleData.RequestScheduleRecalculation();
         CurrentScheduleData.RequestScheduleViewRefresh();
     }

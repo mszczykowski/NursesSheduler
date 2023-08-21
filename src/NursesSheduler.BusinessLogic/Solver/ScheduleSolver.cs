@@ -158,7 +158,7 @@ namespace NursesScheduler.BusinessLogic.Solver
 
                 ISolverState? result;
 
-                if(currentState.IsShiftAssigned)
+                if (currentState.IsShiftAssigned)
                 {
                     currentState.AdvanceUnassignedNursesState();
                     currentState.AdvanceShiftAndDay();

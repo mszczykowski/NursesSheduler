@@ -33,7 +33,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
                     .BuildSortedNursesQueue(solverState.CurrentShift,
                     day.IsWorkDay,
                     solverState.GetPreviousDayDayShift(),
-                    solverState.NurseStates);
+                    solverState.NurseStates,
+                    solverState.CurrentDay);
         }
 
         public override bool TryDequeue(out int result, bool isFirstTry)

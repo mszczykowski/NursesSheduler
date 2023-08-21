@@ -60,6 +60,15 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
+        public INurseQueueBuilder ProritiseWorkersOnTimeOff(int currentDay)
+        {
+            _nursesPrioritised.AddRange(_nurses.Where(n => n.TimeOff[currentDay - 1]));
+
+            _nurses.RemoveAll(n => _nursesPrioritised.Any(np => np.NurseId == n.NurseId));
+
+            return this;
+        }
+
         public Queue<int> GetResult()
         {
             //remove last coma
