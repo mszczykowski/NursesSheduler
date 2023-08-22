@@ -23,5 +23,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         HashSet<int> GetPreviousDayDayShift();
         void PopulateScheduleFromState(Schedule schedule);
         void SetNursesToAssignCounts(IShiftCapacityManager shiftCapacityManager);
+        void SetHoursFromLastShift();
     }
 }

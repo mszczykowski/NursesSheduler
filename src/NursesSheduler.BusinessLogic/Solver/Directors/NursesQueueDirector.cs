@@ -3,6 +3,7 @@ using NursesScheduler.BusinessLogic.Abstractions.Solver.Directors;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
 using NursesScheduler.BusinessLogic.Solver.Builders;
 using NursesScheduler.BusinessLogic.Solver.Enums;
+using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.Directors
@@ -26,7 +27,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
             switch (solverState.CurrentShift, day.IsWorkDay)
             {
                 case (ShiftIndex.Day, true):
-                    BuildQueueForDayShift();
+                    BuildQueueForDayShift(solverState.CurrentDay);
                     break;
                 case (ShiftIndex.Day, false):
                     BuildQueueForDayHolidayShift(solverState.CurrentDay);
@@ -35,16 +36,17 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                     BuildQueueForNightShift(solverState.GetPreviousDayDayShift());
                     break;
                 case (ShiftIndex.Night, false):
-                    BuildQueueForNightHolidayShift(solverState.GetPreviousDayDayShift(), solverState.CurrentDay);
+                    BuildQueueForNightHolidayShift(solverState.GetPreviousDayDayShift());
                     break;
             }
 
             return _nurseQueueBuilder.GetResult();
         }
 
-        private void BuildQueueForDayShift()
+        private void BuildQueueForDayShift(int currentDay)
         {
              _nurseQueueBuilder
+                .ProritiseWorkersOnTimeOff(currentDay)
                 .OrderByLongestBreak();
         }
 
@@ -64,10 +66,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
         }
 
 
-        private void BuildQueueForNightHolidayShift(HashSet<int> previousShift, int currentDay)
+        private void BuildQueueForNightHolidayShift(HashSet<int> previousShift)
         {
             _nurseQueueBuilder
-                .ProritiseWorkersOnTimeOff(currentDay)
                 .ProritisePreviousDayShiftWorkers(previousShift)
                 .OrderByLowestNumberOfNightShitfs();
         }

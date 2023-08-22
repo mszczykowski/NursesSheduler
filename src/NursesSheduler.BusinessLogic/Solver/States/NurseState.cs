@@ -1,6 +1,5 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
-using NursesScheduler.BusinessLogic.Services;
 using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
@@ -106,6 +105,11 @@ namespace NursesScheduler.BusinessLogic.Solver.States
                 return ShiftTypes.Day;
             }
             else return ShiftTypes.Night;
+        }
+
+        public void ResetHoursFromLastShift()
+        {
+            HoursFromLastShift = TimeSpan.Zero;
         }
     }
 }

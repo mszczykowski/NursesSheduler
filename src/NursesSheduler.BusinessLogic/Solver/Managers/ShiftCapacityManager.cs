@@ -62,8 +62,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         private int GetMorningShiftsToAssignInMonth(IEnumerable<INurseState> initialNurseStates,
             IEnumerable<MorningShift> morningShifts, ScheduleStats scheduleStats)
         {
-            
-
             var totalNumberOfMorningShifts = morningShifts.Where(m => m.ShiftLength != TimeSpan.Zero).Count() *
                 initialNurseStates.Count();
 
@@ -85,7 +83,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         {
             RandomiseShiftCapacities(random);
             InitialiseShiftCapacities();
-            InitialisMorningShiftCapacities();
+            InitialisMorningShiftCapacities(random);
             SubtractInitialState();
         }
 
@@ -162,11 +160,14 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             }
         }
 
-        private void InitialisMorningShiftCapacities()
+        private void InitialisMorningShiftCapacities(Random random)
         {
+            Array.Fill(_morningShiftCapacities, 0);
+
             var orderedWorkDayIndexes = _monthDays
+                .Where(d => d.IsWorkDay)
+                .OrderBy(d => random.Next())
                 .Select(d => d.Date.Day - 1)
-                .OrderBy(i => _shiftCapacities[i, (int)ShiftIndex.Day])
                 .ToList();
 
             var morningShiftsLeft = _morningShiftsToAssignInMonth;

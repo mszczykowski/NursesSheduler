@@ -32,5 +32,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
         void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day, 
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
+        void ResetHoursFromLastShift();
     }
 }

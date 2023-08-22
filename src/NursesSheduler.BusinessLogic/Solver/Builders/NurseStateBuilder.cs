@@ -53,19 +53,12 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
             for (int i = 0; i < nurseWorkDays.Count(); i++)
             {
-                if (i > 0 && _hoursToNextShiftMatrix[i - 1] - TimeSpan.FromDays(1) >= TimeSpan.Zero)
-                {
-                    _hoursToNextShiftMatrix[i] = _hoursToNextShiftMatrix[i - 1] - TimeSpan.FromDays(1);
-                }
-                else
-                {
-                    _hoursToNextShiftMatrix[i] = workTimeService.GetHoursToFirstAssignedShift(i - 1, nurseWorkDays);
+                _hoursToNextShiftMatrix[i] = workTimeService.GetHoursToFirstAssignedShift(i + 1, nurseWorkDays);
 
-                    if (!nurseWorkDays.Any(wd => wd.Day >= i - 1 && wd.ShiftType != ShiftTypes.None))
-                    {
-                        _hoursToNextShiftMatrix[i] += GetNextScheudleTimeToFirstShift(nextMonthLength,
-                            nextScheduleNurseStats);
-                    }
+                if (!nurseWorkDays.Any(wd => wd.Day >= i + 1 && wd.ShiftType != ShiftTypes.None))
+                {
+                    _hoursToNextShiftMatrix[i] += GetNextScheudleTimeToFirstShift(nextMonthLength,
+                        nextScheduleNurseStats);
                 }
             }
 

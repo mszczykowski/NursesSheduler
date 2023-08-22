@@ -76,11 +76,12 @@ namespace NursesScheduler.BusinessLogic.Solver
             return AssignShift(stateCopy, GetQueue(), true);
         }
 
-
         private ISolverState? AssignShift(ISolverState previousState, INursesQueue previousQueue, bool shouldRebuildQueue)
         {
             ISolverState currentState = new SolverState(previousState);
             INursesQueue currentQueue = CopyQueue(previousQueue);
+
+            
 
             if (shouldRebuildQueue)
             {
@@ -168,6 +169,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                         return currentState;
                     }
 
+                    currentState.SetHoursFromLastShift();
                     currentState.SetNursesToAssignCounts(_shiftCapacityManager);
 
                     result = AssignShift(currentState, currentQueue, true);
