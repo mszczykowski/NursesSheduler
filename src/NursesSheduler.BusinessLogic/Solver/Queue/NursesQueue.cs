@@ -29,12 +29,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
 
         public override void PopulateQueue(ISolverState solverState, Day day)
         {
-            _nursesQueue = _nurseQueueDirector
-                    .BuildSortedNursesQueue(solverState.CurrentShift,
-                    day.IsWorkDay,
-                    solverState.GetPreviousDayDayShift(),
-                    solverState.NurseStates,
-                    solverState.CurrentDay);
+            _nursesQueue = _nurseQueueDirector.BuildSortedNursesQueue(solverState, day);
         }
 
         public override bool TryDequeue(out int result, bool isFirstTry)
