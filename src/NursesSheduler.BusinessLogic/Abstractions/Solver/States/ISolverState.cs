@@ -14,6 +14,8 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         int NursesToAssignForCurrentShift { get; }
         int NursesToAssignForMorningShift { get; }
         IDictionary<int, ShiftTypes[]> ScheduleState { get; }
+        public int RegularShiftsToSwapForMorning { get; set; }
+        public bool ShouldSwapRegularForMorning { get; }
 
         void AdvanceShiftAndDay();
         void AdvanceUnassignedNursesState();

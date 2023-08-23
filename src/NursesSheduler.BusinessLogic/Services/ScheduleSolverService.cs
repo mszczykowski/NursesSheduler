@@ -71,8 +71,8 @@ namespace NursesScheduler.BusinessLogic.Services
                 Month = currentSchedule.Month + 1 <= 12 ? currentSchedule.Month + 1 : 1,
             });
 
-            var quarterStats = await _quarterStatsService.GetQuarterStatsAsync(currentScheduleStats, morningShifts.SumTimeSpan(m => m.ShiftLength),
-                year, currentSchedule.Month, departamentId);
+            var quarterStats = await _quarterStatsService.GetQuarterStatsAsync(currentScheduleStats, year, 
+                currentSchedule.Month, departamentId);
 
             var initialNurseStates = new NursesStatesDirector().BuildNurseStats(currentSchedule, quarterStats, previousScheduleStats,
                 currentScheduleStats, nextScheduleStats, _workTimeService, nurses);
