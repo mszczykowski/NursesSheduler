@@ -16,21 +16,24 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         int NumberOfTimeOffShiftsToAssign { get; }
         int NurseId { get; }
         NurseTeams NurseTeam { get; }
-        public HashSet<int> PreviouslyAssignedMorningShifts { get; init; }
-        public int? AssignedMorningShiftId { get; set; }
+        HashSet<int> PreviouslyAssignedMorningShifts { get; init; }
+        int? AssignedMorningShiftId { get; set; }
         ShiftTypes PreviousMonthLastShift { get; }
         bool[] TimeOff { get; }
         Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; }
         TimeSpan WorkTimeInQuarterLeft { get; }
+        bool HadNumberOfShiftsReduced { get; }
+        bool ShouldNurseSwapRegularForMorning { get; }
 
+        bool CanNurseSwapRegularForMorning(ISolverState solverState);
         void AdvanceState();
-        void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day, 
+        void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
+            DepartamentSettings departamentSettings, IWorkTimeService workTimeService, bool shouldSwap);
+        void UpdateStateOnRegularShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
-        void UpdateStateOnRegularShiftAssign(ShiftIndex shiftIndex, DayNumbered day, 
+        void UpdateStateOnShiftAssign(ShiftTypes shiftType, TimeSpan shiftLenght, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
-        void UpdateStateOnShiftAssign(ShiftTypes shiftType, TimeSpan shiftLenght, DayNumbered day, 
-            DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
-        void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day, 
+        void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
         void ResetHoursFromLastShift();
     }

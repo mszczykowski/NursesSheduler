@@ -1,6 +1,4 @@
-﻿using NursesScheduler.Domain.Enums;
-
-namespace NursesScheduler.Domain.ValueObjects.Stats
+﻿namespace NursesScheduler.Domain.ValueObjects.Stats
 {
     public record NurseStats
     {

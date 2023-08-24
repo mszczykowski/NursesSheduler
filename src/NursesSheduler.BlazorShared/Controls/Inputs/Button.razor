@@ -1,4 +1,4 @@
-﻿<button class="button @Style @CssHelper.SetIsLoading(_isLoading)" type="button" @onclick="OnClick" disabled=@Disabled>
+﻿<a class="button @Style @CssHelper.SetIsLoading(_isLoading)" type="button" @onclick="OnClick" disabled=@Disabled>
     @if (Icon is not null)
     {
         <span class="icon">
@@ -6,7 +6,7 @@
         </span>
     }
     <span>@Text</span>
-</button>
+</a>
 
 
 @code {
@@ -25,6 +25,11 @@
 
     protected virtual async Task OnClick()
     {
+        if(Disabled)
+        {
+            return;
+        }
+
         await Action.InvokeAsync();
         StateHasChanged();
     }

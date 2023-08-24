@@ -11,6 +11,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 {
     internal sealed class ShiftCapacityManager : IShiftCapacityManager
     {
+        public bool IsSwappingRegularForMorningSuggested { get; init; }
+        public bool IsSwappingRequired { get; init; }
+
         private readonly Day[] _monthDays;
 
         private readonly int[,] _shiftCapacities;
@@ -42,13 +45,18 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
             _initialSolverState = initialSolverState;
 
+            _morningShiftsToAssignInMonth = GetMorningShiftsToAssignInMonth(initialNurseStates,
+                morningShifts, scheduleStats);
+
             _totalNumberOfShiftsToAssign = GetTotalNumberOfShiftsToAssign(initialNurseStates, schedule);
+
+            IsSwappingRequired = morningShifts.SumTimeSpan(m => m.ShiftLength) > ScheduleConstatns.RegularShiftLength;
+            IsSwappingRegularForMorningSuggested = GetIsSwappingRegularForMorningSuggested(scheduleStats, 
+                numberOfShiftsPerNurse);
+
             _targetMinimalNumberOfNursesOnShift = departamentSettings.TargetMinNumberOfNursesOnShift;
             _actualMinimalNumberOfNursesOnShift = GetActualMinimalNumberOfNursesOnShift(departamentSettings
                 .TargetMinNumberOfNursesOnShift);
-
-            _morningShiftsToAssignInMonth = GetMorningShiftsToAssignInMonth(initialNurseStates,
-                morningShifts, scheduleStats);
 
             _numberOfSurplusShifts = GetNumberOfSurplusShifts(_actualMinimalNumberOfNursesOnShift);
 
@@ -105,7 +113,21 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
             var totalNumberOfShifts = _numberOfShiftsPerNurse * schedule.ScheduleNurses.Count();
 
-            return totalNumberOfShifts - totalTimeOffShifts;
+            totalNumberOfShifts -= totalTimeOffShifts;
+
+            return totalNumberOfShifts;
+        }
+
+        private bool GetIsSwappingRegularForMorningSuggested(ScheduleStats scheduleStats, int numberOfRegularShiftsPerNurse)
+        {
+            if (scheduleStats.MonthInQuarter == 3 ||
+                scheduleStats.WorkTimeInMonth - numberOfRegularShiftsPerNurse * ScheduleConstatns.RegularShiftLength 
+                < TimeSpan.Zero)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private int GetActualMinimalNumberOfNursesOnShift(int targetMinimalNumberOfNursesOnShift)

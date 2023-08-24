@@ -66,9 +66,15 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             AssignNurseToCurrentShift(nurse.NurseId);
         }
 
-        public void AssignNurseToMorningShift(INurseState nurse)
+        public void AssignNurseToMorningShift(INurseState nurse, bool swapRegularForMorning)
         {
             NursesToAssignForMorningShift--;
+
+            if(swapRegularForMorning)
+            {
+                NursesToAssignForCurrentShift--;
+            }
+
             AssignNurseToShift(nurse.NurseId, ShiftTypes.Morning);
         }
 

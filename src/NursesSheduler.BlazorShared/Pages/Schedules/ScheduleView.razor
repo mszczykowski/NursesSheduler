@@ -505,7 +505,6 @@ else
                 Month = month,
                 Year = year,
                 DepartamentId = base.CurrentDepartamentStore.CurrentDepartament.DepartamentId,
-                TimeUsedForMorningShifts = _currentQuarterData.MorningShifts.SumTimeSpan(m => m.ShiftLength),
                 CurrentScheduleStats = _mapper.Map<GetQuarterStatsRequest.ScheduleStatsRequest>(scheduleStats),
             };
 
