@@ -23,7 +23,9 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; }
         TimeSpan WorkTimeInQuarterLeft { get; }
         bool HadNumberOfShiftsReduced { get; }
+        bool ShouldNurseSwapRegularForMorning { get; }
 
+        bool CanNurseSwapRegularForMorning(ISolverState solverState);
         void AdvanceState();
         void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService, bool shouldSwap);

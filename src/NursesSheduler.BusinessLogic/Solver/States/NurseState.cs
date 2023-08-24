@@ -27,6 +27,11 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public ShiftTypes PreviousMonthLastShift { get; init; }
         public NurseTeams NurseTeam { get; init; }
         public bool HadNumberOfShiftsReduced { get; set; }
+        public bool ShouldNurseSwapRegularForMorning => !HadNumberOfShiftsReduced 
+            && PreviouslyAssignedMorningShifts.Count() == 1;
+
+        public bool CanNurseSwapRegularForMorning(ISolverState solverState) 
+            => solverState.NursesToAssignForCurrentShift > 0 && NumberOfRegularShiftsToAssign > 0;
 
         public NurseState()
         {

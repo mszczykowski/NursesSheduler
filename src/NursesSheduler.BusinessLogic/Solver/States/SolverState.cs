@@ -14,8 +14,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
         public int NursesToAssignForCurrentShift { get; private set; }
         public int NursesToAssignForMorningShift { get; private set; }
-        public int RegularShiftsToSwapForMorning { get; set; }
-        public bool ShouldSwapRegularForMorning => RegularShiftsToSwapForMorning > 0;
 
         public ICollection<INurseState> NurseStates { get; }
         public IDictionary<int, ShiftTypes[]> ScheduleState { get; }
@@ -55,8 +53,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             NursesToAssignForCurrentShift = stateToCopy.NursesToAssignForCurrentShift;
             NursesToAssignForMorningShift = stateToCopy.NursesToAssignForMorningShift;
 
-            RegularShiftsToSwapForMorning = stateToCopy.RegularShiftsToSwapForMorning;
-
             //deep copies
             NurseStates = new List<INurseState>(stateToCopy.NurseStates.Select(s => new NurseState(s)).ToList());
 
@@ -70,9 +66,15 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             AssignNurseToCurrentShift(nurse.NurseId);
         }
 
-        public void AssignNurseToMorningShift(INurseState nurse)
+        public void AssignNurseToMorningShift(INurseState nurse, bool swapRegularForMorning)
         {
             NursesToAssignForMorningShift--;
+
+            if(swapRegularForMorning)
+            {
+                NursesToAssignForCurrentShift--;
+            }
+
             AssignNurseToShift(nurse.NurseId, ShiftTypes.Morning);
         }
 
