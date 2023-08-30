@@ -26,6 +26,12 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public int? AssignedMorningShiftId { get; set; }
         public ShiftTypes PreviousMonthLastShift { get; init; }
         public NurseTeams NurseTeam { get; init; }
+        public bool HadNumberOfShiftsReduced { get; set; }
+        public bool ShouldNurseSwapRegularForMorning => !HadNumberOfShiftsReduced 
+            && PreviouslyAssignedMorningShifts.Count() == 1;
+
+        public bool CanNurseSwapRegularForMorning(ISolverState solverState) 
+            => solverState.NursesToAssignForCurrentShift > 0 && NumberOfRegularShiftsToAssign > 0;
 
         public NurseState()
         {
@@ -48,6 +54,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             AssignedMorningShiftId = stateToCopy.AssignedMorningShiftId;
             PreviousMonthLastShift = stateToCopy.PreviousMonthLastShift;
             NurseTeam = stateToCopy.NurseTeam;
+            HadNumberOfShiftsReduced = stateToCopy.HadNumberOfShiftsReduced;
 
             //deep copies
             WorkTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(stateToCopy.WorkTimeAssignedInWeeks);
@@ -62,11 +69,17 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         }
 
         public void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
-            DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
+            DepartamentSettings departamentSettings, IWorkTimeService workTimeService, bool shouldSwap)
         {
             if (AssignedMorningShiftId is not null)
             {
                 throw new InvalidOperationException("UpdateStateOnMorningShiftAssign: assigned morning shift is not null");
+            }
+
+            if(shouldSwap && !HadNumberOfShiftsReduced)
+            {
+                NumberOfRegularShiftsToAssign--;
+                HadNumberOfShiftsReduced = true;
             }
 
             AssignedMorningShiftId = morningShift.MorningShiftId;

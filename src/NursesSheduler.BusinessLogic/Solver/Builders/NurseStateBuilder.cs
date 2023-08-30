@@ -25,6 +25,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         private int? _assignedMorningShiftId;
         private ShiftTypes _previousMonthLastShift;
         private NurseTeams _nurseTeam;
+        private bool _hadNumberOfShiftsReduced;
 
         public INurseStateBuilder SetNurseId(ScheduleNurse scheduleNurse)
         {
@@ -161,6 +162,13 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
+        public INurseStateBuilder SetHadNumberOfShiftsReduced(NurseQuarterStats nurseQuarterStats)
+        {
+            _hadNumberOfShiftsReduced = nurseQuarterStats.HadNumberOfShiftsReduced;
+
+            return this;
+        }
+
         public INurseState GetResult()
         {
             return new NurseState
@@ -179,6 +187,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
                 AssignedMorningShiftId = _assignedMorningShiftId,
                 PreviousMonthLastShift = _previousMonthLastShift,
                 NurseTeam = _nurseTeam,
+                HadNumberOfShiftsReduced = _hadNumberOfShiftsReduced,
             };
         }
 

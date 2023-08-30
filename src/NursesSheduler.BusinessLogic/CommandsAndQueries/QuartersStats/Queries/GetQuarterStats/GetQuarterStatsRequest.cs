@@ -8,7 +8,6 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries
         public int Month { get; set; }
         public int Year { get; set; }
         public int DepartamentId { get; set; }
-        public TimeSpan TimeUsedForMorningShifts { get; set; }
 
         public ScheduleStatsRequest CurrentScheduleStats { get; set; }
         public sealed class ScheduleStatsRequest
