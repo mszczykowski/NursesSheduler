@@ -44,8 +44,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
             _totalNumberOfShiftsToAssign = GetTotalNumberOfShiftsToAssign(initialNurseStates, schedule);
             _targetMinimalNumberOfNursesOnShift = departamentSettings.TargetMinNumberOfNursesOnShift;
-            _actualMinimalNumberOfNursesOnShift = GetActualMinimalNumberOfNursesOnShift(departamentSettings
-                .TargetMinNumberOfNursesOnShift);
+            _actualMinimalNumberOfNursesOnShift = GetActualMinimalNumberOfNursesOnShift();
 
             _morningShiftsToAssignInMonth = GetMorningShiftsToAssignInMonth(initialNurseStates,
                 morningShifts, scheduleStats);
@@ -108,11 +107,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             return totalNumberOfShifts - totalTimeOffShifts;
         }
 
-        private int GetActualMinimalNumberOfNursesOnShift(int targetMinimalNumberOfNursesOnShift)
+        private int GetActualMinimalNumberOfNursesOnShift()
         {
-            var calculatedMinimal = _totalNumberOfShiftsToAssign / (_monthDays.Length * ScheduleConstatns.NumberOfShifts);
-
-            return Math.Min(calculatedMinimal, targetMinimalNumberOfNursesOnShift);
+            return _totalNumberOfShiftsToAssign / (_monthDays.Length * ScheduleConstatns.NumberOfShifts);
         }
 
         private void InitialiseCapacitiesComponents()
@@ -126,14 +123,16 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             if (_actualMinimalNumberOfNursesOnShift < _targetMinimalNumberOfNursesOnShift)
             {
                 surplusShiftsLeft = AddSurplusShiftsToCapacity(_regularDayShiftCapacities, surplusShiftsLeft);
-                surplusShiftsLeft = AddSurplusShiftsToCapacity(_holidayDayShiftCapacities, surplusShiftsLeft);
-                AddSurplusShiftsToCapacity(_nightShiftsCapacities, surplusShiftsLeft);
+                surplusShiftsLeft = AddSurplusShiftsToCapacity(_nightShiftsCapacities, surplusShiftsLeft);
+                AddSurplusShiftsToCapacity(_holidayDayShiftCapacities, surplusShiftsLeft);
             }
             else
             {
                 while (surplusShiftsLeft > 0)
                 {
                     surplusShiftsLeft = AddSurplusShiftsToCapacity(_regularDayShiftCapacities, surplusShiftsLeft);
+                    surplusShiftsLeft = AddSurplusShiftsToCapacity(_nightShiftsCapacities, surplusShiftsLeft);
+                    surplusShiftsLeft = AddSurplusShiftsToCapacity(_holidayDayShiftCapacities, surplusShiftsLeft);
                 }
             }
         }
