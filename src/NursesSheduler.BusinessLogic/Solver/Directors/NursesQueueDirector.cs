@@ -10,19 +10,17 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
 {
     internal sealed class NursesQueueDirector : INursesQueueDirector
     {
-        private INurseQueueBuilder _nurseQueueBuilder;
-        
-        private readonly Random _random;
+        private readonly INurseQueueBuilder _nurseQueueBuilder;
 
         public NursesQueueDirector(Random random)
         {
-            _random = random;
+            _nurseQueueBuilder = new NursesQueueBuilder(random);
         }
 
         public Queue<int> BuildSortedNursesQueue(ISolverState solverState, Day day)
         {
-            _nurseQueueBuilder = new NursesQueueBuilder(solverState.NurseStates
-                .Where(n => solverState.ScheduleState[n.NurseId][solverState.CurrentDay - 1] == ShiftTypes.None), _random);
+            _nurseQueueBuilder.InitializeBuilder(solverState.NurseStates
+                .Where(n => solverState.ScheduleState[n.NurseId][solverState.CurrentDay - 1] == ShiftTypes.None));
 
             switch (solverState.CurrentShift, day.IsWorkDay)
             {
