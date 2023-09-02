@@ -123,7 +123,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
             return ScheduleState
                 .Where(entry => entry.Value[CurrentDay - 2] == ShiftTypes.Day)
-                    //|| entry.Value[CurrentDay - 2] == ShiftTypes.Morning)
                 .Select(entry => entry.Key)
                 .ToHashSet();
         }

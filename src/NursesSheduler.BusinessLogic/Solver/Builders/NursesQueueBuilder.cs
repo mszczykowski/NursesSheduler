@@ -35,7 +35,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseQueueBuilder OrderByLongestBreak()
         {
-            _orderByBuilder.Append(nameof(INurseState.HoursFromLastShift) + " desc,");
+            _orderByBuilder.Append(nameof(INurseState.HoursFromLastShift) + " descending,");
 
             return this;
         }

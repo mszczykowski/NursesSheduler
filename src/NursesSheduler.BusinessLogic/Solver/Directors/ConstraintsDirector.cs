@@ -14,9 +14,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
             var constraintsBuilder = new ConstraintsBuilder();
 
             return constraintsBuilder
-                .AddMaxTotalHoursInWeekConstraintConstraint(departamentSettings, monthDays)
-                .AddBreakConstraint(departamentSettings)
-                .AddHasEnoughWorkTimeLeftConstraint()
+                //.AddMaxTotalHoursInWeekConstraintConstraint(departamentSettings, monthDays)
+                //.AddBreakConstraint(departamentSettings)
+                //.AddHasEnoughWorkTimeLeftConstraint()
                 .GetResult();
         }
     }

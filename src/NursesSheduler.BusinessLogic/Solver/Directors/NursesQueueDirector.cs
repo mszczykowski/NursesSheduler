@@ -10,17 +10,19 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
 {
     internal sealed class NursesQueueDirector : INursesQueueDirector
     {
-        private readonly INurseQueueBuilder _nurseQueueBuilder;
+        private readonly Random _random;
+
+        private IEnumerable<INurseState> _nurses;
 
         public NursesQueueDirector(Random random)
         {
-            _nurseQueueBuilder = new NursesQueueBuilder(random);
+            _random = random;
         }
 
         public Queue<int> BuildSortedNursesQueue(ISolverState solverState, Day day)
         {
-            _nurseQueueBuilder.InitializeBuilder(solverState.NurseStates
-                .Where(n => solverState.ScheduleState[n.NurseId][solverState.CurrentDay - 1] == ShiftTypes.None));
+            _nurses = solverState.NurseStates
+                .Where(n => solverState.ScheduleState[n.NurseId][solverState.CurrentDay - 1] == ShiftTypes.None);
 
             switch (solverState.CurrentShift, day.IsWorkDay)
             {
@@ -34,41 +36,30 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                     BuildQueueForNightShift(solverState.GetPreviousDayDayShift());
                     break;
                 case (ShiftIndex.Night, false):
-                    BuildQueueForNightHolidayShift(solverState.GetPreviousDayDayShift());
+                    BuildQueueForNightShift(solverState.GetPreviousDayDayShift());
                     break;
             }
 
-            return _nurseQueueBuilder.GetResult();
+            return new Queue<int>(_nurses.Select(n => n.NurseId));
         }
 
         private void BuildQueueForDayShift(int currentDay)
         {
-             _nurseQueueBuilder
-                .ProritiseWorkersOnTimeOff(currentDay)
-                .OrderByLongestBreak();
+            _nurses.OrderByDescending(n => n.TimeOff[currentDay - 1])
+                .ThenByDescending(n => n.HoursFromLastShift);
         }
 
         private void BuildQueueForDayHolidayShift(int currentDay)
         {
-            _nurseQueueBuilder
-                .ProritiseWorkersOnTimeOff(currentDay)
-                .OrderByLowestNumberOfHolidayShitfs()
-                .OrderByLongestBreak();
+            _nurses.OrderByDescending(n => n.TimeOff[currentDay - 1])
+                .ThenBy(n => n.HolidayHoursAssigned)
+                .ThenByDescending(n => n.HoursFromLastShift);
         }
 
         private void BuildQueueForNightShift(HashSet<int> previousDayShift)
         {
-            _nurseQueueBuilder
-                .ProritisePreviousDayShiftWorkers(previousDayShift)
-                .OrderByLowestNumberOfNightShitfs();
-        }
-
-
-        private void BuildQueueForNightHolidayShift(HashSet<int> previousShift)
-        {
-            _nurseQueueBuilder
-                .ProritisePreviousDayShiftWorkers(previousShift)
-                .OrderByLowestNumberOfNightShitfs();
+            _nurses.OrderByDescending(n => previousDayShift.Contains(n.NurseId))
+                .ThenBy(n => n.NightHoursAssigned);
         }
     }
 }
