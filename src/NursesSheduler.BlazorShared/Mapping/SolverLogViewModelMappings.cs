@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.Models.ViewModels.ValueObjects;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries.GetSolverLogs;
 
 namespace NursesScheduler.BlazorShared.Mapping
 {
