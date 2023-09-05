@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.SolveSchedule
 {
     public sealed class SolveScheduleResponse
     {

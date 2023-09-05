@@ -55,8 +55,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
                 numberOfShiftsPerNurse);
 
             _targetMinimalNumberOfNursesOnShift = departamentSettings.TargetMinNumberOfNursesOnShift;
-            _actualMinimalNumberOfNursesOnShift = GetActualMinimalNumberOfNursesOnShift(departamentSettings
-                .TargetMinNumberOfNursesOnShift);
+            _actualMinimalNumberOfNursesOnShift = GetActualMinimalNumberOfNursesOnShift();
 
             _numberOfSurplusShifts = GetNumberOfSurplusShifts(_actualMinimalNumberOfNursesOnShift);
 
@@ -130,11 +129,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             return false;
         }
 
-        private int GetActualMinimalNumberOfNursesOnShift(int targetMinimalNumberOfNursesOnShift)
+        private int GetActualMinimalNumberOfNursesOnShift()
         {
-            var calculatedMinimal = _totalNumberOfShiftsToAssign / (_monthDays.Length * ScheduleConstatns.NumberOfShifts);
-
-            return Math.Min(calculatedMinimal, targetMinimalNumberOfNursesOnShift);
+            return _totalNumberOfShiftsToAssign / (_monthDays.Length * ScheduleConstatns.NumberOfShifts);
         }
 
         private void InitialiseCapacitiesComponents()

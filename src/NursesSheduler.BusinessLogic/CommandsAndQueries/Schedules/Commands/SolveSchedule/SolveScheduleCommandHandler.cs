@@ -7,7 +7,7 @@ using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.SolveSchedule
 {
     internal sealed class SolveScheduleCommandHandler : IRequestHandler<SolveScheduleRequest,
         SolveScheduleResponse>
@@ -19,7 +19,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
         private readonly ISeedService _seedService;
         private readonly ISolverLoggerService _solverLoggerService;
 
-        public SolveScheduleCommandHandler(IMapper mapper, IScheduleSolverService scheduleSolverService, 
+        public SolveScheduleCommandHandler(IMapper mapper, IScheduleSolverService scheduleSolverService,
             ISeedService seedService, ISolverLoggerService solverLoggerService)
         {
             _mapper = mapper;
@@ -48,7 +48,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
 
             if (thread == null || !thread.IsAlive)
             {
-                thread = new Thread(new ThreadStart(() => TryGenerateSchedule(response, solverSettings, solver, 
+                thread = new Thread(new ThreadStart(() => TryGenerateSchedule(response, solverSettings, solver,
                     currentSchedule, cancellationToken)));
                 thread.Start();
             }
@@ -57,7 +57,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
         }
 
 
-        private void TryGenerateSchedule(SolveScheduleResponse response, SolverSettings solverSettings, 
+        private void TryGenerateSchedule(SolveScheduleResponse response, SolverSettings solverSettings,
             IScheduleSolver solver, Schedule currentSchedule, CancellationToken cancellationToken)
         {
             response.IsSolverRunning = true;
@@ -74,7 +74,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
                     _solverLoggerService.LogEvent(SolverEvents.SolutionFound);
                     break;
                 }
-                if(cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
@@ -84,7 +84,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.Sol
                 solverSettings.GeneratorSeed = _seedService.GetSeed();
             }
 
-            if(result is not null)
+            if (result is not null)
             {
                 result.PopulateScheduleFromState(currentSchedule);
 

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.BuildSchedule
 {
     public class BuildScheduleRequest : IRequest<BuildScheduleResponse>
     {

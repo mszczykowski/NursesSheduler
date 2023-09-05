@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.CalculateMorningShifts
 {
     public sealed class CalculateMorningShiftsRequest : IRequest<IEnumerable<CalculateMorningShiftsResponse>>
     {

@@ -34,6 +34,12 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
+        public IConstraintsBuilder AddAvoidTwoNightShiftsInTheRow()
+        {
+            _result.Add(new AvoidTwoNightShiftsInTheRow());
+            return this;
+        }
+
         public IEnumerable<IConstraint> GetResult() => _result;
     }
 }

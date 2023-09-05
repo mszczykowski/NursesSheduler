@@ -10,19 +10,18 @@
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Documents.Commands.GeneratePdfDocument
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.GetMorningShifts
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.NurseStats.Commands.RecalculateNurseStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Nurses.Queries.GetNursesFromDepartament
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Commands.AddQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Quarters.Queries.GetQuarter
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.QuartersStats.Queries.GetQuarterStats
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.BuildSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.CloseSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.DeleteSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.UpsertSchedule
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.GetSchedule
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStats
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.GetScheduleStatsFromSchedule
-@using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
 @using NursesScheduler.BusinessLogic.Extensions
 
 @inherits ComponenentUsingDepartament

@@ -3,9 +3,9 @@ using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.ValueObjects;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries.GetSolverLogs
 {
-    internal sealed class GetSolverLogsQueryHandler : IRequestHandler<GetSolverLogsRequest, 
+    internal sealed class GetSolverLogsQueryHandler : IRequestHandler<GetSolverLogsRequest,
         IEnumerable<GetSolverLogsResponse>>
     {
         private readonly IMapper _mapper;
@@ -17,7 +17,7 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
             _solverLoggerService = solverLoggerService;
         }
 
-        public Task<IEnumerable<GetSolverLogsResponse>> Handle(GetSolverLogsRequest request, 
+        public Task<IEnumerable<GetSolverLogsResponse>> Handle(GetSolverLogsRequest request,
             CancellationToken cancellationToken)
         {
             bool shouldTryAgain = false;

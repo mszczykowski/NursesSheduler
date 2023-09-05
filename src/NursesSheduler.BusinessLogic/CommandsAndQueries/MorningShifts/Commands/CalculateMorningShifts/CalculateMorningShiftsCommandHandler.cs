@@ -3,16 +3,16 @@ using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure.Providers;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.CalculateMorningShifts
 {
-    internal sealed class CalculateMorningShiftsQueryHandler : IRequestHandler<CalculateMorningShiftsRequest,
+    internal sealed class CalculateMorningShiftsCommandHandler : IRequestHandler<CalculateMorningShiftsRequest,
         IEnumerable<CalculateMorningShiftsResponse>>
     {
         private readonly IWorkTimeService _workTimeService;
         private readonly IDepartamentSettingsProvider _departamentSettingsManager;
         private readonly IMapper _mapper;
 
-        public CalculateMorningShiftsQueryHandler(IWorkTimeService workTimeService,
+        public CalculateMorningShiftsCommandHandler(IWorkTimeService workTimeService,
             IDepartamentSettingsProvider departamentSettingsManager,
             IMapper mapper)
         {
