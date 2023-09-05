@@ -98,15 +98,6 @@ namespace NursesScheduler.BusinessLogic.Solver
                 isFirstTry = false;
                 _currentNurse = currentState.NurseStates.First(e => e.NurseId == _currentNurseId);
 
-                if (!_currentNurse.TimeOff[currentState.CurrentDay - 1] && currentState.NursesToAssignForMorningShift > 0
-                    && _currentNurse.AssignedMorningShiftId is null && _currentNurse.PreviouslyAssignedMorningShifts.Count()
-                    != _morningShifts.Count())
-                {
-                    _possibleMorningShifts = _morningShifts
-                        .Where(m => !_currentNurse.PreviouslyAssignedMorningShifts.Contains(m.MorningShiftId)
-                            && _constraints.All(c => c.IsSatisfied(currentState, _currentNurse, m.ShiftLength)));
-                }
-
                 if (_currentNurse.TimeOff[currentState.CurrentDay - 1])
                 {
                     if (_currentNurse.NumberOfTimeOffShiftsToAssign == 0 ||
@@ -120,27 +111,6 @@ namespace NursesScheduler.BusinessLogic.Solver
 
                     _currentNurse.UpdateStateOnTimeOffShiftAssign(currentState.CurrentShift, currentDay,
                         _departamentSettings, _workTimeService);
-                }
-                else if (_possibleMorningShifts.Count() > 0 && (!_shiftCapacityManager.IsSwappingRequired ||
-                    !_currentNurse.ShouldNurseSwapRegularForMorning ||
-                    _currentNurse.CanNurseSwapRegularForMorning(currentState)))
-                {
-                    var morningShiftToAssign = _possibleMorningShifts.OrderBy(m => _random.Next()).First();
-
-                    if(_shiftCapacityManager.IsSwappingRequired && (_currentNurse.ShouldNurseSwapRegularForMorning ||
-                        (_currentNurse.CanNurseSwapRegularForMorning(currentState) 
-                        && _shiftCapacityManager.IsSwappingRegularForMorningSuggested)))
-                    {
-                        currentState.AssignNurseToMorningShift(_currentNurse, true);
-                        _currentNurse.UpdateStateOnMorningShiftAssign(morningShiftToAssign, currentDay,
-                            _departamentSettings, _workTimeService, true);
-                    }
-                    else
-                    {
-                        currentState.AssignNurseToMorningShift(_currentNurse, false);
-                        _currentNurse.UpdateStateOnMorningShiftAssign(morningShiftToAssign, currentDay,
-                            _departamentSettings, _workTimeService, false);
-                    }
                 }
                 else if (currentState.NursesToAssignForCurrentShift > 0 &&
                     _currentNurse.NumberOfRegularShiftsToAssign > 0 &&

@@ -13,11 +13,10 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public ShiftIndex CurrentShift { get; private set; }
 
         public int NursesToAssignForCurrentShift { get; private set; }
-        public int NursesToAssignForMorningShift { get; private set; }
 
         public ICollection<INurseState> NurseStates { get; }
         public IDictionary<int, ShiftTypes[]> ScheduleState { get; }
-        public bool IsShiftAssigned => NursesToAssignForCurrentShift == 0 && NursesToAssignForMorningShift == 0;
+        public bool IsShiftAssigned => NursesToAssignForCurrentShift == 0;
 
         public SolverState(Schedule schedule, int monthLength, IEnumerable<INurseState> nurses)
         {
@@ -51,7 +50,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             CurrentShift = stateToCopy.CurrentShift;
 
             NursesToAssignForCurrentShift = stateToCopy.NursesToAssignForCurrentShift;
-            NursesToAssignForMorningShift = stateToCopy.NursesToAssignForMorningShift;
 
             //deep copies
             NurseStates = new List<INurseState>(stateToCopy.NurseStates.Select(s => new NurseState(s)).ToList());
@@ -68,8 +66,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
         public void AssignNurseToMorningShift(INurseState nurse, bool swapRegularForMorning)
         {
-            NursesToAssignForMorningShift--;
-
             if(swapRegularForMorning)
             {
                 NursesToAssignForCurrentShift--;
@@ -107,8 +103,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         {
             NursesToAssignForCurrentShift = shiftCapacityManager
                 .GetNumberOfNursesForRegularShift(CurrentShift, CurrentDay);
-            NursesToAssignForMorningShift = shiftCapacityManager
-                .GetNumberOfNursesForMorningShift(CurrentShift, CurrentDay);
         }
 
         public HashSet<int> GetPreviousDayDayShift()

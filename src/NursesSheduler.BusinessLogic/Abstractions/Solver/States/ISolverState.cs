@@ -12,7 +12,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         bool IsShiftAssigned { get; }
         ICollection<INurseState> NurseStates { get; }
         int NursesToAssignForCurrentShift { get; }
-        int NursesToAssignForMorningShift { get; }
         IDictionary<int, ShiftTypes[]> ScheduleState { get; }
 
         void AdvanceShiftAndDay();
