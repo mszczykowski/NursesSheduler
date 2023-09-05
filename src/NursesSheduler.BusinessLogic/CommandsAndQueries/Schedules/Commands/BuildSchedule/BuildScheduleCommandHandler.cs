@@ -1,20 +1,19 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Exceptions;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.BuildSchedule
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.BuildSchedule
 {
-    internal class BuildScheduleQueryHandler : IRequestHandler<BuildScheduleRequest, BuildScheduleResponse>
+    internal class BuildScheduleCommandHandler : IRequestHandler<BuildScheduleRequest, BuildScheduleResponse>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly ISchedulesService _schedulesService;
 
-        public BuildScheduleQueryHandler(IApplicationDbContext context, IMapper mapper, ISchedulesService schedulesService)
+        public BuildScheduleCommandHandler(IApplicationDbContext context, IMapper mapper, ISchedulesService schedulesService)
         {
             _context = context;
             _mapper = mapper;

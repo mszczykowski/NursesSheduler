@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.NurseStats.Commands.RecalculateNurseStats
 {
     public sealed class RecalculateNurseStatsRequest : IRequest<RecalculateNurseStatsResponse>
     {

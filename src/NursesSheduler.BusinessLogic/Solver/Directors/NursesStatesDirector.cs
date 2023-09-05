@@ -45,8 +45,9 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                         nextScheduleStats.Key.Month), scheduleNurse.NurseWorkDays,
                         nextScheduleStats.NursesScheduleStats.FirstOrDefault(n => n.NurseId == scheduleNurse.NurseId),
                         workTimeService)
-                    .SetNumbersOfShifts(currentScheduleStats.WorkTimeInMonth,
-                        currentScheduleStats.NursesScheduleStats.First(n => n.NurseId == scheduleNurse.NurseId))
+                    .SetNumbersOfShifts(quarterStats.ShiftsToAssignInMonths[currentScheduleStats.MonthInQuarter - 1],
+                        currentScheduleStats.NursesScheduleStats.First(n => n.NurseId == scheduleNurse.NurseId),
+                        scheduleNurse.NurseWorkDays)
                     .SetSpecialWorkHours(nurse, scheduleStatsList)
                     .SetWorkTimeInQuarterLeft(quarterStats.WorkTimeInQuarter, nurseQuarterStats)
                     .SetTimeOffs(scheduleNurse.NurseWorkDays)
@@ -54,6 +55,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                     .SetAssignedMorningShift(scheduleNurse.NurseWorkDays)
                     .SetPreviousMonthLastShift(previousScheduleNurseStats)
                     .SetNurseTeam(nurse)
+                    .SetHadNumberOfShiftsReduced(nurseQuarterStats)
                     .GetResult());
             }
 

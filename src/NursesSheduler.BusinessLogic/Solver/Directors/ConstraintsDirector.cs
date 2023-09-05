@@ -17,6 +17,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                 .AddMaxTotalHoursInWeekConstraintConstraint(departamentSettings, monthDays)
                 .AddBreakConstraint(departamentSettings)
                 .AddHasEnoughWorkTimeLeftConstraint()
+                .AddAvoidTwoNightShiftsInTheRow()
                 .GetResult();
         }
     }

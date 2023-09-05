@@ -10,5 +10,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Builders
         IConstraintsBuilder AddHasEnoughWorkTimeLeftConstraint();
         IConstraintsBuilder AddMaxTotalHoursInWeekConstraintConstraint(DepartamentSettings departamentSettings, 
             IEnumerable<DayNumbered> days);
+        IConstraintsBuilder AddAvoidTwoNightShiftsInTheRow();
     }
 }

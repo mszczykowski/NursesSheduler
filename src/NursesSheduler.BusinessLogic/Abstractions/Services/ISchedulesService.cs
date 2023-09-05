@@ -10,5 +10,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         Task SetTimeOffsAsync(int year, int month, Schedule schedule);
         Task<int> UpsertSchedule(Schedule updatedSchdeule, CancellationToken cancellationToken);
         void SetScheduleStats(Schedule schedule, ScheduleStats scheduleStats);
+        Task DeleteSchedule(int scheduleId);
     }
 }

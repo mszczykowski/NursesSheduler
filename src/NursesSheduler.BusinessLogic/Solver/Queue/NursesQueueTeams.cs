@@ -36,22 +36,14 @@ namespace NursesScheduler.BusinessLogic.Solver.Queue
         {
             return _nursesQueueTeamA is null
                     || _nursesQueueTeamB is null
-                    || _nursesQueueTeamA.Count == 0 && _nursesQueueTeamB.Count == 0;
+                    || (_nursesQueueTeamA.Count == 0 && _nursesQueueTeamB.Count == 0);
         }
 
         public override void PopulateQueue(ISolverState solverState, Day day)
         {
-            _nursesQueueTeamA = _nurseQueueDirector
-                    .BuildSortedNursesQueue(solverState.CurrentShift,
-                    day.IsWorkDay,
-                    solverState.GetPreviousDayDayShift(),
-                    solverState.NurseStates.Where(n => n.NurseTeam == NurseTeams.A));
+            _nursesQueueTeamA = _nurseQueueDirector.BuildSortedNursesQueue(solverState, day);
 
-            _nursesQueueTeamB = _nurseQueueDirector
-                .BuildSortedNursesQueue(solverState.CurrentShift,
-                day.IsWorkDay,
-                solverState.GetPreviousDayDayShift(),
-                solverState.NurseStates.Where(n => n.NurseTeam == NurseTeams.B));
+            _nursesQueueTeamB = _nurseQueueDirector.BuildSortedNursesQueue(solverState, day);
         }
 
         public override bool TryDequeue(out int result, bool isFirstTry)

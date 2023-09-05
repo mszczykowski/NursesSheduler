@@ -12,22 +12,7 @@
 <AbsenceFormModal @ref="_absenceFormModal" IsEdit=true SaveAbsence="EditAbsence" />
 <ErrorModal @ref=_errorModal />
 
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <label class="label">Nieobecności</label>
-        </div>
-    </div>
-    <div class="level-right">
-        <div class="level-item">
-            <label class="label">Miesiąc</label>
-        </div>
-        <div class="level-item">
-            <MonthSelect MonthPickerViewModel=_selectedMonth OnChange="(() => StateHasChanged())" />
-        </div>
-    </div>
-</div>
-@if (Absences is null || Absences.Count() == 0)
+@if (_currentAbsences is null || _currentAbsences.Where(a => a.Month == _month).Count() == 0)
 {
     <div class="has-text-centered">
         <h4 class="subtitle is-4">Brak wprowadzonych nieobecności</h4>
@@ -48,7 +33,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var absence in Absences.Where(a => a.Month == _selectedMonth.MonthNumber).OrderBy(a => a.Days.Min()).ToList())
+            @foreach (var absence in _currentAbsences.Where(a => a.Month == _month).OrderBy(a => a.Days.Min()).ToList())
             {
                 <tr>
                     <td>@absence.ToString()</td>
@@ -59,7 +44,7 @@ else
                     @if (!absence.IsClosed)
                     {
                         <td>
-                            <a @onclick="(() => _absenceFormModal.ShowModal(absence, Year))">Edytuj</a>
+                            <a @onclick="(() => _absenceFormModal.ShowModal(absence, _year))">Edytuj</a>
                         </td>
                         <td>
                             <a class="has-text-danger" @onclick="(() => _deleteModal.ShowModal(absence.ToString(), absence.AbsenceId))">Usuń</a>
@@ -82,17 +67,22 @@ else
 
 @code {
     [Parameter]
-    public List<AbsenceViewModel> Absences { get; set; }
+    public IEnumerable<AbsencesSummaryViewModel> AbsencesSummaries { get; set; }
     [Parameter]
-    public int Year { get; set; }
+    public IYearPickerViewModel YearPicker { get; set; }
+    [Parameter]
+    public IMonthPickerViewModel MonthPicker { get; set; }
+
+    private List<AbsenceViewModel> _currentAbsences => AbsencesSummaries.First(s => s.Year == _year).Absences;
 
     private DeleteModalWithId _deleteModal;
     private AbsenceFormModal _editModal;
 
-    private MonthPickerViewModel _selectedMonth = new(DateTime.Now.Month);
-
     private AbsenceFormModal _absenceFormModal;
     private ErrorModal _errorModal;
+
+    private int _month => MonthPicker.MonthNumber;
+    private int _year => YearPicker.YearNumber;
 
     private async Task DeleteAbsence(int absenceId)
     {
@@ -109,7 +99,7 @@ else
                 throw new EntityNotDeletedException(absenceId, nameof(AbsenceViewModel));
             }
 
-            Absences.Remove(Absences.First(a => a.AbsenceId == absenceId));
+            _currentAbsences.RemoveAll(a => a.AbsenceId == absenceId);
 
         }
         catch (Exception e)
@@ -142,8 +132,8 @@ else
                 return;
             }
 
-            Absences.RemoveAll(a => a.AbsenceId == _modifiedAbsence.AbsenceId);
-            Absences.Add(_mapper.Map<AbsenceViewModel>(response.Absence));
+            _currentAbsences.RemoveAll(a => a.AbsenceId == _modifiedAbsence.AbsenceId);
+            _currentAbsences.Add(_mapper.Map<AbsenceViewModel>(response.Absence));
 
             StateHasChanged();
         }

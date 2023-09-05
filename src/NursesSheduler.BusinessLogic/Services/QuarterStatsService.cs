@@ -2,7 +2,6 @@
 using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
 namespace NursesScheduler.BusinessLogic.Services
@@ -49,7 +48,7 @@ namespace NursesScheduler.BusinessLogic.Services
             return GetQuarterNurseStats(quarterSchedulesNurseStats);
         }
 
-        public async Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, int year, int month,
+        public async Task<QuarterStats> GetQuarterStatsAsync(ScheduleStats currentScheduleStats, int year, int month, 
             int departamentId)
         {
             var quarterSchedulesStats = new List<ScheduleStats>
@@ -64,11 +63,38 @@ namespace NursesScheduler.BusinessLogic.Services
             {
                 WorkTimeInQuarter = workTimeInQuarter,
                 TimeForMorningShifts = CalculateTimeForMorningShifts(workTimeInQuarter),
+                ShiftsToAssignInMonths = CalculateShiftsToAssignInMonths(quarterSchedulesStats, workTimeInQuarter),
             };
 
-            quarterStats.NurseStats = GetQuarterNursesStats(quarterSchedulesStats);
+            quarterStats.NurseStats = GetQuarterNursesStats(quarterSchedulesStats, quarterStats.ShiftsToAssignInMonths);
 
             return quarterStats;
+        }
+
+        private int[] CalculateShiftsToAssignInMonths(IEnumerable<ScheduleStats> quarterScheduleStats, 
+            TimeSpan workTimeInQuarter)
+        {
+            var totalNumberOfShifts = (int)Math.Floor(workTimeInQuarter / ScheduleConstatns.RegularShiftLength);
+
+            var shiftToAssignInMonths = new int[3];
+
+            for (var i = 0; i < shiftToAssignInMonths.Length; i++)
+            {
+                var currentScheduleStats = quarterScheduleStats.First(s => s.MonthInQuarter == i + 1);
+                shiftToAssignInMonths[i] = (int)Math.Round(currentScheduleStats.WorkTimeInMonth 
+                    / ScheduleConstatns.RegularShiftLength);
+            }
+
+            while (shiftToAssignInMonths.Sum() < totalNumberOfShifts)
+            {
+                shiftToAssignInMonths[Array.IndexOf(shiftToAssignInMonths, shiftToAssignInMonths.Min())]++;
+            }
+            while (shiftToAssignInMonths.Sum() > totalNumberOfShifts)
+            {
+                shiftToAssignInMonths[Array.IndexOf(shiftToAssignInMonths, shiftToAssignInMonths.Max())]--;
+            }
+
+            return shiftToAssignInMonths;
         }
 
         private async Task<IEnumerable<ScheduleStatsKey>> GetStatsKeysQuarterSchedulesAsync(int year, int quarterNumber,
@@ -102,9 +128,10 @@ namespace NursesScheduler.BusinessLogic.Services
             return await GetStatsKeysQuarterSchedulesAsync(year, quarterNumber, departamentSettings);
         }
 
-        private IEnumerable<NurseStats> GetQuarterNursesStats(IEnumerable<ScheduleStats> quarterSchedulesStats)
+        private IEnumerable<NurseQuarterStats> GetQuarterNursesStats(IEnumerable<ScheduleStats> quarterSchedulesStats,
+            int[] shiftToAssignInMonths)
         {
-            var nursesQuarterStats = new List<NurseStats>();
+            var nursesQuarterStats = new List<NurseQuarterStats>();
 
             var nursesIds = quarterSchedulesStats
                 .SelectMany(s => s.NursesScheduleStats)
@@ -112,9 +139,14 @@ namespace NursesScheduler.BusinessLogic.Services
 
             foreach (var nurseId in nursesIds)
             {
-                nursesQuarterStats.Add(GetQuarterNurseStats(quarterSchedulesStats
+                var nurseQuarterStats = GetQuarterNurseStats(quarterSchedulesStats
                     .SelectMany(q => q.NursesScheduleStats)
-                    .Where(s => s.NurseId == nurseId)));
+                    .Where(s => s.NurseId == nurseId));
+
+                nurseQuarterStats.HadNumberOfShiftsReduced 
+                    = GetHadNumberOfShiftsReduced(shiftToAssignInMonths, quarterSchedulesStats, nurseId);
+
+                nursesQuarterStats.Add(nurseQuarterStats);
             }
 
             return nursesQuarterStats;
@@ -135,9 +167,9 @@ namespace NursesScheduler.BusinessLogic.Services
             return quarterScheduleStats;
         }
 
-        private NurseStats GetQuarterNurseStats(IEnumerable<NurseStats> quarterSchedulesNurseStats)
+        private NurseQuarterStats GetQuarterNurseStats(IEnumerable<NurseStats> quarterSchedulesNurseStats)
         {
-            var nurseQuarterStats = new NurseStats
+            var nurseQuarterStats = new NurseQuarterStats
             {
                 NurseId = quarterSchedulesNurseStats.First().NurseId,
                 AssignedMorningShiftsIds = new List<int>(),
@@ -186,6 +218,28 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             return workTimeInQuarter - ((int)Math.Floor(workTimeInQuarter / ScheduleConstatns.RegularShiftLength)
                 * ScheduleConstatns.RegularShiftLength);
+        }
+
+        private bool GetHadNumberOfShiftsReduced(int[] shiftsToAssignInMonths, 
+            IEnumerable<ScheduleStats> quarterScheduleStats, int nurseId)
+        {
+            foreach(var scheduleStats in quarterScheduleStats)
+            {
+                var nurseStats = scheduleStats.NursesScheduleStats.FirstOrDefault(s => s.NurseId == nurseId);
+                
+                if(nurseStats is null)
+                {
+                    continue;
+                }
+
+                if((int)Math.Floor(nurseStats.AssignedWorkTime / ScheduleConstatns.RegularShiftLength)
+                    == shiftsToAssignInMonths[scheduleStats.MonthInQuarter - 1] - 1)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

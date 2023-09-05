@@ -5,9 +5,9 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.ValueObjects.Stats;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.NurseStats.Commands.RecalculateNurseStats
 {
-    internal sealed class RecalculateNurseStatsQueryHandler : IRequestHandler<RecalculateNurseStatsRequest, RecalculateNurseStatsResponse>
+    internal sealed class RecalculateNurseStatsCommandHandler : IRequestHandler<RecalculateNurseStatsRequest, RecalculateNurseStatsResponse>
     {
         private readonly IMapper _mapper;
         private readonly IScheduleStatsService _scheduleStatsService;
@@ -15,8 +15,8 @@ namespace NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Querie
         private readonly IScheduleValidatorService _scheduleValidatorService;
         private readonly IScheduleStatsProvider _scheduleStatsProvider;
 
-        public RecalculateNurseStatsQueryHandler(IMapper mapper, IScheduleStatsService scheduleStatsService, 
-            IQuarterStatsService quarterStatsService, IScheduleValidatorService scheduleValidatorService, 
+        public RecalculateNurseStatsCommandHandler(IMapper mapper, IScheduleStatsService scheduleStatsService,
+            IQuarterStatsService quarterStatsService, IScheduleValidatorService scheduleValidatorService,
             IScheduleStatsProvider scheduleStatsProvider)
         {
             _mapper = mapper;

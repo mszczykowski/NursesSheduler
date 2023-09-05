@@ -18,10 +18,11 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         void AdvanceShiftAndDay();
         void AdvanceUnassignedNursesState();
         void AssignNurseOnTimeOff(INurseState nurse);
-        void AssignNurseToMorningShift(INurseState nurse);
+        void AssignNurseToMorningShift(INurseState nurse, bool swapRegularForMorning);
         void AssignNurseToRegularShift(INurseState nurse);
         HashSet<int> GetPreviousDayDayShift();
         void PopulateScheduleFromState(Schedule schedule);
         void SetNursesToAssignCounts(IShiftCapacityManager shiftCapacityManager);
+        void SetHoursFromLastShift();
     }
 }

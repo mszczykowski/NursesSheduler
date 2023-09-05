@@ -23,6 +23,7 @@ namespace NursesScheduler.BlazorShared.Models.ViewModels.Entities
                 }
                 else if(_previousNumberOfRetries > 0)
                 {
+                    GeneratorSeed = "";
                     NumberOfRetries = _previousNumberOfRetries;
                 }
             }

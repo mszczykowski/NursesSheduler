@@ -4,6 +4,7 @@
     {
         public TimeSpan WorkTimeInQuarter { get; set; }
         public TimeSpan TimeForMorningShifts { get; set; }
-        public IEnumerable<NurseStats> NurseStats { get; set; }
+        public IEnumerable<NurseQuarterStats> NurseStats { get; set; }
+        public int[] ShiftsToAssignInMonths { get; set; }
     }
 }

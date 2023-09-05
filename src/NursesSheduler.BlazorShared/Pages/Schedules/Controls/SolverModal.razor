@@ -1,5 +1,6 @@
-﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule
+﻿@using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.SolveSchedule
 @using NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries
+@using NursesScheduler.BusinessLogic.CommandsAndQueries.SolverLogs.Queries.GetSolverLogs
 
 @inject IMediator _mediatr
 @inject IMapper _mapper
@@ -109,6 +110,7 @@
         CurrentScheduleData.Schedule.ScheduleNurses = _mapper.Map<ICollection<ScheduleNurseViewModel>>(_solveScheduleResponse.SolverResult.ScheduleNurses);
         SolverSettings.GeneratorSeed = _solveScheduleResponse.SolverResult.SolverSettings.GeneratorSeed;
 
+        CurrentScheduleData.RequestResolveMorningShifts();
         CurrentScheduleData.RequestScheduleRecalculation();
         CurrentScheduleData.RequestScheduleViewRefresh();
     }

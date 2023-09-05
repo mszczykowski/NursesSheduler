@@ -44,8 +44,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
             foreach (var nurse in nurses)
             {
-                nurse.NightHoursBalance += minNightHours;
-                nurse.HolidayHoursBalance += minHolidayHours;
+                nurse.NightHoursBalance -= minNightHours;
+                nurse.HolidayHoursBalance -= minHolidayHours;
             }
         }
     }

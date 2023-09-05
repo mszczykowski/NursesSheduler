@@ -25,6 +25,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         private int? _assignedMorningShiftId;
         private ShiftTypes _previousMonthLastShift;
         private NurseTeams _nurseTeam;
+        private bool _hadNumberOfShiftsReduced;
 
         public INurseStateBuilder SetNurseId(ScheduleNurse scheduleNurse)
         {
@@ -53,19 +54,12 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
             for (int i = 0; i < nurseWorkDays.Count(); i++)
             {
-                if (i > 0 && _hoursToNextShiftMatrix[i - 1] - TimeSpan.FromDays(1) >= TimeSpan.Zero)
-                {
-                    _hoursToNextShiftMatrix[i] = _hoursToNextShiftMatrix[i - 1] - TimeSpan.FromDays(1);
-                }
-                else
-                {
-                    _hoursToNextShiftMatrix[i] = workTimeService.GetHoursToFirstAssignedShift(i - 1, nurseWorkDays);
+                _hoursToNextShiftMatrix[i] = workTimeService.GetHoursToFirstAssignedShift(i + 1, nurseWorkDays);
 
-                    if (!nurseWorkDays.Any(wd => wd.Day >= i - 1 && wd.ShiftType != ShiftTypes.None))
-                    {
-                        _hoursToNextShiftMatrix[i] += GetNextScheudleTimeToFirstShift(nextMonthLength,
-                            nextScheduleNurseStats);
-                    }
+                if (!nurseWorkDays.Any(wd => wd.Day >= i + 1 && wd.ShiftType != ShiftTypes.None))
+                {
+                    _hoursToNextShiftMatrix[i] += GetNextScheudleTimeToFirstShift(nextMonthLength,
+                        nextScheduleNurseStats);
                 }
             }
 
@@ -75,24 +69,26 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public INurseStateBuilder SetNumbersOfShifts(TimeSpan workTimeInMonth, NurseScheduleStats nurseScheduleStats)
+        public INurseStateBuilder SetNumbersOfShifts(int numberOfShiftsToAssignInMonth, 
+            NurseScheduleStats nurseScheduleStats, IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            if(nurseScheduleStats.TimeOffAssigned > nurseScheduleStats.TimeOffToAssign)
-            {
-                _numberOfTimeOffShiftsToAssign = (int)Math
-                    .Round(nurseScheduleStats.TimeOffAssigned
-                        / ScheduleConstatns.RegularShiftLength);
-            }
-            else
-            {
-                _numberOfTimeOffShiftsToAssign = (int)Math
-                    .Round((nurseScheduleStats.TimeOffToAssign - nurseScheduleStats.TimeOffAssigned)
-                        / ScheduleConstatns.RegularShiftLength);
-            }
+            _numberOfRegularShiftsToAssign = numberOfShiftsToAssignInMonth;
 
-            _numberOfRegularShiftsToAssign = (int)Math
-                .Floor((workTimeInMonth - nurseScheduleStats.AssignedWorkTime)
-                    / ScheduleConstatns.RegularShiftLength) - _numberOfTimeOffShiftsToAssign;
+            _numberOfTimeOffShiftsToAssign = (int)Math.Round(nurseScheduleStats.TimeOffToAssign 
+                / ScheduleConstatns.RegularShiftLength);
+
+            _numberOfTimeOffShiftsToAssign -= nurseWorkDays
+                .Count(wd => wd.IsTimeOff && wd.ShiftType != ShiftTypes.None && wd.ShiftType != ShiftTypes.Morning);
+
+            if (_numberOfTimeOffShiftsToAssign < 0)
+            {
+                _numberOfRegularShiftsToAssign += _numberOfTimeOffShiftsToAssign;
+                _numberOfTimeOffShiftsToAssign = 0;
+            }
+            _numberOfRegularShiftsToAssign -= _numberOfTimeOffShiftsToAssign;
+
+            _numberOfRegularShiftsToAssign -= nurseWorkDays
+                .Count(wd => !wd.IsTimeOff && wd.ShiftType != ShiftTypes.None && wd.ShiftType != ShiftTypes.Morning);
 
             return this;
         }
@@ -166,6 +162,13 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
+        public INurseStateBuilder SetHadNumberOfShiftsReduced(NurseQuarterStats nurseQuarterStats)
+        {
+            _hadNumberOfShiftsReduced = nurseQuarterStats.HadNumberOfShiftsReduced;
+
+            return this;
+        }
+
         public INurseState GetResult()
         {
             return new NurseState
@@ -184,6 +187,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
                 AssignedMorningShiftId = _assignedMorningShiftId,
                 PreviousMonthLastShift = _previousMonthLastShift,
                 NurseTeam = _nurseTeam,
+                HadNumberOfShiftsReduced = _hadNumberOfShiftsReduced,
             };
         }
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using NursesScheduler.BlazorShared.Models.ViewModels.ValueObjects;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.SchedulesStats.Queries.RecalculateNurseScheduleStats;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.NurseStats.Commands.RecalculateNurseStats;
 
 namespace NursesScheduler.BlazorShared.Mapping
 {

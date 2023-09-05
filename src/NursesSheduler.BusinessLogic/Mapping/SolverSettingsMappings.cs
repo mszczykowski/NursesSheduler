@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Queries.SolveSchedule;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.SolveSchedule;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Mapping

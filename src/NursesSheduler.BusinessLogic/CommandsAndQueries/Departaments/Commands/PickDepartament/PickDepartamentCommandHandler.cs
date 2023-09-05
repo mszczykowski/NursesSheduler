@@ -6,15 +6,15 @@ using NursesScheduler.BusinessLogic.Abstractions.Services;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Exceptions;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.PickDepartament
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament
 {
-    internal class PickDepartamentQueryHandler : IRequestHandler<PickDepartamentRequest, PickDepartamentResponse>
+    internal class PickDepartamentCommandHandler : IRequestHandler<PickDepartamentRequest, PickDepartamentResponse>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IAbsencesService _absencesService;
 
-        public PickDepartamentQueryHandler(IApplicationDbContext context, IMapper mapper,
+        public PickDepartamentCommandHandler(IApplicationDbContext context, IMapper mapper,
             IAbsencesService absencesService)
         {
             _context = context;

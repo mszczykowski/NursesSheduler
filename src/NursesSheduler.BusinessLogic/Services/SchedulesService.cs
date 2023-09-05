@@ -25,6 +25,21 @@ namespace NursesScheduler.BusinessLogic.Services
             _scheduleStatsProvider = scheduleStatsProvider;
         }
 
+        public async Task DeleteSchedule(int scheduleId)
+        {
+            var schedule = await _applicationDbContext.Schedules.FindAsync(scheduleId)
+                ?? throw new EntityNotFoundException(scheduleId, nameof(Schedule));
+
+            if (schedule.IsClosed)
+            {
+                throw new OperationNotPermittedException("Deleting closed schedule");
+            }
+
+            await InvalidateScheduleStatsCache(schedule);
+
+            _applicationDbContext.Schedules.Remove(schedule);
+        }
+
         public async Task<Schedule> CreateNewScheduleAsync(int month, Quarter quarter)
         {
             return new Schedule
@@ -86,15 +101,7 @@ namespace NursesScheduler.BusinessLogic.Services
 
         public async Task<int> UpsertSchedule(Schedule updatedSchdeule, CancellationToken cancellationToken)
         {
-            var quarter = await _applicationDbContext.Quarters.FindAsync(updatedSchdeule.QuarterId)
-                ?? throw new EntityNotFoundException(updatedSchdeule.QuarterId, nameof(Quarter));
-
-            _scheduleStatsProvider.InvalidateCache(new ScheduleStatsKey
-            {
-                DepartamentId = quarter.DepartamentId,
-                Month = updatedSchdeule.Month,
-                Year = quarter.Year,
-            });
+            InvalidateScheduleStatsCache(updatedSchdeule);
 
             var oldSchedule = await _applicationDbContext.Schedules
                 .Include(s => s.ScheduleNurses)
@@ -191,6 +198,19 @@ namespace NursesScheduler.BusinessLogic.Services
             }
 
             return workDays;
+        }
+
+        private async Task InvalidateScheduleStatsCache(Schedule schedule)
+        {
+            var quarter = await _applicationDbContext.Quarters.FindAsync(schedule.QuarterId)
+                ?? throw new EntityNotFoundException(schedule.QuarterId, nameof(Quarter));
+
+            _scheduleStatsProvider.InvalidateCache(new ScheduleStatsKey
+            {
+                DepartamentId = quarter.DepartamentId,
+                Month = schedule.Month,
+                Year = quarter.Year,
+            });
         }
     }
 }

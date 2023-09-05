@@ -62,7 +62,10 @@
             return;
         }
 
-        SolverSettings = _solverSettingsForm.SolverSettings;
+        SolverSettings.UseOwnSeed = _solverSettingsForm.SolverSettings.UseOwnSeed;
+        SolverSettings.GeneratorSeed = _solverSettingsForm.SolverSettings.GeneratorSeed;
+        SolverSettings.NumberOfRetries = _solverSettingsForm.SolverSettings.NumberOfRetries;
+        
         ChangeVisibility();
     }
 }

@@ -74,7 +74,6 @@ namespace NursesScheduler.BusinessLogic.Services
                     case ShiftTypes.Morning:
                         var morningShiftLenght = workDay.MorningShift?.ShiftLength
                             ?? throw new InvalidOperationException("GetHoursFromLastShift: Morning shift length cannot be null");
-
                         hoursFromLastAssignedShift += 2 * ScheduleConstatns.RegularShiftLength - morningShiftLenght;
                         return hoursFromLastAssignedShift;
                 }
@@ -83,7 +82,7 @@ namespace NursesScheduler.BusinessLogic.Services
         }
         public TimeSpan GetHoursFromLastAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays)
         {
-            return GetHoursFromLastAssignedShift(31, nurseWorkDays);
+            return GetHoursFromLastAssignedShift(32, nurseWorkDays);
         }
         public TimeSpan GetHoursToFirstAssignedShift(int fromDay, IEnumerable<NurseWorkDay> nurseWorkDays)
         {

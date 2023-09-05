@@ -1,6 +1,6 @@
 ﻿using NursesScheduler.Domain.Enums;
 
-namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Queries.CalculateMorningShifts
+namespace NursesScheduler.BusinessLogic.CommandsAndQueries.MorningShifts.Commands.CalculateMorningShifts
 {
     public sealed class CalculateMorningShiftsResponse
     {

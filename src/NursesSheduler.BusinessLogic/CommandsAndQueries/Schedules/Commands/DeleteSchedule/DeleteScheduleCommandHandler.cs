@@ -1,30 +1,23 @@
 ﻿using MediatR;
 using NursesScheduler.BusinessLogic.Abstractions.Infrastructure;
-using NursesScheduler.Domain.Entities;
-using NursesScheduler.Domain.Exceptions;
+using NursesScheduler.BusinessLogic.Abstractions.Services;
 
 namespace NursesScheduler.BusinessLogic.CommandsAndQueries.Schedules.Commands.DeleteSchedule
 {
     internal sealed class DeleteScheduleCommandHandler : IRequestHandler<DeleteScheduleRequest, DeleteScheduleResponse>
     {
         private readonly IApplicationDbContext _applicationDbContext;
+        private readonly ISchedulesService _schedulesService;
 
-        public DeleteScheduleCommandHandler(IApplicationDbContext applicationDbContext)
+        public DeleteScheduleCommandHandler(IApplicationDbContext applicationDbContext, ISchedulesService schedulesService)
         {
             _applicationDbContext = applicationDbContext;
+            _schedulesService = schedulesService;
         }
 
         public async Task<DeleteScheduleResponse> Handle(DeleteScheduleRequest request, CancellationToken cancellationToken)
         {
-            var schedule = await _applicationDbContext.Schedules.FindAsync(request.ScheduleId)
-                ?? throw new EntityNotFoundException(request.ScheduleId, nameof(Schedule));
-
-            if(schedule.IsClosed)
-            {
-                throw new OperationNotPermittedException("Deleting closed schedule");
-            }
-
-            _applicationDbContext.Schedules.Remove(schedule);
+            _schedulesService.DeleteSchedule(request.ScheduleId);
 
             var result = await _applicationDbContext.SaveChangesAsync(cancellationToken);
 

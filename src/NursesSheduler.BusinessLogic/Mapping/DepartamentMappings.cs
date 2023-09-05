@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.CreateDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.EditDepartament;
+using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Commands.PickDepartament;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetAllDepartaments;
 using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.GetDepartament;
-using NursesScheduler.BusinessLogic.CommandsAndQueries.Departaments.Queries.PickDepartament;
 using NursesScheduler.Domain.Entities;
 
 namespace NursesScheduler.BusinessLogic.Mapping
