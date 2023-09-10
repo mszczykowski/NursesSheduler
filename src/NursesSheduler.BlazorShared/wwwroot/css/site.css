@@ -203,6 +203,12 @@ th.holiday {
     border-bottom: 2px solid black !important;
 }
 
+.table-schedule tfoot tr {
+    border-top: 2px solid black !important;
+    border-bottom: none !important;
+}
+
+
 th.name-col, td.name-col {
     overflow: hidden;
     white-space: nowrap;

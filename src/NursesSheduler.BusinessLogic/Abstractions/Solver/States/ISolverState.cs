@@ -13,10 +13,9 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         int NursesToAssignForCurrentShift { get; set; }
 
         void AdvanceShiftAndDay();
-        void AdvanceUnassignedNursesState();
         IEnumerable<int> GetPreviousDayDayShift();
         void PopulateScheduleFromState(Schedule schedule);
-        void SetHoursFromLastShift();
+        void RecalculateNursesFromAndToShiftHours();
         void SetNursesToAssignCounts(IShiftCapacityManager shiftCapacityManager);
     }
 }

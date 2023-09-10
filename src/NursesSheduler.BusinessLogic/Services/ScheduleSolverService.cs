@@ -79,8 +79,8 @@ namespace NursesScheduler.BusinessLogic.Services
 
             var initialSolverState = new SolverState(initialNurseStates);
 
-            var shiftCapacityManager = new ShiftCapacityManager(initialNurseStates, initialSolverState, departamentSettings,
-                scheduleMonthDays, currentSchedule, currentScheduleStats, morningShifts, quarterStats
+            var shiftCapacityManager = new ShiftCapacityManager(initialNurseStates, departamentSettings,
+                scheduleMonthDays, currentScheduleStats, morningShifts, quarterStats
                 .ShiftsToAssignInMonths[currentScheduleStats.MonthInQuarter - 1]);
 
             _scheduleSolver.InitialiseSolver(morningShifts, scheduleMonthDays, constraints, departamentSettings,

@@ -12,10 +12,10 @@ namespace NursesScheduler.BusinessLogic.Solver.States
     {
         public int NurseId { get; init; }
         public TimeSpan[] WorkTimeAssignedInWeeks { get; set; }
-
-        public TimeSpan _hoursFromLastShift;
-        public TimeSpan HoursFromLastShift { get; set; }
-        public TimeSpan[] HoursToNextShiftMatrix { get; set; }
+        public TimeSpan PreviousMonthHoursFromLastShift { get; set; }
+        public TimeSpan NextMonthHoursToNextShift { get; set; }
+        public TimeSpan HoursFromLastShift { get; private set; }
+        public TimeSpan HoursToNextShift { get; private set; }
         public int NumberOfRegularShiftsToAssign { get; set; }
         public int NumberOfTimeOffShiftsToAssign { get; set; }
         public TimeSpan HolidayHoursAssigned { get; set; }
@@ -41,8 +41,8 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         {
             //shallow copies
             NurseId = stateToCopy.NurseId;
-            HoursToNextShiftMatrix = stateToCopy.HoursToNextShiftMatrix;
-            HoursFromLastShift = stateToCopy.HoursFromLastShift;
+            PreviousMonthHoursFromLastShift = stateToCopy.PreviousMonthHoursFromLastShift;
+            NextMonthHoursToNextShift = stateToCopy.NextMonthHoursToNextShift;
             NumberOfRegularShiftsToAssign = stateToCopy.NumberOfRegularShiftsToAssign;
             NumberOfTimeOffShiftsToAssign = stateToCopy.NumberOfTimeOffShiftsToAssign;
             HolidayHoursAssigned = stateToCopy.HolidayHoursAssigned;
@@ -54,6 +54,8 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             PreviousMonthLastShift = stateToCopy.PreviousMonthLastShift;
             NurseTeam = stateToCopy.NurseTeam;
             HadNumberOfShiftsReduced = stateToCopy.HadNumberOfShiftsReduced;
+            HoursFromLastShift = stateToCopy.HoursFromLastShift;
+            HoursToNextShift = stateToCopy.HoursToNextShift;
 
             //deep copies
             WorkTimeAssignedInWeeks = new TimeSpan[stateToCopy.WorkTimeAssignedInWeeks.Length];
@@ -72,17 +74,11 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         }
 
         public void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
-            DepartamentSettings departamentSettings, IWorkTimeService workTimeService, bool shouldSwap)
+            DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             if (AssignedMorningShiftId is not null)
             {
                 throw new InvalidOperationException("UpdateStateOnMorningShiftAssign: assigned morning shift is not null");
-            }
-
-            if(shouldSwap && !HadNumberOfShiftsReduced)
-            {
-                NumberOfRegularShiftsToAssign--;
-                HadNumberOfShiftsReduced = true;
             }
 
             AssignedMorningShiftId = morningShift.MorningShiftId;
@@ -95,13 +91,13 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             NumberOfTimeOffShiftsToAssign--;
-            HolidayHoursAssigned += workTimeService.GetShiftHolidayHours(GetShiftType(shiftIndex), 
+            HolidayHoursAssigned += workTimeService.GetShiftHolidayHours(GetShiftType(shiftIndex),
                 ScheduleConstatns.RegularShiftLength, day, departamentSettings);
             UpdateStateOnShiftAssign(GetShiftType(shiftIndex), ScheduleConstatns.RegularShiftLength, day,
                 departamentSettings, workTimeService);
         }
 
-        public void UpdateStateOnShiftAssign(ShiftTypes shiftType, TimeSpan shiftLenght, DayNumbered day,
+        private void UpdateStateOnShiftAssign(ShiftTypes shiftType, TimeSpan shiftLenght, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService)
         {
             WorkTimeAssignedInWeeks[day.WeekInQuarter - 1] += shiftLenght;
@@ -112,9 +108,53 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             ScheduleRow[day.Date.Day - 1] = shiftType;
         }
 
-        public void AdvanceState()
+        public void RecalculateHoursFromLastShift(int day)
         {
-            HoursFromLastShift += ScheduleConstatns.RegularShiftLength;
+            HoursFromLastShift = TimeSpan.Zero;
+
+            for (int i = day - 2; i >= 0; i--)
+            {
+                switch (ScheduleRow[i])
+                {
+                    case ShiftTypes.None:
+                        HoursFromLastShift += TimeSpan.FromDays(1);
+                        break;
+                    case ShiftTypes.Day:
+                        HoursFromLastShift += ScheduleConstatns.RegularShiftLength;
+                        return;
+                    case ShiftTypes.Morning:
+                        HoursFromLastShift += ScheduleConstatns.RegularShiftLength;
+                        return;
+                    case ShiftTypes.Night:
+                        return;
+                }
+            }
+
+            HoursFromLastShift += PreviousMonthHoursFromLastShift;
+        }
+
+        public void RecalculateHoursToNextShift(int day)
+        {
+            HoursToNextShift = TimeSpan.Zero;
+
+            for (int i = day - 1; i < ScheduleRow.Length; i++)
+            {
+                switch (ScheduleRow[i])
+                {
+                    case ShiftTypes.None:
+                        HoursToNextShift += TimeSpan.FromDays(1);
+                        break;
+                    case ShiftTypes.Day:
+                        return;
+                    case ShiftTypes.Morning:
+                        return;
+                    case ShiftTypes.Night:
+                        HoursToNextShift += ScheduleConstatns.RegularShiftLength;
+                        return;
+                }
+            }
+
+            HoursToNextShift += NextMonthHoursToNextShift;
         }
 
         private ShiftTypes GetShiftType(ShiftIndex shiftIndex)
@@ -126,51 +166,10 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             else return ShiftTypes.Night;
         }
 
-        public void ResetHoursFromLastShift()
+        public void RecalculateFromPreviousAndToNextShift(int day)
         {
-            HoursFromLastShift = TimeSpan.Zero;
-        }
-
-        public void RecalculateHoursFromLastShift()
-        {
-            if(PreviousMonthLastShift == ShiftTypes.Night)
-            {
-                HoursFromLastShift = TimeSpan.Zero;
-            }
-            else
-            {
-                HoursFromLastShift = ScheduleConstatns.RegularShiftLength;
-            }
-        }
-
-        public void ResetHoursToNextShiftMatrix(IWorkTimeService workTimeService)
-        {
-            bool shouldAddNextMonthHours;
-            for (int i = 0; i < ScheduleRow.Count(); i++)
-            {
-                HoursToNextShiftMatrix[i] = workTimeService.GetHoursToFirstAssignedShift(i + 1, ScheduleRow);
-
-                shouldAddNextMonthHours = true;
-                for (int j = i; j < ScheduleRow.Count(); j++)
-                {
-                    if(ScheduleRow[j] != ShiftTypes.None)
-                    {
-                        shouldAddNextMonthHours = false;
-                        break;
-                    }
-                }
-
-                if(shouldAddNextMonthHours)
-                {
-                    HoursToNextShiftMatrix[i] += HoursToNextShiftMatrix.Last();
-                }
-            }
-        }
-
-        public void AssignMorningShift(int day, MorningShift morningShift)
-        {
-            ScheduleRow[day - 1] = ShiftTypes.Morning;
-            AssignedMorningShiftId = morningShift.MorningShiftId;
+            RecalculateHoursFromLastShift(day);
+            RecalculateHoursToNextShift(day);
         }
     }
 }

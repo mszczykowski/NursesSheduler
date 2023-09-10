@@ -29,7 +29,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
                 NurseStates.Add(new NurseState(nurse));
             }
 
-            SetHoursFromLastShift();
+            RecalculateNursesFromAndToShiftHours();
         }
 
         public SolverState(ISolverState stateToCopy)
@@ -54,19 +54,9 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             }
         }
 
-        public void AdvanceUnassignedNursesState()
-        {
-            foreach (var nurseState in NurseStates
-                .Where(n => n.ScheduleRow[CurrentDay - 1] == ShiftTypes.None))
-            {
-                nurseState.AdvanceState();
-            }
-        }
-
         public void SetNursesToAssignCounts(IShiftCapacityManager shiftCapacityManager)
         {
-            NursesToAssignForCurrentShift = shiftCapacityManager
-                .GetNumberOfNursesForRegularShift(CurrentShift, CurrentDay);
+            NursesToAssignForCurrentShift = shiftCapacityManager.ActualMinimalNumberOfNursesOnShift;
         }
 
         public IEnumerable<int> GetPreviousDayDayShift()
@@ -106,25 +96,12 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             }
         }
 
-        public void SetHoursFromLastShift()
+        public void RecalculateNursesFromAndToShiftHours()
         {
-            if (CurrentShift == ShiftIndex.Day)
+            foreach(var nurse in NurseStates)
             {
-                foreach (var nurse in NurseStates.Where(n => n.ScheduleRow[CurrentDay - 1] == ShiftTypes.Day
-                    || n.ScheduleRow[CurrentDay - 1] == ShiftTypes.Morning))
-
-                {
-                    nurse.ResetHoursFromLastShift();
-                }
+                nurse.RecalculateFromPreviousAndToNextShift(CurrentDay);
             }
-            else if (CurrentShift == ShiftIndex.Night)
-            {
-                foreach (var nurse in NurseStates.Where(n => n.ScheduleRow[CurrentDay - 1] == ShiftTypes.Night))
-                {
-                    nurse.ResetHoursFromLastShift();
-                }
-            }
-
         }
     }
 }

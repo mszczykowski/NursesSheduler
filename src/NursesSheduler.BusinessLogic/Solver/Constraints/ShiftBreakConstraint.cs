@@ -24,19 +24,17 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
 
             if(currentShift == ShiftIndex.Day)
             {
-                return currentNurseState
-                    .HoursToNextShiftMatrix[currentDay - 1] 
-                    - 
+                return currentNurseState.HoursToNextShift
+                    -
                     ScheduleConstatns.RegularShiftLength
                     >=
                     _minimalShiftBreak;
             }
             else
             {
-                return currentNurseState
-                   .HoursToNextShiftMatrix[currentDay]
+                return currentNurseState.HoursToNextShift
                    -
-                   ScheduleConstatns.RegularShiftLength
+                   ScheduleConstatns.RegularShiftLength * 2
                    >=
                    _minimalShiftBreak;
             }

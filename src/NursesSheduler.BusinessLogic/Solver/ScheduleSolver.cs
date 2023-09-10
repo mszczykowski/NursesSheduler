@@ -11,7 +11,6 @@ using NursesScheduler.Domain.Constants;
 using NursesScheduler.Domain.Entities;
 using NursesScheduler.Domain.Enums;
 using NursesScheduler.Domain.ValueObjects;
-using System.Diagnostics;
 
 namespace NursesScheduler.BusinessLogic.Solver
 {
@@ -67,8 +66,6 @@ namespace NursesScheduler.BusinessLogic.Solver
         {
             _solvingCanceled = false;
 
-            _shiftCapacityManager.GenerateCapacities(random);
-
             var stateCopy = new SolverState(_initialState);
 
             stateCopy.SetNursesToAssignCounts(_shiftCapacityManager);
@@ -81,7 +78,15 @@ namespace NursesScheduler.BusinessLogic.Solver
 
             if (result is not null)
             {
+                TryAssignTimeOffs(result.NurseStates);
+                foreach(var nurse in result.NurseStates)
+                {
+                    nurse.NumberOfRegularShiftsToAssign += nurse.NumberOfTimeOffShiftsToAssign;
+                }
+
+                TryAssignAdditionalShifts(result.NurseStates, random);
                 TryAssignMorningShifts(result.NurseStates, random);
+                
             }
 
             return result;
@@ -107,39 +112,32 @@ namespace NursesScheduler.BusinessLogic.Solver
             {
                 _currentNurse = currentState.NurseStates.First(e => e.NurseId == _currentNurseId);
 
+                if (_currentNurse.TimeOff[currentState.CurrentDay - 1])
+                {
+                    continue;
+                }
+
+
                 if (_constraints.Any(c => !c.IsSatisfied(currentState.CurrentDay, currentState.CurrentShift, _currentNurse,
                             ScheduleConstatns.RegularShiftLength)))
                 {
                     continue;
                 }
 
-                if (_currentNurse.TimeOff[currentState.CurrentDay - 1])
-                {
-                    if (_currentNurse.NumberOfTimeOffShiftsToAssign == 0)
-                    {
-                        continue;
-                    }
 
-                    _currentNurse.UpdateStateOnTimeOffShiftAssign(currentState.CurrentShift, currentDay,
-                        _departamentSettings, _workTimeService);
-                }
-                else
+                if (_currentNurse.NumberOfRegularShiftsToAssign == 0)
                 {
-                    if (_currentNurse.NumberOfRegularShiftsToAssign == 0)
-                    {
-                        continue;
-                    }
-
-                    currentState.NursesToAssignForCurrentShift--;
-                    _currentNurse.UpdateStateOnRegularShiftAssign(currentState.CurrentShift, currentDay,
-                        _departamentSettings, _workTimeService);
+                    continue;
                 }
+
+                currentState.NursesToAssignForCurrentShift--;
+                _currentNurse.UpdateStateOnRegularShiftAssign(currentState.CurrentShift, currentDay,
+                    _departamentSettings, _workTimeService);
 
                 ISolverState? result;
 
                 if (currentState.IsShiftAssigned)
                 {
-                    currentState.AdvanceUnassignedNursesState();
                     currentState.AdvanceShiftAndDay();
 
                     if (currentState.CurrentDay > _monthDays.Length)
@@ -147,7 +145,7 @@ namespace NursesScheduler.BusinessLogic.Solver
                         return currentState;
                     }
 
-                    currentState.SetHoursFromLastShift();
+                    currentState.RecalculateNursesFromAndToShiftHours();
                     currentState.SetNursesToAssignCounts(_shiftCapacityManager);
 
                     result = AssignRegularShift(currentState, null);
@@ -200,6 +198,65 @@ namespace NursesScheduler.BusinessLogic.Solver
             return false;
         }
 
+        private void TryAssignAdditionalShifts(IEnumerable<INurseState> nurseStates, Random random)
+        {
+            foreach (var nurseState in nurseStates.OrderBy(n => random.Next()))
+            {
+                var daysOrdered = _monthDays
+                    .OrderByDescending(d => nurseStates.Where(n => n.ScheduleRow[d.Date.Day - 1] == ShiftTypes.Day && !n.TimeOff[d.Date.Day - 1]).Count() 
+                        < _shiftCapacityManager.TargetMinimalNumberOfNursesOnShift)
+                    .ThenByDescending(d => d.IsWorkDay)
+                    .ThenBy(d => nurseStates
+                        .Where(n => (n.ScheduleRow[d.Date.Day - 1] == ShiftTypes.Day || n.ScheduleRow[d.Date.Day - 1] == ShiftTypes.Morning) && !n.TimeOff[d.Date.Day - 1]).Count());
+
+                foreach (var currentDay in daysOrdered.Select(d => d.Date.Day))
+                {
+                    var nextDay = currentDay + 1;
+
+                    if (nurseState.NumberOfRegularShiftsToAssign == 0)
+                    {
+                        break;
+                    }
+
+                    if (nurseState.ScheduleRow[currentDay - 1] != ShiftTypes.None && (nextDay > _monthDays.Length ||
+                        nurseState.ScheduleRow[nextDay - 1] == ShiftTypes.None))
+                    {
+                        continue;
+                    }
+                    if (nextDay <= _monthDays.Length && nurseState.ScheduleRow[nextDay - 1] != ShiftTypes.None)
+                    {
+                        continue;
+                    }
+
+                    nurseState.RecalculateFromPreviousAndToNextShift(currentDay);
+
+                    if (nurseState.TimeOff[currentDay - 1] || _constraints.Any(c => !c.IsSatisfied(currentDay, ShiftIndex.Day,
+                         nurseState, ScheduleConstatns.RegularShiftLength)))
+                    {
+                        continue;
+                    }
+
+                    nurseState.UpdateStateOnRegularShiftAssign(ShiftIndex.Day, _monthDays[currentDay - 1],
+                        _departamentSettings, _workTimeService);
+
+                    if (nurseState.NumberOfRegularShiftsToAssign != 0 && nextDay <= _monthDays.Length &&
+                        nurseState.ScheduleRow[nextDay - 1] == ShiftTypes.None)
+                    {
+                        nurseState.RecalculateFromPreviousAndToNextShift(nextDay);
+
+                        if (_constraints.Any(c => !c.IsSatisfied(nextDay, ShiftIndex.Night,
+                            nurseState, ScheduleConstatns.RegularShiftLength)) || nurseState.TimeOff[nextDay - 1])
+                        {
+                            continue;
+                        }
+
+                        nurseState.UpdateStateOnRegularShiftAssign(ShiftIndex.Night, _monthDays[nextDay - 1],
+                            _departamentSettings, _workTimeService);
+                    }
+                }
+            }
+        }
+
         private void TryAssignMorningShifts(IEnumerable<INurseState> nurseStates, Random random)
         {
             foreach (var nurseState in nurseStates)
@@ -212,53 +269,102 @@ namespace NursesScheduler.BusinessLogic.Solver
                     continue;
                 }
 
-                if (_shiftCapacityManager.IsSwappingRequired && _shiftCapacityManager.IsSwappingRegularForMorningSuggested 
+                if (_shiftCapacityManager.IsSwappingRequired && _shiftCapacityManager.IsSwappingRegularForMorningSuggested
                     && nurseState.ShouldNurseSwapRegularForMorning)
                 {
-                    foreach (var day in _monthDays.OrderBy(d => random.Next()))
+                    foreach (var day in _monthDays.OrderByDescending(d => nurseStates
+                        .Where(n => n.ScheduleRow[d.Date.Day - 1] == ShiftTypes.Day && !n.TimeOff[d.Date.Day - 1]).Count()))
                     {
-                        if(nurseState.ScheduleRow[day.Date.Day - 1] == ShiftTypes.Day && !nurseState.TimeOff[day.Date.Day - 1])
+                        if (nurseState.ScheduleRow[day.Date.Day - 1] == ShiftTypes.Day && !nurseState.TimeOff[day.Date.Day - 1])
                         {
-                            nurseState.AssignMorningShift(day.Date.Day, possibleMorningShifts
-                                .Where(m => m.ShiftLength == possibleMorningShifts.Select(p => p.ShiftLength).Max())
-                                .First());
+                            nurseState.UpdateStateOnMorningShiftAssign(possibleMorningShifts
+                                   .Where(m => m.ShiftLength == possibleMorningShifts.Select(p => p.ShiftLength).Max())
+                                   .First(), day, _departamentSettings, _workTimeService);
                             break;
                         }
                     }
                 }
                 else
                 {
-                    nurseState.RecalculateHoursFromLastShift();
-                    nurseState.ResetHoursToNextShiftMatrix(_workTimeService);
-
-                    for(int i = 0; i < nurseState.ScheduleRow.Length; i++)
+                    foreach (var dayNumber in _monthDays.OrderBy(d => nurseStates
+                        .Where(n => n.ScheduleRow[d.Date.Day - 1] == ShiftTypes.Day && !n.TimeOff[d.Date.Day - 1]).Count())
+                        .Select(d => d.Date.Day))
                     {
-                        if(nurseState.ScheduleRow[i] != ShiftTypes.None)
+                        if (nurseState.ScheduleRow[dayNumber - 1] != ShiftTypes.None || nurseState.TimeOff[dayNumber - 1])
                         {
-                            nurseState.ResetHoursFromLastShift();
                             continue;
                         }
 
-                        if (nurseState.TimeOff[i])
-                        {
-                            continue;
-                        }
+                        nurseState.RecalculateFromPreviousAndToNextShift(dayNumber);
 
                         var currentDayPossibleMorningShifts = possibleMorningShifts
-                            .Where(m => _constraints.All(c => c.IsSatisfied(i + 1, ShiftIndex.Day, 
+                            .Where(m => _constraints.All(c => c.IsSatisfied(dayNumber, ShiftIndex.Day,
                             nurseState, m.ShiftLength)));
 
-                        if(currentDayPossibleMorningShifts.Count() != 0)
+                        if (currentDayPossibleMorningShifts.Count() != 0)
                         {
-                            nurseState.AssignMorningShift(i + 1, possibleMorningShifts
+                            nurseState.UpdateStateOnMorningShiftAssign(possibleMorningShifts
                                    .Where(m => m.ShiftLength == possibleMorningShifts.Select(p => p.ShiftLength).Min())
-                                   .First());
+                                   .First(), _monthDays[dayNumber - 1], _departamentSettings, _workTimeService);
 
                             break;
                         }
+                    }
+                }
+            }
+        }
 
-                        nurseState.AdvanceState();
-                        nurseState.AdvanceState();
+        private void TryAssignTimeOffs(IEnumerable<INurseState> nurseStates)
+        {
+            foreach (var nurseState in nurseStates.Where(n => n.TimeOff.Any(t => t)))
+            {
+                var daysOrdered = _monthDays
+                    .Where(d => nurseState.TimeOff[d.Date.Day - 1])
+                    .OrderBy(d => d.IsWorkDay);
+
+                foreach (var currentDay in daysOrdered.Select(d => d.Date.Day))
+                {
+                    var nextDay = currentDay + 1;
+
+                    if (nurseState.NumberOfTimeOffShiftsToAssign == 0)
+                    {
+                        break;
+                    }
+
+                    if (nurseState.ScheduleRow[currentDay - 1] != ShiftTypes.None && (nextDay > _monthDays.Length ||
+                        nurseState.ScheduleRow[nextDay - 1] == ShiftTypes.None))
+                    {
+                        continue;
+                    }
+                    if (nextDay <= _monthDays.Length && nurseState.ScheduleRow[nextDay - 1] != ShiftTypes.None)
+                    {
+                        continue;
+                    }
+
+                    nurseState.RecalculateFromPreviousAndToNextShift(currentDay);
+
+                    if (_constraints.Any(c => !c.IsSatisfied(currentDay, ShiftIndex.Day,
+                         nurseState, ScheduleConstatns.RegularShiftLength)))
+                    {
+                        continue;
+                    }
+
+                    nurseState.UpdateStateOnTimeOffShiftAssign(ShiftIndex.Day, _monthDays[currentDay - 1],
+                        _departamentSettings, _workTimeService);
+
+                    if (nurseState.NumberOfTimeOffShiftsToAssign != 0 && nextDay <= _monthDays.Length &&
+                        nurseState.ScheduleRow[nextDay - 1] == ShiftTypes.None)
+                    {
+                        nurseState.RecalculateFromPreviousAndToNextShift(nextDay);
+
+                        if (_constraints.Any(c => !c.IsSatisfied(nextDay, ShiftIndex.Night,
+                            nurseState, ScheduleConstatns.RegularShiftLength)))
+                        {
+                            continue;
+                        }
+
+                        nurseState.UpdateStateOnTimeOffShiftAssign(ShiftIndex.Night, _monthDays[nextDay - 1],
+                            _departamentSettings, _workTimeService);
                     }
                 }
             }
