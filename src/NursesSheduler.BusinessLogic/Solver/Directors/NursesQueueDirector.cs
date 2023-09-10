@@ -22,7 +22,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
         public Queue<int> BuildSortedNursesQueue(ISolverState solverState, Day day)
         {
             _nurses = solverState.NurseStates
-                .Where(n => solverState.ScheduleState[n.NurseId][solverState.CurrentDay - 1] == ShiftTypes.None)
+                .Where(n => n.ScheduleRow[solverState.CurrentDay - 1] == ShiftTypes.None)
                 .OrderBy(n => _random.Next());
 
             switch (solverState.CurrentShift, day.IsWorkDay)
@@ -48,7 +48,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
         {
             _nurses = _nurses
                 .OrderByDescending(n => n.TimeOff[currentDay - 1])
-                .ThenByDescending(n => n.HoursFromLastShift);
+                .ThenByDescending(n => n.NumberOfRegularShiftsToAssign);
         }
 
         private void BuildQueueForDayHolidayShift(int currentDay)
@@ -59,7 +59,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                 .ThenByDescending(n => n.HoursFromLastShift);
         }
 
-        private void BuildQueueForNightShift(HashSet<int> previousDayShift)
+        private void BuildQueueForNightShift(IEnumerable<int> previousDayShift)
         {
             _nurses = _nurses
                 .OrderByDescending(n => previousDayShift.Contains(n.NurseId))

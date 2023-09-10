@@ -9,16 +9,16 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 {
     internal sealed class SolverState : ISolverState
     {
-        public int CurrentDay { get; private set; }
+        public int CurrentDay { get; set; }
         public ShiftIndex CurrentShift { get; private set; }
 
-        public int NursesToAssignForCurrentShift { get; private set; }
+        public int NursesToAssignForCurrentShift { get; set; }
 
         public ICollection<INurseState> NurseStates { get; }
-        public IDictionary<int, ShiftTypes[]> ScheduleState { get; }
+
         public bool IsShiftAssigned => NursesToAssignForCurrentShift == 0;
 
-        public SolverState(Schedule schedule, int monthLength, IEnumerable<INurseState> nurses)
+        public SolverState(IEnumerable<INurseState> nurses)
         {
             CurrentDay = 1;
             CurrentShift = ShiftIndex.Day;
@@ -27,17 +27,6 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             foreach (var nurse in nurses)
             {
                 NurseStates.Add(new NurseState(nurse));
-            }
-
-            ScheduleState = new Dictionary<int, ShiftTypes[]>();
-            foreach (var nurse in schedule.ScheduleNurses)
-            {
-                ScheduleState.Add(nurse.NurseId, new ShiftTypes[monthLength]);
-
-                foreach (var workday in nurse.NurseWorkDays)
-                {
-                    ScheduleState[nurse.NurseId][workday.Day - 1] = workday.ShiftType;
-                }
             }
 
             SetHoursFromLastShift();
@@ -53,32 +42,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
             //deep copies
             NurseStates = new List<INurseState>(stateToCopy.NurseStates.Select(s => new NurseState(s)).ToList());
-
-            ScheduleState = stateToCopy.ScheduleState
-                .ToDictionary(entry => entry.Key, entry => (ShiftTypes[])entry.Value.Clone());
         }
-
-        public void AssignNurseToRegularShift(INurseState nurse)
-        {
-            NursesToAssignForCurrentShift--;
-            AssignNurseToCurrentShift(nurse.NurseId);
-        }
-
-        public void AssignNurseToMorningShift(INurseState nurse, bool swapRegularForMorning)
-        {
-            if(swapRegularForMorning)
-            {
-                NursesToAssignForCurrentShift--;
-            }
-
-            AssignNurseToShift(nurse.NurseId, ShiftTypes.Morning);
-        }
-
-        public void AssignNurseOnTimeOff(INurseState nurse)
-        {
-            AssignNurseToCurrentShift(nurse.NurseId);
-        }
-
 
         public void AdvanceShiftAndDay()
         {
@@ -93,7 +57,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
         public void AdvanceUnassignedNursesState()
         {
             foreach (var nurseState in NurseStates
-                .Where(n => ScheduleState[n.NurseId][CurrentDay - 1] == ShiftTypes.None))
+                .Where(n => n.ScheduleRow[CurrentDay - 1] == ShiftTypes.None))
             {
                 nurseState.AdvanceState();
             }
@@ -105,27 +69,26 @@ namespace NursesScheduler.BusinessLogic.Solver.States
                 .GetNumberOfNursesForRegularShift(CurrentShift, CurrentDay);
         }
 
-        public HashSet<int> GetPreviousDayDayShift()
+        public IEnumerable<int> GetPreviousDayDayShift()
         {
             if (CurrentDay == 1)
             {
                 return NurseStates
                     .Where(n => n.PreviousMonthLastShift == ShiftTypes.Day)
-                    .Select(n => n.NurseId)
-                    .ToHashSet();
+                    .Select(n => n.NurseId);
             }
 
-            return ScheduleState
-                .Where(entry => entry.Value[CurrentDay - 2] == ShiftTypes.Day)
-                .Select(entry => entry.Key)
-                .ToHashSet();
+            return NurseStates
+                .Where(n => n.ScheduleRow[CurrentDay - 2] == ShiftTypes.Day)
+                .Select(n => n.NurseId);
         }
 
         public void PopulateScheduleFromState(Schedule schedule)
         {
             foreach (var scheduleNurse in schedule.ScheduleNurses)
             {
-                var nurseSchedule = ScheduleState[scheduleNurse.NurseId];
+                var nurseState = NurseStates.First(n => n.NurseId == scheduleNurse.NurseId);
+
                 foreach (var workDay in scheduleNurse.NurseWorkDays)
                 {
                     if (workDay.ShiftType != ShiftTypes.None)
@@ -133,40 +96,22 @@ namespace NursesScheduler.BusinessLogic.Solver.States
                         continue;
                     }
 
-                    workDay.ShiftType = nurseSchedule[workDay.Day - 1];
+                    workDay.ShiftType = nurseState.ScheduleRow[workDay.Day - 1];
 
                     if (workDay.ShiftType == ShiftTypes.Morning)
                     {
-                        workDay.MorningShiftId = NurseStates
-                            .First(n => n.NurseId == scheduleNurse.NurseId).AssignedMorningShiftId;
+                        workDay.MorningShiftId = nurseState.AssignedMorningShiftId;
                     }
                 }
             }
         }
 
-        private void AssignNurseToCurrentShift(int nurseId)
+        public void SetHoursFromLastShift()
         {
             if (CurrentShift == ShiftIndex.Day)
             {
-                AssignNurseToShift(nurseId, ShiftTypes.Day);
-            }
-            else
-            {
-                AssignNurseToShift(nurseId, ShiftTypes.Night);
-            }
-        }
-
-        private void AssignNurseToShift(int nurseId, ShiftTypes shiftType)
-        {
-            ScheduleState[nurseId][CurrentDay - 1] = shiftType;
-        }
-
-        public void SetHoursFromLastShift()
-        {
-            if(CurrentShift == ShiftIndex.Day)
-            {
-                foreach (var nurse in NurseStates.Where(n => ScheduleState[n.NurseId][CurrentDay - 1] == ShiftTypes.Day 
-                    || ScheduleState[n.NurseId][CurrentDay - 1] == ShiftTypes.Morning))
+                foreach (var nurse in NurseStates.Where(n => n.ScheduleRow[CurrentDay - 1] == ShiftTypes.Day
+                    || n.ScheduleRow[CurrentDay - 1] == ShiftTypes.Morning))
 
                 {
                     nurse.ResetHoursFromLastShift();
@@ -174,7 +119,7 @@ namespace NursesScheduler.BusinessLogic.Solver.States
             }
             else if (CurrentShift == ShiftIndex.Night)
             {
-                foreach (var nurse in NurseStates.Where(n => ScheduleState[n.NurseId][CurrentDay - 1] == ShiftTypes.Night))
+                foreach (var nurse in NurseStates.Where(n => n.ScheduleRow[CurrentDay - 1] == ShiftTypes.Night))
                 {
                     nurse.ResetHoursFromLastShift();
                 }

@@ -20,12 +20,11 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
         int? AssignedMorningShiftId { get; set; }
         ShiftTypes PreviousMonthLastShift { get; }
         bool[] TimeOff { get; }
-        Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; }
+        public TimeSpan[] WorkTimeAssignedInWeeks { get; }
         TimeSpan WorkTimeInQuarterLeft { get; }
         bool HadNumberOfShiftsReduced { get; }
         bool ShouldNurseSwapRegularForMorning { get; }
-
-        bool CanNurseSwapRegularForMorning(ISolverState solverState);
+        public ShiftTypes[] ScheduleRow { get; set; }
         void AdvanceState();
         void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService, bool shouldSwap);
@@ -35,6 +34,9 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
         void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
+        void ResetHoursToNextShiftMatrix(IWorkTimeService workTimeService);
         void ResetHoursFromLastShift();
+        void RecalculateHoursFromLastShift();
+        void AssignMorningShift(int day, MorningShift morningShift);
     }
 }

@@ -77,7 +77,7 @@ namespace NursesScheduler.BusinessLogic.Services
             var initialNurseStates = new NursesStatesDirector().BuildNurseStats(currentSchedule, quarterStats, previousScheduleStats,
                 currentScheduleStats, nextScheduleStats, _workTimeService, nurses);
 
-            var initialSolverState = new SolverState(currentSchedule, scheduleMonthDays.Count(), initialNurseStates);
+            var initialSolverState = new SolverState(initialNurseStates);
 
             var shiftCapacityManager = new ShiftCapacityManager(initialNurseStates, initialSolverState, departamentSettings,
                 scheduleMonthDays, currentSchedule, currentScheduleStats, morningShifts, quarterStats

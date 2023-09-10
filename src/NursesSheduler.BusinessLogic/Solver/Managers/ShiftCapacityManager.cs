@@ -15,23 +15,23 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         public bool IsSwappingRequired { get; init; }
 
         private readonly Day[] _monthDays;
-
         private readonly int[,] _shiftCapacities;
-        private readonly int[] _morningShiftCapacities;
-
         private readonly ISolverState _initialSolverState;
 
         private readonly int _totalNumberOfShiftsToAssign;
         private readonly int _targetMinimalNumberOfNursesOnShift;
         private readonly int _actualMinimalNumberOfNursesOnShift;
-        private readonly int _morningShiftsToAssignInMonth;
         private readonly int _numberOfShiftsPerNurse;
+        private readonly int _previousScheduleNumberOfDayShiftNurses;
 
         private readonly int _numberOfSurplusShifts;
+        private int _numberOfSurplusNightShifts;
 
         private int[] _regularDayShiftCapacities;
-        private int[] _nightShiftsCapacities;
         private int[] _holidayDayShiftCapacities;
+
+        public int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber)
+            => _shiftCapacities[dayNumber - 1, (int)shiftIndex];
 
         public ShiftCapacityManager(IEnumerable<INurseState> initialNurseStates, ISolverState initialSolverState,
             DepartamentSettings departamentSettings, Day[] monthDays, Schedule schedule, ScheduleStats scheduleStats,
@@ -41,12 +41,8 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             _numberOfShiftsPerNurse = numberOfShiftsPerNurse;
 
             _shiftCapacities = new int[_monthDays.Length, ScheduleConstatns.NumberOfShifts];
-            _morningShiftCapacities = new int[_monthDays.Length];
 
             _initialSolverState = initialSolverState;
-
-            _morningShiftsToAssignInMonth = GetMorningShiftsToAssignInMonth(initialNurseStates,
-                morningShifts, scheduleStats);
 
             _totalNumberOfShiftsToAssign = GetTotalNumberOfShiftsToAssign(initialNurseStates, schedule);
 
@@ -60,45 +56,21 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             _numberOfSurplusShifts = GetNumberOfSurplusShifts(_actualMinimalNumberOfNursesOnShift);
 
             _regularDayShiftCapacities = new int[_monthDays.Where(d => d.IsWorkDay).Count()];
-            _nightShiftsCapacities = new int[_monthDays.Length];
             _holidayDayShiftCapacities = new int[_monthDays.Length - _regularDayShiftCapacities.Length];
 
-            InitialiseCapacitiesComponents();
-        }
-
-        private int GetMorningShiftsToAssignInMonth(IEnumerable<INurseState> initialNurseStates,
-            IEnumerable<MorningShift> morningShifts, ScheduleStats scheduleStats)
-        {
-            var totalNumberOfMorningShifts = morningShifts.Where(m => m.ShiftLength != TimeSpan.Zero).Count() *
-                initialNurseStates.Count();
-
-            var numberOfAssignedMorningShifts = initialNurseStates
-                .Where(n => n.AssignedMorningShiftId != null && morningShifts
-                    .First(m => m.MorningShiftId == n.AssignedMorningShiftId).ShiftLength != TimeSpan.Zero)
-                .Count()
-                +
-                initialNurseStates
-                .SelectMany(n => n.PreviouslyAssignedMorningShifts)
-                .Where(p => morningShifts
-                    .First(m => m.MorningShiftId == p).ShiftLength != TimeSpan.Zero)
+            _previousScheduleNumberOfDayShiftNurses = _initialSolverState.NurseStates
+                .Where(n => n.PreviousMonthLastShift == ShiftTypes.Day)
                 .Count();
 
-            return (totalNumberOfMorningShifts - numberOfAssignedMorningShifts) / (3 - (scheduleStats.MonthInQuarter - 1));
+            InitialiseCapacitiesComponents();
         }
 
         public void GenerateCapacities(Random random)
         {
             RandomiseShiftCapacities(random);
-            InitialiseShiftCapacities();
-            InitialisMorningShiftCapacities(random);
+            InitialiseShiftCapacities(random);
             SubtractInitialState();
         }
-
-        public int GetNumberOfNursesForRegularShift(ShiftIndex shiftIndex, int dayNumber)
-            => _shiftCapacities[dayNumber - 1, (int)shiftIndex];
-
-        public int GetNumberOfNursesForMorningShift(ShiftIndex shiftIndex, int dayNumber)
-            => shiftIndex == ShiftIndex.Day ? _morningShiftCapacities[dayNumber - 1] : 0;
 
         private int GetTotalNumberOfShiftsToAssign(IEnumerable<INurseState> initialNurseStates, Schedule schedule)
         {
@@ -137,35 +109,28 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         private void InitialiseCapacitiesComponents()
         {
             Array.Fill(_regularDayShiftCapacities, _actualMinimalNumberOfNursesOnShift);
-            Array.Fill(_nightShiftsCapacities, _actualMinimalNumberOfNursesOnShift);
             Array.Fill(_holidayDayShiftCapacities, _actualMinimalNumberOfNursesOnShift);
 
             int surplusShiftsLeft = _numberOfSurplusShifts;
 
-            if (_actualMinimalNumberOfNursesOnShift < _targetMinimalNumberOfNursesOnShift)
-            {
-                surplusShiftsLeft = AddSurplusShiftsToCapacity(_regularDayShiftCapacities, surplusShiftsLeft);
-                surplusShiftsLeft = AddSurplusShiftsToCapacity(_holidayDayShiftCapacities, surplusShiftsLeft);
-                AddSurplusShiftsToCapacity(_nightShiftsCapacities, surplusShiftsLeft);
-            }
-            else
-            {
-                while (surplusShiftsLeft > 0)
-                {
-                    surplusShiftsLeft = AddSurplusShiftsToCapacity(_regularDayShiftCapacities, surplusShiftsLeft);
-                }
-            }
+            _numberOfSurplusNightShifts = 0;
+
+            surplusShiftsLeft = AddSurplusShiftsToCapacity(_regularDayShiftCapacities, surplusShiftsLeft);
+            surplusShiftsLeft = AddSurplusShiftsToCapacity(_holidayDayShiftCapacities, surplusShiftsLeft);
+
+            _numberOfSurplusNightShifts += surplusShiftsLeft;
         }
 
-        private void InitialiseShiftCapacities()
+        private void InitialiseShiftCapacities(Random random)
         {
             var regularShiftIterator = 0;
-            var nightShiftIterator = 0;
             var holidayShiftIterator = 0;
+
+            var surplusNightShiftsLeft = _numberOfSurplusNightShifts;
 
             for (int i = 0; i < _monthDays.Length; i++)
             {
-                _shiftCapacities[i, (int)ShiftIndex.Night] = _nightShiftsCapacities[nightShiftIterator++];
+                _shiftCapacities[i, (int)ShiftIndex.Night] = _actualMinimalNumberOfNursesOnShift;
 
                 if (!_monthDays[i].IsWorkDay)
                 {
@@ -177,30 +142,27 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
                     _shiftCapacities[i, (int)ShiftIndex.Day] = _regularDayShiftCapacities[regularShiftIterator++];
                 }
             }
-        }
 
-        private void InitialisMorningShiftCapacities(Random random)
-        {
-            Array.Fill(_morningShiftCapacities, 0);
-
-            var orderedWorkDayIndexes = _monthDays
-                .Where(d => d.IsWorkDay)
-                .OrderBy(d => random.Next())
-                .Select(d => d.Date.Day - 1)
-                .ToList();
-
-            var morningShiftsLeft = _morningShiftsToAssignInMonth;
-
-            while (morningShiftsLeft > 0)
+            foreach(var day in _monthDays.OrderBy(d => random.Next()))
             {
-                for (int i = 0; i < _morningShiftCapacities.Length; i++)
+                if (surplusNightShiftsLeft == 0)
                 {
-                    _morningShiftCapacities[orderedWorkDayIndexes[i]]++;
-                    morningShiftsLeft--;
-                    if (morningShiftsLeft == 0)
-                    {
-                        break;
-                    }
+                    break;
+                }
+
+                var currentIndex = day.Date.Day - 1;
+
+                if ((currentIndex == 0 &&
+                    _shiftCapacities[currentIndex, (int)ShiftIndex.Night] < _previousScheduleNumberOfDayShiftNurses)
+                    ||
+                    (currentIndex == 0 && _previousScheduleNumberOfDayShiftNurses == 0 &&
+                    _shiftCapacities[currentIndex, (int)ShiftIndex.Night] < _targetMinimalNumberOfNursesOnShift)
+                    ||
+                    (currentIndex != 0 &&
+                    _shiftCapacities[currentIndex, (int)ShiftIndex.Night] < _shiftCapacities[currentIndex - 1, (int)ShiftIndex.Day]))
+                {
+                    _shiftCapacities[currentIndex, (int)ShiftIndex.Night]++;
+                    surplusNightShiftsLeft--;
                 }
             }
         }
@@ -209,7 +171,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
         {
             _regularDayShiftCapacities = _regularDayShiftCapacities.OrderBy(i => random.Next()).ToArray();
             _holidayDayShiftCapacities = _holidayDayShiftCapacities.OrderBy(i => random.Next()).ToArray();
-            _nightShiftsCapacities = _nightShiftsCapacities.OrderBy(i => random.Next()).ToArray();
         }
         private int GetNumberOfSurplusShifts(int minimalNumberOfNursesOnShift)
         {
@@ -222,15 +183,20 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
 
         private void SubtractInitialState()
         {
-            foreach (var entry in _initialSolverState.ScheduleState)
+            foreach(var nurseState in _initialSolverState.NurseStates)
             {
-                for (int i = 0; i < entry.Value.Length; i++)
+                for (int i = 0; i < nurseState.ScheduleRow.Length; i++)
                 {
-                    if (entry.Value[i] == ShiftTypes.Day)
+                    if(nurseState.TimeOff[i])
+                    {
+                        continue;
+                    }
+
+                    if (nurseState.ScheduleRow[i] == ShiftTypes.Day)
                     {
                         DecraseCapacity(i, ShiftIndex.Day);
                     }
-                    else if (entry.Value[i] == ShiftTypes.Night)
+                    else if (nurseState.ScheduleRow[i] == ShiftTypes.Night)
                     {
                         DecraseCapacity(i, ShiftIndex.Night);
                     }
@@ -279,6 +245,13 @@ namespace NursesScheduler.BusinessLogic.Solver.Managers
             for (int i = 0; i < capacities.Length; i++)
             {
                 capacities[i]++;
+                surplusShiftsCount--;
+                if (surplusShiftsCount == 0)
+                {
+                    break;
+                }
+
+                _numberOfSurplusNightShifts++;
                 surplusShiftsCount--;
                 if (surplusShiftsCount == 0)
                 {

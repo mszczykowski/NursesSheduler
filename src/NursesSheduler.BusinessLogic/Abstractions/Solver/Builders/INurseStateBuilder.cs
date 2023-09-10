@@ -22,6 +22,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.Builders
         INurseStateBuilder SetWorkTimeAssignedInWeeks(NurseStats nurseQuarterStats);
         INurseStateBuilder SetWorkTimeInQuarterLeft(TimeSpan workTimeInQuarter, NurseStats nurseQuarterStats);
         INurseStateBuilder SetHadNumberOfShiftsReduced(NurseQuarterStats nurseQuarterStats);
-
+        INurseStateBuilder BuildAssignedShifts(IEnumerable<NurseWorkDay> nurseWorkDays);
     }
 }

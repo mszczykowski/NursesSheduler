@@ -56,6 +56,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                     .SetPreviousMonthLastShift(previousScheduleNurseStats)
                     .SetNurseTeam(nurse)
                     .SetHadNumberOfShiftsReduced(nurseQuarterStats)
+                    .BuildAssignedShifts(scheduleNurse.NurseWorkDays)
                     .GetResult());
             }
 

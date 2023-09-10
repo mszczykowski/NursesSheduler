@@ -12,7 +12,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
     internal sealed class NurseStateBuilder : INurseStateBuilder
     {
         private int _nurseId;
-        private Dictionary<int, TimeSpan> _workTimeAssignedInWeeks;
+        private TimeSpan[] _workTimeAssignedInWeeks;
         private TimeSpan _hoursFromLastShift;
         private TimeSpan[] _hoursToNextShiftMatrix;
         private int _numberOfRegularShiftsToAssign;
@@ -26,6 +26,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
         private ShiftTypes _previousMonthLastShift;
         private NurseTeams _nurseTeam;
         private bool _hadNumberOfShiftsReduced;
+        private ShiftTypes[] _assignedShifts;
 
         public INurseStateBuilder SetNurseId(ScheduleNurse scheduleNurse)
         {
@@ -35,7 +36,13 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
 
         public INurseStateBuilder SetWorkTimeAssignedInWeeks(NurseStats nurseQuarterStats)
         {
-            _workTimeAssignedInWeeks = new Dictionary<int, TimeSpan>(nurseQuarterStats.WorkTimeAssignedInWeeks);
+            _workTimeAssignedInWeeks = new TimeSpan[nurseQuarterStats.WorkTimeAssignedInWeeks.Select(w => w.Key).Max()];
+
+            foreach(var week in nurseQuarterStats.WorkTimeAssignedInWeeks)
+            {
+                _workTimeAssignedInWeeks[week.Key - 1] = week.Value;
+            }
+
             return this;
         }
 
@@ -169,6 +176,18 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
+        public INurseStateBuilder BuildAssignedShifts(IEnumerable<NurseWorkDay> nurseWorkDays)
+        {
+            _assignedShifts = new ShiftTypes[nurseWorkDays.Count()];
+
+            foreach(var workDay in nurseWorkDays)
+            {
+                _assignedShifts[workDay.Day - 1] = workDay.ShiftType;
+            }
+
+            return this;
+        }
+
         public INurseState GetResult()
         {
             return new NurseState
@@ -188,6 +207,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
                 PreviousMonthLastShift = _previousMonthLastShift,
                 NurseTeam = _nurseTeam,
                 HadNumberOfShiftsReduced = _hadNumberOfShiftsReduced,
+                ScheduleRow = _assignedShifts,
             };
         }
 

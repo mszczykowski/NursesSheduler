@@ -1,5 +1,6 @@
 ﻿using NursesScheduler.BusinessLogic.Abstractions.Solver.Constraints;
 using NursesScheduler.BusinessLogic.Abstractions.Solver.States;
+using NursesScheduler.BusinessLogic.Solver.Enums;
 using NursesScheduler.Domain.ValueObjects;
 
 namespace NursesScheduler.BusinessLogic.Solver.Constraints
@@ -14,11 +15,11 @@ namespace NursesScheduler.BusinessLogic.Solver.Constraints
             _monthDays = days.OrderBy(d => d.Date.Day).ToArray();
         }
 
-        public bool IsSatisfied(ISolverState currentSolverState, INurseState currentNurseState, 
+        public bool IsSatisfied(int currentDay, ShiftIndex currentShift, INurseState currentNurseState, 
             TimeSpan shiftLengthToAssing)
         {
             return (currentNurseState
-                .WorkTimeAssignedInWeeks[_monthDays[currentSolverState.CurrentDay - 1].WeekInQuarter] 
+                .WorkTimeAssignedInWeeks[_monthDays[currentDay - 1].WeekInQuarter - 1] 
                 + shiftLengthToAssing) 
                 <= _maxWorkTimeInMonth;
         }
