@@ -43,7 +43,6 @@
             <td>
                 <p><b>Dni:</b></p>
                 <p><b>Nocy:</b></p>
-                <p><b>Ranków:</b></p>
             </td>
             @foreach (var day in ScheduleData.Days)
             {
@@ -52,8 +51,6 @@
                         .Where(wd => wd.ShiftType == ShiftTypes.Day && wd.Day == day.Date.Day && !wd.IsTimeOff)).Count()</p>
                     <p>@ScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays.
                         Where(wd => wd.ShiftType == ShiftTypes.Night && wd.Day == day.Date.Day && !wd.IsTimeOff)).Count()</p>
-                        <p>@ScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays.
-                        Where(wd => wd.ShiftType == ShiftTypes.Morning && wd.Day == day.Date.Day && !wd.IsTimeOff)).Count()</p>
                 </td>
             }
         </tr>
