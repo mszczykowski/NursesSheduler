@@ -49,8 +49,8 @@
                 <td>
                     <p>@ScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays
                         .Where(wd => wd.ShiftType == ShiftTypes.Day && wd.Day == day.Date.Day && !wd.IsTimeOff)).Count()</p>
-                    <p>@ScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays.
-                        Where(wd => wd.ShiftType == ShiftTypes.Night && wd.Day == day.Date.Day && !wd.IsTimeOff)).Count()</p>
+                    <p>@ScheduleData.Schedule.ScheduleNurses.SelectMany(n => n.NurseWorkDays
+                        .Where(wd => wd.ShiftType == ShiftTypes.Night && wd.Day == day.Date.Day && !wd.IsTimeOff)).Count()</p>
                 </td>
             }
         </tr>
