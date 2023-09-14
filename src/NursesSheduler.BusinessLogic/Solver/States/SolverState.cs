@@ -20,16 +20,13 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
         public SolverState(IEnumerable<INurseState> nurses)
         {
-            CurrentDay = 1;
-            CurrentShift = ShiftIndex.Day;
-
+            CurrentDay = 0;
+            NursesToAssignForCurrentShift = 0;
             NurseStates = new List<INurseState>();
             foreach (var nurse in nurses)
             {
                 NurseStates.Add(new NurseState(nurse));
             }
-
-            RecalculateNursesFromAndToShiftHours();
         }
 
         public SolverState(ISolverState stateToCopy)
@@ -46,17 +43,25 @@ namespace NursesScheduler.BusinessLogic.Solver.States
 
         public void AdvanceShiftAndDay()
         {
-            CurrentShift++;
-            if ((int)CurrentShift >= ScheduleConstatns.NumberOfShifts)
+            if(CurrentDay == 0)
             {
+                CurrentDay = 1;
                 CurrentShift = ShiftIndex.Day;
-                CurrentDay++;
+            }
+            else
+            {
+                CurrentShift++;
+                if ((int)CurrentShift >= ScheduleConstatns.NumberOfShifts)
+                {
+                    CurrentShift = ShiftIndex.Day;
+                    CurrentDay++;
+                }
             }
         }
 
         public void SetNursesToAssignCounts(IShiftCapacityManager shiftCapacityManager)
         {
-            NursesToAssignForCurrentShift = shiftCapacityManager.ActualMinimalNumberOfNursesOnShift;
+            NursesToAssignForCurrentShift = shiftCapacityManager.GetNumberOfNursesForShift(CurrentShift, CurrentDay);
         }
 
         public IEnumerable<int> GetPreviousDayDayShift()
