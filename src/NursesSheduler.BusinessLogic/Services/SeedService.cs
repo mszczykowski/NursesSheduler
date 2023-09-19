@@ -4,6 +4,6 @@ namespace NursesScheduler.BusinessLogic.Services
 {
     internal sealed class SeedService : ISeedService
     {
-        public string GetSeed() => Guid.NewGuid().ToString();
+        public string GetSeed() => Environment.TickCount.ToString();
     }
 }

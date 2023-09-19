@@ -28,12 +28,6 @@ namespace NursesScheduler.BusinessLogic.Solver.Builders
             return this;
         }
 
-        public IConstraintsBuilder AddHasEnoughWorkTimeLeftConstraint()
-        {
-            _result.Add(new HasEnoughWorkTimeLeft());
-            return this;
-        }
-
         public IConstraintsBuilder AddAvoidTwoNightShiftsInTheRow()
         {
             _result.Add(new AvoidTwoNightShiftsInTheRow());

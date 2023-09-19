@@ -79,7 +79,15 @@
             return;
         }
 
-        _newAbsenceSelection.To = day;
+        if(day < _newAbsenceSelection.From)
+        {
+            _newAbsenceSelection.To = _newAbsenceSelection.From;
+            _newAbsenceSelection.From = day;
+        }
+        else
+        {
+            _newAbsenceSelection.To = day;
+        }
 
         await OnAbsenceSelected.InvokeAsync(_newAbsenceSelection);
 

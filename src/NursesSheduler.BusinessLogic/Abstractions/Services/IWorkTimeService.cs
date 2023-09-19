@@ -21,5 +21,6 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Services
         TimeSpan GetShiftHolidayHours(ShiftTypes shiftType, TimeSpan? optionalMorningShiftLenght, Day day,
             DepartamentSettings departamentSettings);
         TimeSpan GetHoursFromLastAssignedShift(int toDay, IEnumerable<NurseWorkDay> nurseWorkDays);
+        TimeSpan GetHoursToFirstAssignedShift(int fromDay, ShiftTypes[] scheduleRow);
     }
 }

@@ -35,16 +35,18 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                 var previousScheduleNurseStats = previousScheduleStats.NursesScheduleStats
                     .FirstOrDefault(n => n.NurseId == scheduleNurse.NurseId);
 
+                var nextScheduleNurseStats = nextScheduleStats.NursesScheduleStats
+                    .FirstOrDefault(n => n.NurseId == scheduleNurse.NurseId);
+
                 nurseStates.Add(nurseStateBuilder
                     .SetNurseId(scheduleNurse)
                     .SetWorkTimeAssignedInWeeks(nurseQuarterStats)
-                    .SetHoursFromLastShift(DateTime.DaysInMonth(previousScheduleStats.Key.Year,
+                    .SetNextMonthHoursToNextShiftx(DateTime.DaysInMonth(previousScheduleStats.Key.Year,
                         previousScheduleStats.Key.Month),
+                        nextScheduleNurseStats)
+                    .SetPreviousMonthHoursFromLastShift(DateTime.DaysInMonth(nextScheduleStats.Key.Year,
+                        nextScheduleStats.Key.Month),
                         previousScheduleNurseStats)
-                    .SetHoursToNextShiftMatrix(DateTime.DaysInMonth(nextScheduleStats.Key.Year,
-                        nextScheduleStats.Key.Month), scheduleNurse.NurseWorkDays,
-                        nextScheduleStats.NursesScheduleStats.FirstOrDefault(n => n.NurseId == scheduleNurse.NurseId),
-                        workTimeService)
                     .SetNumbersOfShifts(quarterStats.ShiftsToAssignInMonths[currentScheduleStats.MonthInQuarter - 1],
                         currentScheduleStats.NursesScheduleStats.First(n => n.NurseId == scheduleNurse.NurseId),
                         scheduleNurse.NurseWorkDays)
@@ -56,6 +58,7 @@ namespace NursesScheduler.BusinessLogic.Solver.Directors
                     .SetPreviousMonthLastShift(previousScheduleNurseStats)
                     .SetNurseTeam(nurse)
                     .SetHadNumberOfShiftsReduced(nurseQuarterStats)
+                    .BuildAssignedShifts(scheduleNurse.NurseWorkDays)
                     .GetResult());
             }
 
