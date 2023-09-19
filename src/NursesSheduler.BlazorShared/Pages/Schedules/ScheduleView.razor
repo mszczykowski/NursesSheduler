@@ -247,6 +247,8 @@ else
     private async Task OnSeletedDateChangedAsync()
     {
         _isLoading = true;
+        _currentDisplayedSchedule = ScheduleDisplayed.Current;
+
         await Task.Delay(1);
 
         try

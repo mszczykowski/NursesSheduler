@@ -11,8 +11,8 @@
         Lipiec = 7,
         Sierpień = 8,
         Wrzesień = 9,
-        Listopad = 10,
-        Październik = 11,
+        Październik = 10,
+        Listopad = 11,
         Grudzień = 12,
     }
 }

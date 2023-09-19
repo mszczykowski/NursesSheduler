@@ -25,10 +25,10 @@
                     <TimeSpanInput Label="Docelowa minimalna długość dyżuru (ranki)" @bind-Value="Settings.TargetMinimalMorningShiftLenght" ValidationFor="@(() => Settings.TargetMinimalMorningShiftLenght)" />
                     <NumberInput Label="Domyślna liczba prób generatora" @bind-Value="Settings.DefaultGeneratorRetryValue" ValidationFor="@(() => Settings.DefaultGeneratorRetryValue)"/>
                     <NumberInput Label="Maksymanly czas próby generatora (w sekundach)" @bind-Value="Settings.DefaultGeneratorTimeOut" ValidationFor="@(() => Settings.DefaultGeneratorTimeOut)"/>
-                    <div class="field">
+                    @*<div class="field">
                         <InputCheckbox @bind-Value="Settings.UseTeams" />
                         <label class="checkbox">Użyj zespołów przy generacji grafików (eksperymentalne)</label>
-                    </div>
+                    </div>*@
                     <div class="buttons is-right">
                         <LoadingButton Text="Resetuj" Action="Cancel"/>
                         <LoadingButton Style="is-primary" Text="Zapisz" Action="OnSubmit"/>

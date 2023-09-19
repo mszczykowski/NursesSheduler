@@ -84,12 +84,13 @@ namespace NursesScheduler.BusinessLogic.Services
         {
             return GetHoursFromLastAssignedShift(32, nurseWorkDays);
         }
-        public TimeSpan GetHoursToFirstAssignedShift(int fromDay, IEnumerable<NurseWorkDay> nurseWorkDays)
+        public TimeSpan GetHoursToFirstAssignedShift(int fromDay, ShiftTypes[] scheduleRow)
         {
             TimeSpan hoursToFirstAssignedShift = TimeSpan.Zero;
-            foreach (var workDay in nurseWorkDays.Where(wd => wd.Day >= fromDay).OrderBy(wd => wd.Day))
+
+            for (int i = fromDay - 1; i < scheduleRow.Length; i++)
             {
-                switch (workDay.ShiftType)
+                switch (scheduleRow[i])
                 {
                     case ShiftTypes.None:
                         hoursToFirstAssignedShift += TimeSpan.FromDays(1);
@@ -104,6 +105,10 @@ namespace NursesScheduler.BusinessLogic.Services
                 }
             }
             return hoursToFirstAssignedShift;
+        }
+        public TimeSpan GetHoursToFirstAssignedShift(int fromDay, IEnumerable<NurseWorkDay> nurseWorkDays)
+        {
+            return GetHoursToFirstAssignedShift(fromDay, nurseWorkDays.OrderBy(wd => wd.Day).Select(wd => wd.ShiftType).ToArray());
         }
 
         public TimeSpan GetHoursToFirstAssignedShift(IEnumerable<NurseWorkDay> nurseWorkDays)

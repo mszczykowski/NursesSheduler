@@ -8,33 +8,34 @@ namespace NursesScheduler.BusinessLogic.Abstractions.Solver.States
 {
     internal interface INurseState
     {
-        TimeSpan HolidayHoursAssigned { get; }
-        TimeSpan HoursFromLastShift { get; }
-        TimeSpan[] HoursToNextShiftMatrix { get; }
-        TimeSpan NightHoursAssigned { get; }
-        int NumberOfRegularShiftsToAssign { get; }
-        int NumberOfTimeOffShiftsToAssign { get; }
-        int NurseId { get; }
-        NurseTeams NurseTeam { get; }
-        HashSet<int> PreviouslyAssignedMorningShifts { get; init; }
         int? AssignedMorningShiftId { get; set; }
-        ShiftTypes PreviousMonthLastShift { get; }
-        bool[] TimeOff { get; }
-        Dictionary<int, TimeSpan> WorkTimeAssignedInWeeks { get; }
-        TimeSpan WorkTimeInQuarterLeft { get; }
-        bool HadNumberOfShiftsReduced { get; }
+        bool HadNumberOfShiftsReduced { get; set; }
+        TimeSpan HolidayHoursAssigned { get; set; }
+        TimeSpan HoursFromLastShift { get; }
+        TimeSpan HoursToNextShift { get; }
+        TimeSpan NextMonthHoursToNextShift { get; set; }
+        TimeSpan NightHoursAssigned { get; set; }
+        int NumberOfRegularShiftsToAssign { get; set; }
+        int NumberOfTimeOffShiftsToAssign { get; set; }
+        int NurseId { get; init; }
+        NurseTeams NurseTeam { get; init; }
+        HashSet<int> PreviouslyAssignedMorningShifts { get; init; }
+        TimeSpan PreviousMonthHoursFromLastShift { get; set; }
+        ShiftTypes PreviousMonthLastShift { get; init; }
+        ShiftTypes[] ScheduleRow { get; set; }
         bool ShouldNurseSwapRegularForMorning { get; }
+        bool[] TimeOff { get; init; }
+        TimeSpan[] WorkTimeAssignedInWeeks { get; set; }
+        TimeSpan WorkTimeInQuarterLeft { get; set; }
 
-        bool CanNurseSwapRegularForMorning(ISolverState solverState);
-        void AdvanceState();
+        void RecalculateHoursFromLastShift(int day);
+        void RecalculateHoursToNextShift(int day);
         void UpdateStateOnMorningShiftAssign(MorningShift morningShift, DayNumbered day,
-            DepartamentSettings departamentSettings, IWorkTimeService workTimeService, bool shouldSwap);
-        void UpdateStateOnRegularShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
-        void UpdateStateOnShiftAssign(ShiftTypes shiftType, TimeSpan shiftLenght, DayNumbered day,
+        void UpdateStateOnRegularShiftAssign(ShiftIndex shiftIndex, DayNumbered day, 
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
-        void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day,
+        void UpdateStateOnTimeOffShiftAssign(ShiftIndex shiftIndex, DayNumbered day, 
             DepartamentSettings departamentSettings, IWorkTimeService workTimeService);
-        void ResetHoursFromLastShift();
+        void RecalculateFromPreviousAndToNextShift(int day);
     }
 }
